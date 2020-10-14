@@ -1,0 +1,230 @@
+
+body {
+  background: #f5f6fa;
+  font-family: 'Open Sans', sans-serif;
+  overflow: hidden;
+  margin: 0;
+}
+
+.index {
+  width: 100vw;
+  height: 100vh;
+}
+
+.navbar {
+  background: #2A3F54 !important;
+  padding-right: 50px;
+  padding-left: 50px;
+}
+
+.nav-link {
+  color: #fff !important;
+}
+
+.masthead {
+  color: white;
+  min-height: 30rem;
+  width: 100%;
+  height: 100%;
+  padding-top: 8rem;
+  padding-bottom: 8rem;
+  background: url('/img/background.jpeg');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.masthead h1 {
+  font-size: 4rem;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 992px) {
+  .masthead {
+    height: 100vh;
+  }
+  .masthead h1 {
+    font-size: 5.5rem;
+  }
+} 
+
+
+
+
+
+/*-----SIDEBAR-----*/
+
+.sidebar {
+position: absolute;
+width: 250px;
+height: 100%;	
+background: #2A3F54;
+color: #ECF0F1;
+outline: 1px solid #1e2d3b;
+}
+
+/*Título del Menú*/
+.sidebar h2 {
+text-align: center;
+margin: 0;
+background: #1e2d3b;
+padding: 13px;
+} 
+
+.sidebar ul {
+list-style: none;
+padding: 0;
+margin: 0;
+}
+
+ul.acorh,
+ul.acorh * {
+/* width: 250px;*/
+margin: 0;
+padding: 0;
+border: 0;
+}
+
+
+/*Diseño de las opcines de las tablas de sidebar*/
+ul.acorh li a {
+display: block;
+padding: 10px 10px 10px 20px;
+background: #2A3F54;
+color: #eee;
+border-bottom: 1px solid #1d2c3a;
+border-top: 1px solid #1d2c3a;
+text-decoration: none;
+box-sizing: border-box;
+}
+
+ul.acorh li ul {
+max-height: 0; /*Para que la tabla se esconda*/
+margin: 0;
+padding: 0;
+list-style: none;
+overflow: hidden;
+transition: 0.4s all ease-in;
+}
+
+/*Diseño de submenu*/
+ul.acorh li li a {
+padding: 10px 10px 10px 40px;
+background: #999;
+color: #000;
+font-size: 16px;
+border: 0;
+border-bottom: 1px solid #ccc;
+box-sizing: border-box;
+}
+
+/*Realiza la función para desplegar las tablas*/
+ul.acorc li li:last-child a {
+border-bottom: 0;
+}
+
+/*Realiza la función para desplegar las tablas*/
+ul.acorh li:hover ul {
+max-height: 300px;
+transition: 0.4s all ease-in;
+}
+
+/*Color de las tablas cuando se pasa el mouse por encima*/
+ul.acorh li a:hover {
+background: #666;
+color: #fff;
+}
+
+.sidebar .acorh .icono{
+font-size: 100 px;
+line-height: 78 px;  
+
+}
+
+.sidebar .acorh  .icono.derecha{
+float: right;
+margin-right: 10px;
+
+}
+
+.sidebar .acorh  .icono.izquierda{
+float: left;
+margin-right: 10px;
+}
+
+
+
+/*-----FIN SIDEBAR-----*/
+
+
+
+
+
+/*-----LOGIN-----*/
+
+.login {
+background-image: url(img/login.jpeg);
+background-repeat: no-repeat;
+background-size: cover;
+min-height: 40rem;
+padding-top: 1rem;
+width: 100%;
+height: 100%;
+background-position: center center;
+background-attachment: fixed;
+color: #fff;
+}
+.formulario{
+background: rgba(0,.0,.0,.2);
+padding: 20px;
+border-radius: 10px;
+box-shadow: 0 0 30px rgba(0,.0,.0,.0.568);
+color:white;
+
+}
+
+.form-control{
+background: rgba(0,.0,.0,.3);
+border-style: none;
+transition: 0.5s ease-in;
+outline: none;
+box-shadow: none;
+color:white;
+}
+
+.form-control:focus{
+background: none;
+box-shadow: none;
+outline: none;
+color:white;
+}
+
+.form-control::placeholder{
+color: white;
+}
+
+.ingresar{
+background: #222A3F;
+padding: 10px;
+font-size: 16px;
+font-weight: 700!important;
+color:white;
+box-shadow: 0 0 30px rgba(0,.0,.0,.0.568);
+transition: 0.5s ease-in;
+}
+
+.ingresar:hover{
+color: white;
+}
+
+
+.olvide {
+color: white;
+text-decoration-style: none;
+text-decoration-line: none;
+}
+
+
+/*-----FIN LOGIN-----*/
+

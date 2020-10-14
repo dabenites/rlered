@@ -34,7 +34,21 @@ const result = await pool.query('INSERT INTO links set ?', [newlink]);//InserciÃ
 
 router.get('/', isLoggedIn, async (req, res) => {
     const links = await pool.query('SELECT * FROM links WHERE user_id = ?', [req.user.id]);
-    res.render('links/list', { links }); //.hbs
+    const modulos = await pool.query('SELECT * FROM sys_modulo as t1, sys_grupo_modulo as t2 WHERE t1.sys_Grupo_modulo_idGrupo_modulo = t2.idGrupo_modulo');
+    const modulosHTML = {};
+    modulos.forEach(function(elemento, indice, array) {
+        if (modulosHTML[elemento.Nombre_Grupo] === undefined)
+        {
+            modulosHTML[elemento.Nombre_Grupo] = [];
+        }
+        if (modulosHTML[elemento.Nombre_Grupo]["modulos"] === undefined)
+        {
+            modulosHTML[elemento.Nombre_Grupo]["modulos"] = [];
+        }
+        modulosHTML[elemento.Nombre_Grupo]["modulos"].push(elemento.Descripcion);
+    });
+    console.log(modulosHTML);
+    res.render('links/list', { links , modulosHTML}); //.hbs
 });
 
 router.get('/delete/:id', async (req, res) => {

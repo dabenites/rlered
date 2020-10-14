@@ -27,7 +27,7 @@ router.get('/signin', isNotLoggeIn, (req, res ) => {
      
 
     passport.authenticate('local.signin',{
-      successRedirect: '/profile', // si todo se redirecciona bien me manda profile
+      successRedirect: '/dashboard', // si todo se redirecciona bien me manda profile
       failureRedirect: '/signin',// si todo sale mal que me mande a signin
       failureFlash: true
     })(req,res,next);

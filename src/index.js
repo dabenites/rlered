@@ -1,58 +1,77 @@
-const express = require('express'); 
+const express = require('express');
 const morgan = require('morgan');
+const path = require('path');
 const exphbs = require('express-handlebars');
-const path   = require('path');
-const flash = require('connect-flash');
 const session = require('express-session');
-const MySQLStore = require('express-mysql-session');
 
-const {database} = require('./keys');
-const { render } = require('timeago.js');
-// inicializamos el proyecto 
+//const validator = require('express-validator');
+const passport = require('passport');
+const flash = require('connect-flash');
+const MySQLStore = require('express-mysql-session')(session);
+const bodyParser = require('body-parser');
 
-const app = express(); // variable  que manejara la aplicación 
+const { database } = require('./keys');
 
-// Configuraciones 
-app.set('port', process.env.PORT || 4000); 
-app.set('views', path.join(__dirname,'views'));
-app.engine('.hbs',exphbs({
-    defaultLayout : 'main',
-    layoutsDir : path.join(app.get('views'), 'layouts'),
-    partialsDir : path.join(app.get('views'), 'partials'),
-    extname : '.hbs',
-    helpers : require('./lib/handlebars')
-}));
-app.set('view engine' , '.hbs');
 
+
+//Inicialización 
+const app = express();
+require('./lib/passport');
+
+// Settings
+app.set('port', process.env.PORT || 4000);
+// app.set('views', path.join("netoffice.herokuapp.com", 'views'));
+app.set('views', path.join(__dirname, 'views'));
+app.engine('.hbs', exphbs({
+  defaultLayout: 'main',
+  layoutsDir: path.join(app.get('views'), 'layouts'),
+  partialsDir: path.join(app.get('views'), 'partials'),
+  extname: '.hbs',
+  helpers: require('./lib/handlebars')
+}))
+app.set('view engine', '.hbs');
+
+
+// Middlewares
 app.use(session({
-    secret: 'faztmysqlnodemysql',
-    resave: false,
-    saveUninitialized: false,
-    store: new MySQLStore(database)
-  }));
+  secret: 'faztmysqlnodemysql',
+  resave: false,
+  saveUninitialized: false,
+  store: new MySQLStore(database)
+}));
 app.use(flash());
-app.use(morgan('dev')); // muestra por consulo lo que llega por servidor.
-app.use(express.urlencoded({extended : false}));
+app.use(morgan('dev'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+
+app.use(flash());
+app.use(morgan('dev'));
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(passport.initialize());
+app.use(passport.session());
 
 
-// Variables Globales
-app.use((req,res,next) => {
-    app.locals.success = req.flash('success');
-    next();
+//Variables globales 
+app.use((req, res, next) => {
+  app.locals.success = req.flash('success');
+  app.locals.message = req.flash('message');
+  app.locals.user = req.user;
+  next();
 });
 
-// RUTAS URLS DE NUESTRO SERVIDOR 
-app.use(require('./routes'));
+//Rutas
+app.use(require('./routes/index'));
 app.use(require('./routes/authentication'));
-app.use('/links', require('./routes/links')); // precede una ruta con el prefijo links
+app.use('/links', require('./routes/links'));
 
 
-// ARCHIVOS PUBLICOS PUBLIC 
+//Archivos publicos 
+// app.use(express.static(path.join("netoffice.herokuapp.com", 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-// COMENZAR EL SERVIDOR
-app.listen(app.get('port'), ()=> console.log('SERVER ON PORT' , app.get('port')));
-
-
+//Satart servidor 
+app.listen(app.get('port'), () => {
+  console.log('Server on port', app.get('port'));
+});

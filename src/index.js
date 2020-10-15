@@ -1,7 +1,7 @@
 const express = require('express');
-const morgan = require('morgan');
-const path = require('path');
-const exphbs = require('express-handlebars');
+const morgan  = require('morgan');
+const path    = require('path');
+const exphbs  = require('express-handlebars');
 const session = require('express-session');
 
 //const validator = require('express-validator');
@@ -44,11 +44,6 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-
-app.use(flash());
-app.use(morgan('dev'));
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -58,6 +53,7 @@ app.use((req, res, next) => {
   app.locals.success = req.flash('success');
   app.locals.message = req.flash('message');
   app.locals.user = req.user;
+  app.locals.modulos = req.modulos;
   next();
 });
 
@@ -65,6 +61,8 @@ app.use((req, res, next) => {
 app.use(require('./routes/index'));
 app.use(require('./routes/authentication'));
 app.use('/links', require('./routes/links'));
+app.use('/dashboard', require('./routes/dashboard'));
+app.use('/mantenedores', require('./routes/mantenedores'));
 
 
 //Archivos publicos 
@@ -73,5 +71,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Satart servidor 
 app.listen(app.get('port'), () => {
-  console.log('Server on port', app.get('port'));
+  //console.log('Server on port', app.get('port'));
 });
+

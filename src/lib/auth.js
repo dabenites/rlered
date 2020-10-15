@@ -3,7 +3,7 @@ module.exports = {  //exportara un objeto
         if (req.isAuthenticated()) { //Nos devulve un true o un false
             return next();
         }
-        return res.redirect('/signin');
+        return res.redirect('/signin2');
     },
     
     
@@ -12,7 +12,7 @@ module.exports = {  //exportara un objeto
             return next(); //retorna al siguiente
 
     }
-    return res.redirect('/profile');
+    return res.redirect('/dashboard');
     }
 
 }; 

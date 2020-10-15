@@ -18,10 +18,10 @@ function closeNav() {
 }
 </script> -->
     <div id="mySidenav" class="sidebar">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+       <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 			<ul class="acorh"> 
          {{#each modulosHTML}}    
-			    <li><a href="#"><i class="icono izquierda fa fa-home" aria-hidden="true"> </i> OPCIÓN 1 <i class="icono derecha fa fa-chevron-down" aria-hidden="true"></i></a>
+			    <li><a href="#"><i class="icono izquierda {{icono}}" aria-hidden="true"> </i> {{grupo}}<i class="icono derecha fa fa-chevron-down" aria-hidden="true"></i></a>
             <ul>
               {{#each modulos}}
                 <li><a href="{{aref}}"><i class="icono izquierda {{icon}}" aria-hidden="true"></i>  {{nombre}}</a></li>

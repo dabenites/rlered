@@ -11,8 +11,6 @@ passport.use('local.signin', new LocalStrategy({
   passReqToCallback: true
 }, async (req, username, password, done) => {
   const rows = await pool.query('SELECT * FROM sys_usuario as t0 , sys_password as t1 WHERE  t0.idUsuario = t1.idUsuario AND  login = ?', [username]);
-  //console.log('SELECT * FROM sys_usuario as t0 , sys_password as t1 WHERE  t0.idUsuario = t1.idUsuario AND  login = ?');
-  //console.log(username);
   if (rows.length > 0) {
     const user = rows[0];
     const validPassword = await helpers.matchPassword(password, user.password)
@@ -33,5 +31,30 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   const rows = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [id]);
+  const modulos = await pool.query('SELECT t1.*,t2.Nombre as grupoNombre , t2.icon as grupoIcon FROM sys_modulo as t1, sys_grupo_modulo as t2 WHERE t1.idGrupo = t2.idGrupo');
+  const modulosHTML = {};
+  modulos.forEach(function(elemento, indice, array) {
+      if (modulosHTML[elemento.grupoNombre] === undefined)
+      {
+          modulosHTML[elemento.grupoNombre] = [];
+          modulosHTML[elemento.grupoNombre]["grupo"] = elemento.grupoNombre;
+          modulosHTML[elemento.grupoNombre]["icono"] = elemento.grupoIcon;
+      }
+      if (modulosHTML[elemento.grupoNombre]["modulos"] === undefined)
+      {
+          modulosHTML[elemento.grupoNombre]["modulos"] = [];
+      }
+
+      const unMudulo ={ //Se gurdaran en un nuevo objeto
+          nombre : elemento.Nombre ,
+          icon : elemento.icon ,
+          aref : elemento.aref
+                      };
+
+      
+      modulosHTML[elemento.grupoNombre]["modulos"].push(unMudulo);
+  });
+  rows[0]["modulos"] = modulosHTML;
+  //console.log(rows[0]);
   done(null, rows[0]);
 });

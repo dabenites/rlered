@@ -18,17 +18,16 @@ router.post('/signup', isNotLoggeIn, passport.authenticate('local.signup',{
 
 // SIGNIN
 
-router.get('/signin', isNotLoggeIn, (req, res ) => { 
-    res.render('auth/signin.hbs'); //hbs
+router.get('/signin2', isNotLoggeIn, (req, res ) => { 
+    res.render('auth/signin2.hbs', {layout: 'mainLogin'}); //hbs
   });
 
 
-  router.post('/signin',isNotLoggeIn, (req,res,next) => { // para que no me muestre la vista de logeo si la lo estoy 
+router.post('/signin2',isNotLoggeIn, (req,res,next) => { // para que no me muestre la vista de logeo si la lo estoy 
      
-
     passport.authenticate('local.signin',{
       successRedirect: '/dashboard', // si todo se redirecciona bien me manda profile
-      failureRedirect: '/signin',// si todo sale mal que me mande a signin
+      failureRedirect: '/signin2',// si todo sale mal que me mande a signin
       failureFlash: true
     })(req,res,next);
   });
@@ -40,7 +39,7 @@ router.get('/signin', isNotLoggeIn, (req, res ) => {
 
   router.get('/logout',isLoggedIn, (req, res) => {
     req.logOut(); // una vez que ya no estare el usuario 
-    res.redirect('/signin'); // se redireccionara a esta vista
+    res.redirect('/signin2'); // se redireccionara a esta vista
   });
 
 

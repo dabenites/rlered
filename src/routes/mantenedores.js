@@ -6,33 +6,160 @@ const router = express.Router();
 const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
 
-router.get('/', isLoggedIn, async (req, res) => {
+router.get('/usuario', isLoggedIn, async (req, res) => {
+    res.render('mantenedores/creacionUsuarios', { req ,layout: 'template'});
+});
 
-    const modulos = await pool.query('SELECT t1.*,t2.Nombre as grupoNombre , t2.icon as grupoIcon FROM sys_modulo as t1, sys_grupo_modulo as t2 WHERE t1.idGrupo = t2.idGrupo');
-    const modulosHTML = {};
-    modulos.forEach(function(elemento, indice, array) {
-        if (modulosHTML[elemento.Nombre_Grupo] === undefined)
-        {
-            modulosHTML[elemento.Nombre_Grupo] = [];
-            modulosHTML[elemento.Nombre_Grupo]["grupo"] = elemento.grupoNombre;
-            modulosHTML[elemento.Nombre_Grupo]["icono"] = elemento.grupoIcon;
-        }
-        if (modulosHTML[elemento.Nombre_Grupo]["modulos"] === undefined)
-        {
-            modulosHTML[elemento.Nombre_Grupo]["modulos"] = [];
-        }
-
-        const unMudulo ={ //Se gurdaran en un nuevo objeto
-            nombre : elemento.Nombre ,
-            icon : elemento.icon ,
-            aref : elemento.aref
-                        };
-
-        
-        modulosHTML[elemento.Nombre_Grupo]["modulos"].push(unMudulo);
+router.get('/valoruf', isLoggedIn, async (req, res) => {
+    
+    var https = require('https');
+    https.get('https://mindicador.cl/api', function(res) {
+        res.setEncoding('utf-8');
+        var data = '';
+     
+        res.on('data', function(chunk) {
+            data += chunk;
+        });
+        res.on('end', function() {
+            var dailyIndicators = JSON.parse(data); // JSON to JavaScript object
+            //res.send('El valor actual de la UF es $' + dailyIndicators.uf.valor);
+            console.log('El valor actual de la UF es $' + dailyIndicators.uf.valor);
+        });
+     
+    }).on('error', function(err) {
+        console.log('Error al consumir la API!');
     });
-    res.render('mantenedores/creacionUsuarios', { modulosHTML , req ,layout: 'template'});
+
+
+    
+    res.render('mantenedores/valoruf', { req ,layout: 'template'});
+});
+
+
+router.get('/pais', isLoggedIn, async (req, res) => {
+    const paises = await pool.query('SELECT * FROM pais');
+    res.render('mantenedores/pais', { req ,paises, layout: 'template'});
+});
+
+
+
+router.post('/addPais', async (req,res) => {
+    const { name } = req.body; //Obtener datos title,url,description
+
+    const newPais  ={ //Se gurdaran en un nuevo objeto
+        pais : name 
+    };
+    //Guardar datos en la BD     
+    const result = await pool.query('INSERT INTO pais set ?', [newPais]);//Inserción
+    res.redirect('../mantenedores/pais');
 
 });
+
+router.post('/editPais', async (req,res) => {
+    const {  id, name } = req.body; //Obtener datos title,url,description
+
+    const newPais  ={ //Se gurdaran en un nuevo objeto
+        pais : name 
+    };
+    //Guardar datos en la BD     
+    await pool.query('UPDATE pais set ? WHERE id = ?', [newPais, id]);
+    res.redirect('../mantenedores/pais');
+
+});
+
+
+router.get('/pais/edit/:id', async (req, res) => {
+    const { id } = req.params;
+    const paises = await pool.query('SELECT * FROM pais');
+    const pais = await pool.query('SELECT * FROM pais WHERE id = ?', [id]);
+    res.render('mantenedores/pais', { req , paises, pais: pais[0], layout: 'template'});
+    
+});
+router.get('/pais/delete/:id', async (req, res) => {
+    const { id } = req.params;
+    
+    await pool.query('DELETE FROM pais WHERE ID = ?', [id]);
+    const paises = await pool.query('SELECT * FROM pais');
+    res.render('mantenedores/pais', { req ,paises, layout: 'template'});
+    
+});
+
+router.get('/centrocosto', isLoggedIn, async (req, res) => {
+    const centrosCostos = await pool.query('SELECT * FROM centro_costo');
+    res.render('mantenedores/centrocosto', { req ,centrosCostos, layout: 'template'});
+});
+
+router.post('/addCentroCosto', async (req,res) => {
+    const { name } = req.body; //Obtener datos title,url,description
+
+    const newCenctroCosto  ={ //Se gurdaran en un nuevo objeto
+        centroCosto : name 
+    };
+    //Guardar datos en la BD     
+    const result = await pool.query('INSERT INTO centro_costo set ?', [newCenctroCosto]);//Inserción
+    res.redirect('../mantenedores/centrocosto');
+
+});
+router.get('/centrocosto/edit/:id', async (req, res) => {
+    const { id } = req.params;
+    const centrosCostos = await pool.query('SELECT * FROM centro_costo');
+    const centro = await pool.query('SELECT * FROM centro_costo WHERE id = ?', [id]);
+    //console.log(centro);
+    
+    res.render('mantenedores/centrocosto', { req , centrosCostos, centro: centro[0], layout: 'template'});
+    
+});
+router.post('/editCentroCosto', async (req,res) => {
+    const {  id, name } = req.body; //Obtener datos title,url,description
+
+    const newCentroCosto  ={ //Se gurdaran en un nuevo objeto
+        centroCosto : name 
+    };
+    //Guardar datos en la BD     
+    await pool.query('UPDATE centro_costo set ? WHERE id = ?', [newCentroCosto, id]);
+    res.redirect('../mantenedores/centrocosto');
+
+});
+
+
+router.get('/categoria', isLoggedIn, async (req, res) => {
+    const categorias = await pool.query('SELECT * FROM categorias as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id');
+    const centrosCostos = await pool.query('SELECT * FROM centro_costo');
+    const isEqualHelperHandlerbar = function(a, b, opts) {
+        if (a == b) {
+            return true
+        } else { 
+            return false
+        } 
+    };
+    //console.log(centrosCostos);
+    res.render('mantenedores/categoria', { req ,categorias,centrosCostos, layout: 'template', helpers : {
+        if_equal : isEqualHelperHandlerbar
+    }});
+});
+
+router.get('/categoria/edit/:id', async (req, res) => {
+    const { id } = req.params;
+    const categorias = await pool.query('SELECT * FROM categorias as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id');
+    const centrosCostos = await pool.query('SELECT * FROM centro_costo');
+    const categoria = await pool.query('SELECT * FROM categorias WHERE id = ?', [id]);
+    console.log(categoria[0]);
+    const isEqualHelperHandlerbar = function(a, b, opts) {
+        console.log(a + "----" + b);
+        if (a == b) {
+            return true
+        } else { 
+            return false
+        } 
+    };
+    
+    res.render('mantenedores/categoria', { req , categorias, centrosCostos, categoria: categoria[0], 
+                                           layout: 'template', helpers : {
+                                            if_equal : isEqualHelperHandlerbar
+                                        }});
+    
+});
+
+
 
 module.exports = router;

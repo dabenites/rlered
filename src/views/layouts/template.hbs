@@ -10,11 +10,11 @@
     <title> TITULO APPS | </title>
 
     <!-- Bootstrap -->
-    <link href="template/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../template/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="template/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../../template/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- Custom Theme Style -->
-    <link href="template/vendors/build/css/custom.min.css" rel="stylesheet">
+    <link href="../../../template/vendors/build/css/custom.min.css" rel="stylesheet">
   </head>
 
   <body class="nav-md">
@@ -29,7 +29,7 @@
             <!-- sidebar menu -->
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
-                <h3>General</h3>
+                <h3>Modulos</h3>
                 <ul class="nav side-menu">
                     {{#each req.user.modulos}}
                         <li>
@@ -58,7 +58,7 @@
               <ul class=" navbar-right">
                 <li class="nav-item dropdown open" style="padding-left: 15px;">
                   <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="img/img.jpg" alt="">{{{req.user.NombreCompleto}}} 
+                    <img src="../../../img/img.jpg" alt="">{{{req.user.NombreCompleto}}} 
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item"  href="javascript:;"> Profile</a>
@@ -91,12 +91,12 @@
     </div>
 
     <!-- jQuery -->
-    <script src="template/vendors/jquery/dist/jquery.min.js"></script>
+    <script src="../../../template/vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
-    <script src="template/vendors/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../../template/vendors/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Custom Theme Scripts -->
-    <script src="template/vendors/build/js/custom.min.js"></script>
+    <script src="../../../template/vendors/build/js/custom.min.js"></script>
 	
   </body>
 </html>

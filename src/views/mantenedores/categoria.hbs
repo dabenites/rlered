@@ -1,0 +1,120 @@
+              <div class="col-md-6 col-sm-6  ">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Categorias<small>Las categoria son para agrupar al personal</small></h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Centro Costo</th>
+                          <th>Nombre</th>
+                          <th>Opciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                           {{#if categoria }}
+                                {{#each categorias}}
+                                    <tr > 
+                                        <th scope="row">{{id}}</th>
+                                        <td>{{centroCosto}}</td>
+                                        <td>{{categoria}}</td>
+                                        <td style="padding: .15rem;">
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="../../categoria/delete/{{id}}">
+                                                Borrar 
+                                            </a>
+                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs" href="../../categoria/edit/{{id}}">
+                                                Editar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{/each}} 
+                           {{else}}
+                                {{#each categorias}}
+                                    <tr > 
+                                        <th scope="row">{{id}}</th>
+                                        <td>{{centroCosto}}</td>
+                                        <td>{{categoria}}</td>
+                                        <td style="padding: .15rem;">
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="categoria/delete/{{id}}">
+                                                Borrar 
+                                            </a>
+                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs" href="categoria/edit/{{id}}">
+                                                Editar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{/each}} 
+                            {{/if}}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+    <div class="col-md-6 ">
+        					<div class="x_panel">
+								<div class="x_title">
+                                      {{#if categoria }}
+                                        <h2>Actualizar Categoria <small>{{categoria.categoria}}</small></h2>
+                                      {{else}}
+                                        <h2>Registrar Categoria <small>Se podra seleccionar la categoria al momento de ingresar un usuario</small></h2>
+                                      {{/if}}
+									
+									<div class="clearfix"></div>
+								</div>
+								<div class="x_content">
+
+									<!-- start form for validation -->
+                                    {{#if categoria }}
+                                        <form id="demo-form" data-parsley-validate action="/mantenedores/categoria" method="POST">
+                                    {{else}}
+                                        <form id="demo-form" data-parsley-validate action="/mantenedores/categoria" method="POST">
+                                    {{/if}}
+									
+                                    {{#if categoria }}
+                                        <label for="ID Categoria">Id Categoria* :</label>
+										<input type="text" id="id" class="form-control" value="{{categoria.id}}" name="id" readonly />
+                                    {{/if}}
+										<label for="Nombre Categoria">Nombre Categoria * :</label>
+										<input type="text" id="name" class="form-control" value="{{categoria.categoria}}" name="name" required />
+                                        <label for="Nombre Categoria">Centro Costo* :</label>
+										<!-- <input type="text" id="name" class="form-control" value="{{categoria.categoria}}" name="name" required /> -->
+                                        <select class="form-control" name="idCentroCosto">
+                                             {{#if categoria }}
+                                                    {{#each centrosCostos}}
+                                                        {{#if (if_equal id @categoria) }}
+                                                            <option value="{{id}}" selected>{{centroCosto}}</option>
+                                                        {{else}}
+                                                            <option value="{{id}}">{{centroCosto}}</option>
+                                                        {{/if}}
+													    
+                                                     {{/each}} 
+                                             {{else}}
+                                             <option>Seleccione una opcion</option>
+                                                     {{#each centrosCostos}}
+													    
+                                                     {{/each}} 
+                                              {{/if}}
+										</select>
+                                         <label for="Valor HH"> Valor HH :</label>
+                                         <input type="text" id="valorhh" class="form-control" value="{{categoria.valorHH}}" name="valorhh" required />
+									<br />
+                                    {{#if categoria }}
+                                     <button  type="submit" class="btn btn-warning btn-block">
+                                                Actualizar
+                                    </button>
+                                    {{else}}
+                                    <button  type="submit" onvolumechange=""class="btn btn-success btn-block">
+                                                Ingresar
+                                            </button>
+                                    {{/if}}
+									    
+
+									</form>
+									<!-- end form for validations -->
+
+								</div>
+							</div>
+    </div>

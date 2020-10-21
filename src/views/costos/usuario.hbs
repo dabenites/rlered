@@ -1,0 +1,72 @@
+							<div class="x_panel">
+								<div class="x_title">
+									<h2>Costos Usuario<small>Los costos seran por mes</small></h2>
+									<div class="clearfix"></div>
+								</div>
+								<div class="x_content">
+									<br />
+									<form class="form-label-left input_mask" action="/costos/usuario" method="GET">
+										<div class="form-group row">
+                                            <div class="col-md-1 col-sm-1 "></div>
+											<label class="col-form-label col-md-1 col-sm-1 label-align">Año</label>
+                                                <div class="col-md-2 col-sm-2 ">
+                                                    <select id="anio" name="anio" class="form-control" required>
+                                                         {{#each annios}}
+                                                            <option value="{{this}}">{{this}}</option>
+                                                         {{/each}} 
+                                                    </select>
+                                                </div>
+                                                <label class="col-form-label col-md-1 col-sm-1 label-align">Mes</label>
+                                                <div class="col-md-2 col-sm-2 ">
+                                                    <select id="mes" name="mes" class="form-control" required>
+                                                        {{#each messes}}
+                                                                {{#if actual}}
+                                                                    <option value="{{id}}" selected>{{nombre}}</option>
+                                                                {{else}}
+                                                                    <option value="{{id}}">{{nombre}}</option>
+                                                                {{/if}}
+                                                                
+                                                        {{/each}} 
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3 col-sm-3 ">
+												    <button type="submit" class="btn btn-primary">Revisar</button>
+												    <button type="button" class="btn btn-success">Cargar</button>
+											    </div>
+                                            <div class="col-md-1 col-sm-1 "></div>
+										</div>
+										<div class="ln_solid"></div>
+									</form>
+								</div>
+							</div>
+               <div class="x_panel">
+						<div class="x_content">
+							<br />
+							<form class="form-horizontal form-label-left">
+							</form>
+						</div>
+                        <table class="table table-hover" id="example" class="display">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Nombre</th>
+                                    <th>Centro Costo</th>
+                                    <th>Categoria</th>
+                                    <th>Sucursal</th>
+                                    <th>Costo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each costos}}
+                                <tr>
+                                    <th>{{idUsuario}}</th>
+                                    <td>centro costo</td>
+                                    <td>{{Nombre}}</td>
+                                    <td>{{idCategoria}}</td>
+                                    <td>{{idSucursal}}</td>
+                                    <td>{{costo}}</td>
+                                </tr>
+                                {{/each}} 
+                            </tbody>
+                    </table>
+				</div>

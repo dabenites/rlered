@@ -63,6 +63,7 @@ app.use(require('./routes/authentication'));
 app.use('/links', require('./routes/links'));
 app.use('/dashboard', require('./routes/dashboard'));
 app.use('/mantenedores', require('./routes/mantenedores'));
+app.use('/costos', require('./routes/costos'));
 //app.use('/mantenedores/usuario', require('./routes/mantenedores'));
 
 

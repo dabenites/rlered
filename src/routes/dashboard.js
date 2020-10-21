@@ -8,6 +8,7 @@ const { isLoggedIn } = require('../lib/auth');
 
 router.get('/', isLoggedIn, async (req, res) => {
     
+    /*
     switch(req.user.idCategoria)
     {
         case 1: 
@@ -19,8 +20,8 @@ router.get('/', isLoggedIn, async (req, res) => {
         default:
         break;
     }
-    
-  
+    */
+   res.render('dashboard/idi', { req ,layout: 'template'});
 });
 
 module.exports = router;

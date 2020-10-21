@@ -11,6 +11,7 @@
                           <th>ID</th>
                           <th>Centro Costo</th>
                           <th>Nombre</th>
+                          <th>Valor HH</th>
                           <th>Opciones</th>
                         </tr>
                       </thead>
@@ -21,6 +22,7 @@
                                         <th scope="row">{{id}}</th>
                                         <td>{{centroCosto}}</td>
                                         <td>{{categoria}}</td>
+                                        <td>{{valorHH}}</td>
                                         <td style="padding: .15rem;">
                                             <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="../../categoria/delete/{{id}}">
                                                 Borrar 
@@ -37,6 +39,7 @@
                                         <th scope="row">{{id}}</th>
                                         <td>{{centroCosto}}</td>
                                         <td>{{categoria}}</td>
+                                        <td>{{valorHH}}</td>
                                         <td style="padding: .15rem;">
                                             <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="categoria/delete/{{id}}">
                                                 Borrar 
@@ -68,9 +71,9 @@
 
 									<!-- start form for validation -->
                                     {{#if categoria }}
-                                        <form id="demo-form" data-parsley-validate action="/mantenedores/categoria" method="POST">
+                                        <form id="demo-form" data-parsley-validate action="/mantenedores/editCategoria" method="POST">
                                     {{else}}
-                                        <form id="demo-form" data-parsley-validate action="/mantenedores/categoria" method="POST">
+                                        <form id="demo-form" data-parsley-validate action="/mantenedores/eddCategoria" method="POST">
                                     {{/if}}
 									
                                     {{#if categoria }}
@@ -84,7 +87,7 @@
                                         <select class="form-control" name="idCentroCosto">
                                              {{#if categoria }}
                                                     {{#each centrosCostos}}
-                                                        {{#if (if_equal id @categoria) }}
+                                                        {{#if (if_equal id ../categoria.idCentroCosto) }}
                                                             <option value="{{id}}" selected>{{centroCosto}}</option>
                                                         {{else}}
                                                             <option value="{{id}}">{{centroCosto}}</option>
@@ -94,7 +97,7 @@
                                              {{else}}
                                              <option>Seleccione una opcion</option>
                                                      {{#each centrosCostos}}
-													    
+													     <option value="{{id}}">{{centroCosto}}</option>
                                                      {{/each}} 
                                               {{/if}}
 										</select>

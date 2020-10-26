@@ -1,0 +1,53 @@
+<!--LISTAR-->
+<div class="col-md-12 col-sm-12 ">
+     <div class="x_panel">
+       <div class="x_title">
+            <h2>Listar Usuarios<small></small></h2>
+		        <ul class="nav navbar-right panel_toolbox">
+			        <td style="text-align: right;width:220px">
+        	            <a style="padding: .50rem;" type="button" class="btn btn-info"  href="/mantenedores/usuario/crear">Crear usuarios</a>
+			        </td>
+		        </ul>
+                <div class="clearfix"></div>
+       </div>
+       <div class="x_content">
+            <table class="table table-hover">
+                    <thead>
+                        <tr>
+			            <th>ID</th> 
+                        <th>Nombre completo</th>
+                        <th>E-mail</th>
+                        <th>Teléfono</th>
+                        <th>Nombre usuario</th>	
+                        <th>Categoría</th>
+                        <th>Sucursal</t>
+			            <th>Opciones</th>						  						  					  		  						  					  
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {{#each usuarios}}
+                    <tr>
+                        <th scope="row">{{idUsuario}}</th>
+                        <td>{{NombreCompleto}}</td>
+                        <td>{{Email}}</td>
+                        <td>{{Telefono}}</td>
+                        <td>{{login}}</td>
+                        <td>{{categoria}}</td>                                                        
+                        <td>{{direccion}}</td>
+                        <td style="padding: .15rem;">                                          
+                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"href="usuario/delete/{{idUsuario}}">
+                                Borrar
+                            </a>
+                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"href="usuario/editar/{{idUsuario}}">
+                                Editar
+                            </a>
+                            <a style="padding: .25rem;" type="button" class="btn btn-warning btn-xs"href="usuario/permisos/{{idUsuario}}">
+                                Permisos
+                            </a>
+                        </td>
+                    </tr>
+                    {{/each}}
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,14 +1,173 @@
 const express = require('express');
 const { render } = require('timeago.js');
 const router = express.Router();
+const bodyParser = require('body-parser');
 
 //importar una conexión a DB
 const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
+const { chdir } = require('process');
+
+router.get('/sucursal', isLoggedIn, async (req, res) => {
+    const paises = await pool.query("SELECT * FROM pais");
+    const sucursales = await pool.query("SELECT t1.*, t2.pais FROM sys_sucursal as t1, pais as t2 where t1.id_pais = t2.id");
+
+    res.render('mantenedores/sucursal', { paises , sucursales, req ,layout: 'template'});
+}); 
 
 router.get('/usuario', isLoggedIn, async (req, res) => {
-    res.render('mantenedores/creacionUsuarios', { req ,layout: 'template'});
+    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
+    res.render('mantenedores/usuarios', { usuarios, req ,layout: 'template'});
 }); 
+
+router.get('/usuario/editar/:id', isLoggedIn, async (req, res) => {
+    const { id } = req.params;
+    //console.log(req.params);
+    const usuarios = await pool.query('SELECT * FROM sys_usuario');
+    const usuario = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [id]);
+    const categoria = await pool.query('SELECT * FROM sys_categoria');
+    const sucursal = await pool.query('SELECT * FROM sys_sucursal');
+
+    const isEqualHelperHandlerbar = function(a, b, opts) {
+         if (a == b) {
+             return true
+         } else { 
+             return false
+         } 
+     };
+     console.log(usuario);
+    res.render('mantenedores/editarUsuario', { req , usuarios,categoria,sucursal, usuario: usuario[0], layout: 'template', helpers : {
+        if_equal : isEqualHelperHandlerbar
+    }});
+}); 
+
+router.get('/usuario/crear/', isLoggedIn, async (req, res) => {
+    const usuarios = await pool.query('SELECT * FROM sys_usuario');
+    const categoria = await pool.query('SELECT * FROM sys_categoria');
+    const sucursal = await pool.query('SELECT * FROM sys_sucursal');
+    
+    res.render('mantenedores/crearUsuario', { req ,usuarios,categoria,sucursal, layout: 'template'});
+});
+
+
+router.post('/editarUsuarios', async (req, res) => {
+    const { idUsuario,Nombre,NombreCompleto,Email,Telefono,login,idCategoria,idSucursal,aPaterno,aMaterno,
+    pNombre,sNombre,titulo } = req.body;
+
+   const newUsario  ={ //Se gurdaran en un nuevo objeto
+    Nombre:Nombre,
+    NombreCompleto:NombreCompleto,
+    Email:Email,
+    Telefono:Telefono,
+    login:login,
+    idCategoria:idCategoria,
+    idSucursal:idSucursal ,
+    aPaterno:aPaterno,
+    aMaterno:aMaterno,
+    pNombre:pNombre,
+    sNombre :sNombre,
+    titulo:titulo
+};
+
+    //console.log(req.body);
+   const result = await pool.query('UPDATE sys_usuario set ? WHERE idUsuario = ?', [newUsario, idUsuario]);
+   res.redirect('/mantenedores/usuario');
+
+});
+
+router.post('/addUsuario', async (req, res) => {
+    const { Nombre,NombreCompleto,Email,Telefono,login,idCategoria,idSucursal,aPaterno,aMaterno,
+    pNombre,sNombre,titulo } = req.body;
+
+   const newUsario  ={ //Se gurdaran en un nuevo objeto
+    Nombre:Nombre,
+    NombreCompleto:NombreCompleto,
+    Email:Email,
+    Telefono:Telefono,
+    login:login,
+    idCategoria:idCategoria,
+    idSucursal:idSucursal ,
+    aPaterno:aPaterno,
+    aMaterno:aMaterno,
+    pNombre:pNombre,
+    sNombre :sNombre,
+    titulo:titulo
+};
+
+    console.log(req.body);
+   const result = await pool.query('INSERT INTO sys_usuario set ? ', [newUsario]);
+   res.redirect('/mantenedores/usuario');
+
+});
+
+
+router.get('/usuario/delete/:id', async (req, res) => {
+    const { id } = req.params;
+    
+    await pool.query('DELETE FROM sys_usuario WHERE idUsuario = ?', [id]);
+    res.redirect('/mantenedores/usuario');
+    
+});
+
+router.get('/usuario/permisos/:id', async (req, res) => {
+    const { id } = req.params;
+    const usuario = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [id]);
+
+    //const permisos = await pool.query("SELECT t1.*, t2.Nombre AS nomGrupo FROM sys_modulo AS t1, sys_grupo_modulo AS t2 WHERE t1.idGrupo = t2.idGrupo");
+
+    var query = "SELECT t1.*, t2.Nombre AS nomGrupo, if (t3.idPermiso > 0,1,0) AS estado " +
+                " FROM sys_grupo_modulo AS t2 , sys_modulo AS t1 " +
+                " LEFT JOIN sys_permiso AS t3 ON t3.idUsuario = "+ id +" AND t3.idModulo = t1.idModulo   WHERE t1.idGrupo = t2.idGrupo ";
+    
+    const permisos = await pool.query(query);
+
+    const isEqualHelperHandlerbar = function(a, b, opts) {
+        // console.log(a + "----" + b);
+         if (a == b) {
+             return true
+         } else { 
+             return false
+         } 
+     };
+
+    res.render('mantenedores/permisos', { permisos, usuario: usuario[0],req ,layout: 'template', helpers : {
+        if_equal : isEqualHelperHandlerbar
+    }});
+
+});
+
+router.post('/usuario/permisos', async (req,res) => {
+    //console.log(req.body.items);
+    
+    //console.log(res.json(req.body));
+    var parametros = JSON.stringify(req.body);
+    var informacion = parametros.split(',');
+    
+    var permisosUsuario = [];
+    var idUsuario = 0;
+    informacion.forEach(element => {
+        var datos = element.split(':');
+        var especificos = datos[0].split('_');
+        //permisosUsuario.push(datos[1]);
+        idUsuario = especificos[2].replace(/["']/g, "");
+        const permiso = {
+            idUsuario : idUsuario,
+            idModulo  : especificos[1]
+        }
+        permisosUsuario.push(permiso);
+    });
+
+   // console.log(permisosUsuario);
+    const borrar = pool.query(' DELETE FROM  sys_permiso WHERE  idUsuario = ?', [idUsuario]); 
+    permisosUsuario.forEach(permiso => {
+    const result = pool.query('INSERT INTO  sys_permiso set ?', [permiso]);
+    });
+
+    res.redirect('/mantenedores/usuario');
+
+});
+
+
 
 router.post('/actualizarUF', isLoggedIn, async (req, ress) => {
     const { year } = req.body; 
@@ -45,7 +204,7 @@ router.post('/actualizarUF', isLoggedIn, async (req, ress) => {
                                 fecha_valor : dateFormat(informacion.serie[i].fecha,"yyyy-mm-dd"),
                                 valor : informacion.serie[i].valor
                             };
-                            const result = pool.query('INSERT INTO moneda_valor set ?', [newValor]);
+                            const result = pool.query('INSERT INTO INTO moneda_valor set ?', [newValor]);
                         }
               }
             ress.redirect('../mantenedores/valoruf');
@@ -54,8 +213,6 @@ router.post('/actualizarUF', isLoggedIn, async (req, ress) => {
     }).on('error', function(err) {
         console.log('Error al consumir la API!' + err.message);
     });
-
-
 }); 
 
 router.get('/valoruf', isLoggedIn, async (req, ress) => {
@@ -247,7 +404,7 @@ router.get('/categoria/edit/:id', async (req, res) => {
     const categorias = await pool.query('SELECT * FROM categorias as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id');
     const centrosCostos = await pool.query('SELECT * FROM centro_costo');
     const categoria = await pool.query('SELECT * FROM categorias WHERE id = ?', [id]);
-    console.log(categoria[0]);
+    //console.log(categoria[0]);
     const isEqualHelperHandlerbar = function(a, b, opts) {
        // console.log(a + "----" + b);
         if (a == b) {
@@ -296,5 +453,55 @@ router.get('/categoria/delete/:id', async (req, res) => {
     await pool.query('DELETE FROM categorias WHERE ID = ?', [id]);
     res.redirect('/mantenedores/categoria');
 });
+
+
+router.post('/addSucursal', async (req,res) => {
+    const {  id_pais, direccion , fono } = req.body;//Obtener datos title,url,description
+
+    const newSucursal  ={ //Se gurdaran en un nuevo objeto
+        id_pais : id_pais,
+        direccion : direccion,
+        fono : fono
+    };
+    //Guardar datos en la BD     
+    const result = await pool.query('INSERT INTO sys_sucursal set ?', [newSucursal]);//Inserción
+    res.redirect('../mantenedores/sucursal');
+
+});
+
+router.get('/sucursal/edit/:id', async (req, res) => {
+    const { id } = req.params;
+    const paises = await pool.query("SELECT * FROM pais");
+    const sucursales = await pool.query("SELECT t1.*, t2.pais FROM sys_sucursal as t1, pais as t2 where t1.id_pais = t2.id");
+    const sucursal = await pool.query("SELECT t1.*, t2.pais FROM sys_sucursal as t1, pais as t2 where t1.id_pais = t2.id AND t1.id_Sucursal = ?", [id]);
+    const isEqualHelperHandlerbar = function(a, b, opts) {
+        // console.log(a + "----" + b);
+         if (a == b) {
+             return true
+         } else { 
+             return false
+         } 
+     };
+    res.render('mantenedores/sucursal', { paises , sucursales, sucursal: sucursal[0], req ,layout: 'template', 
+                                helpers : {
+                                            if_equal : isEqualHelperHandlerbar
+                                        }});
+    
+});
+
+router.post('/editSucursal', async (req,res) => {
+    const {  id, id_pais , direccion , fono} = req.body; //Obtener datos title,url,description
+
+    const newSucursal  ={ //Se gurdaran en un nuevo objeto
+        id_pais : id_pais,
+        direccion : direccion,
+        fono : fono
+    };
+    //Guardar datos en la BD     
+    await pool.query('UPDATE sys_sucursal set ? WHERE id_Sucursal = ?', [newSucursal, id]);
+    res.redirect('../mantenedores/sucursal');
+
+});
+
 
 module.exports = router;

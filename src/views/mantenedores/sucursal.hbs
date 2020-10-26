@@ -1,0 +1,128 @@
+              <div class="col-md-7 col-sm-7  ">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Sucursales<small>Sucursales Rene lagos engineers</small></h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Pais</th>
+                          <th>Fono</th>
+                          <th>Direccion</th>
+                          <th>Opciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                           {{#if sucursal }}
+                                {{#each sucursales}}
+                                    <tr > 
+                                        <th scope="row">{{id_Sucursal}}</th>
+                                        <td>{{pais}}</td>
+                                        <td>{{fono}}</td>
+                                        <td>{{direccion}}</td>
+                                        <td style="padding: .15rem;">
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="../../sucursal/delete/{{id_Sucursal}}">
+                                                Borrar 
+                                            </a>
+                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs" href="../../sucursal/edit/{{id_Sucursal}}">
+                                                Editar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{/each}} 
+                           {{else}}
+                                {{#each sucursales}}
+                                    <tr > 
+                                        <th scope="row">{{id_Sucursal}}</th>
+                                        <td>{{pais}}</td>
+                                        <td>{{fono}}</td>
+                                        <td>{{direccion}}</td>
+                                        <td style="padding: .15rem;">
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="sucursal/delete/{{id_Sucursal}}">
+                                                Borrar 
+                                            </a>
+                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs" href="sucursal/edit/{{id_Sucursal}}">
+                                                Editar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{/each}} 
+                            {{/if}}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+    <div class="col-md-5 ">
+        					<div class="x_panel">
+								<div class="x_title">
+                                      {{#if sucursal }}
+                                        <h2>Actualizar Centro Costo <small>{{centro.centroCosto}}</small></h2>
+                                      {{else}}
+                                        <h2>Registrar Sucursal <small>Se podra seleccionar una sucursal al momento de registrar un usuario</small></h2>
+                                      {{/if}}
+									
+									<div class="clearfix"></div>
+								</div>
+								<div class="x_content">
+
+									<!-- start form for validation -->
+                                    {{#if sucursal }}
+                                        <form id="demo-form" data-parsley-validate action="/mantenedores/editSucursal" method="POST">
+                                    {{else}}
+                                        <form id="demo-form" data-parsley-validate action="/mantenedores/addSucursal" method="POST">
+                                    {{/if}}
+									
+                                    {{#if sucursal}}
+                                        <label for="ID Centro">Id Sucursal* :</label>
+										<input type="text" id="id" class="form-control" value="{{sucursal.id_Sucursal}}" name="id" readonly />
+                                    {{/if}}
+
+                                    <label for="Nombre Categoria">Pais * :</label>
+                                    <select class="form-control" name="id_pais">
+                                             {{#if sucursal }}
+                                                    {{#each paises}}
+                                                        {{#if (if_equal id ../sucursal.id_pais) }}
+                                                            <option value="{{id}}" selected>{{pais}}</option>
+                                                        {{else}}
+                                                            <option value="{{id}}">{{pais}}</option>
+                                                        {{/if}}
+													    
+                                                     {{/each}} 
+                                             {{else}}
+                                             <option>Seleccione una opcion</option>
+                                                     {{#each paises}}
+													     <option value="{{id}}">{{pais}}</option>
+                                                     {{/each}} 
+                                              {{/if}}
+									</select>
+
+									<label for="Nombre Centro Costo">Direccion * :</label>
+									<input type="text" id="direccion" class="form-control" value="{{sucursal.direccion}}" name="direccion" required />
+
+                                    <label for="Nombre Centro Costo">Fono * :</label>
+									<input type="text" id="fono" class="form-control" value="{{sucursal.fono}}" name="fono" required />
+
+
+									<br />
+                                    {{#if sucursal }}
+                                     <button  type="submit" class="btn btn-warning btn-block">
+                                                Actualizar
+                                    </button>
+                                    {{else}}
+                                    <button  type="submit" onvolumechange=""class="btn btn-success btn-block">
+                                                Ingresar
+                                    </button>
+                                    {{/if}}
+									    
+
+									</form>
+									<!-- end form for validations -->
+
+								</div>
+							</div>
+    </div>              

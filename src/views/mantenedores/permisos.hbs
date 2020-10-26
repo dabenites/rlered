@@ -1,0 +1,43 @@
+<div class="col-md-6 col-sm-6  ">
+    <div class="x_panel">
+        <div class="x_title">
+                    <h2>Permisos Usuario<small>{{usuario.nombre}}</small></h2>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+                    <form id="demo-form" data-parsley-validate action="/mantenedores/usuario/permisos" method="POST">
+                   <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Grupo</th>
+                          <th>Modulo</th>
+                          <th>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          
+                                {{#each permisos}}
+                                    <tr > 
+                                        <th scope="row">{{idModulo}}</th>
+                                        <td>{{nomGrupo}}</td>
+                                        <td>{{Nombre}}</td>
+                                        <td>
+                                            {{#if (if_equal estado 1) }}
+                                                <input type="checkbox" class="js-switch" name="estado_{{idModulo}}_{{../usuario.idUsuario}}" checked/>
+                                            {{else}}
+                                                <input type="checkbox" class="js-switch" name="estado_{{idModulo}}_{{../usuario.idUsuario}}" />
+                                            {{/if}}
+                                            
+                                        </td>
+                                    </tr>
+                                {{/each}} 
+                      </tbody>
+                    </table>
+                    <button  type="submit" class="btn btn-success btn-block">
+                                                Ingresar
+                                            </button>
+                        </form>
+        </div>
+    </div>
+</div>

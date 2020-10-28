@@ -8,6 +8,7 @@ const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
 const { chdir } = require('process');
 
+
 router.get('/sucursal', isLoggedIn, async (req, res) => {
     const paises = await pool.query("SELECT * FROM pais");
     const sucursales = await pool.query("SELECT t1.*, t2.pais FROM sys_sucursal as t1, pais as t2 where t1.id_pais = t2.id");
@@ -15,10 +16,12 @@ router.get('/sucursal', isLoggedIn, async (req, res) => {
     res.render('mantenedores/sucursal', { paises , sucursales, req ,layout: 'template'});
 }); 
 
+
 router.get('/usuario', isLoggedIn, async (req, res) => {
     const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
     res.render('mantenedores/usuarios', { usuarios, req ,layout: 'template'});
 }); 
+
 
 router.get('/usuario/editar/:id', isLoggedIn, async (req, res) => {
     const { id } = req.params;
@@ -40,6 +43,7 @@ router.get('/usuario/editar/:id', isLoggedIn, async (req, res) => {
         if_equal : isEqualHelperHandlerbar
     }});
 }); 
+
 
 router.get('/usuario/crear/', isLoggedIn, async (req, res) => {
     const usuarios = await pool.query('SELECT * FROM sys_usuario');
@@ -777,6 +781,145 @@ router.get('/sucursal/delete/:id', async (req, res) => {
     //console.log(verToask);
     res.render('mantenedores/sucursal', { verToask, req ,sucursales,layout: 'template'});
 })
+
+
+
+
+
+
+router.get('/tipoProyecto', isLoggedIn, async (req, res) => {
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+    res.render('mantenedores/tipoProyecto', { req ,proyectos, layout: 'template'});
+});
+
+
+router.post('/addTipoProyecto', async (req,res) => {
+    const { id, descripcion } = req.body; //Obtener datos title,url,description
+
+    const newProyecto  ={ //Se gurdaran en un nuevo objeto
+        id: id,
+        descripcion : descripcion 
+    };
+
+    //Guardar datos en la BD     
+    const result = await pool.query('INSERT INTO proyecto_tipo set ?', [newProyecto]);//Inserción
+    //res.redirect('../mantenedores/pais');
+
+
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+    //console.log(usuarios);
+
+    
+    const verToask = {
+        titulo : descripcion,
+        body   : "Se ha creado correctamente",
+        tipo   : "Crear"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/tipoProyecto', { verToask, req ,proyectos,layout: 'template'});
+
+})
+
+
+/* AGREGAR */
+router.get('/tipoProyecto', isLoggedIn, async (req, res) => {
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+    res.render('mantenedores/tipoProyecto', { req ,proyectos, layout: 'template'});
+});
+
+/* AGREGAR PROYECTO FUNCIONA*/
+router.post('/addTipoProyecto', async (req,res) => {
+    const { id, descripcion } = req.body; //Obtener datos title,url,description
+
+    const newProyecto  ={ //Se gurdaran en un nuevo objeto
+        id: id,
+        descripcion : descripcion 
+    };
+
+    //Guardar datos en la BD     
+    const result = await pool.query('INSERT INTO proyecto_tipo set ?', [newProyecto]);//Inserción
+    //res.redirect('../mantenedores/pais');
+
+
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+    //console.log(usuarios);
+
+    
+    const verToask = {
+        titulo : descripcion,
+        body   : "Se ha creado correctamente",
+        tipo   : "Crear"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/tipoProyecto', { verToask, req ,proyectos,layout: 'template'});
+
+})
+
+
+router.get('/tipoProyecto/edit/:id', async (req, res) => {
+    const { id } = req.params;
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+    const proyecto = await pool.query('SELECT * FROM proyecto_tipo WHERE id = ?', [id]);
+    res.render('mantenedores/tipoProyecto', { req , proyectos, proyecto: proyecto[0], layout: 'template'});
+    
+});
+
+router.post('/editTipoProyecto', async (req,res) => {
+    const {  id, descripcion } = req.body; //Obtener datos id, descripcion
+
+    const newProyecto  ={ //Se gurdaran en un nuevo objeto
+        descripcion : descripcion 
+    };
+    //Guardar datos en la BD     
+    await pool.query('UPDATE proyecto_tipo set ? WHERE id = ?', [newProyecto, id]);
+    //res.redirect('../mantenedores/pais');
+
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+    //console.log(usuarios);
+
+    
+    const verToask = {
+        titulo : descripcion,
+        body   : "Se ha editado correctamente",
+        tipo   : "Editar"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/tipoProyecto', { verToask, req ,proyectos,layout: 'template'});
+
+})
+
+
+/* ELIMINAR PROYECTO FUNCIONA*/
+router.get('/tipoProyecto/delete/:id', async (req, res) => {
+    const { id } = req.params;
+
+    const nombre = await pool.query('SELECT descripcion FROM proyecto_tipo WHERE id = ?', [id]);
+    console.log(nombre);
+
+    await pool.query('DELETE FROM proyecto_tipo WHERE ID = ?', [id]);
+
+
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+
+
+
+    const verToask = {
+    
+        titulo : nombre[0].descripcion,
+        body   : "Se ha eliminado correctamente ",
+        tipo   : "Eliminar"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/tipoProyecto', { verToask, req ,proyectos,layout: 'template'});
+
+
+});
+
+
+
+
+
+
 
 
 

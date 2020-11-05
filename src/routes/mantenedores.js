@@ -50,6 +50,7 @@ router.get('/usuario/crear/', isLoggedIn, async (req, res) => {
 });
 
 
+
 router.post('/editarUsuarios', async (req, res) => {
     const { idUsuario,Nombre,NombreCompleto,Email,Telefono,login,idCategoria,idSucursal,aPaterno,aMaterno,
     pNombre,sNombre,titulo } = req.body;
@@ -71,9 +72,20 @@ router.post('/editarUsuarios', async (req, res) => {
 
     //console.log(req.body);
    const result = await pool.query('UPDATE sys_usuario set ? WHERE idUsuario = ?', [newUsario, idUsuario]);
-   res.redirect('/mantenedores/usuario');
 
-});
+   const usuarios = await pool.query('SELECT * FROM sys_usuario');
+   //console.log(usuarios);
+
+   
+   const verToask = {
+       titulo : NombreCompleto,
+       body   : "Se ha editado correctamente",
+       tipo   : "Editar"
+   };
+   //console.log(verToask);
+   res.render('mantenedores/usuarios', { verToask, req ,usuarios,layout: 'template'});
+
+})
 
 router.post('/addUsuario', async (req, res) => {
     const { Nombre,NombreCompleto,Email,Telefono,login,idCategoria,idSucursal,aPaterno,aMaterno,
@@ -96,18 +108,48 @@ router.post('/addUsuario', async (req, res) => {
 
     console.log(req.body);
    const result = await pool.query('INSERT INTO sys_usuario set ? ', [newUsario]);
-   res.redirect('/mantenedores/usuario');
-
-});
+  
+   const usuarios = await pool.query('SELECT * FROM sys_usuario');
+   //console.log(usuarios);
+ 
+   
+   const verToask = {
+       titulo : NombreCompleto,
+       body   : "Se ha creado correctamente",
+       tipo   : "Crear"
+   };
+   //console.log(verToask);
+   res.render('mantenedores/usuarios', { verToask, req ,usuarios,layout: 'template'});
+ 
+ })
 
 
 router.get('/usuario/delete/:id', async (req, res) => {
     const { id } = req.params;
     
+    const nombre = await pool.query('SELECT NombreCompleto FROM sys_usuario WHERE idUsuario = ?', [id]);
+   console.log(nombre);
+
     await pool.query('DELETE FROM sys_usuario WHERE idUsuario = ?', [id]);
-    res.redirect('/mantenedores/usuario');
+    //res.redirect('/mantenedores/usuario');
+
     
-});
+    const usuarios = await pool.query('SELECT * FROM sys_usuario');
+    //console.log(usuarios);
+
+
+    const verToask = {
+    
+        titulo : nombre[0].NombreCompleto,
+        body   : "Se ha eliminado correctamente ",
+        tipo   : "Eliminar"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/usuarios', { verToask, req ,usuarios,layout: 'template'});
+
+    
+})
+
 
 router.get('/usuario/permisos/:id', async (req, res) => {
     const { id } = req.params;
@@ -163,9 +205,21 @@ router.post('/usuario/permisos', async (req,res) => {
     const result = pool.query('INSERT INTO  sys_permiso set ?', [permiso]);
     });
 
-    res.redirect('/mantenedores/usuario');
+    const usuario = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [idUsuario]);
 
-});
+    const verToask = {
+        titulo : usuario[0].NombreCompleto,
+        body   : "Se le han dado los permisos necesarios ",
+        tipo   : "Permisos"
+    };
+    //console.log(verToask);
+
+    const usuarios = await pool.query('SELECT * FROM sys_usuario');
+
+
+    res.render('mantenedores/usuarios', { verToask, req ,usuarios,layout: 'template'});
+
+})
 
 
 
@@ -309,9 +363,22 @@ router.post('/addPais', async (req,res) => {
     };
     //Guardar datos en la BD     
     const result = await pool.query('INSERT INTO pais set ?', [newPais]);//Inserción
-    res.redirect('../mantenedores/pais');
+ 
 
-});
+
+    const paises = await pool.query('SELECT * FROM pais');
+ 
+
+    
+    const verToask = {
+        titulo : name,
+        body   : "Se ha creado correctamente",
+        tipo   : "Crear"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/pais', { verToask, req ,paises,layout: 'template'});
+
+})
 
 router.post('/editPais', async (req,res) => {
     const {  id, name } = req.body; //Obtener datos title,url,description
@@ -321,9 +388,20 @@ router.post('/editPais', async (req,res) => {
     };
     //Guardar datos en la BD     
     await pool.query('UPDATE pais set ? WHERE id = ?', [newPais, id]);
-    res.redirect('../mantenedores/pais');
+  
 
-});
+   const paises = await pool.query('SELECT * FROM pais');
+
+   
+   const verToask = {
+       titulo : name,
+       body   : "Se ha editado correctamente",
+       tipo   : "Editar"
+   };
+   //console.log(verToask);
+   res.render('mantenedores/pais', { verToask, req ,paises,layout: 'template'});
+
+})
 
 
 router.get('/pais/edit/:id', async (req, res) => {
@@ -335,9 +413,29 @@ router.get('/pais/edit/:id', async (req, res) => {
 });
 router.get('/pais/delete/:id', async (req, res) => {
     const { id } = req.params;
+    const nombre = await pool.query('SELECT pais FROM pais WHERE id = ?', [id]);
+    console.log(nombre);
+
     await pool.query('DELETE FROM pais WHERE ID = ?', [id]);
-    res.redirect('/mantenedores/pais');
+
+
+    const paises = await pool.query('SELECT * FROM pais');
+
+
+
+    const verToask = {
+    
+        titulo : nombre[0].pais,
+        body   : "Se ha eliminado correctamente ",
+        tipo   : "Eliminar"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/pais', { verToask, req ,paises,layout: 'template'});
+
+
 });
+
+
 
 router.get('/centrocosto', isLoggedIn, async (req, res) => {
     const centrosCostos = await pool.query('SELECT * FROM centro_costo');
@@ -352,9 +450,23 @@ router.post('/addCentroCosto', async (req,res) => {
     };
     //Guardar datos en la BD     
     const result = await pool.query('INSERT INTO centro_costo set ?', [newCenctroCosto]);//Inserción
-    res.redirect('../mantenedores/centrocosto');
+    //res.redirect('../mantenedores/centrocosto');
 
-});
+    const centrosCostos = await pool.query('SELECT * FROM centro_costo');
+    //console.log(usuarios);
+
+    
+    const verToask = {
+        titulo : name,
+        body   : "Se ha creado correctamente",
+        tipo   : "Crear"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/centrocosto', { verToask, req ,centrosCostos,layout: 'template'});
+
+
+})
+
 router.get('/centrocosto/edit/:id', async (req, res) => {
     const { id } = req.params;
     const centrosCostos = await pool.query('SELECT * FROM centro_costo');
@@ -372,15 +484,45 @@ router.post('/editCentroCosto', async (req,res) => {
     };
     //Guardar datos en la BD     
     await pool.query('UPDATE centro_costo set ? WHERE id = ?', [newCentroCosto, id]);
-    res.redirect('../mantenedores/centrocosto');
+  
 
-});
+    const centrosCostos = await pool.query('SELECT * FROM centro_costo');
+    //console.log(usuarios);
+
+    
+    const verToask = {
+        titulo : name,
+        body   : "Se ha editado correctamente",
+        tipo   : "Editar"
+    };
+    //console.log(centro_costo);
+    res.render('mantenedores/centrocosto', { verToask, req ,centrosCostos,layout: 'template'});
+  
+})
 
 router.get('/centrocosto/delete/:id', async (req, res) => {
     const { id } = req.params;
+
+
+    const nombre = await pool.query('SELECT centroCosto FROM centro_costo WHERE id = ?', [id]);
+    console.log(nombre);
+
     await pool.query('DELETE FROM centro_costo WHERE ID = ?', [id]);
-    res.redirect('/mantenedores/centrocosto');
-});
+    //res.redirect('/mantenedores/centrocosto');
+
+    const centrosCostos = await pool.query('SELECT * FROM centro_costo');
+    //console.log(usuarios);
+
+    
+    const verToask = {
+        titulo :nombre[0].centroCosto,
+        body   : "Se ha eliminado correctamente ",
+        tipo   : "Eliminar"
+    };
+    //console.log(centro_costo);
+    res.render('mantenedores/centrocosto', { verToask, req ,centrosCostos,layout: 'template'});
+
+})
 
 router.get('/categoria', isLoggedIn, async (req, res) => {
     const categorias = await pool.query('SELECT t1.*, t2.centroCosto FROM categorias as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id');
@@ -429,11 +571,23 @@ router.post('/editCategoria', async (req,res) => {
         categoria : name,
         valorHH : valorhh
     };
-    //Guardar datos en la BD     
-    await pool.query('UPDATE categorias set ? WHERE id = ?', [newCategoria, id]);
-    res.redirect('../mantenedores/categoria');
+   //Guardar datos en la BD     
+   await pool.query('UPDATE categorias set ? WHERE id = ?', [newCategoria, id]);
+   //res.redirect('../mantenedores/categoria');
 
-});
+   const categorias = await pool.query('SELECT * FROM categorias');
+   //console.log(usuarios);
+
+   
+   const verToask = {
+       titulo : name,
+       body   : "Se ha editado correctamente",
+       tipo   : "Editar"
+   };
+   //console.log(verToask);
+   res.render('mantenedores/categoria', { verToask, req ,categorias,layout: 'template'});
+
+})
 
 router.post('/eddCategoria', async (req,res) => {
     const {  id, name , idCentroCosto , valorhh} = req.body;//Obtener datos title,url,description
@@ -443,16 +597,48 @@ router.post('/eddCategoria', async (req,res) => {
         categoria : name,
         valorHH : valorhh
     };
-    //Guardar datos en la BD     
-    const result = await pool.query('INSERT INTO categorias set ?', [newCategoria]);//Inserción
-    res.redirect('../mantenedores/categoria');
+  //Guardar datos en la BD     
+  const result = await pool.query('INSERT INTO categorias set ?', [newCategoria]);//Inserción
+  //res.redirect('../mantenedores/categoria');
 
-});
+  const categorias = await pool.query('SELECT * FROM categorias');
+  //console.log(usuarios);
+
+  
+  const verToask = {
+      titulo : name,
+      body   : "Se ha creado correctamente",
+      tipo   : "Crear"
+  };
+  //console.log(verToask);
+  res.render('mantenedores/categoria', { verToask, req ,categorias,layout: 'template'});
+
+})
+
+
 router.get('/categoria/delete/:id', async (req, res) => {
     const { id } = req.params;
+
+    const nombre = await pool.query('SELECT categoria FROM categorias WHERE id = ?', [id]);
+    console.log(nombre);
+
+
+
     await pool.query('DELETE FROM categorias WHERE ID = ?', [id]);
-    res.redirect('/mantenedores/categoria');
-});
+    //res.redirect('/mantenedores/categoria');
+
+    const categorias = await pool.query('SELECT * FROM categorias');
+    //console.log(usuarios);
+ 
+    
+    const verToask = {
+        titulo : nombre[0].categoria,
+        body   : "Se ha eliminado correctamente ",
+        tipo   : "Eliminar"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/categoria', { verToask, req ,categorias,layout: 'template'});
+})
 
 
 router.post('/addSucursal', async (req,res) => {
@@ -465,9 +651,27 @@ router.post('/addSucursal', async (req,res) => {
     };
     //Guardar datos en la BD     
     const result = await pool.query('INSERT INTO sys_sucursal set ?', [newSucursal]);//Inserción
-    res.redirect('../mantenedores/sucursal');
+    // console.log(result["insertId"]);
 
-});
+    // query para buscar el ultimo id ingresado
+
+    const sucursal = await pool.query('SELECT * FROM sys_sucursal WHERE id_Sucursal = ?', [result["insertId"]]);
+
+    const verToask = {
+        titulo : sucursal[0].direccion,
+        body   : "Se ha creado correctamente",
+        tipo   : "Crear"
+    };
+
+    
+
+    const sucursales = await pool.query("SELECT t1.*, t2.pais FROM sys_sucursal as t1, pais as t2 where t1.id_pais = t2.id");
+    const paises = await pool.query("SELECT * FROM pais ");
+    res.render('mantenedores/sucursal', { verToask, req ,sucursales,paises,layout: 'template'});
+
+
+
+})
 
 router.get('/sucursal/edit/:id', async (req, res) => {
     const { id } = req.params;
@@ -497,11 +701,144 @@ router.post('/editSucursal', async (req,res) => {
         direccion : direccion,
         fono : fono
     };
-    //Guardar datos en la BD     
-    await pool.query('UPDATE sys_sucursal set ? WHERE id_Sucursal = ?', [newSucursal, id]);
-    res.redirect('../mantenedores/sucursal');
+   //Guardar datos en la BD   
+   await pool.query('UPDATE sys_sucursal set ? WHERE id_Sucursal = ?', [newSucursal, id]);
+  
+   const sucursal = await pool.query('SELECT * FROM sys_sucursal WHERE id_Sucursal = ?', [id]);
 
+   
+   const verToask = {
+       titulo : sucursal[0].direccion,
+       body   : "Se ha editado correctamente",
+       tipo   : "Editar"
+   };
+  
+   const sucursales = await pool.query("SELECT t1.*, t2.pais FROM sys_sucursal as t1, pais as t2 where t1.id_pais = t2.id");
+   const paises = await pool.query("SELECT * FROM pais ");
+   res.render('mantenedores/sucursal', { verToask, req ,sucursales,paises,layout: 'template'});
+
+})
+
+router.get('/sucursal/delete/:id', async (req, res) => {
+    const { id } = req.params;
+
+    const nombre = await pool.query('SELECT direccion FROM sys_sucursal WHERE id_Sucursal = ?', [id]);
+    console.log(nombre);
+
+
+
+    await pool.query('DELETE FROM sys_sucursal WHERE id_Sucursal = ?', [id]);
+    //res.redirect('/mantenedores/categoria');
+
+    const sucursales = await pool.query('SELECT * FROM sys_sucursal');
+    //console.log(usuarios);
+ 
+    
+    const verToask = {
+        titulo : nombre[0].direccion,
+        body   : "Se ha eliminado correctamente ",
+        tipo   : "Eliminar"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/sucursal', { verToask, req ,sucursales,layout: 'template'});
+})
+
+
+
+
+/* AGREGAR */
+router.get('/tipoProyecto', isLoggedIn, async (req, res) => {
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+    res.render('mantenedores/tipoProyecto', { req ,proyectos, layout: 'template'});
 });
+
+/* AGREGAR PROYECTO FUNCIONA*/
+router.post('/addTipoProyecto', async (req,res) => {
+    const { id, descripcion } = req.body; //Obtener datos title,url,description
+
+    const newProyecto  ={ //Se gurdaran en un nuevo objeto
+        id: id,
+        descripcion : descripcion 
+    };
+
+    //Guardar datos en la BD     
+    const result = await pool.query('INSERT INTO proyecto_tipo set ?', [newProyecto]);//Inserción
+    //res.redirect('../mantenedores/pais');
+
+
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+    //console.log(usuarios);
+
+    
+    const verToask = {
+        titulo : descripcion,
+        body   : "Se ha creado correctamente",
+        tipo   : "Crear"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/tipoProyecto', { verToask, req ,proyectos,layout: 'template'});
+
+})
+
+
+router.get('/tipoProyecto/edit/:id', async (req, res) => {
+    const { id } = req.params;
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+    const proyecto = await pool.query('SELECT * FROM proyecto_tipo WHERE id = ?', [id]);
+    res.render('mantenedores/tipoProyecto', { req , proyectos, proyecto: proyecto[0], layout: 'template'});
+    
+});
+
+router.post('/editTipoProyecto', async (req,res) => {
+    const {  id, descripcion } = req.body; //Obtener datos id, descripcion
+
+    const newProyecto  ={ //Se gurdaran en un nuevo objeto
+        descripcion : descripcion 
+    };
+    //Guardar datos en la BD     
+    await pool.query('UPDATE proyecto_tipo set ? WHERE id = ?', [newProyecto, id]);
+    //res.redirect('../mantenedores/pais');
+
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+    //console.log(usuarios);
+
+    
+    const verToask = {
+        titulo : descripcion,
+        body   : "Se ha editado correctamente",
+        tipo   : "Editar"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/tipoProyecto', { verToask, req ,proyectos,layout: 'template'});
+
+})
+
+
+/* ELIMINAR PROYECTO FUNCIONA*/
+router.get('/tipoProyecto/delete/:id', async (req, res) => {
+    const { id } = req.params;
+
+    const nombre = await pool.query('SELECT descripcion FROM proyecto_tipo WHERE id = ?', [id]);
+    console.log(nombre);
+
+    await pool.query('DELETE FROM proyecto_tipo WHERE ID = ?', [id]);
+
+
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+
+
+
+    const verToask = {
+    
+        titulo : nombre[0].descripcion,
+        body   : "Se ha eliminado correctamente ",
+        tipo   : "Eliminar"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/tipoProyecto', { verToask, req ,proyectos,layout: 'template'});
+
+})
+
 
 
 module.exports = router;

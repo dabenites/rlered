@@ -66,6 +66,7 @@ app.use('/mantenedores', require('./routes/mantenedores'));
 app.use('/costos', require('./routes/costos')); 
 app.use('/proveedor', require('./routes/proveedor'));
 app.use('/solicitudes', require('./routes/solicitudes'));
+app.use('/facturacion', require('./routes/facturacion'));
 //app.use('/mantenedores/usuario', require('./routes/mantenedores'));
 
 //Archivos publicos 

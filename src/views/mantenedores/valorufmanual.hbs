@@ -1,11 +1,11 @@
 							<div class="x_panel">
 								<div class="x_title">
-									<h2>Costos Usuario<small>Los costos seran por mes</small></h2>
+									<h2>Valor UF<small>Ingreso manual de los valores de la UF</small></h2>
 									<div class="clearfix"></div>
 								</div>
 								<div class="x_content">
 									<br />
-									<form class="form-label-left input_mask" action="/costos/usuario" method="GET">
+									<form class="form-label-left input_mask" action="/mantenedores/valorufmanual" method="GET">
 										<div class="form-group row">
 											<label class="col-form-label col-md-1 col-sm-1 label-align">Año</label>
                                                 <div class="col-md-2 col-sm-2 ">
@@ -30,9 +30,6 @@
                                                 </div>
                                                 <div class="col-md-4 col-sm-4 ">
 												    <button type="submit" class="btn btn-primary">Revisar</button>
-                                                     <a href="/costos/descargarPlanilla?anio={{year}}&mes={{mes}}"><button type="button" class="btn btn-success">Descargar </button></a>
-												    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Cargar</button>
-                                                    <a href="/costos/duplicarAnterior?anio={{year}}&mes={{mes}}"><button type="button" class="btn btn-primary">Replicar Mes anterior</button></a>
 											    </div>
 										</div>
 										<div class="ln_solid"></div>
@@ -62,34 +59,5 @@
                                                     </div>
 								            </div>
 							</div>
-               <div class="x_panel">
-						<div class="x_content">
-							<br />
-							<form class="form-horizontal form-label-left">
-							</form>
-						</div>
-                        <table class="table table-hover" id="example" class="display">
-                            <thead>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Nombre</th>
-                                    <th>Centro Costo</th>
-                                    <th>Categoria</th>
-                                    <th>Sucursal</th>
-                                    <th>Costo</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{#each costos}}
-                                <tr>
-                                    <th>{{idUsuario}}</th>
-                                    <td>{{Nombre}}</td>
-                                    <td>{{centroCosto}}</td>
-                                    <td>{{categoria}}</td>
-                                    <td>{{direccion}}</td>
-                                    <td>{{costo}}</td>
-                                </tr>
-                                {{/each}} 
-                            </tbody>
-                    </table>
-				</div>
+    <div class="x_panel">
+	</div>

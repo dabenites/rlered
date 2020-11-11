@@ -106,7 +106,7 @@ router.post('/addUsuario', async (req, res) => {
     titulo:titulo
 };
 
-    console.log(req.body);
+   // console.log(req.body);
    const result = await pool.query('INSERT INTO sys_usuario set ? ', [newUsario]);
   
    const usuarios = await pool.query('SELECT * FROM sys_usuario');
@@ -128,7 +128,7 @@ router.get('/usuario/delete/:id', async (req, res) => {
     const { id } = req.params;
     
     const nombre = await pool.query('SELECT NombreCompleto FROM sys_usuario WHERE idUsuario = ?', [id]);
-   console.log(nombre);
+   //console.log(nombre);
 
     await pool.query('DELETE FROM sys_usuario WHERE idUsuario = ?', [id]);
     //res.redirect('/mantenedores/usuario');
@@ -148,7 +148,7 @@ router.get('/usuario/delete/:id', async (req, res) => {
     res.render('mantenedores/usuarios', { verToask, req ,usuarios,layout: 'template'});
 
     
-})
+});
 
 
 router.get('/usuario/permisos/:id', async (req, res) => {
@@ -352,6 +352,58 @@ router.get('/pais', isLoggedIn, async (req, res) => {
     const paises = await pool.query('SELECT * FROM pais');
     res.render('mantenedores/pais', { req ,paises, layout: 'template'});
 });
+
+router.get('/valorufmanual', isLoggedIn, async (req, res) => {
+    
+    var fecha = new Date();
+    var year = fecha.getFullYear();
+    var mes = fecha.getMonth() + 1;
+    const annios = [];
+
+    
+    if (req.query.anio !== undefined)
+    {
+        year = req.query.anio;
+    }
+    if (req.query.mes !== undefined)
+    {
+        mes = req.query.mes;
+    }
+    
+
+    for (let step = 0; step < 10; step++) {
+        annios.push(year - step);
+      }
+
+    const listadoMeses = [ 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const messes = [];
+    listadoMeses.forEach((element, i) => {
+        if ((i+1) == mes)
+        {
+            const Mes = {
+                id : (i + 1),
+                nombre : element,
+                actual : true
+            }
+            messes.push(Mes);
+        }
+        else
+        {
+            const Mes = {
+                id : (i + 1),
+                nombre : element,
+                actual : false
+            }
+            messes.push(Mes);
+        }
+    });
+
+    // ir a buscar toda la informacion de los varoles ingresados.
+
+    res.render('mantenedores/valorufmanual' ,{ annios,messes, req ,layout: 'template'});
+});
+
+
 
 
 

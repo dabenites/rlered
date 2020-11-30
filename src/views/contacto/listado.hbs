@@ -1,0 +1,270 @@
+<div class="x_panel">
+	<div class="x_title">
+	    <h2>Contactos <small>Listado de contactos de la empresa</small></h2>
+	    <div class="clearfix"></div>
+    </div>
+	<div class="x_content">
+                        <table class="table table-hover" id="example" class="display">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Dirección</th>
+                                    <th>Télefono</th>
+                                    <th>Celular</th>
+                                    <th>Comentario</th>
+                                    <th>Categoria</th>
+                                    <th><a data-toggle="modal" data-target=".bs-example-modal-lg"><i class="fa fa-user">Agregar </i></a></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each contactos}}
+                                <tr>
+                                    <td>{{name}}</td>
+                                    <td>{{address1}}</td>
+                                    <td>{{phone}}</td>
+                                    <td>{{movil}}</td>
+                                    <td>{{comments}}</td>
+                                    <td>{{keys_words}}</td>
+                                    <td></td>
+                                </tr>
+                                {{/each}} 
+                            </tbody>
+                    </table>
+
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Agregar Contactco</h4>
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form name="vContacto" id="vContacto">
+						<table width="100%">										
+						    <tr>
+								<td></td>
+								<td style="padding-right:5px;" align=right class="PopUpCheck">Nombre</td>
+								<td colspan="3" class="PopUpCheck"> 
+									<input class="form-control" placeholder="Nombre Contancto" id="iNombreContacto" name="iNombreContacto" onkeypress="desactivaIngreso();"> 
+								</td>
+							</tr>
+							<tr>
+								<td colspan=6 style="padding-top:5px;" align=center class="PopUpCheck">
+								<table>
+									<tr>
+									    <td style="padding-right:5px;"><label>Comprobar&nbsp; similitud : </label></td>
+										<td><button type="button" class="btn btn-success" onclick="VerificarIngreso();">Verificar</button></td>
+									</tr>
+								</table>
+								</td>
+																			
+							</tr>									
+							<tr>
+								<td id="respVerificacion" colspan="6">
+																			
+								</td>
+							</tr>
+						</table>
+					</form>	
+                </div>
+				<div class="modal-footer">
+						<!-- <button type="button" class="btn btn-default" id="buttonVolver" name="buttonVolver" onclick="VerificarIngresoPopUp();" style="display:none;">Volver</button> -->
+						<button type="button" class="btn btn-default" id="buttonCerrar" name="buttonCerrar" data-dismiss="modal" onclick="habilitarIngreso();">Cerrar</button>
+					    <button type="button" class="btn btn-primary" id="buttonInsertContacto" name="buttonInsertContacto" disabled onclick="FormIngresoContacto();">Siguiente</button>
+				</div>
+
+            </div>
+        </div>
+    </div>
+
+	</div>
+</div>
+
+<script>
+function VerificarIngreso ( )
+{
+	
+	var INombreContacto = $("#iNombreContacto").val();
+	$('#buttonInsertContacto').show();
+	$('#buttonVolver').hide();
+	if ( iNombreContacto != "")
+	{
+
+
+		var TableContactoForm = '';
+			$.ajax({
+							async: false,
+							type : 'POST', 
+							url	 : "/costos/ajaxNombre", 
+							data : "NombreContacto="+INombreContacto,
+							success : function (resultado) 
+								{ 
+		
+									TableContactoForm = resultado; 
+									ActivaIngresoContacto ();
+								} 
+						});
+						
+		if (TableContactoForm == "1")
+		{
+			document.getElementById("respVerificacion").innerHTML = "";
+			FormIngresoContacto();
+		}
+		else
+		{
+			document.getElementById("respVerificacion").innerHTML = TableContactoForm;
+		}
+	}
+	else
+	{
+		// Sin nombre 
+	
+	}
+	
+	$( "#buttonCerrar" ).removeClass( "btn btn-primary" ).addClass( "btn btn-default" );
+	
+	
+}
+
+function ActivaIngresoContacto ()
+{
+
+	$("#buttonInsertContacto").removeAttr("disabled");
+}
+
+function desactivaIngreso ()
+{
+	$('#buttonInsertContacto').attr('disabled','disabled');
+	//--------------------------------------------------------->
+}
+
+function habilitarIngreso ( )
+{
+	document.getElementById("respVerificacion").innerHTML = '';	
+}
+
+
+function FormIngresoContacto()
+{
+	
+
+	$.ajax({
+							async: false,
+							type : 'POST', 
+							url	 : "/contacto/ajaxNombre", 
+							data : "NombreContacto="+INombreContacto,
+							success : function (resultado) 
+								{ 
+		
+									TableContactoForm = resultado; 
+									ActivaIngresoContacto ();
+								} 
+						});
+
+
+	document.getElementById("respVerificacion").innerHTML = '';
+	var INombreContacto = $("#iNombreContacto").val();
+	var TableContactoForm = '';
+	$.ajax
+		(
+			{
+				async: false,
+				type : 'POST', 
+				url	 : "/contacto/bFormIngreso", 
+				data : "iNombreContacto="+INombreContacto,
+					success : function (resultado) 
+						{ 
+		
+							TableContactoForm = resultado; 
+							ActivaIngresoContacto ();
+						} 
+			}
+		);
+	
+	document.getElementById("respVerificacion").innerHTML = TableContactoForm;
+	
+	$('#buttonInsertContacto').hide();
+	$('#buttonVolver').show();
+	// cambiar clase al boton Cerrar para seguir con una misma linea de colores
+	$( "#buttonCerrar" ).removeClass( "btn btn-default" ).addClass( "btn btn-primary" );
+	// ocultar div de check similitud 
+	$('.PopUpCheck').hide();
+}
+
+function verEsEmpresa( iValor )
+	{
+		//alert(iValor);
+		switch ( iValor )
+		{
+			case '2':
+			case  2 :
+				$('#iEmpresaAsociada').show();	
+			break;
+			case '0':
+			case  0 :
+			case '1':
+			case  1 :
+			case '3':
+			case  3 :
+				$('#iEmpresaAsociada').hide();
+			break;
+		
+		}
+	}
+	 function InsertarContactoCloseForm ()
+{
+	var obj	= creaObjetoContacto();
+	
+	var TableContactoForm = '';
+	$.ajax
+		(
+			{
+				async: false,
+				type : 'POST', 
+				url	 : "/contacto/addContacto", 
+				data : obj,
+					success : function (resultado) 
+						{ 
+							TableContactoForm = resultado; 
+							
+						} 
+			}
+		);
+
+	
+	
+}	
+	
+function creaObjetoContacto ()
+{
+	var obj = new Object();
+		var nombre 		    	= $( "#iNombreContacto" );
+		var direccion	   	 	= $( "#iDireccionContacto" );
+		var telefono	    	= $( "#iTelefonoContacto" );
+		var tipo_conctacto  	= $( "#iTipoContacto" );
+		var empresa_asociada  	= $( "#iEmpresaAsociada" );
+		var movil	    		= $( "#iMovilContacto" );
+		var url   				= $( "#iUrlContacto" );
+		var e_mail 				= $( "#iMailContacto" );
+		var comentario			= $( "#iComentarioContacto" );
+		//var concepto			= $( "#concepto" );
+		var concepto = "";
+				$('input[name="concepto[]"]:checked').each(function() {
+					concepto += $(this).val() + ",";
+				});
+	
+	obj.nombre			= nombre.val(); 
+	obj.direccion		= direccion.val(); 
+	obj.telefono		= telefono.val(); 
+	obj.tipo_conctacto	= tipo_conctacto.val(); 
+	obj.empresa_asociada = empresa_asociada.val(); 
+	obj.movil			= movil.val(); 
+	obj.url				= url.val(); 
+	obj.e_mail			= e_mail.val(); 
+	obj.comentario		= comentario.val(); 
+	obj.concepto		= concepto; 
+	
+	return obj;	
+}
+</script>

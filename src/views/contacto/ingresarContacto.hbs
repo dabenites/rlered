@@ -1,0 +1,181 @@
+	<form name="vContacto" id="vContacto">
+		<div class="panel panel-success" style="margin-top:2%;">
+	        <div class="panel-heading">
+                  Ingreso Contacto
+            </div>
+            <div class="panel-body">
+				<table width="100%">
+					<tr>
+						<td style="padding-right:5px;" align=right>Nombre</td>
+						<td colspan="3"> 
+								<input class="form-control" value="{{{nombre}}}" id="iNombreContacto" name="iNombreContacto" readonly> 
+						</td>
+ 				    </tr>
+ 				    <tr>
+ 				    	<td style="padding-right:5px;" align=right> Direccion </td>
+ 				    	<td> 
+ 				    		<input class="form-control" placeholder="Direccion Contancto" id="iDireccionContacto" name="iDireccionContacto"> 
+ 				    	</td>
+ 				    	<td style="padding-right:5px;" align=right> Telefono</td>
+ 				    	<td> 
+ 				    		<input class="form-control" placeholder="Telefono Contancto " id="iTelefonoContacto" name="iTelefonoContacto">  
+ 				    	</td>
+ 				    </tr>
+ 				    <tr>
+ 				    	<td style="padding-right:5px;" align=right> Tipo </td>
+ 				    	<td style="width:30%">
+ 				    		<table >
+ 				    			<tr>
+ 				    				<td>
+			 				    		<select   name="iTipoContacto" id="iTipoContacto" onchange="verEsEmpresa(this.value);">
+			 				    			<option value="0"> 	 Seleccione	</option>
+				                  			<option value="1"> 	 Empresas	</option>
+				                			<option value="2">   Personas	</option>
+				                 			<option value="3"> 	 Servicios	</option>														                  		
+					                  	</select>
+					                </td> 	
+					                <td id="empresasAsociadas" >
+											
+										<select  name="iEmpresaAsociada" id="iEmpresaAsociada" style="width:150px;display:none;" >
+												<option value="0"> Seleccione	</option>
+											        {{#each empresas}}
+												<option value="{{id}}"> {{name}}	</option>
+                                                     {{/each}}     
+										</select>			
+
+					                </td>	
+			                  	</tr>
+		                  	</table>
+				    	</td>
+ 				    	<td style="padding-right:5px;" align=right> Movil</td>
+ 				    	<td> 
+ 				    		<input class="form-control" placeholder="Movil Contancto" id="iMovilContacto" name="iMovilContacto"> 
+ 				    	</td>
+ 				    </tr>
+ 				    <tr>
+ 				    	<td style="padding-right:5px;" align=right> URL</td>
+ 				    	<td>
+ 				    		<input class="form-control" placeholder="URL Contancto" id="iUrlContacto" name="iUrlContacto"> 
+ 				    	</td>
+ 				    	<td style="padding-right:5px;" align=right> E-mail</td>
+ 				    	<td> 
+ 				    		<input class="form-control" placeholder="Email Contancto" id="iMailContacto" name="iMailContacto"> 
+ 				    	</td>
+ 				    </tr>
+
+ 				    <tr>
+ 				    	<td style="padding-right:5px;" align=right> Categoria:</td>
+ 				    	<td>
+ 				    		<div class="form-group">
+                            	<div class="checkbox">
+                            	    <label class="checkbox">
+                            	        <input type="checkbox" name="concepto[]" id="concepto" value="1">Arquitecto
+                                    </label>
+                                    <label class="checkbox">
+                            	        <input type="checkbox" name="concepto[]" id="concepto" value="2">Constructora
+                                    </label>
+                                    <label class="checkbox">
+                                        <input type="checkbox" name="concepto[]" id="concepto" value="3">ITO
+                                    </label>
+                                    <label class="checkbox">
+                                        <input type="checkbox" name="concepto[]" id="concepto" value="4">Inmobiliaria
+                                    </label>                                   
+                                </div>
+                           </div>
+ 				    	</td>
+ 				    	<td>
+ 				    		<div class="form-group">
+                            	<div class="checkbox">
+                            	    <label class="checkbox">
+                                         <input type="checkbox" name="concepto[]" id="concepto" value="5">Mec. Suelo
+                                    </label>
+                                    <label class="checkbox">
+                                         <input type="checkbox" name="concepto[]" id="concepto" value="6">Postensado
+                                    </label>
+                                    <label class="checkbox">
+                                         <input type="checkbox" name="concepto[]" id="concepto" value="7">Muro Cortina
+                                    </label>
+                                </div>
+                           </div>
+
+ 				    	</td>
+ 				    	<td></td>
+ 				    </tr>
+ 				    <tr>
+ 				    	<td style="padding-right:5px;" align=right> Comentario</td>
+ 				    	<td colspan=3>
+ 				    		<textarea class="form-control" name="iComentarioContacto" id="iComentarioContacto" rows="2"></textarea>
+ 				    	</td>
+
+ 				    </tr>
+ 				    <tr style="padding-top:2%;">
+ 				    	<td colspan=4 align=center style="padding-top:2%;"> 
+ 				    		<button type="button" class="btn btn-success" onclick="InsertarContactoCloseForm();">Ingresar Contacto</button>
+ 				    	</td>
+ 				    </tr>
+				</table>
+            </div>
+        </div>														
+	</form>
+    <script>
+ function InsertarContactoCloseForm ()
+{
+	var obj	= creaObjetoContacto();
+	
+	var TableContactoForm = '';
+	$.ajax
+		(
+			{
+				async: false,
+				type : 'POST', 
+				url	 : "/costos/addContacto", 
+				data : obj,
+					success : function (resultado) 
+						{ 
+							TableContactoForm = resultado; 
+							
+						} 
+			}
+		);
+	
+		document.getElementById("ContactosRLE").innerHTML = TableContactoForm;	
+	
+	
+	// Cerramos la creacion//
+	//$('#myModal').modal('toggle');
+}	
+	
+function creaObjetoContacto ()
+{
+	var obj = new Object();
+		var nombre 		    	= $( "#iNombreContacto" );
+		var direccion	   	 	= $( "#iDireccionContacto" );
+		var telefono	    	= $( "#iTelefonoContacto" );
+		var tipo_conctacto  	= $( "#iTipoContacto" );
+		var empresa_asociada  	= $( "#iEmpresaAsociada" );
+		var movil	    		= $( "#iMovilContacto" );
+		var url   				= $( "#iUrlContacto" );
+		var e_mail 				= $( "#iMailContacto" );
+		var comentario			= $( "#iComentarioContacto" );
+		//var concepto			= $( "#concepto" );
+		var concepto = "";
+				$('input[name="concepto[]"]:checked').each(function() {
+					concepto += $(this).val() + ",";
+				});
+	
+	obj.nombre			= nombre.val(); 
+	obj.direccion		= direccion.val(); 
+	obj.telefono		= telefono.val(); 
+	obj.tipo_conctacto	= tipo_conctacto.val(); 
+	obj.empresa_asociada = empresa_asociada.val(); 
+	obj.movil			= movil.val(); 
+	obj.url				= url.val(); 
+	obj.e_mail			= e_mail.val(); 
+	obj.comentario		= comentario.val(); 
+	obj.concepto		= concepto; 
+	obj.action			= 'ajax'; 
+	obj.object			= 'IngresarContacto'; 
+	
+	return obj;	
+}
+    </script>

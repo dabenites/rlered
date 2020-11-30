@@ -11,6 +11,7 @@
                 <thead>
                     <tr>
                         <th>Proyecto</th>
+                        <th>Proveedor</th>
                         <th>Solicitante</th>
                         <th>Fecha Ingreso</th>
                         <th>Opciones</th>
@@ -21,6 +22,7 @@
                             {{#each costosExternos}}
                                 <tr > 
                                     <td>{{year}}-{{code}} : {{nombre}}</td>
+                                    <td>{{proveedor}}</td>
                                     <td>{{NombreCompleto}}</td>
                                     <td>{{fechaIngreso}}</td>
                                     <td>
@@ -34,6 +36,7 @@
                             {{#each costosExternos}}
                                 <tr > 
                                     <td>{{year}}-{{code}} : {{nombre}}</td>
+                                    <td>{{proveedor}}</td>
                                     <td>{{NombreCompleto}}</td>
                                     <td>{{fechaIngreso}}</td>
                                     <td>
@@ -53,7 +56,7 @@
 <div class="col-md-7 ">
     <div class="x_panel">
 		<div class="x_title">
-               <h2>Revisar Costo Externo<small>{{costoExterno.nomPro}}</small></h2> 
+               <h2>Revisar Costo Externo<small>{{costoExterno.year}}-{{costoExterno.code}} : {{costoExterno.nomPro}}</small></h2> 
 		    <div class="clearfix"></div>
 		</div>
         <div class="x_content">
@@ -62,7 +65,7 @@
                     <a class="nav-link active" id="revisar-tab" data-toggle="tab" href="#revisar" role="tab" aria-controls="revisar" aria-selected="true">Revisar</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile1" role="tab" aria-controls="profile" aria-selected="false">Anteriores</a>
+                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile1" role="tab" aria-controls="profile" aria-selected="false">Historial</a>
                 </li>
             </ul>
                     <div class="tab-content" id="myTabContent">
@@ -120,8 +123,8 @@
                                 <label class="col-form-label col-md-4 col-sm-4 label-align" for="descripcion"></label>
                                 <input type="hidden" id="estado" class="form-control" value="" name="estado" readonly />
                                 <input type="hidden" id="id_costo_externo" class="form-control" value="{{costoExterno.idCostoExterno}}" name="id_costo_externo" readonly />
-                                <button type="button" onclick="revisarAction(0);" class="btn btn-danger" type="button">Rechazar</button>
                                 <button type="button" onclick="revisarAction(1);"class="btn btn-success" type="reset">Aceptar</button>
+                                <button type="button" onclick="revisarAction(0);" class="btn btn-danger" type="button">Rechazar</button>
                             </div>
                         </form>
                       </div>

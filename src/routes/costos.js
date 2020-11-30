@@ -238,7 +238,8 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
     });
 
     // Buscar la informacion de los usuarios.
-    const costos  = await pool.query("SELECT * " +
+    const costos  = await pool.query("SELECT * ," +
+                                     "FORMAT(t1.costo, 0, 'de_DE') AS costoFormat" +
                                     " FROM    " +
                                                     " sys_usuario_costo AS t1," + 
                                                     " sys_usuario  AS t2, " +
@@ -257,6 +258,7 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
                                                     "t3.idCentroCosto = t4.id" +
                                     " AND       " +
                                                     "t5.id_Sucursal = t2.idSucursal");
+                                                    
     res.render('costos/usuario', { annios, messes, costos,year,mes, req ,layout: 'template'});
 }); 
 
@@ -265,7 +267,7 @@ router.get('/eproyectos', isLoggedIn, async (req, res) => {
     const proveedores =  await pool.query("SELECT * FROM prov_externo ORDER BY nombre ASC");
     const centros =  await pool.query("SELECT * FROM centro_costo ORDER BY centroCosto ASC");
     const monedas =  await pool.query("SELECT * FROM moneda_tipo as t1 WHERE  t1.id_moneda in (1,2,4)");
-    const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY nombre ASC");
+    const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");
 
 
     // Seleccicionar los costos que el ha ingresado
@@ -290,14 +292,17 @@ router.get('/aproyectos', isLoggedIn, async (req, res) => {
 
     // Seleccicionar los costos que el ha ingresado
     const costosExternos = await pool.query("SELECT " + 
-                                            "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso  FROM pro_costo_externo as t1, "+
+                                            "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso , t5.nombre as proveedor" +
+                                            " FROM pro_costo_externo as t1, "+
                                             " pro_proyectos as t2, " +
                                             " pro_costo_externo_estado as t3, " +
-                                            " sys_usuario as t4 " +
+                                            " sys_usuario as t4, " +
+                                            " prov_externo as t5 " + 
                                             " WHERE t1.id_estado = 1" + 
                                             " AND t1.id_proyecto = t2.id" +
                                             " AND t1.id_estado = t3.id"+ 
-                                            " AND t1.id_ingreso = t4.idUsuario");
+                                            " AND t1.id_ingreso = t4.idUsuario" + 
+                                            " AND t5.id = t1.id_prov_externo" );
 
     res.render('proyecto/acostoexterno', {costosExternos, req ,layout: 'template'});
 
@@ -307,14 +312,17 @@ router.get('/costoexterno/revisar/:id', async (req, res) => {
     const { id } = req.params;
     
     const costosExternos = await pool.query("SELECT " + 
-    "* , t1.id as idCostoExterno ,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso FROM pro_costo_externo as t1, "+
+    "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso , t5.nombre as proveedor" +
+    " FROM pro_costo_externo as t1, "+
     " pro_proyectos as t2, " +
     " pro_costo_externo_estado as t3, " +
-    " sys_usuario as t4 " +
+    " sys_usuario as t4, " +
+    " prov_externo as t5 " + 
     " WHERE t1.id_estado = 1" + 
     " AND t1.id_proyecto = t2.id" +
     " AND t1.id_estado = t3.id"+ 
-    " AND t1.id_ingreso = t4.idUsuario");
+    " AND t1.id_ingreso = t4.idUsuario" + 
+    " AND t5.id = t1.id_prov_externo" );
 
     const costoExterno = await pool.query("SELECT " + 
     "* , t1.id as idCostoExterno,t1.descripcion as desTra,  t5.nombre as nomProveedor,t2.nombre As nomPro, t2.id As idPro FROM pro_costo_externo as t1, "+
@@ -425,7 +433,18 @@ router.post('/addCostoExterno', isLoggedIn, async (req, res) => {
     const proveedores =  await pool.query("SELECT * FROM prov_externo ORDER BY nombre ASC");
     const centros =  await pool.query("SELECT * FROM centro_costo ORDER BY centroCosto ASC");
     const monedas =  await pool.query("SELECT * FROM moneda_tipo as t1 WHERE  t1.id_moneda in (1,2,4)");
-    const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY nombre ASC");
+    const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");
+
+       // Seleccicionar los costos que el ha ingresado
+    const costosExternos = await pool.query("SELECT " + 
+       "* " +
+       " , DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso " +
+       " FROM pro_costo_externo as t1,"+
+       " pro_proyectos as t2, " +
+       " pro_costo_externo_estado as t3 " +
+       " WHERE t1.id_ingreso = "+req.user.idUsuario+"" + 
+       " AND t1.id_proyecto = t2.id" +
+       " AND t1.id_estado = t3.id");
 
     const verToask = {
         titulo : "Costo Externo",
@@ -433,8 +452,29 @@ router.post('/addCostoExterno', isLoggedIn, async (req, res) => {
         tipo   : "Crear"
     };
 
-    res.render('proyecto/costoexterno', {verToask, proveedores,centros,monedas, proyectos , req ,layout: 'template'});
+    res.render('proyecto/costoexterno', {verToask, proveedores,centros,monedas, proyectos , costosExternos, req ,layout: 'template'});
 
 
 });
+
+router.post('/ajax', express.json({type: '*/*'}), async (req,res) => {
+    //res.json(req.body);
+
+    
+    var id = req.body[0].vid;
+    var valor = req.body[0].vvalor;
+    var nombre = req.body[0].vnombre;
+    var annio = req.body[0].vannio;
+    var mes = req.body[0].vmes;
+
+    //console.log("ID" + id + "VALOR" + valor + "NOIMBRE" + nombre + "ANNIO" + annio + "MEs" + mes);
+
+    const result = await pool.query('UPDATE sys_usuario_costo set costo  = ? WHERE annio = ? AND mes = ? AND idUsuario = ?', [valor,annio,mes,id]);
+
+
+
+    res.send("OK");
+});
+
+
 module.exports = router;

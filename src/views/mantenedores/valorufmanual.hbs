@@ -30,6 +30,7 @@
                                                 </div>
                                                 <div class="col-md-4 col-sm-4 ">
 												    <button type="submit" class="btn btn-primary">Revisar</button>
+                                                    <a href="/mantenedores/valoruf"> <button type="button" class="btn btn-primary">Volver</button></a>
 											    </div>
 										</div>
 										<div class="ln_solid"></div>
@@ -60,4 +61,66 @@
 								            </div>
 							</div>
     <div class="x_panel">
+        <div class="x_title">
+			<h2>Informacion del mes <small></small></h2>
+		<div class="clearfix"></div>
+        
+		</div>
+		<div class="x_content">
+            <form class="form-label-left input_mask" action="/mantenedores/valorufmanual" >
+                <table class="table table-hover" id="example" class="display">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Moneda</th>
+                                    <th>Actual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each diasPorMes}}
+                                <tr>
+                                    <td>{{fecha}}</td>
+                                    <td>Unidad de fomento (UF)</td>
+                                    <td><input type="text" id="{{fecha}}" class="form-control" value="{{valor}}" name="{{fecha}}"/></td>
+                                </tr>
+                                {{/each}} 
+                            </tbody>
+                            <tfoot>
+                                <th></th> 
+                                <th>                        <button type="button" onclick="getInfoDataTable();" class="btn btn-primary">Ingresar</button></th> 
+                                <th></th> 
+                            </tfoot>
+                    </table>
+            </form>
+        </div>
 	</div>
+
+    <script>
+        function getInfoDataTable()
+        {
+
+            var tbl = $('#example').DataTable();
+            var params = tbl.$('input').serializeArray();
+
+            // recorrer la informacion de los parametros.
+            var informacion = [];
+            params.forEach((item, index, arr) => {
+                const dia = {
+                        fecha : item.name,
+                        valor : item.value
+                    }
+                informacion.push(dia);
+            });
+            //console.log(informacion);
+             $.ajax({
+                            type: 'post',
+                            url: '/mantenedores/ajax',
+                            contentType: 'application/json',
+                            data: JSON.stringify(informacion),
+                            
+                        });
+
+
+        }
+        
+    </script>

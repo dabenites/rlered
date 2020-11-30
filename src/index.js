@@ -67,6 +67,8 @@ app.use('/costos', require('./routes/costos'));
 app.use('/proveedor', require('./routes/proveedor'));
 app.use('/solicitudes', require('./routes/solicitudes'));
 app.use('/facturacion', require('./routes/facturacion'));
+app.use('/contacto', require('./routes/contacto'));
+app.use('/ploter', require('./routes/ploter'));
 //app.use('/mantenedores/usuario', require('./routes/mantenedores'));
 
 //Archivos publicos 

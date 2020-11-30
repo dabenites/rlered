@@ -399,14 +399,74 @@ router.get('/valorufmanual', isLoggedIn, async (req, res) => {
     });
 
     // ir a buscar toda la informacion de los varoles ingresados.
+    
+    var numeroDias = diasEnUnMes(mes,year);
+    const diasPorMes = [];
+    for (let step = 1; step <= numeroDias; step++) {
+        if (step < 10)
+        {
+            step = "0" + step;
+        }
 
-    res.render('mantenedores/valorufmanual' ,{ annios,messes, req ,layout: 'template'});
+        const valorUFDia = await pool.query("SELECT * FROM moneda_valor AS t1 WHERE t1.fecha_valor = '"+ year+"-"+mes+"-"+step +"' AND id_moneda = 4");
+        
+        if(!isEmpty(valorUFDia))
+        {
+            const dia = {
+                fecha : year+"-"+mes+"-"+step,
+                valor : valorUFDia[0].valor
+            }
+            diasPorMes.push(dia);
+        }
+        else
+        {
+            const dia = {
+                fecha : year+"-"+mes+"-"+step,
+                valor : ""
+            }
+            diasPorMes.push(dia);
+        }
+
+      }
+
+
+    res.render('mantenedores/valorufmanual' ,{ annios,messes,diasPorMes, req ,layout: 'template'});
 });
 
+function isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+}
+function diasEnUnMes(mes, año) {
+	return new Date(año, mes, 0).getDate();
+}
 
+router.post('/ajax', express.json({type: '*/*'}), async (req,res) => {
+    //res.json(req.body);
 
+    //console.log(req.body);
+    for (let i in req.body)
+    {
+        var fecha = req.body[i].fecha;
+        var valor = req.body[i].valor;
 
+        const monedaValor  ={ //Se gurdaran en un nuevo objeto
+            id_moneda : 4,
+            fecha_valor : fecha,
+            valor :  valor
+        };
+        //Guardar datos en la BD     
+        //DELETE FROM `rle_red`.`moneda_valor` WHERE  `id_moneda`=4 AND `fecha_valor`='2020-11-06' AND `valor`=28872.0400 LIMIT 1;
+        const result0 = await pool.query('DELETE FROM moneda_valor WHERE id_moneda = ? AND fecha_valor = ?', [4,fecha]);
+        const result = await pool.query('INSERT INTO moneda_valor set ?', [monedaValor]);//Inserción
 
+    }
+    res.send("OK");
+});
+    
 router.post('/addPais', async (req,res) => {
     const { name } = req.body; //Obtener datos title,url,description
 
@@ -672,7 +732,7 @@ router.get('/categoria/delete/:id', async (req, res) => {
     const { id } = req.params;
 
     const nombre = await pool.query('SELECT categoria FROM categorias WHERE id = ?', [id]);
-    console.log(nombre);
+    ///console.log(nombre);
 
 
 
@@ -775,7 +835,7 @@ router.get('/sucursal/delete/:id', async (req, res) => {
     const { id } = req.params;
 
     const nombre = await pool.query('SELECT direccion FROM sys_sucursal WHERE id_Sucursal = ?', [id]);
-    console.log(nombre);
+    //console.log(nombre);
 
 
 

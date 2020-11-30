@@ -1,0 +1,229 @@
+<div class="col-md-12 col-sm-12  ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Admisnitración de solicitudes de ploteo.<small></small></h2>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <ul class="nav nav-tabs justify-content-end bar_tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="ingreso-tab" data-toggle="tab" href="#ingreso" role="tab" aria-controls="ingreso" aria-selected="true">Ingresar</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pendiente-tab" data-toggle="tab" href="#pendiente" role="tab" aria-controls="pendiente" aria-selected="false">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="historial-tab" data-toggle="tab" href="#historial" role="tab" aria-controls="historial" aria-selected="false">Historial</a>
+                </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="ingreso" role="tabpanel" aria-labelledby="ingreso-tab">
+                        <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"  action="/ploter/addSolicitud" method="POST">
+                            <span class="section">1.- Que Servicio Solicita</span>  
+                                <div class="form-group row">
+                                    <label class="col-md-1 col-sm-1  control-label">Impresión
+                                    </label>
+                                    <div class="col-md-11 col-sm-11 ">
+                                        <div class="checkbox">
+                                            <label><input  name="Radio1" type="checkbox" value = "1" checked/> ING</label>
+                                            <label><input  name="Radio2" type="checkbox" value = "1"/> ARQ</label>
+                                            <label><input  name="Radio4" type="checkbox" value = "1"/> Portada</label>
+                                            <label><input  name="Radio3" type="checkbox" value = "1"/> Listado</label>
+                                            <label><input  name="Radio5" type="checkbox" value = "1"/> Doblado</label>
+                                            <label><input  name="Radio22" type="checkbox" value = "1"/> PDF</label>
+                                            <label><input  name="Radio66" type="checkbox" value = "1"/> Limpiar planos</label>
+                                            <label><input  name="Radio6" type="checkbox" value = "1"/> Otro</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-1 col-sm-1  control-label">Digital 
+                                    </label>
+                                    <div class="col-md-11 col-sm-11 ">
+                                        <div class="checkbox">
+                                            <label><input  name="Radio7" type="checkbox" value = "1" /> Lista de Planos</label>
+                                            <label><input  name="Radio8" type="checkbox" value = "1"/> CD</label>
+                                            <label><input  name="Radio9" type="checkbox" value = "1"/> Mail</label>
+                                            <label><input  name="Radio10" type="checkbox" value = "1"/> Calculo Areas</label>
+                                            <label><input  name="Radio11" type="checkbox" value = "1"/> Bindear</label>
+                                        </div>
+                                    </div>
+                                </div>
+             
+                    <div class="form-group row">
+                        <div class="col-md-4 col-sm-4 ">
+                            <span class="section">2.- Informacion Impresión</span> 
+                                <div class="item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="Proyecto">Proyecto<span class="required">*</span></label>
+                                        <div class="col-md-9 col-sm-9 ">
+                                            <select class="form-control" name="idProyecto" id="idProyecto">                        
+                                                {{#each proyectos}}
+                                                <option value="{{id}}">{{year}}-{{code}} : {{nombre}}</option>
+                                                {{/each}} 
+                                            </select>
+                                        </div>
+                                </div>
+                                <div class="item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="ruta">Ruta Archivos</label>
+                                        <div class="col-md-9 col-sm-9 ">
+                                        <input type="text" id="ruta" class="form-control" value="" name="ruta" placeholder="Ruta del proyecto" />
+                                        </div>
+                                </div>
+                                <div class="item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="fechaHora">Fecha y Hora Entrega:</label>
+                                        <div class="col-md-9 col-sm-9 ">
+                                        <input type="text" id="fecha" class="form-control" value="" name="fecha" placeholder="Ruta del proyecto" />
+                                        </div>
+                                </div>
+                                <div class="item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Destinatario</label>
+                                        <div class="col-md-9 col-sm-9 ">
+                                            <select class="form-control" name="idDestinatario" id="idDestinatario">                        
+                                                {{#each usuarios}}
+                                                <option value="{{id}}">{{NombreCompleto}}</option>
+                                                {{/each}} 
+                                            </select>
+                                        </div>
+                                </div>
+                                <div class="item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="comentarios">Comentarios</label>
+                                        <div class="col-md-9 col-sm-9 ">
+                                        <textarea name="comentarios" id="comentarios" class="form-control" rows="2"></textarea>    
+                                        </div>
+                                </div>
+                        </div>
+                    <div class="col-md-5 col-sm-5 ">
+                        <span class="section">3.- Documentos de Impresión</span> 
+                        <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="ruta">Series (seleccione series completas)</label>
+                                    <div class="col-md-9 col-sm-9 ">
+                                        <div class="checkbox">
+                                        <input  name="Radio12" type="checkbox" value="1" /> Todo
+                                        <input  name="Radio13" type="checkbox" value="1"/> 100
+                                        <input  name="Radio14" type="checkbox" value="1"/> 200
+                                        <input  name="Radio15" type="checkbox" value="1"/> 300
+                                        <input  name="Radio16" type="checkbox" value="1"/> 400
+                                        <input  name="Radio17" type="checkbox" value="1"/> 500
+                                        <input  name="Radio18" type="checkbox" value="1"/> 600
+                                        <input  name="Radio19" type="checkbox" value="1"/> 700
+                                        <input  name="Radio20" type="checkbox" value="1"/> 800
+                                        <input  name="Radio21" type="checkbox" value="1"/> 900
+                                        </div>
+                                    </div>
+                        </div>
+                        <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Otros (100,103;100-103)</label>
+                                    <div class="col-md-9 col-sm-9 ">
+                                        <input type="text" id="otroarch" class="form-control" value="" name="otroarch" placeholder="Otros" />
+                                    </div>
+                        </div>
+                        <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Detalle Escalas</label>
+                                    <div class="col-md-9 col-sm-9 ">
+                                        <input type="text" id="escalas" class="form-control" value="" name="escalas" placeholder="Ingrese detalles de escalas" />
+                                    </div>
+                        </div>
+                        <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Copias Impresion</label>
+                                    <div class="col-md-9 col-sm-9 ">
+                                        <input type="text" id="ncopias" class="form-control" value="" name="ncopias" placeholder="numero de copias" />
+                                    </div>
+                        </div>
+                        <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Copias CD's</label>
+                                    <div class="col-md-9 col-sm-9 ">
+                                        <input type="text" id="ncopiasCD" class="form-control" value="" name="ncopiasCD" placeholder="numero de copias CDs" />
+                                    </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3 ">
+                        <span class="section">4.- Configuración</span> 
+                            <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Formato Papel</label>
+                                    <div class="col-md-9 col-sm-9 ">
+                                        <select class="form-control" name="formapapel" id="formapapel">                        
+                                            <option value="Ninguno">Ninguno</option>
+                                            <option value="Carta">Carta</option>
+                                            <option value="A0">A0</option>
+                                            <option value="A1">A1</option>
+                                            <option value="A2">A2</option>
+                                            <option value="A3">A3</option>
+                                            <option value="A4">A4</option>
+                                            <option value="AF">Ajustado a Formato</option>	
+                                        </select>
+                                    </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Tipo Papel</label>
+                                    <div class="col-md-9 col-sm-9 ">
+                                        <select class="form-control" name="tipopapel" id="tipopapel">                        
+                                            <option value="Ninguno">Ninguno</option>
+                                            <option value="Bond">Bond</option>
+                                            <option value="Vegetal">Vegetal</option>
+                                        </select>
+                                    </div>
+                            </div>
+                    </div>
+                    </div>
+                    <div class="ln_solid"></div>
+                        <div class="form-group">
+                            <div class="col-md-9 col-sm-9  offset-md-5">
+                                <!--<button type="button" class="btn btn-primary">Cancelar</button>-->
+                                <button type="submit" class="btn btn-success">Enviar Solicitud</button>
+                            </div>
+                        </div>
+                    </form> 
+                    </div>
+                    <div class="tab-pane fade" id="pendiente" role="tabpanel" aria-labelledby="pendiente-tab">
+                       <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nombre Proyecto</th> 
+                                    <th>Solicito</th>
+                                    <th>Incluye</th>
+                                    <th>Entrega</th>
+                                    <th>Series</th>	
+                                    <th>Planos</th>
+                                    <th>Formato</t>
+                                    <th>Papel</th>						  						  					  		  						  					  
+                                    <th>Escalas</th>
+                                    <th>Comentario</th>
+                                    <th>Ruta</th>
+                                    <th>Copias Impresas</th>
+                                    <th>Copias CD</th>
+                                    <th>Fecha Solicitud</th>
+                                    <th>Destinatario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {{#each usuarios}}
+                            <tr>
+                                <th scope="row">{{idUsuario}}</th>
+                                <td>{{NombreCompleto}}</td>
+                                <td>{{Email}}</td>
+                                <td>{{Telefono}}</td>
+                                <td>{{login}}</td>
+                                <td>{{categoria}}</td>                                                        
+                                <td>{{direccion}}</td>
+                                <td style="padding: .15rem;">                                          
+                                    <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"href="usuario/delete/{{idUsuario}}">
+                                        Borrar
+                                    </a>
+                                    <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"href="usuario/editar/{{idUsuario}}">
+                                        Editar
+                                    </a>
+                                    <a style="padding: .25rem;" type="button" class="btn btn-warning btn-xs"href="usuario/permisos/{{idUsuario}}">
+                                        Permisos
+                                    </a>
+                                </td>
+                            </tr>
+                            {{/each}}
+                    </table>
+                    </div>
+                    <div class="tab-pane fade" id="historial" role="tabpanel" aria-labelledby="historial-tab">
+                        Cargar tabla con el historial de las cosas. 
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>

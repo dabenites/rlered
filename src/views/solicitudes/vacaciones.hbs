@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8'>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSRF Token-->
+  <meta name="csrf-token" content="DeScwEWMqNNcFQoVzueIxDfZlUQLL3b1sNASG5u0">
+
+  <title>Document</title>
+  <link href='../../core/main.css' rel='stylesheet' />
+  <link href='../../daygrid/main.css' rel='stylesheet' />
+
+  <!--Estilos de vistas-->
+  <link href='../../list/main.css' rel='stylesheet' />
+  <link href='../../timegrid/main.css' rel='stylesheet' />
+
+
+  <!--CSS-->
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+    }
+
+    #calendar {
+      max-width: 800px;
+      margin: 40px auto;
+    }
+  </style>
+
+
+  <!--Codigo del FULL CALENDAR-->
+  <script src='../core/main.js'></script>
+  <script src='../interaction/main.js'></script>
+  <script src='../../daygrid/main.js'></script>
+
+  <!--Funcionalidades adicionales-->
+  <script src='../../list/main.js'></script>
+  <script src='../../timegrid/main.js'></script>
+
+  <script src='../core/locales/es.js'></script>
+
+
+
+
+  <!--JQuery-->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+
+
+
+
+
+
+
+  <!--Funcionalidad y uso de fullcalendar-->
+  <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var calendarEl = document.getElementById('calendar');
+
+
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        defaultDate: new Date(), //cambiar la fecha inicial
+        plugins: ['dayGrid', 'interaction', 'timeGrid', 'list'],
+        defaultView: 'dayGridMonth',
+        /*CABEZERA */
+        header: {
+          left: 'prev, next today ',
+          center: 'title',
+          right: 'dayGridMonth, Miboton'
+
+        },
+        selectable: true,
+        selectHelper: true,
+        eventLimit: true,
+        //eventLimit: 1,
+        editable: true,
+        select: true,
+        Boolean, default: true,
+        hiddenDays: [0, 6],
+        // allDay:true,
+
+
+
+
+
+        /*BOTON*/
+        customButtons: {
+
+          Miboton: {
+            text: "Listar información",
+            click: function () {
+
+              // ir a la base de datos preguntar lacantidad de dias que entrega 
+              /*$.ajax({
+                      type: 'post',
+                      url: '/solicitudes/getDias'
+                    },success : function(response){
+                      $('#txtfecha').val(response);
+                    });*/
+
+              $.ajax({
+                type: 'post',
+                url: '/solicitudes/getDias',
+                data: Object,
+                dataType: 'text'
+              })
+                .done(function (data) {
+                  console.log(data);
+                  $('#txtfecha').val(data);
+                });
+              $('#exampleModal').modal('toggle'); //Me muestra el formulario si esta oculto
+            }
+          }
+        },
+
+
+        //Selecciona con click en una fecha determinada
+
+        dateClick: function (info) {
+
+          //$('#txtfecha').val(info.dateStr);//Me muestra la fecha seleccionada 
+          calendar.addEvent({ date: info.dateStr });
+
+
+          var informacion = [];
+          const fecha = {
+            dia: info.dateStr
+
+          };
+          informacion.push(fecha);
+
+
+
+          $.ajax({
+            type: 'post',
+            url: '/solicitudes/ajaxAdd',
+            contentType: 'application/json',
+            data: JSON.stringify(informacion),
+          });
+        },
+
+
+        eventClick: function (info) {
+          console.log(info)
+          console.log(info.event.dateStr);//se saca
+          console.log(info.event.start);//se sac
+
+          console.log(info.event.end);//se saca
+          console.log(info.event.textColor);//se saca
+          console.log(info.event.backgroundColor);//se saca
+
+          console.log(info.event.extendedProps.descripcion);//se saca 
+
+
+        },
+
+
+      });
+
+      calendar.setOption('locale', 'Es');
+
+      calendar.render();
+
+    });
+
+  </script>
+
+
+</head>
+
+
+
+
+<body>
+
+
+  <!-- Modal -->
+  <!--<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+      <div class="x_title">
+
+        <div class="clearfix">
+        </div>
+      </div>
+      <div class="x_content">-->
+
+
+
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Vacaciones <small>Ingresar solicitud</small> </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+          <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        <form action="/solicitudes/AddIngreso" method="POST">
+
+          <div class="x_content">
+
+            <div class="x_title">
+              <div class="clearfix"></div>
+              <br />
+
+              <label for="Nombre Aprobador">Aprobador * :</label>
+              <select class=" form-control" name="idAprobador" id="idAprobador">
+                {{#each usuarios}}
+                <option value="{{idUsuario}}">{{NombreCompleto}}</option>
+                {{/each}}
+              </select>
+
+
+              <label for="Fecha">Días seleccionados:</label>
+              <input type="txt" id="txtfecha" class="form-control" value="{{sol_selec_dias.fecha}}" name="txtfecha"
+                Readonly />
+
+
+              <label for="Informar">Informar a * :</label>
+              <select class=" form-control" name="idInformar" id="idInformar">
+                {{#each usuarios}}
+                <option value="{{idUsuario}}">{{NombreCompleto}}</option>
+                {{/each}}
+              </select>
+
+
+              <div class="item form-group">
+                <label class="col-form-label col-md-3 col-sm-3 label-align" for="txtComentario">Comentario<span
+                    class="required"></span>
+                </label>
+                <div class="col-md-6 col-sm-6 ">
+                  <textarea type="txt" id="comentario" name="comentario" required="required" class="form-control"
+                    rows="5" cols="84"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <!--</div>-->
+
+          <!--</form>-->
+
+          <div class="modal-footer">
+
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" id="btnAgregar" class="btn btn-success">Agregar</button>
+          </div>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col"></div>
+    <div class="col-10">
+      <div id='calendar'></div>
+    </div>
+    <div class="col"></div>
+
+    <div id="calendar"></div>
+
+
+</body>
+
+</html>

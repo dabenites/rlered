@@ -219,7 +219,7 @@ router.post('/usuario/permisos', async (req,res) => {
 
     res.render('mantenedores/usuarios', { verToask, req ,usuarios,layout: 'template'});
 
-})
+});
 
 
 

@@ -10,7 +10,7 @@
                     <a class="nav-link active" id="ingreso-tab" data-toggle="tab" href="#ingreso" role="tab" aria-controls="ingreso" aria-selected="true">Ingresar</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="pendiente-tab" data-toggle="tab" href="#pendiente" role="tab" aria-controls="pendiente" aria-selected="false">Profile</a>
+                    <a class="nav-link" id="pendiente-tab" data-toggle="tab" href="#pendiente" role="tab" aria-controls="pendiente" aria-selected="false">Pendientes</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="historial-tab" data-toggle="tab" href="#historial" role="tab" aria-controls="historial" aria-selected="false">Historial</a>
@@ -25,14 +25,14 @@
                                     </label>
                                     <div class="col-md-11 col-sm-11 ">
                                         <div class="checkbox">
-                                            <label><input  name="Radio1" type="checkbox" value = "1" checked/> ING</label>
-                                            <label><input  name="Radio2" type="checkbox" value = "1"/> ARQ</label>
-                                            <label><input  name="Radio4" type="checkbox" value = "1"/> Portada</label>
-                                            <label><input  name="Radio3" type="checkbox" value = "1"/> Listado</label>
-                                            <label><input  name="Radio5" type="checkbox" value = "1"/> Doblado</label>
-                                            <label><input  name="Radio22" type="checkbox" value = "1"/> PDF</label>
-                                            <label><input  name="Radio66" type="checkbox" value = "1"/> Limpiar planos</label>
-                                            <label><input  name="Radio6" type="checkbox" value = "1"/> Otro</label>
+                                            <label><input  name="impresion" type="checkbox" value = "ING" checked/> ING</label>
+                                            <label><input  name="impresion" type="checkbox" value = "ARQ"/> ARQ</label>
+                                            <label><input  name="impresion" type="checkbox" value = "Portada"/> Portada</label>
+                                            <label><input  name="impresion" type="checkbox" value = "Listado"/> Listado</label>
+                                            <label><input  name="impresion" type="checkbox" value = "Doblado"/> Doblado</label>
+                                            <label><input  name="impresion" type="checkbox" value = "PDF"/> PDF</label>
+                                            <label><input  name="impresion" type="checkbox" value = "Limpiar planos"/> Limpiar planos</label>
+                                            <label><input  name="impresion" type="checkbox" value = "Otro"/> Otro</label>
                                         </div>
                                     </div>
                                 </div>
@@ -41,11 +41,11 @@
                                     </label>
                                     <div class="col-md-11 col-sm-11 ">
                                         <div class="checkbox">
-                                            <label><input  name="Radio7" type="checkbox" value = "1" /> Lista de Planos</label>
-                                            <label><input  name="Radio8" type="checkbox" value = "1"/> CD</label>
-                                            <label><input  name="Radio9" type="checkbox" value = "1"/> Mail</label>
-                                            <label><input  name="Radio10" type="checkbox" value = "1"/> Calculo Areas</label>
-                                            <label><input  name="Radio11" type="checkbox" value = "1"/> Bindear</label>
+                                            <label><input  name="digital" type="checkbox" value = "Lista de Planos" /> Lista de Planos</label>
+                                            <label><input  name="digital" type="checkbox" value = "CD"/> CD</label>
+                                            <label><input  name="digital" type="checkbox" value = "Mail"/> Mail</label>
+                                            <label><input  name="digital" type="checkbox" value = "Calculo Areas"/> Calculo Areas</label>
+                                            <label><input  name="digital" type="checkbox" value = "Bindear"/> Bindear</label>
                                         </div>
                                     </div>
                                 </div>
@@ -72,7 +72,7 @@
                                 <div class="item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3 label-align" for="fechaHora">Fecha y Hora Entrega:</label>
                                         <div class="col-md-9 col-sm-9 ">
-                                        <input type="text" id="fecha" class="form-control" value="" name="fecha" placeholder="Ruta del proyecto" />
+                                        <input type="text" id="fecha" class="form-control" value="03-12-2020" name="fecha" placeholder="Ruta del proyecto" />
                                         </div>
                                 </div>
                                 <div class="item form-group">
@@ -80,7 +80,7 @@
                                         <div class="col-md-9 col-sm-9 ">
                                             <select class="form-control" name="idDestinatario" id="idDestinatario">                        
                                                 {{#each usuarios}}
-                                                <option value="{{id}}">{{NombreCompleto}}</option>
+                                                <option value="{{idUsuario}}">{{NombreCompleto}}</option>
                                                 {{/each}} 
                                             </select>
                                         </div>
@@ -98,16 +98,16 @@
                                 <label class="col-form-label col-md-3 col-sm-3 label-align" for="ruta">Series (seleccione series completas)</label>
                                     <div class="col-md-9 col-sm-9 ">
                                         <div class="checkbox">
-                                        <input  name="Radio12" type="checkbox" value="1" /> Todo
-                                        <input  name="Radio13" type="checkbox" value="1"/> 100
-                                        <input  name="Radio14" type="checkbox" value="1"/> 200
-                                        <input  name="Radio15" type="checkbox" value="1"/> 300
-                                        <input  name="Radio16" type="checkbox" value="1"/> 400
-                                        <input  name="Radio17" type="checkbox" value="1"/> 500
-                                        <input  name="Radio18" type="checkbox" value="1"/> 600
-                                        <input  name="Radio19" type="checkbox" value="1"/> 700
-                                        <input  name="Radio20" type="checkbox" value="1"/> 800
-                                        <input  name="Radio21" type="checkbox" value="1"/> 900
+                                        <input  name="series" type="checkbox" value="Todas" /> Todo
+                                        <input  name="series" type="checkbox" value="100"/> 100
+                                        <input  name="series" type="checkbox" value="200"/> 200
+                                        <input  name="series" type="checkbox" value="300"/> 300
+                                        <input  name="series" type="checkbox" value="400"/> 400
+                                        <input  name="series" type="checkbox" value="500"/> 500
+                                        <input  name="series" type="checkbox" value="600"/> 600
+                                        <input  name="series" type="checkbox" value="700"/> 700
+                                        <input  name="series" type="checkbox" value="800"/> 800
+                                        <input  name="series" type="checkbox" value="900"/> 900
                                         </div>
                                     </div>
                         </div>
@@ -196,28 +196,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {{#each usuarios}}
-                            <tr>
-                                <th scope="row">{{idUsuario}}</th>
-                                <td>{{NombreCompleto}}</td>
-                                <td>{{Email}}</td>
-                                <td>{{Telefono}}</td>
-                                <td>{{login}}</td>
-                                <td>{{categoria}}</td>                                                        
-                                <td>{{direccion}}</td>
-                                <td style="padding: .15rem;">                                          
-                                    <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"href="usuario/delete/{{idUsuario}}">
-                                        Borrar
-                                    </a>
-                                    <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"href="usuario/editar/{{idUsuario}}">
-                                        Editar
-                                    </a>
-                                    <a style="padding: .25rem;" type="button" class="btn btn-warning btn-xs"href="usuario/permisos/{{idUsuario}}">
-                                        Permisos
-                                    </a>
-                                </td>
-                            </tr>
-                            {{/each}}
                     </table>
                     </div>
                     <div class="tab-pane fade" id="historial" role="tabpanel" aria-labelledby="historial-tab">

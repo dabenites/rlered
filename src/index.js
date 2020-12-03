@@ -13,7 +13,6 @@ const bodyParser = require('body-parser');
 const { database } = require('./keys');
 
 
-
 //Inicialización 
 const app = express();
 require('./lib/passport');

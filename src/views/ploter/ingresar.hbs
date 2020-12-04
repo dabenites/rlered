@@ -175,7 +175,7 @@
                     </form> 
                     </div>
                     <div class="tab-pane fade" id="pendiente" role="tabpanel" aria-labelledby="pendiente-tab">
-                       <table class="table table-hover">
+                         <table class="table table-hover" name="example" id="example">
                             <thead>
                                 <tr>
                                     <th>Nombre Proyecto</th> 
@@ -183,7 +183,54 @@
                                     <th>Incluye</th>
                                     <th>Entrega</th>
                                     <th>Series</th>	
-                                    <th>Planos</th>
+                                    <th>Formato</t>
+                                    <th>Papel</th>						  						  					  		  						  					  
+                                    <th>Escalas</th>
+                                    <th>Comentario</th>
+                                    <th>Ruta</th>
+                                    <th>Copias Impresas</th>
+                                    <th>Copias CD</th>
+                                    <th>Fecha Solicitud</th>
+                                    <th>Destinatario</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each ploteosPendientes}}
+                                    <tr>
+                                        <td>{{nombre}}</td> 
+                                        <td>{{login}}</td>
+                                        <td>{{complementeo}}</td>
+                                        <td>{{prioridad}}</td>
+                                        <td>{{serie1}}</td>	
+                                        <td>{{formapapel}}</td>
+                                        <td>{{tipopapel}}</td>						  						  					  		  						  					  
+                                        <td>{{scalaespecial}}</td>
+                                        <td>{{observacion}}</td>
+                                        <td>{{ruta}}</td>
+                                        <td>{{ncopiasimp}}</td>
+                                        <td>{{ncopiascd}}</td>
+                                        <td>{{fecha}}</td>
+                                        <td>{{destinatario}}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-info btn-xs" onclick="cargaEstado('Procesando',{{id}})">Procesando</button>
+                                            <button type="button" class="btn btn-info btn-xs" onclick="cargaEstado('Terminado',{{id}})">Terminado</button>
+                                        </td>
+                                    </tr>
+                                {{/each}} 
+                            </tbody>
+                            
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="historial" role="tabpanel" aria-labelledby="historial-tab">
+                        <table class="table table-hover" name="tablafacturacion" id="tablafacturacion">
+                            <thead>
+                                <tr>
+                                    <th>Nombre Proyecto</th> 
+                                    <th>Solicito</th>
+                                    <th>Incluye</th>
+                                    <th>Entrega</th>
+                                    <th>Series</th>	
                                     <th>Formato</t>
                                     <th>Papel</th>						  						  					  		  						  					  
                                     <th>Escalas</th>
@@ -196,12 +243,57 @@
                                 </tr>
                             </thead>
                             <tbody>
-                    </table>
-                    </div>
-                    <div class="tab-pane fade" id="historial" role="tabpanel" aria-labelledby="historial-tab">
-                        Cargar tabla con el historial de las cosas. 
+                                {{#each ploteos}}
+                                    <tr>
+                                        <td>{{nombre}}</td> 
+                                        <td>{{login}}</td>
+                                        <td>{{complementeo}}</td>
+                                        <td>{{prioridad}}</td>
+                                        <td>{{serie1}}</td>	
+                                        <td>{{formapapel}}</td>
+                                        <td>{{tipopapel}}</td>						  						  					  		  						  					  
+                                        <td>{{scalaespecial}}</td>
+                                        <td>{{observacion}}</td>
+                                        <td>{{ruta}}</td>
+                                        <td>{{ncopiasimp}}</td>
+                                        <td>{{ncopiascd}}</td>
+                                        <td>{{fecha}}</td>
+                                        <td>{{destinatario}}</td>
+                                    </tr>
+                                {{/each}} 
+                            </tbody>
+                            
+                        </table>
                     </div>
                 </div>
         </div>
     </div>
 </div>
+
+<script>
+
+    function cargaEstado(estado , key) 
+    {
+        var informacion = [];
+                const dato = {
+                        estado : estado,
+                        id : key
+                    };
+                informacion.push(dato);
+
+
+        $.ajax({  
+            type: 'post',
+            url:'/ploter/cambiaEstado',  
+            contentType: 'application/json',
+            data: JSON.stringify(informacion),
+            success:function(response){  
+                console.log(response);
+            },  
+            error:function(response){  
+                     alert('server error');     
+            }  
+        });  
+
+    }
+</script>

@@ -11,8 +11,13 @@ const { isLoggedIn } = require('../lib/auth');
 router.get('/ploteo', isLoggedIn, async (req, res) => {
 
     const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");       
-    const usuarios = await pool.query('SELECT * FROM sys_usuario');                             
-    res.render('ploter/ingresar', { proyectos,usuarios, req ,layout: 'template'});
+    const usuarios = await pool.query('SELECT * FROM sys_usuario');      
+    
+    const ploteos =  await pool.query('SELECT * FROM solicitudes ORDER BY id DESC LIMIT 100');      
+    const ploteosPendientes =  await pool.query("SELECT * FROM solicitudes as t WHERE t.estado in ('Pendiente', 'Proceso') ");
+
+    //console.log(ploteos);
+    res.render('ploter/ingresar', { proyectos,usuarios,ploteos, ploteosPendientes , req ,layout: 'template'});
 }); 
 
 router.post('/addSolicitud', isLoggedIn, async (req, res) => {
@@ -126,14 +131,14 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
         comen : ''
     };
 
-    console.log('INSERT INTO solicitudes set ?', [solicitud]);
+    //console.log('INSERT INTO solicitudes set ?', [solicitud]);
 
     const result = pool.query('INSERT INTO solicitudes set ?', [solicitud]);
 
 
     
 
-    console.log(mailImpresion);
+    //console.log(mailImpresion);
 
 
 
@@ -200,6 +205,31 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
 */
    res.send("Mensaje");
 }); 
+
+
+router.post('/cambiaEstado',express.json({type: '*/*'}), isLoggedIn, async (req, res) => {
+
+    //console.log(req.body[0].estado);
+    //res.send("mensaje");
+    //update solicitudes set estado = '$var', horat = '$hora' where id=$cod
+
+    switch(req.body[0].estado)
+    {
+        case 'Procesando':
+            const pro = await pool.query('UPDATE solicitudes set estado = ? WHERE id = ?', [req.body[0].estado,req.body[0].id]);
+            res.send("mensaje");
+        break;
+        case 'Terminado':
+            var hora = dateFormat(new Date(), "HH:MM");
+            var fecha = dateFormat(new Date(), "dd-mm-yyyy");
+            const ter = await pool.query('UPDATE solicitudes set estado = ? , horat = ? ,fechat = ? WHERE id = ?', [req.body[0].estado,hora,fecha,req.body[0].id]);
+            res.send("mensaje");
+        break;
+    }
+}); 
+
+
+
 
 
 

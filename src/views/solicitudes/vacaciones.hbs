@@ -1,21 +1,9 @@
-<!DOCTYPE html>
-<html lang='en'>
-
-<head>
-  <meta charset='utf-8'>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- CSRF Token-->
-  <meta name="csrf-token" content="DeScwEWMqNNcFQoVzueIxDfZlUQLL3b1sNASG5u0">
-
-  <title>Document</title>
+  <!--
   <link href='../../core/main.css' rel='stylesheet' />
   <link href='../../daygrid/main.css' rel='stylesheet' />
-
-  <!--Estilos de vistas-->
-  <link href='../../list/main.css' rel='stylesheet' />
+  <link href='../../list/main.css' rel='stylesheet' /> 
   <link href='../../timegrid/main.css' rel='stylesheet' />
-
+  -->
 
   <!--CSS-->
   <style>
@@ -28,34 +16,28 @@
     }
 
     #calendar {
-      max-width: 800px;
+      max-width: 100%;
       margin: 40px auto;
     }
   </style>
 
 
   <!--Codigo del FULL CALENDAR-->
+  <!--
   <script src='../core/main.js'></script>
   <script src='../interaction/main.js'></script>
   <script src='../../daygrid/main.js'></script>
-
-  <!--Funcionalidades adicionales-->
   <script src='../../list/main.js'></script>
   <script src='../../timegrid/main.js'></script>
-
   <script src='../core/locales/es.js'></script>
-
-
-
-
-  <!--JQuery-->
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+  -->
 
-
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.css' rel='stylesheet' />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.js"></script>
 
 
 
@@ -64,50 +46,25 @@
   <!--Funcionalidad y uso de fullcalendar-->
   <script>
 
-    document.addEventListener('DOMContentLoaded', function () {
-      var calendarEl = document.getElementById('calendar');
+   document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
 
-
-      var calendar = new FullCalendar.Calendar(calendarEl, {
-        defaultDate: new Date(), //cambiar la fecha inicial
-        plugins: ['dayGrid', 'interaction', 'timeGrid', 'list'],
-        defaultView: 'dayGridMonth',
-        /*CABEZERA */
-        header: {
-          left: 'prev, next today ',
-          center: 'title',
-          right: 'dayGridMonth, Miboton'
-
-        },
-        selectable: true,
-        selectHelper: true,
-        eventLimit: true,
-        //eventLimit: 1,
-        editable: true,
-        select: true,
-        Boolean, default: true,
-        hiddenDays: [0, 6],
-        // allDay:true,
-
-
-
-
-
-        /*BOTON*/
-        customButtons: {
-
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    headerToolbar: {
+      left: 'prev,next',
+      center: 'title',
+      right: 'Miboton'
+    },
+    initialDate: new Date(),
+    hiddenDays: [0, 6],
+    contentHeight: 650,
+    height: 650,
+    customButtons: {
           Miboton: {
-            text: "Listar información",
+            text: "Ingresar Solicitud",
             click: function () {
 
               // ir a la base de datos preguntar lacantidad de dias que entrega 
-              /*$.ajax({
-                      type: 'post',
-                      url: '/solicitudes/getDias'
-                    },success : function(response){
-                      $('#txtfecha').val(response);
-                    });*/
-
               $.ajax({
                 type: 'post',
                 url: '/solicitudes/getDias',
@@ -115,73 +72,70 @@
                 dataType: 'text'
               })
                 .done(function (data) {
-                  console.log(data);
+                  //console.log(data);
                   $('#txtfecha').val(data);
                 });
               $('#exampleModal').modal('toggle'); //Me muestra el formulario si esta oculto
             }
           }
         },
+    events: '/solicitudes/eventos',
+    //events:[      {        start: '2020-12-15',        display: 'background',        overlap: false      }    ],
+    dateClick: function (info) {
 
+         // var allEvents = getEvents();
+        
 
-        //Selecciona con click en una fecha determinada
+         // console.log(jsEvent);
+        var diaSolicitado = calendar.formatDate(info.dateStr, {
+                                                                year: 'numeric',
+                                                                month: 'numeric',
+                                                                day: 'numeric'
+                                                              });
 
-        dateClick: function (info) {
+         var allEvents = calendar.getEvents();
+         var exists = false;
+         $.each( allEvents, function( index, value ){
+            //  console.log(moment(value.start).format("DD-MM-YYYY HH:mm"));
+            //  calendar.formatDate();
+            //  console.log(formatDate(value.start, 'MM-dd-yyyy'));
 
-          //$('#txtfecha').val(info.dateStr);//Me muestra la fecha seleccionada 
+                    var diaEvento = calendar.formatDate(value.start, {
+                                                                year: 'numeric',
+                                                                month: 'numeric',
+                                                                day: 'numeric'
+                                                              });
+
+                    if (diaSolicitado == diaEvento)
+                      exists = true;
+
+         });
+        
+        if (!exists)
+        {
           calendar.addEvent({ date: info.dateStr });
-
 
           var informacion = [];
           const fecha = {
             dia: info.dateStr
-
           };
           informacion.push(fecha);
-
-
-
           $.ajax({
             type: 'post',
             url: '/solicitudes/ajaxAdd',
             contentType: 'application/json',
             data: JSON.stringify(informacion),
           });
+        }
+          
         },
+  });
 
-
-        eventClick: function (info) {
-          console.log(info)
-          console.log(info.event.dateStr);//se saca
-          console.log(info.event.start);//se sac
-
-          console.log(info.event.end);//se saca
-          console.log(info.event.textColor);//se saca
-          console.log(info.event.backgroundColor);//se saca
-
-          console.log(info.event.extendedProps.descripcion);//se saca 
-
-
-        },
-
-
-      });
-
-      calendar.setOption('locale', 'Es');
-
-      calendar.render();
-
-    });
+  calendar.render();
+});
 
   </script>
 
-
-</head>
-
-
-
-
-<body>
 
 
   <!-- Modal -->
@@ -193,7 +147,6 @@
         </div>
       </div>
       <div class="x_content">-->
-
 
 
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -264,17 +217,4 @@
     </div>
   </div>
 
-
-  <div class="row">
-    <div class="col"></div>
-    <div class="col-10">
-      <div id='calendar'></div>
-    </div>
-    <div class="col"></div>
-
-    <div id="calendar"></div>
-
-
-</body>
-
-</html>
+      <div id='calendar' name="calendar" style="width: 70%;"></div>

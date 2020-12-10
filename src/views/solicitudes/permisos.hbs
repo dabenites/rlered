@@ -1,0 +1,216 @@
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+    }
+
+    #calendar {
+      max-width: 100%;
+      margin: 40px auto;
+    }
+  </style>
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.css' rel='stylesheet' />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.js"></script>
+<script src='../core/locales/es.js'></script>
+
+  <!--Funcionalidad y uso de fullcalendar-->
+  <script>
+
+   document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
+
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    headerToolbar: {
+      left: 'prev,next',
+      center: 'title',
+      right: ''
+    },
+    businessHours: [ // specify an array instead
+        {
+            daysOfWeek: [ 1, 2, 3, 4 ], // Monday, Tuesday, Wednesday
+            startTime: '08:00', // 8am
+            endTime: '18:30' // 6pm
+        },
+        {
+            daysOfWeek: [ 5 ], //  Friday
+            startTime: '08:00', // 10am
+            endTime: '13:30' // 4pm
+        }
+        ],
+    slotMinTime: "08:00:00",
+    slotMaxTime: "18:30:00",
+     allDaySlot: false,
+    initialView: 'timeGridWeek',
+    initialDate: new Date(),
+    hiddenDays: [0, 6],
+    contentHeight: 650,
+    height: 650,
+    selectable: true,
+    select: function(info) {
+      //alert('selected ' + info.startStr + ' to ' + info.endStr);
+     var diaInicial = calendar.formatDate(info.startStr, {
+                                                                year: 'numeric',
+                                                                month: 'numeric',
+                                                                day: 'numeric'
+                                                              });
+
+      var horaInicial =  calendar.formatDate(info.startStr, { hour: '2-digit' , minute : '2-digit'});
+
+      var diaTermino = calendar.formatDate(info.endStr, {
+                                                                year: 'numeric',
+                                                                month: 'numeric',
+                                                                day: 'numeric'
+                                                              });
+
+      var horaTermino =  calendar.formatDate(info.endStr, { hour: '2-digit' , minute : '2-digit'});
+
+      var Per = "";
+      if (diaInicial == diaTermino)
+      {
+        Per = "Dia " + diaInicial + " Horario : " + horaInicial + " Hasta " + horaTermino;
+      }
+      else
+      {
+        Per = "Desde" + diaInicial + " " +horaInicial +  " Hasta "+  diaTermino + " " + horaTermino;
+      }
+
+     $('#fechaI').val(diaInicial);
+     $('#horaI').val(horaInicial);
+     $('#fechaT').val(diaTermino);
+     $('#horaT').val(horaTermino);
+
+     $('#periodo').html(Per);
+      $('#exampleModal').modal('toggle'); 
+    },
+    events: '/solicitudes/getPermisos',
+  });
+ 
+  calendar.setOption('locale', 'es');
+  calendar.render();
+});
+
+  </script>
+
+
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Ingreso de Permisos</h2>
+                     <ul class="nav navbar-right panel_toolbox">
+                      Solicitado&nbsp;<button style=" background-color: rgb(51, 196, 255)"></button>&nbsp;&nbsp;
+                      Aprobado&nbsp;<button style=" background-color:rgb(51, 255, 88)"></button>
+                    </ul>
+
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+
+                    <div id='calendar' name="calendar" style="width: 70%;"></div>
+
+                  </div>
+                </div>
+
+
+
+
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Permisos <small>Seleccione un tipo de permisos.</small> </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+          <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        <form action="/solicitudes/IngresoPermiso" method="POST">
+
+          <div class="x_content">
+
+            <div class="x_title">
+              <div class="clearfix"></div>
+             <div class="item form-group">
+                    
+					    <label>
+								<input type="radio" class="flat" name="tipoP" id="Per" value="Per" checked onclick="validoTipo(this.value);"> Permiso     <br>
+                <!-- <input type="radio" class="flat" name="tipoP" id="Act" value="Act" onclick="validoTipo(this.value);"> Actividad no relacionada a proyecto -->
+              </label>
+             </div>
+             <div class="item form-group">
+                <label>Perdiodo : </label>
+                <label id="periodo" name="periodo"></label>
+                <input id="fechaI" name="fechaI" type="hidden" value="">
+                <input id="horaI" name="horaI" type="hidden" value="">
+                <input id="fechaT" name="fechaT" type="hidden" value="">
+                <input id="horaT" name="horaT" type="hidden" value="">
+             </div>
+             <div name="actividad" id="actividad" style="display:none">
+               <div class="item form-group">
+                 <label class="col-form-label col-md-3 col-sm-3 label-align" for="Nombre Aprobador">Actividad </label>
+                  <select class=" form-control" name="idActividad" id="idActividad">
+                      <option value="0">Seleccione</option>
+                      <option value="1">Actividad RLE</option>
+                      <option value="2">Permiso NO recuperable</option>
+                      <option value="2">Permiso NO recuperable</option>
+                      <option value="3">Capacitacion</option>
+                      <option value="5">Seminario/Congreso</option>
+                  </select>
+               </div>
+             </div>
+
+             <div class="item form-group">
+                <label class="col-form-label col-md-3 col-sm-3 label-align" for="Nombre Aprobador">Aprobador</label>
+                  <select class=" form-control" name="idAprobador" id="idAprobador">
+                    {{#each usuarios}}
+                        <option value="{{idUsuario}}">{{NombreCompleto}}</option>
+                    {{/each}}
+                  </select>
+             </div>
+              <div class="item form-group">
+                <label class="col-form-label col-md-3 col-sm-3 label-align" for="txtComentario">Comentario<span
+                    class="required"></span>
+                </label>
+                <div class="col-md-9 col-sm-9 ">
+                  <textarea type="txt" id="comentario" name="comentario" required="required" class="form-control"
+                    rows="5" cols="84"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <!--</div>-->
+
+          <!--</form>-->
+
+          <div class="modal-footer">
+
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" id="btnSolicitar" class="btn btn-success">Solicitar</button>
+          </div>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    function validoTipo(valor)
+    {
+      switch(valor)
+      {
+        case "Per":
+        document.getElementById('actividad').style.display = "none";
+        break;
+        case "Act":
+        document.getElementById('actividad').style.display = "block";
+        break;
+      }
+    
+    }
+
+  </script>

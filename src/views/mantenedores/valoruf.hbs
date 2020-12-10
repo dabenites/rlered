@@ -2,6 +2,7 @@
 						<div class="x_title">
 							<h2>Información moneda UF <small>Tener los valores actualizados para un correcto funcionamiento de los Dashboard</small></h2>
                                 <ul class="nav navbar-right panel_toolbox">
+                                     <button type="button" class="btn btn-success btn-xs"><a class="close-link" href="/mantenedores/valorufmanual"> Actualizar Manual</a></button>
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-clock-o"></i></a>
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -10,7 +11,7 @@
                                                  {{/each}} 
                                             </div>
                                         </li>
-                                    <li><a class="close-link" href="/mantenedores/valorufmanual"><i class="fa fa-hand-o-down"></i></a>    
+                                    <!--<li><a class="close-link" href="/mantenedores/valorufmanual"><i class="fa fa-hand-o-down"></i></a>    -->
                                     <li><a class="close-link"><i class="fa fa-close"></i></a>
                                     </li>
                                 </ul>
@@ -21,6 +22,15 @@
 							<form class="form-horizontal form-label-left">
 							</form>
 						</div>
+                        {{#if actualizarUF}}
+
+                                            <form id="demo-form" data-parsley-validate action="/mantenedores/actualizarUF" method="POST">
+                                                <input type="hidden" name="year" id="year" value="{{year}}">  
+                                                <label>Existen valores de Uf no ingresadas.</label>  
+                                                <button type="submit" class="btn btn-success btn-xs"> Actualizar </button>
+                                            </form>
+                                   
+                        {{/if}}
                         <table class="table table-hover" id="example" class="display">
                             <thead>
                                 <tr>
@@ -40,17 +50,5 @@
                                 </tr>
                                 {{/each}} 
                             </tbody>
-                            <tfoot>
-                                {{#if actualizarUF}}
-                                    <tr>
-                                        <th colspan="2">Existen valores de Uf no ingresadas.
-                                            <form id="demo-form" data-parsley-validate action="/mantenedores/actualizarUF" method="POST">
-                                                <input type="hidden" name="year" id="year" value="{{year}}">    
-                                                <button type="submit" class="btn btn-success btn-xs"> Actualizar </button>
-                                            </form>
-                                        </th>
-                                    </tr>
-                                {{/if}}
-                            </tfoot>
                     </table>
 				</div>

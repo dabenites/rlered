@@ -2,6 +2,7 @@ const express = require('express');
 const { render } = require('timeago.js');
 const router = express.Router();
 const bodyParser = require('body-parser');
+var util = require("util");
 
 //importar una conexión a DB
 const pool = require('../database');
@@ -246,7 +247,7 @@ router.post('/actualizarUF', isLoggedIn, async (req, ress) => {
         res.on('data', function(chunk) {
             data += chunk;
         });
-        res.on('end', function() {
+        res.on('end', async function() {
             var informacion = JSON.parse(data);
             var dateFormat = require('dateformat');
             var actualizarUF = false;
@@ -258,7 +259,10 @@ router.post('/actualizarUF', isLoggedIn, async (req, ress) => {
                                 fecha_valor : dateFormat(informacion.serie[i].fecha,"yyyy-mm-dd"),
                                 valor : informacion.serie[i].valor
                             };
-                            const result = pool.query('INSERT INTO INTO moneda_valor set ?', [newValor]);
+                            //console.log(newValor);
+                            console.log("INSERT INTO INTO moneda_valor (id_moneda,fecha_valor) VALUES (4,'"+ dateFormat(informacion.serie[i].fecha,"yyyy-mm-dd")+"')");
+
+                            
                         }
               }
             ress.redirect('../mantenedores/valoruf');
@@ -293,13 +297,13 @@ router.get('/valoruf', isLoggedIn, async (req, ress) => {
     const indicacoresCL =  {};
 
     // valores de la UF por el año actual
-    const valoresUF = await pool.query("SELECT * FROM moneda_valor AS t1 WHERE t1.fecha_valor LIKE '"+ year +"-%' AND id_moneda = 4");
+    const valoresUF = await pool.query("SELECT *, FORMAT( t1.valor , 2) AS valorFormateado  FROM moneda_valor AS t1 WHERE t1.fecha_valor LIKE '"+ year +"-%' AND id_moneda = 4");
     
     const infoUF = {};
     valoresUF.forEach(function(elemento, indice, array) {
         if (infoUF[elemento.fecha_valor] === undefined)
         {
-            infoUF[elemento.fecha_valor] = elemento.valor;
+            infoUF[elemento.fecha_valor] = elemento.valorFormateado;
         }
     });
     

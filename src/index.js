@@ -68,6 +68,7 @@ app.use('/solicitudes', require('./routes/solicitudes'));
 app.use('/facturacion', require('./routes/facturacion'));
 app.use('/contacto', require('./routes/contacto'));
 app.use('/ploter', require('./routes/ploter'));
+app.use('/bitacora', require('./routes/bitacora'));
 //app.use('/mantenedores/usuario', require('./routes/mantenedores'));
 
 //Archivos publicos 

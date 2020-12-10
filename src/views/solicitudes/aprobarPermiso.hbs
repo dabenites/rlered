@@ -1,0 +1,162 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+<div class="col-md-5 col-sm-5  ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Aprobación de Permisos <small> Listado de permisos por aprobar</small></h2>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Solicitante</th>
+                        <th>Fecha Ingreso</th>
+                        <th>Periordo</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                    <tbody>
+                        {{#if permiso }}
+                            {{#each permisos}}
+                                <tr > 
+                                    <td>{{NombreCompleto}}</td>
+                                    <td>{{fecha}}</td>
+                                    <td>{{fecha_per}} : {{fecha_inicio}} hasta {{fecha_termino}}</td>
+                                    <td>
+                                        <a style="padding: .25rem;" type="button" class="btn btn-primary btn-xs" href="../../solicitudes/revisar/{{id}}">
+                                            Revisar 
+                                        </a>
+                                    </td>
+                                </tr>
+                            {{/each}} 
+                        {{else}}
+                            {{#each permisos}}
+                                <tr > 
+                                    <td>{{NombreCompleto}}</td>
+                                    <td>{{fecha}}</td>
+                                    <td>{{fecha_per}} : {{fecha_inicio}} hasta {{fecha_termino}}</td>
+                                    <td>
+                                        <a style="padding: .25rem;" type="button" class="btn btn-primary btn-xs" href="solicitudes/revisar/{{id}}">
+                                            Revisar 
+                                        </a>
+                                    </td>
+                                </tr>
+                             {{/each}} 
+                        {{/if}}
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ {{#if permiso }}
+<div class="col-md-7 ">
+    <div class="x_panel">
+		<div class="x_title">
+               <h2>Revisar Permiso<small>{{permiso.NombreCompleto}}</small></h2> 
+		    <div class="clearfix"></div>
+		</div>
+        <div class="x_content">
+            <ul class="nav nav-tabs justify-content-end bar_tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="revisar-tab" data-toggle="tab" href="#revisar" role="tab" aria-controls="revisar" aria-selected="true">Revisar</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile1" role="tab" aria-controls="profile" aria-selected="false">Historial Permisos</a>
+                </li>
+            </ul>
+                    <div class="tab-content" id="myTabContent">
+                      <div class="tab-pane fade show active" id="revisar" role="tabpanel" aria-labelledby="home-tab">
+                        <form id="updatePermiso" name="updatePermiso" data-parsley-validate action="/solicitudes/updatePermisos" method="POST">
+                            <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name">Solicitante <span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <input type="text" id="solicitante" class="form-control" value="{{permiso.NombreCompleto}}" name="solicitante" readonly />
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="Centro Costo">Fecha Ingreso  <span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <input type="text" id="fechaIngreso" class="form-control" value="{{permiso.fechaI}}" name="fechaIngreso" readonly />
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="Tipo Moneda">Fecha<span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <input type="text" id="fecha" class="form-control" value="{{permiso.fecha_per}}" name="fecha" readonly />
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="Costo">Hora Inicio<span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <input type="text" id="horaInicio" class="form-control" value="{{permiso.fecha_inicio}}" name="horaInicio" readonly />
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="Num HH">Hora Termino<span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <input type="text" id="horaTermino" class="form-control" value="{{permiso.fecha_termino}}" name="horaTermino" readonly />
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="descripcion">Descripcion<span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 ">
+                                        <textarea class="form-control" rows="3" name="descripcion" id="descripcion" readonly>{{permiso.comentario}}</textarea>         
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="descripcion">Observacion<span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 ">
+                                        <textarea class="form-control" rows="3" name="Observacion" id="Observacion" ></textarea>         
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="col-form-label col-md-4 col-sm-4 label-align" for="descripcion"></label>
+                                <input type="hidden" id="estado" class="form-control" value="" name="estado" readonly />
+                                <input type="hidden" id="id_solicitud" class="form-control" value="{{permiso.id}}" name="id_solicitud" readonly />
+                                <button type="button" onclick="revisarAction(1);"class="btn btn-success" type="reset">Aceptar</button>
+                                <button type="button" onclick="revisarAction(0);" class="btn btn-danger" type="button">Rechazar</button>
+                            </div>
+                        </form>
+                      </div>
+                      <div class="tab-pane fade" id="profile1" role="tabpanel" aria-labelledby="profile-tab">
+                        <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Solicitante</th>
+                                        <th>Fecha Ingreso</th>
+                                        <th>Periordo</th>
+                                    </tr>
+                                </thead>
+                                    <tbody>
+                                            {{#each permisoAnteriores}}
+                                                <tr> 
+                                                    <td>{{NombreCompleto}}</td>
+                                                    <td>{{fechaIngreso}}</td>
+                                                    <td>{{descripcion}}</td>
+                                                </tr>
+                                            {{/each}} 
+                                    </tbody>
+                            </table>
+                      </div>
+                    </div>
+        </div>  
+    </div>
+</div>
+ {{/if}}
+
+<script>
+    function revisarAction(estado)
+        {
+            switch(estado)
+            {
+                case 0:
+                $("#estado").val(0);
+                break;
+                case 1:
+                $("#estado").val(1);
+                break;
+            }
+            document.getElementById("updatePermiso").submit();
+        }
+</script>

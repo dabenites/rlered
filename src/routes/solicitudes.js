@@ -5,6 +5,70 @@ var dateFormat = require('dateformat');
 
 const { isLoggedIn } = require('../lib/auth');
 
+// Permisos 
+router.get('/permisos', isLoggedIn, async (req, res) => {
+  // buscar los datos del usuario en las variables req
+ 
+  //console.log("permisos de usuario");
+  const usuarios = await pool.query('SELECT * FROM sys_usuario');
+
+
+  res.render('solicitudes/permisos', { req ,usuarios,res,layout: 'template'});
+
+  
+
+}); 
+
+
+// INgreso de permisos.
+router.post('/IngresoPermiso', isLoggedIn, async (req, res) => {
+  // buscar los datos del usuario en las variables req
+ 
+ const { tipoP,fechaI,horaI ,fechaT,horaT,idActividad,idAprobador,comentario} = req.body; 
+ var horai = horaI.substring(0, 5);
+ var horaf = horaT.substring(0, 5);
+
+
+ var dateTimeInicio = dateFormat(fechaI, "yyyy-mm-dd") + " " + horai;
+ var dateTimeTermino = dateFormat(fechaT, "yyyy-mm-dd") + " " + horaf;
+ 
+
+ // Permiso
+ const permiso  ={ //Se gurdaran en un nuevo objeto
+
+  idUsuario :  req.user.idUsuario,
+  idAprobador: idAprobador,
+  idInformar : 0,
+  idTipoSolicitud : 2,
+  fecha : new Date(),
+  comentario:comentario,
+  idEstado: '2'
+}
+  //Guardar datos en la BD      
+
+ const infoPermiso = await pool.query('INSERT INTO sol_solicitud  set ? ', [permiso]);
+ const det_permiso  ={ //Se gurdaran en un nuevo objeto
+
+  idUsuario :  req.user.idUsuario,
+  idEstado : 2,
+  idActividad : idActividad,
+  fecha_inicio : dateFormat(dateTimeInicio, 'yyyy-dd-mm HH:MM:ss') ,
+  fecha_termino : dateFormat(dateTimeTermino,'yyyy-dd-mm HH:MM:ss'),
+  idSolicitud : infoPermiso.insertId
+}
+
+
+const infoSolicitud = await pool.query('INSERT INTO sol_permiso  set ? ', [det_permiso]);
+
+// cargada el detalle de la solicitud 
+
+res.redirect("../solicitudes/permisos");
+
+}); 
+
+
+
+
 
 // vacaciones 
 router.get('/vacaciones', isLoggedIn, async (req, res) => {
@@ -34,6 +98,47 @@ router.post('/getDias', async (req,res) => {
   const d =  numeroDias[0]["ndias"].toString();
   
   res.send(d);
+});
+
+
+router.get('/getPermisos', async (req,res) => {
+  
+  const permisosIngresados = await pool.query("SELECT * FROM sol_solicitud AS t , sol_permiso AS t2 WHERE " +
+                                " t.idUsuario = " +req.user.idUsuario + " AND t.idTipoSolicitud = 2 AND " + 
+                                " t.id = t2.idSolicitud"); 
+
+  const permisos = [];
+  permisosIngresados.forEach(element => {
+    switch(element.idEstado)
+    {
+        case 2:
+          const permisoSol = {
+            title : element.comentario,
+            start : element.fecha_inicio,
+            end: element.fecha_termino,
+            overlap: false,
+            color: '#33C4FF'
+        }
+              permisos.push(permisoSol);
+        break;
+        case 3:
+          const permisoApro = {
+            title : element.comentario,
+            start : element.fecha_inicio,
+            end: element.fecha_termino,
+            overlap: false,
+            color: ':#33FF58'
+        }
+        console.log("asd");
+              permisos.push(permisoApro);
+        break;
+    }
+    
+  });
+
+  res.send(permisos);
+
+
 });
 
 router.get('/eventos', async (req,res) => {
@@ -88,9 +193,10 @@ router.get('/vacacionesDiaRle', async (req,res) => {
         
           const diaVacaciones = {
             start : dateFormat(element.fecha, "yyyy-mm-dd"),
-            title : element.NombreCompleto,
-            textColor: 'black',
-            color : '#f8f9fa'
+            display : 'background',
+            overlap: false,
+            color: '#33FF58',
+            title : element.NombreCompleto
             
             
         }
@@ -152,6 +258,7 @@ router.post('/AddIngreso', async (req,res) => {
     idUsuario :  idUsuario,
     idAprobador: idAprobador,
     idInformar : idInformar,
+    idTipoSolicitud : 1,
     fecha : fecha,
     comentario:comentario,
     idEstado: '1'
@@ -168,6 +275,72 @@ router.post('/AddIngreso', async (req,res) => {
 
 
     res.redirect("../solicitudes/vacaciones");
+
+
+});
+
+
+
+router.get('/apermisos', async (req,res) => {
+
+  const permisos  = await pool.query(' SELECT t2.NombreCompleto, '+
+                                    "DATE_FORMAT(t1.fecha,'%Y-%m-%d') AS fecha, " +
+                                    "DATE_FORMAT(t3.fecha_inicio,'%Y-%m-%d' ) AS fecha_per," +
+                                    "DATE_FORMAT(t3.fecha_inicio,'%H:%i' ) AS fecha_inicio," +
+                                    "DATE_FORMAT(t3.fecha_termino,'%H:%i' ) AS fecha_termino, "+
+                                    't1.id' +
+                                    ' FROM sol_solicitud AS t1, sys_usuario AS t2, sol_permiso AS t3 '+
+                                     ' WHERE' +
+                                     ' t1.idTipoSolicitud = 2 AND t1.idEstado = 2 AND t1.idUsuario = t2.idUsuario AND t3.idSolicitud = t1.id ' +
+                                     ' AND ' + 
+                                     " t1.idAprobador = "+ req.user.idUsuario +"");
+
+  res.render('solicitudes/aprobarPermiso', { req ,permisos , layout: 'template'})
+
+}); 
+
+router.get('/solicitudes/revisar/:id', async (req, res) => {
+
+  const { id } = req.params;
+
+  const permisos  = await pool.query(' SELECT t2.NombreCompleto, '+
+                                    "DATE_FORMAT(t1.fecha,'%Y-%m-%d') AS fecha, " +
+                                    "DATE_FORMAT(t3.fecha_inicio,'%Y-%m-%d' ) AS fecha_per," +
+                                    "DATE_FORMAT(t3.fecha_inicio,'%H:%i' ) AS fecha_inicio," +
+                                    "DATE_FORMAT(t3.fecha_termino,'%H:%i' ) AS fecha_termino, "+
+                                    't1.id' +
+                                    ' FROM sol_solicitud AS t1, sys_usuario AS t2, sol_permiso AS t3 '+
+                                     ' WHERE' +
+                                     ' t1.idTipoSolicitud = 2 AND t1.idEstado = 2 AND t1.idUsuario = t2.idUsuario AND t3.idSolicitud = t1.id ' +
+                                     ' AND ' + 
+                                     " t1.idAprobador = "+ req.user.idUsuario +"");
+
+  const permiso = await pool.query(' SELECT t2.NombreCompleto, '+
+                                    "DATE_FORMAT(t1.fecha,'%Y-%m-%d') AS fechaI, " +
+                                    "DATE_FORMAT(t3.fecha_inicio,'%Y-%m-%d' ) AS fecha_per," +
+                                    "DATE_FORMAT(t3.fecha_inicio,'%H:%i' ) AS fecha_inicio," +
+                                    "DATE_FORMAT(t3.fecha_termino,'%H:%i' ) AS fecha_termino, "+
+                                    " t1.*, "+
+                                    ' t1.id' +
+                                    ' FROM sol_solicitud AS t1, sys_usuario AS t2, sol_permiso AS t3 '+
+                                    ' WHERE' +
+                                    ' t1.idTipoSolicitud = 2 AND t1.idEstado = 2 AND t1.idUsuario = t2.idUsuario AND t3.idSolicitud = t1.id ' +
+                                    ' AND ' + 
+                                    " t1.id = "+ id+"");
+
+  
+  res.render('solicitudes/aprobarPermiso', { req ,permisos ,permiso:permiso[0], layout: 'template'})
+
+}); 
+
+
+
+router.post('/updatePermisos', async (req,res) => {
+
+  console.log(req.body);
+
+
+    res.send("asd");
 
 
 });

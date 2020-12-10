@@ -239,7 +239,7 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
 
     // Buscar la informacion de los usuarios.
     const costos  = await pool.query("SELECT * ," +
-                                     "FORMAT(t1.costo, 0, 'de_DE') AS costoFormat" +
+                                     "FORMAT(t1.costo,2) AS costoFormat" +
                                     " FROM    " +
                                                     " sys_usuario_costo AS t1," + 
                                                     " sys_usuario  AS t2, " +

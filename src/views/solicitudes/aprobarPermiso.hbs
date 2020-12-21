@@ -123,17 +123,19 @@
                         <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Solicitante</th>
+                                        <th>Aprobador</th>
                                         <th>Fecha Ingreso</th>
                                         <th>Periordo</th>
+                                        <th>Descripcion</th>
                                     </tr>
                                 </thead>
                                     <tbody>
                                             {{#each permisoAnteriores}}
                                                 <tr> 
                                                     <td>{{NombreCompleto}}</td>
-                                                    <td>{{fechaIngreso}}</td>
-                                                    <td>{{descripcion}}</td>
+                                                    <td>{{fechaI}}</td>
+                                                    <td>{{fecha_per}} - {{fecha_inicio}} : {{fecha_termino}}</td>
+                                                    <td>{{comentario}}</td>
                                                 </tr>
                                             {{/each}} 
                                     </tbody>
@@ -151,10 +153,10 @@
             switch(estado)
             {
                 case 0:
-                $("#estado").val(0);
+                $("#estado").val(0); // rechazado
                 break;
                 case 1:
-                $("#estado").val(1);
+                $("#estado").val(1); // aprobado
                 break;
             }
             document.getElementById("updatePermiso").submit();

@@ -1,0 +1,131 @@
+<div class="col-md-12 col-sm-12 ">
+  <div class="x_panel">
+    <div class="x_title">
+      <h2>Proyectos<small>Listado de proyectos </small></h2>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+      <table class="table table-hover" class="table table-hover" id="example" class="display">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Año</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Complejidad</th>
+            <th>Surpeficie PPTO</th>
+            <th>Superficie APC</th>
+            <th>Pais</th>
+            <th>Ciudad</th>
+            <th>N° Pisos</th>
+            <th>N° Subterraneo</th>
+            <th>DP</th>
+            <th>JP</th>
+            <th>ValorM2</th>
+            <th>Zona</th>
+            <th>Suelo</th>
+            <th>FevhaIn</th>
+            <th>FechaEn</th>
+            <th>FechaTe</th>
+            <th>Cliente</th>
+            <th>Arquitectura</th>
+            <th>Constructora</th>
+            <th>Revisor</th>
+            <th>Opciones</th>
+
+          </tr>
+        </thead>
+        <tbody>
+          {{#if buscad }}
+          {{#each buscadores}}
+          <tr>
+            <th scope="row">{{id}}</th>
+            <td>{{nombre}}</td>
+            <td>{{year}}</td>
+            <td>{{Tipo}}</td>
+            <td>{{Estado}}</td>
+            <td>{{Complejidad}}</td>
+            <td>{{SuperficiePPTO}}</td>
+            <td>{{SuperficieAPC}}</td>
+            <td>{{Pais}}</td>
+            <td>{{Ciudad}}</td>
+            <td>{{Npisos}}</td>
+            <td>{{Nsubterraneo}}</td>
+            <td>{{DP}}</td>
+            <td>{{JP}}</td>
+            <td>{{ValorMC}}</td>
+            <td>{{Zona}}</td>
+            <td>{{Suelo}}</td>
+            <td>{{FechaIni}}</td>
+            <td>{{FechaEnt}}</td>
+            <td>{{FechaTer}}</td>
+            <td>{{Cliente}}</td>
+            <td>{{Arquitectura}}</td>
+            <td>{{Constructora}}</td>
+            <td>{{Revisor}}</td>
+            <td>{{NPlanos}}</td>
+
+  
+  
+  
+  
+            <td style="padding: .15rem;">
+              <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                href="../../buscador/delete/{{id}}">
+                Borrar
+              </a>
+              <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                href="../../buscador/edit/{{id}}">
+                Editar
+              </a>
+            </td>
+          </tr>
+          {{/each}}
+          {{else}}
+          {{#each buscadores}}
+          <tr>
+            <th scope="row">{{id}}</th>
+            <td>{{nombre}}</td>
+            <td>{{year}}</td>
+            <td>{{Tipo}}</td>
+            <td>{{Estado}}</td>
+            <td>{{Complejidad}}</td>
+            <td>{{SuperficiePPTO}}</td>
+            <td>{{SuperficieAPC}}</td>
+            <td>{{Pais}}</td>
+            <td>{{Ciudad}}</td>
+            <td>{{Npisos}}</td>
+            <td>{{Nsubterraneo}}</td>
+            <td>{{DP}}</td>
+            <td>{{JP}}</td>
+            <td>{{ValorMC}}</td>
+            <td>{{Zona}}</td>
+            <td>{{Suelo}}</td>
+            <td>{{FechaIni}}</td>
+            <td>{{FechaEnt}}</td>
+            <td>{{FechaTer}}</td>
+            <td>{{Cliente}}</td>
+            <td>{{Arquitectura}}</td>
+            <td>{{Constructora}}</td>
+            <td>{{Revisor}}</td>
+            <td>{{NPlanos}}</td>
+
+  
+            <td style="padding: .15rem;">
+              <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="buscador/delete/{{id}}">
+                Borrar
+              </a>
+              <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs" href="buscador/edit/{{id}}">
+                Editar
+              </a>
+            </td>
+          </tr>
+          {{/each}}
+          {{/if}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

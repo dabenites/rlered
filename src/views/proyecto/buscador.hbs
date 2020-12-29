@@ -1,0 +1,261 @@
+<body>
+  <div class="container">
+    <div class="col-md-12 col-sm-12 ">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Buscador<small>Listado de proyectos</small></h2>
+
+          <ul class="nav navbar-right panel_toolbox">
+            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+            <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+          </ul>
+          <div class="clearfix">
+          </div>
+        </div>
+        <div class="x_content">
+          <br />
+          <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="/proyecto/listPro"
+            method="POST">
+            <!--CAMBIAR-->
+
+            <div class="form-group row">
+              <div class="col-md-6 col-sm-6 ">
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="year">
+                    Año :<span ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="number" id="year" name="year"  class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="nombre">Nombre:<span
+                      ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="nombre" name="nombre"  class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Tipo">Tipo:<span
+                     ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="Tipo" name="Tipo"  class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Estado">Estado:<span
+                   ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="Estado" name="Estado"  class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Complejidad">Complejidad:<span
+                      ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="Complejidad" name="Complejidad" class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="SuperficiePPTO">Superficie PPTO:<span
+                    ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="number" id="SuperficiePPTO" name="SuperficiePPTO"
+                      class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="SuperficieAPC">Superficie APC:<span
+                    ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="number" id="SuperficieAPC" name="SuperficieAPC" 
+                      class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Pais">Pais:<span
+                    ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="Pais" name="Pais" class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Ciudad">Ciudad:<span
+                     ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="Ciudad" name="Ciudad"  class="form-control">
+                  </div>
+                </div>
+
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Npisos">N°
+                    Pisos:<span ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="number" id="Npisos" name="Npisos"  class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Nsubterraneo">N°
+                    Subterraneo:<span ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="number" id="Nsubterraneo" name="Nsubterraneo" class="form-control">
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 col-sm-6 ">
+                <div class="form-group row">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align">Director:</label>
+                  <div class="col-md-7 col-sm-7">
+                    <select class="select2_single form-control" tabindex="-1" name="DP" id="DP">
+                      {{#each usuarios}}
+                      <option value="{{idUsuario}}">{{NombreCompleto}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align">Jefe de
+                    proyecto:</label>
+                  <div class="col-md-7 col-sm-7">
+                    <select class="select2_single form-control" tabindex="-1" name="JP" id="JP">
+                      {{#each usuarios}}
+                      <option value="{{idUsuario}}">{{NombreCompleto}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="ValorMC">
+                    ValorM2:<span ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="number" id="ValorMC" name="ValorMC"  class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Zona"> Zona:<span
+                     ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="Zona" name="Zona"  class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Suelo">Suelo:<span
+                      ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="Suelo" name="Suelo"  class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaIni">Fecha
+                    inicio:<span
+                    ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="FechaIni" name="FechaIni"  class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaEnt"> Fecha
+                    entrega:<span ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="FechaEnt" name="FechaEnt" class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaTer"> Fecha
+                    termino:<span ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="FechaTer" name="FechaTer" class="form-control">
+                  </div>
+
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Cliente">Cliente:<span
+                      ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="text" id="Cliente" name="Cliente" class="form-control">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align">Arquitectura:</label>
+                  <div class="col-md-7 col-sm-7">
+                    <select class="select2_single form-control" tabindex="-1" name="Arquitectura" id="Constructora">
+                      {{#each contacto}}
+                      <option value="{{id}}">{{name}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align">Constructora:</label>
+                  <div class="col-md-7 col-sm-7">
+                    <select class="select2_single form-control" tabindex="-1" name="Constructora" id="Constructora">
+                      {{#each contacto}}
+                      <option value="{{id}}">{{name}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align">Revisor:</label>
+                  <div class="col-md-7 col-sm-7">
+                    <select class="select2_single form-control" tabindex="-1" name="Revisor" id="Revisor">
+                      {{#each contacto}}
+                      <option value="{{id}}">{{name}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Nplanos">N°de
+                    planos:<span ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="number" id="Nplanos" name="Nplanos"  class="form-control">
+                  </div>
+                </div>
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Nplanos">
+                    Servicio :<span ></span>
+                  </label>
+                  <div class="col-md-7 col-sm-7 ">
+                    <input type="number" id="Servicio" name="Servicio"  class="form-control">
+                  </div>
+                </div>
+
+
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                  <div class="col-md-9 col-sm-9  offset-md-3">
+                    <button type="submit" class="btn btn-success">Aceptar</button>
+                  </div>
+                  <!--
+                  <ul class="col-md-9 col-sm-9  offset-md-3">
+                  <td style="text-align: right;width:220px">
+                    <a style="padding: .50rem;" type="button" class="btn btn-success"
+                      href="/proyecto/listPro">Aceptar</a>
+                  </td>
+                </ul>
+                -->
+                </div>
+          </form>
+        </div>
+      </div>
+    </div>

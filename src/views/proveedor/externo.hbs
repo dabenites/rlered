@@ -1,121 +1,128 @@
-              <div class="col-md-7 col-sm-7  ">
-                <div class="x_panel">
-                  <div class="x_title">
-                    <h2>Proveedores<small>Listado de proveedores externos a Rene lagos</small></h2>
-                    <div class="clearfix"></div>
-                  </div>
-                  <div class="x_content">
-                    <table class="table table-hover" class="table table-hover" id="example" class="display">
-                      <thead>
-                        <tr>
-                          <th>ID</th>
-                          <th>Nombre</th>
-                          <th>Fono</th>
-                          <th>Mail</th>
-                          <th>Opciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                           {{#if proveedor }}
-                                {{#each proveedores}}
-                                    <tr > 
-                                        <th scope="row">{{id}}</th>
-                                        <td>{{nombre}}</td>
-                                        <td>{{fono}}</td>
-                                        <td>{{mail}}</td>
-                                        <td style="padding: .15rem;">
-                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="../../externo/delete/{{id}}">
-                                                Borrar 
-                                            </a>
-                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs" href="../../externo/edit/{{id}}">
-                                                Editar
-                                            </a>
-                                        </td>
-                                    </tr>
-                                {{/each}} 
-                           {{else}}
-                                {{#each proveedores}}
-                                    <tr > 
-                                        <th scope="row">{{id}}</th>
-                                        <td>{{nombre}}</td>
-                                        <td>{{fono}}</td>
-                                        <td>{{mail}}</td>
-                                        <td style="padding: .15rem;">
-                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="externo/delete/{{id}}">
-                                                Borrar 
-                                            </a>
-                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs" href="externo/edit/{{id}}">
-                                                Editar
-                                            </a>
-                                        </td>
-                                    </tr>
-                                {{/each}} 
-                            {{/if}}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+<div class="col-md-7 col-sm-7  ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Proveedores<small>Listado de proveedores externos a Rene lagos</small></h2>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <table class="table table-hover" class="table table-hover" id="example" class="display">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Fono</th>
+                        <th>Mail</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#if proveedor }}
+                    {{#each proveedores}}
+                    <tr>
+                        <th scope="row">{{id}}</th>
+                        <td>{{nombre}}</td>
+                        <td>{{fono}}</td>
+                        <td>{{mail}}</td>
+                        <td style="padding: .15rem;">
+                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                href="../../externo/delete/{{id}}">
+                                Borrar
+                            </a>
+                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                                href="../../externo/edit/{{id}}">
+                                Editar
+                            </a>
+                        </td>
+                    </tr>
+                    {{/each}}
+                    {{else}}
+                    {{#each proveedores}}
+                    <tr>
+                        <th scope="row">{{id}}</th>
+                        <td>{{nombre}}</td>
+                        <td>{{fono}}</td>
+                        <td>{{mail}}</td>
+                        <td style="padding: .15rem;">
+                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                href="externo/delete/{{id}}">
+                                Borrar
+                            </a>
+                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                                href="externo/edit/{{id}}">
+                                Editar
+                            </a>
+                        </td>
+                    </tr>
+                    {{/each}}
+                    {{/if}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 
-               <div class="col-md-5 ">
-        					<div class="x_panel">
-								<div class="x_title">
-                                      {{#if proveedor }}
-                                        <h2>Actualizar Proveedor <small>{{proveedor.nombre}}</small></h2>
-                                      {{else}}
-                                        <h2>Registrar Proveedor <small>Se podra ingresar un costos externo a los proyectos</small></h2>
-                                      {{/if}}
-									
-									<div class="clearfix"></div>
-								</div>
-								<div class="x_content">
+<div class="col-md-5 ">
+    <div class="x_panel">
+        <div class="x_title">
+            {{#if proveedor }}
+            <h2>Actualizar Proveedor <small>{{proveedor.nombre}}</small></h2>
+            {{else}}
+            <h2>Registrar Proveedor <small>Se podra ingresar un costos externo a los proyectos</small></h2>
+            {{/if}}
 
-									<!-- start form for validation -->
-                                    {{#if proveedor }}
-                                        <form id="demo-form" data-parsley-validate action="/proveedor/editExterno" method="POST">
-                                    {{else}}
-                                        <form id="demo-form" data-parsley-validate action="/proveedor/addExterno" method="POST">
-                                    {{/if}}
-									
-                                    {{#if proveedor}}
-                                        <label for="ID Proveedor">Id Proveedor* :</label>
-										<input type="text" id="id" class="form-control" value="{{proveedor.id}}" name="id" readonly />
-                                    {{/if}}
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
 
-									<label for="RUT">Rut * :</label>
-									<input type="text" id="rut" class="form-control" value="{{proveedor.rut}}" name="rut" required />
+            <!-- start form for validation -->
+            {{#if proveedor }}
+            <form id="demo-form" data-parsley-validate action="/proveedor/editExterno" method="POST">
+                {{else}}
+                <form id="demo-form" data-parsley-validate action="/proveedor/addExterno" method="POST">
+                    {{/if}}
 
-                                    <label for="Nombre">Nombre * :</label>
-									<input type="text" id="nombre" class="form-control" value="{{proveedor.nombre}}" name="nombre" required />
-                                    
-                                    <label for="Razon Social">Razon Social * :</label>
-									<input type="text" id="razon_social" class="form-control" value="{{proveedor.razon_social}}" name="razon_social" required />
-                                    
-                                    <label for="Fono ">Fono * :</label>
-									<input type="text" id="fono" class="form-control" value="{{proveedor.fono}}" name="fono" required />
+                    {{#if proveedor}}
+                    <label for="ID Proveedor">Id Proveedor* :</label>
+                    <input type="text" id="id" class="form-control" value="{{proveedor.id}}" name="id" readonly />
+                    {{/if}}
 
-                                    <label for="Mail ">Mail * :</label>
-									<input type="text" id="mail" class="form-control" value="{{proveedor.mail}}" name="mail" required />
+                    <label for="RUT">Rut * :</label>
+                    <input type="text" id="rut" class="form-control" value="{{proveedor.rut}}" name="rut" required />
 
-                                    <label for="Direccion ">Direccion * :</label>
-									<input type="text" id="direccion" class="form-control" value="{{proveedor.mail}}" name="direccion" required />
+                    <label for="Nombre">Nombre * :</label>
+                    <input type="text" id="nombre" class="form-control" value="{{proveedor.nombre}}" name="nombre"
+                        required />
 
-									<br />
-                                    {{#if proveedor }}
-                                     <button  type="submit" class="btn btn-warning btn-block">
-                                                Actualizar
-                                    </button>
-                                    {{else}}
-                                    <button  type="submit" onvolumechange=""class="btn btn-success btn-block">
-                                                Ingresar
-                                    </button>
-                                    {{/if}}
-									    
+                    <label for="Razon Social">Razon Social * :</label>
+                    <input type="text" id="razon_social" class="form-control" value="{{proveedor.razon_social}}"
+                        name="razon_social" required />
 
-									</form>
-									<!-- end form for validations -->
+                    <label for="Fono ">Fono * :</label>
+                    <input type="text" id="fono" class="form-control" value="{{proveedor.fono}}" name="fono" required />
 
-								</div>
-							</div>
-    </div>      
+                    <label for="Mail ">Mail * :</label>
+                    <input type="text" id="mail" class="form-control" value="{{proveedor.mail}}" name="mail" required />
+
+                    <label for="Direccion ">Direccion * :</label>
+                    <input type="text" id="direccion" class="form-control" value="{{proveedor.mail}}" name="direccion"
+                        required />
+
+                    <br />
+                    {{#if proveedor }}
+                    <button type="submit" class="btn btn-warning btn-block">
+                        Actualizar
+                    </button>
+                    {{else}}
+                    <button type="submit" onvolumechange="" class="btn btn-success btn-block">
+                        Ingresar
+                    </button>
+                    {{/if}}
+
+
+                </form>
+                <!-- end form for validations -->
+
+        </div>
+    </div>
+</div>

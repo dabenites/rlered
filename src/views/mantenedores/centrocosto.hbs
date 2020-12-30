@@ -6,7 +6,9 @@
 <div class="col-md-6 col-sm-6  ">
     <div class="x_panel">
         <div class="x_title">
-            <h2>Centro Costos<small>Los centros de costos es una agrupacion para las categorias</small></h2>
+            <h2>Centro Costos
+                <!--<small>Los centros de costos es una agrupacion para las categorias</small>-->
+            </h2>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -25,13 +27,13 @@
                         <th scope="row">{{id}}</th>
                         <td>{{centroCosto}}</td>
                         <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="../../centrocosto/delete/{{id}}">
-                                Borrar
-                            </a>
                             <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
                                 href="../../centrocosto/edit/{{id}}">
                                 Editar
+                            </a>
+                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                href="../../centrocosto/delete/{{id}}">
+                                Borrar
                             </a>
                         </td>
                     </tr>
@@ -42,14 +44,15 @@
                         <th scope="row">{{id}}</th>
                         <td>{{centroCosto}}</td>
                         <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="centrocosto/delete/{{id}}">
-                                Borrar
-                            </a>
                             <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
                                 href="centrocosto/edit/{{id}}">
                                 Editar
                             </a>
+                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                href="centrocosto/delete/{{id}}">
+                                Borrar
+                            </a>
+
                         </td>
                     </tr>
                     {{/each}}
@@ -65,8 +68,8 @@
             {{#if centro }}
             <h2>Actualizar Centro Costo <small>{{centro.centroCosto}}</small></h2>
             {{else}}
-            <h2>Registrar Centro Costo <small>Se podra seleccionar el centro de costo en el ingreso de una
-                    categoria</small></h2>
+            <h2>Registrar Centro Costo <!--<small>Se podra seleccionar el centro de costo en el ingreso de una
+                    categoria</small>--></h2>
             {{/if}}
 
             <div class="clearfix"></div>

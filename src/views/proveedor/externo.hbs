@@ -1,7 +1,9 @@
 <div class="col-md-7 col-sm-7  ">
     <div class="x_panel">
         <div class="x_title">
-            <h2>Proveedores<small>Listado de proveedores externos a Rene lagos</small></h2>
+            <h2>Proveedores
+                <!--<small>Listado de proveedores externos a Rene lagos</small>-->
+            </h2>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -24,13 +26,13 @@
                         <td>{{fono}}</td>
                         <td>{{mail}}</td>
                         <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="../../externo/delete/{{id}}">
-                                Borrar
-                            </a>
                             <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
                                 href="../../externo/edit/{{id}}">
                                 Editar
+                            </a>
+                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                href="../../externo/delete/{{id}}">
+                                Borrar
                             </a>
                         </td>
                     </tr>
@@ -43,13 +45,13 @@
                         <td>{{fono}}</td>
                         <td>{{mail}}</td>
                         <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="externo/delete/{{id}}">
-                                Borrar
-                            </a>
                             <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
                                 href="externo/edit/{{id}}">
                                 Editar
+                            </a>
+                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                href="externo/delete/{{id}}">
+                                Borrar
                             </a>
                         </td>
                     </tr>
@@ -68,7 +70,7 @@
             {{#if proveedor }}
             <h2>Actualizar Proveedor <small>{{proveedor.nombre}}</small></h2>
             {{else}}
-            <h2>Registrar Proveedor <small>Se podra ingresar un costos externo a los proyectos</small></h2>
+            <h2>Registrar Proveedor <!--<small>Se podra ingresar un costos externo a los proyectos</small>--></h2>
             {{/if}}
 
             <div class="clearfix"></div>

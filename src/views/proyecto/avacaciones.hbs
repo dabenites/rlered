@@ -21,31 +21,32 @@
                 </thead>
                 <tbody>
                     {{#if selecciona }}
-                        {{#each soliVacaciones}}
-                        <tr>
-                            <th scope="row">{{idUsuario}}</th>
-                            <td>{{NombreCompleto}}</td>
-                            <td>{{Dias}}</td>
-                            <td 
-                            style="padding: .15rem;">
-                                <a style="padding: .25rem;" type="button" class="btn btn-success  btn-xs" href="../../avacaciones/revisar/{{id}}"><!--CAMBIAR-->
-                                    Revisar
-                                </a>
-                            </td>
-                        </tr>
-                        {{/each}}
+                    {{#each soliVacaciones}}
+                    <tr>
+                        <th scope="row">{{idUsuario}}</th>
+                        <td>{{NombreCompleto}}</td>
+                        <td>{{Dias}}</td>
+                        <td style="padding: .15rem;">
+                            <a style="padding: .25rem;" type="button" class="btn btn-warning  btn-xs"
+                                href="../../avacaciones/revisar/{{id}}">
+                                Revisar
+                            </a>
+                        </td>
+                    </tr>
+                    {{/each}}
                     {{else}}
                     {{#each soliVacaciones}}
-                        <tr>
-                            <th scope="row">{{idUsuario}}</th>
-                            <td>{{NombreCompleto}}</td>
-                            <td>{{Dias}}</td>
-                            <td style="padding: .15rem;">
-                                <a style="padding: .25rem;" type="button" class="btn btn-success btn-xs"href="avacaciones/revisar/{{id}}">
-                                    Revisar
-                                </a>
-                            </td>
-                        </tr>
+                    <tr>
+                        <th scope="row">{{idUsuario}}</th>
+                        <td>{{NombreCompleto}}</td>
+                        <td>{{Dias}}</td>
+                        <td style="padding: .15rem;">
+                            <a style="padding: .25rem;" type="button" class="btn btn-warning btn-xs"
+                                href="avacaciones/revisar/{{id}}">
+                                Revisar
+                            </a>
+                        </td>
+                    </tr>
                     {{/each}}
                     {{/if}}
                 </tbody>
@@ -67,24 +68,27 @@
 
             <ul class="nav nav-tabs justify-content-end bar_tabs" id="myTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="revisar-tab" data-toggle="tab" href="#revisar" role="tab"aria-controls="revisar" aria-selected="true">Revisar</a>
+                    <a class="nav-link active" id="revisar-tab" data-toggle="tab" href="#revisar" role="tab"
+                        aria-controls="revisar" aria-selected="true">Revisar</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab"aria-controls="profile" aria-selected="false">Historial</a>
+                    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab"
+                        aria-controls="profile" aria-selected="false">Historial</a>
                 </li>
             </ul>
 
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="revisar" role="tabpanel" aria-labelledby="home-tab">
-                    <form id="updateVacaciones" name="updateVacaciones" data-parsley-validate action="/solicitudes/updateVacaciones" method="POST">
+                    <form id="updateVacaciones" name="updateVacaciones" data-parsley-validate
+                        action="/solicitudes/updateVacaciones" method="POST">
                         <!-- CAMBIAR-->
 
                         <div class="item form-group">
                             <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name">Usuario <span
                                     class="required">*</span></label>
                             <div class="col-md-6 col-sm-6 ">
-                                <input type="text" id="usuario" class="form-control"
-                                    value="{{obj.NombreCompleto}}" name="usuario" readonly />
+                                <input type="text" id="usuario" class="form-control" value="{{obj.NombreCompleto}}"
+                                    name="usuario" readonly />
                             </div>
                         </div>
 
@@ -92,12 +96,12 @@
                             <label class="col-form-label col-md-3 col-sm-3 label-align" for="dia">Nº Días
                                 <span class="required">*</span></label>
                             <div class="col-md-6 col-sm-6 ">
-                                <input type="text" id="dia" class="form-control" value="{{obj.Dias}}"
-                                    name="dia" readonly />
+                                <input type="text" id="dia" class="form-control" value="{{obj.Dias}}" name="dia"
+                                    readonly />
                             </div>
                         </div>
 
-                      <!--  <div class="item form-group">
+                        <!--  <div class="item form-group">
                             <label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaIngreso">Fecha
                                 Ingreso<span class="required">*</span></label>
                             <div class="col-md-6 col-sm-6 ">
@@ -111,7 +115,7 @@
                             <div class="col-md-6 col-sm-6 ">
                                 <ul class="list-group">
                                     {{#each diasFecha}}
-                                        <li>{{fecha}}</li>
+                                    <li>{{fecha}}</li>
                                     {{/each}}
                                 </ul>
                             </div>
@@ -128,17 +132,24 @@
 
                         <div class="item form-group">
                             <label class="col-form-label col-md-3 col-sm-3 label-align"
-                                for="descripcion">Observacion<span class="required">*</span></label>
+                                for="descripcion">Observación<span class="required">*</span></label>
                             <div class="col-md-6 col-sm-6 ">
                                 <textarea class="form-control" rows="3" name="Observacion" id="Observacion"></textarea>
                             </div>
                         </div>
 
+
+                        <div class="ln_solid"></div>
                         <div class="item form-group">
+                            <div class="col-md-9 col-sm-9 offset-md-4">
                             <input type="hidden" id="estado" class="form-control" value="" name="estado" readonly />
-                            <input type="hidden" id="id_solicitud" class="form-control" value="{{obj.id}}" name="id_solicitud" readonly />
-                            <button type="button" onclick="revisarAction(1);" class="btn btn-success"type="reset">Aceptar</button>
-                            <button type="button" onclick="revisarAction(0);" class="btn btn-danger"type="button">Rechazar</button>
+                            <input type="hidden" id="id_solicitud" class="form-control" value="{{obj.id}}"
+                                name="id_solicitud" readonly />
+                            <button type="button" onclick="revisarAction(1);" class="btn btn-success"
+                                type="reset">Aceptar</button>
+                            <button type="button" onclick="revisarAction(0);" class="btn btn-danger"
+                                type="button">Rechazar</button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -146,28 +157,29 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                         
+
                                 <th>Días</th>
                                 <th>Fecha Ingreso</th>
                                 <th>Opciones</th>
-                  
+
                             </tr>
                         </thead>
                         <tbody>
                             {{#each seleccionaList}}
                             <tr>
-                     
+
                                 <td>{{Dias}}</td>
                                 <td>{{fecha}}</td>
 
                                 <!-- Button trigger modal -->
                                 <td style="padding: .15rem;">
-                                <button  style="padding: .25rem;" type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#exampleModal">
-                                    Revisar
-                                </button>
+                                    <button style="padding: .25rem;" type="button" class="btn btn-warning btn-xs"
+                                        data-toggle="modal" data-target="#exampleModal">
+                                        Revisar
+                                    </button>
                                 </td>
 
-                            
+
                             </tr>
                             {{/each}}
                     </table>
@@ -180,31 +192,32 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Fechas seleccionadas</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Fechas seleccionadas</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
 
-            <form action="/facturacion/addFecha" method="POST"></form>
+                <form action="/facturacion/addFecha" method="POST"></form>
 
 
-             <label for="Fecha">Días seleccionados:</label>
-              <input type="txt" id="fecha" class="form-control" value="{{sol_selec_dias.fecha}}" name="fecha"
-                Readonly />
-            </form>
+                <label for="Fecha">Días seleccionados:</label>
+                <input type="txt" id="fecha" class="form-control" value="{{sol_selec_dias.fecha}}" name="fecha"
+                    Readonly />
+                </form>
 
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 
@@ -218,17 +231,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
-    function revisarAction(estado)
-        {
-            switch(estado)
-            {
-                case 0:
+    function revisarAction(estado) {
+        switch (estado) {
+            case 0:
                 $("#estado").val(0); // rechazado
                 break;
-                case 1:
+            case 1:
                 $("#estado").val(1); // aprobado
                 break;
-            }
-            document.getElementById("updateVacaciones").submit();
         }
+        document.getElementById("updateVacaciones").submit();
+    }
 </script>

@@ -1,126 +1,128 @@
-							<div class="x_panel">
-								<div class="x_title">
-									<h2>Valor UF<small>Ingreso manual de los valores de la UF</small></h2>
-									<div class="clearfix"></div>
-								</div>
-								<div class="x_content">
-									<br />
-									<form class="form-label-left input_mask" action="/mantenedores/valorufmanual" method="GET">
-										<div class="form-group row">
-											<label class="col-form-label col-md-1 col-sm-1 label-align">Año</label>
-                                                <div class="col-md-2 col-sm-2 ">
-                                                    <select id="anio" name="anio" class="form-control" required>
-                                                         {{#each annios}}
-                                                            <option value="{{this}}">{{this}}</option>
-                                                         {{/each}} 
-                                                    </select>
-                                                </div>
-                                                <label class="col-form-label col-md-1 col-sm-1 label-align">Mes</label>
-                                                <div class="col-md-2 col-sm-2 ">
-                                                    <select id="mes" name="mes" class="form-control" required>
-                                                        {{#each messes}}
-                                                                {{#if actual}}
-                                                                    <option value="{{id}}" selected>{{nombre}}</option>
-                                                                {{else}}
-                                                                    <option value="{{id}}">{{nombre}}</option>
-                                                                {{/if}}
-                                                                
-                                                        {{/each}} 
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4 col-sm-4 ">
-												    <button type="submit" class="btn btn-primary">Revisar</button>
-                                                    <a href="/mantenedores/valoruf"> <button type="button" class="btn btn-primary">Volver</button></a>
-											    </div>
-										</div>
-										<div class="ln_solid"></div>
-									</form>
-                                        <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
-                                                        <div class="modal-dialog modal-sm">
-                                                        <div class="modal-content">
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Valor UF Manual <!--<small>Ingreso manual de los valores de la UF</small>--></h2>
+        <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+        <br />
+        <form class="form-label-left input_mask" action="/mantenedores/valorufmanual" method="GET">
+            <div class="form-group row">
+                <label class="col-form-label col-md-1 col-sm-1 label-align">Año</label>
+                <div class="col-md-2 col-sm-2 ">
+                    <select id="anio" name="anio" class="form-control" required>
+                        {{#each annios}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <label class="col-form-label col-md-1 col-sm-1 label-align">Mes</label>
+                <div class="col-md-2 col-sm-2 ">
+                    <select id="mes" name="mes" class="form-control" required>
+                        {{#each messes}}
+                        {{#if actual}}
+                        <option value="{{id}}" selected>{{nombre}}</option>
+                        {{else}}
+                        <option value="{{id}}">{{nombre}}</option>
+                        {{/if}}
 
-                                                            <div class="modal-header">
-                                                            <h4 class="modal-title" id="myModalLabel2">Cargar Archivo</h4>
-                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
-                                                            </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <form action="/costos/fileupload" method="post" enctype="multipart/form-data">
-                                                                    <input type="file" name="filetoupload">
-                                                                    <input type="submit">
-                                                                </form>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                            <button type="button" class="btn btn-primary">Save changes</button>
-                                                            </div>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="col-md-4 col-sm-4 ">
+                    <button type="submit" class="btn btn-primary">Revisar</button>
+                    <a href="/mantenedores/valoruf"> <button type="button" class="btn btn-primary">Volver</button></a>
+                </div>
+            </div>
+            <div class="ln_solid"></div>
+        </form>
+        <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
 
-                                                        </div>
-                                                        </div>
-                                                    </div>
-								            </div>
-							</div>
-    <div class="x_panel">
-        <div class="x_title">
-			<h2>Informacion del mes <small></small></h2>
-		<div class="clearfix"></div>
-        
-		</div>
-		<div class="x_content">
-            <form class="form-label-left input_mask" action="/mantenedores/valorufmanual" >
-                <table class="table table-hover" id="example" class="display">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Moneda</th>
-                                    <th>Actual</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{#each diasPorMes}}
-                                <tr>
-                                    <td>{{fecha}}</td>
-                                    <td>Unidad de fomento (UF)</td>
-                                    <td><input type="text" id="{{fecha}}" class="form-control" value="{{valor}}" name="{{fecha}}"/></td>
-                                </tr>
-                                {{/each}} 
-                            </tbody>
-                            <tfoot>
-                                <th></th> 
-                                <th>                        <button type="button" onclick="getInfoDataTable();" class="btn btn-primary">Ingresar</button></th> 
-                                <th></th> 
-                            </tfoot>
-                    </table>
-            </form>
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel2">Cargar Archivo</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/costos/fileupload" method="post" enctype="multipart/form-data">
+                            <input type="file" name="filetoupload">
+                            <input type="submit">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary">Guardar</button>
+                    </div>
+
+                </div>
+            </div>
         </div>
-	</div>
+    </div>
+</div>
+<div class="x_panel">
+    <div class="x_title">
+        <h2>Informacion del mes <small></small></h2>
+        <div class="clearfix"></div>
 
-    <script>
-        function getInfoDataTable()
-        {
+    </div>
+    <div class="x_content">
+        <form class="form-label-left input_mask" action="/mantenedores/valorufmanual">
+            <table class="table table-hover" id="example" class="display">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Moneda</th>
+                        <th>Actual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each diasPorMes}}
+                    <tr>
+                        <td>{{fecha}}</td>
+                        <td>Unidad de fomento (UF)</td>
+                        <td><input type="text" id="{{fecha}}" class="form-control" value="{{valor}}" name="{{fecha}}" />
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+                <tfoot>
+                    <th></th>
+                    <th> <button type="button" onclick="getInfoDataTable();" class="btn btn-primary">Ingresar</button>
+                    </th>
+                    <th></th>
+                </tfoot>
+            </table>
+        </form>
+    </div>
+</div>
 
-            var tbl = $('#example').DataTable();
-            var params = tbl.$('input').serializeArray();
+<script>
+    function getInfoDataTable() {
 
-            // recorrer la informacion de los parametros.
-            var informacion = [];
-            params.forEach((item, index, arr) => {
-                const dia = {
-                        fecha : item.name,
-                        valor : item.value
-                    }
-                informacion.push(dia);
-            });
-            //console.log(informacion);
-             $.ajax({
-                            type: 'post',
-                            url: '/mantenedores/ajax',
-                            contentType: 'application/json',
-                            data: JSON.stringify(informacion),
-                            
-                        });
+        var tbl = $('#example').DataTable();
+        var params = tbl.$('input').serializeArray();
+
+        // recorrer la informacion de los parametros.
+        var informacion = [];
+        params.forEach((item, index, arr) => {
+            const dia = {
+                fecha: item.name,
+                valor: item.value
+            }
+            informacion.push(dia);
+        });
+        //console.log(informacion);
+        $.ajax({
+            type: 'post',
+            url: '/mantenedores/ajax',
+            contentType: 'application/json',
+            data: JSON.stringify(informacion),
+
+        });
 
 
-        }
-        
-    </script>
+    }
+
+</script>

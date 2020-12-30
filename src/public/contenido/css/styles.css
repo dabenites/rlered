@@ -25,6 +25,8 @@ form[role=login] {
 	border-radius: 10px;
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
+
+
 }
 	form[role=login] img {
 		display: block;
@@ -35,9 +37,21 @@ form[role=login] {
 	form[role=login] button {
 		font-size: 18px;
 		margin: 16px 0;
+		
+		
 	}
+	form[role=login] button {
+		font-size: 18px;
+		margin: 16px 0;
+		background-color: #fed300;
+
+		
+		
+	}
+
 	form[role=login] > div {
 		text-align: center;
+	
 	}
 	
 .form-links {
@@ -48,3 +62,5 @@ form[role=login] {
 	.form-links a {
 		color: #fff;
 	}
+
+

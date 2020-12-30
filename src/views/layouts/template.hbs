@@ -16,6 +16,8 @@
     <!-- Custom Theme Style -->
     <link href="../../../template/vendors/build/css/custom.min.css" rel="stylesheet">
 
+
+
      <link href="../../../template/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
      <link href="../../../template/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
      <link href="../../../template/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
@@ -34,9 +36,10 @@
 
             <div class="clearfix"></div>
             <!-- sidebar menu -->
+            <!--<img src="../../../img/logo_rene_lagos.jpg" alt="">-->
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
-                <h3>Modulos</h3>
+               <!-- <h3>Modulos</h3>-->
                 <ul class="nav side-menu">
                     {{#each req.user.modulos}}
                         <li>
@@ -68,8 +71,8 @@
                     <img src="../../../img/img.jpg" alt="">{{{req.user.NombreCompleto}}} 
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item"  href="javascript:;"> Profile</a>
-                    <a class="dropdown-item"  href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
+                    <a class="dropdown-item"  href="javascript:;"> Perfil</a>
+                    <a class="dropdown-item"  href="/logout"><i class="fa fa-sign-out pull-right"></i> Salir</a>
                   </div>
                 </li>
               </ul>
@@ -89,7 +92,7 @@
         <!-- footer content -->
         <footer>
           <div class="pull-right">
-            nombre desarrollador !! 
+            FG-DB
           </div>
           <div class="clearfix"></div>
         </footer>

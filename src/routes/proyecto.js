@@ -99,7 +99,7 @@ router.get('/buscador', isLoggedIn, async (req, res) => {
 });
 
 
-router.post('/editBusca', async (req, res) => {
+/*router.post('/editBusca', async (req, res) => {
   const { id, nombre, year, Tipo, Estado, Complejidad, SuperficiePPTO, SuperficieAPC, Pais, Ciudad,
     Ubicacion, Npisos, Nsubterraneo, DP, JP, ValorMC, Zona, Suelo, FechaIni, FechaEnt,
     FechaTer, Cliente, Arquitectura, Constructora, Revisor, Nplanos, Servicio } = req.body; //Obtener datos title,url,description
@@ -137,19 +137,10 @@ router.post('/editBusca', async (req, res) => {
   await pool.query('UPDATE pro_proyectos set ? WHERE id = ?', [newBuscador, id]);
   res.redirect('../proyecto/buscador');
 
-});
+});*/
 
 
-router.get('/buscador/edit/:id', async (req, res) => {
-  const { id } = req.params;
-
-  const buscadores = await pool.query("SELECT * FROM pro_proyectos ");
-  const buscador = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [id]);
-  res.render('proyecto/iproyecto', { buscadores, buscador: buscador[0], req, layout: 'template' });
-
-});
-
-router.get('/buscador/delete/:id', async (req, res) => {
+/*router.get('/buscador/delete/:id', async (req, res) => {
   const { id } = req.params;
   await pool.query('DELETE FROM pro_proyectos WHERE id = ?', [id]);
 
@@ -157,7 +148,7 @@ router.get('/buscador/delete/:id', async (req, res) => {
   res.redirect('/proyecto/buscador');
 
 
-});
+});*/
 
 
 
@@ -236,16 +227,51 @@ router.get('/buscador/edit/:id', async (req, res) => {
 
   const buscadores = await pool.query("SELECT * FROM pro_proyectos ");
   const buscador = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [id]);
-  res.render('proyecto/iproyecto', { buscadores, buscador: buscador[0], req, layout: 'template' });
 
+  const isEqualHelperHandlerbar = function(a, b, opts) {
+    if (a == b) {
+        return true
+    } else { 
+        return false
+    } 
+};
+
+
+
+  res.render('proyecto/editProyecto', { buscadores, buscador: buscador[0], req, layout: 'template', helpers : {
+    if_equal : isEqualHelperHandlerbar }});
 });
+
+/*router.post('/buscador/edit/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const buscadores = await pool.query("SELECT * FROM pro_proyectos ");
+  const buscador = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [id]);
+
+  const isEqualHelperHandlerbar = function(a, b, opts) {
+    if (a == b) {
+        return true
+    } else { 
+        return false
+    } 
+};
+console.log(usuario);
+
+res.send("sadads");
+
+  //res.render('proyecto/editProyecto', { buscadores, buscador: buscador[0], req, layout: 'template', helpers : {
+  //  if_equal : isEqualHelperHandlerbar }});
+});*/
+
+
+
 
 router.get('/buscador/delete/:id', async (req, res) => {
   const { id } = req.params;
   await pool.query('DELETE FROM pro_proyectos WHERE id = ?', [id]);
 
 
-  res.redirect('/proyecto/listPro');
+  res.redirect('/proyecto/buscador');
 
 
 });

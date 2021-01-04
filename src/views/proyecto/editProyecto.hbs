@@ -64,13 +64,12 @@
 							<div class="col-md-6 col-sm-6 ">
 
 								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align">Año:</label>
-									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="year" id="year">
-											{{#each proye}}
-											<option value="{{id}}">{{year}}</option>
-											{{/each}}
-										</select>
+									<label class="col-form-label col-md-3 col-sm-3 label-align"
+										for="year">Año:<span class="required">*</span>
+									</label>
+									<div class="col-md-7 col-sm-7 ">
+										<input value="{{buscador.year}}" type="text" id="year" name="year" required="required"
+											class="form-control">
 									</div>
 								</div>
 								<!--<div class="item form-group">
@@ -89,7 +88,7 @@
 										for="nombre">Nombre:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="nombre" name="nombre" required="required"
+										<input value="{{buscador.nombre}}" type="text" id="nombre" name="nombre" required="required"
 											class="form-control">
 									</div>
 								</div>
@@ -106,8 +105,9 @@
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Tipo:</label>
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="Tipo" id="Tipo">
+											<option>Seleccione una opción</option>
 											{{#each tipo}}
-											<option value="{{id}}">{{descripcion}}</option>
+											<option value="{{buscador}}">{{tipo}}</option>
 											{{/each}}
 										</select>
 									</div>
@@ -117,7 +117,7 @@
 										for="Estado">Estado:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="Estado" name="Estado" required="required"
+										<input value="{{buscador.Estado}}" type="text" id="Estado" name="Estado" required="required"
 											class="form-control">
 									</div>
 								</div>
@@ -126,7 +126,7 @@
 										for="Complejidad">Complejidad:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="Complejidad" name="Complejidad" required="required"
+										<input value="{{buscador.Complejidad}}"type="text" id="Complejidad" name="Complejidad" required="required"
 											class="form-control">
 									</div>
 								</div>
@@ -135,7 +135,7 @@
 										for="SuperficiePPTO">Superficie PPTO:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="number" id="SuperficiePPTO" name="SuperficiePPTO"
+										<input value="{{buscador.SuperficiePPTO}}" type="number" id="SuperficiePPTO" name="SuperficiePPTO"
 											required="required" class="form-control">
 									</div>
 								</div>
@@ -144,17 +144,19 @@
 										for="SuperficieAPC">Superficie APC:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="number" id="SuperficieAPC" name="SuperficieAPC" required="required"
+										<input value="{{buscador.SuperficieAPC}}" type="number" id="SuperficieAPC" name="SuperficieAPC" required="required"
 											class="form-control">
 									</div>
 								</div>
-								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align" for="Pais">Pais:<span
-											class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="Pais" name="Pais" required="required"
-											class="form-control">
+								<div class="form-group row">
+									<label class="col-form-label col-md-3 col-sm-3 label-align">País:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="pais" id="pais">
+											<option>Seleccione una opción</option>
+											{{#each pais}}
+											<option value="{{id}}">{{pais}}</option>
+											{{/each}}
+										</select>
 									</div>
 								</div>
 								<div class="item form-group">
@@ -162,7 +164,7 @@
 										for="Ciudad">Ciudad:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="Ciudad" name="Ciudad" required="required"
+										<input value="{{buscador.Ciudad}}" type="text" id="Ciudad" name="Ciudad" required="required"
 											class="form-control">
 									</div>
 								</div>
@@ -175,25 +177,25 @@
 										<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="text" class="form-control" id="search_input" name="Ubicacion"
+										<input value="{{buscador.Ubicacion}}" type="text" class="form-control" id="search_input" name="Ubicacion"
 											placeholder="Escriba la dirección..." />
 										<input type="hidden" id="loc_lat" />
 										<input type="hidden" id="loc_long" />
 									</div>
 								</div>
 
-								<!-- Display latitude and longitude -->
+								<!-- Display latitude and longitude 
 								<div class="latlong-view">
 									<p><b>Latitude:</b> <span id="latitude_view"></span></p>
 									<p><b>Longitude:</b> <span id="longitude_view"></span></p>
-								</div>
+								</div>-->
 
 								<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align" for="Npisos">N°
 										Pisos:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="number" id="Npisos" name="Npisos" required="required"
+										<input value="{{buscador.Npisos}}"type="number" id="Npisos" name="Npisos" required="required"
 											class="form-control">
 									</div>
 								</div>
@@ -202,16 +204,17 @@
 										Subterraneo:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="number" id="Nsubterraneo" name="Nsubterraneo" required="required"
+										<input value="{{buscador.Nsubterraneo}}" type="number" id="Nsubterraneo" name="Nsubterraneo" required="required"
 											class="form-control">
 									</div>
 								</div>
 							</div>
 							<div class="col-md-6 col-sm-6 ">
 								<div class="form-group row">
-									<label class="col-form-label col-md-3 col-sm-3 label-align">Director:</label>
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Director de Proyecto:</label>
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="DP" id="DP">
+											<option>Seleccione una opción</option>
 											{{#each usuarios}}
 											<option value="{{idUsuario}}">{{NombreCompleto}}</option>
 											{{/each}}
@@ -223,6 +226,7 @@
 										proyecto:</label>
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="JP" id="JP">
+											<option>Seleccione una opción</option>
 											{{#each usuarios}}
 											<option value="{{idUsuario}}">{{NombreCompleto}}</option>
 											{{/each}}
@@ -234,7 +238,7 @@
 										ValorM2:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="number" id="ValorMC" name="ValorMC" required="required"
+										<input value="{{buscador.ValorMC}}"type="number" id="ValorMC" name="ValorMC" required="required"
 											class="form-control">
 									</div>
 								</div>
@@ -243,7 +247,7 @@
 											class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="Zona" name="Zona" required="required"
+										<input value="{{buscador.Zona}}"type="text" id="Zona" name="Zona" required="required"
 											class="form-control">
 									</div>
 								</div>
@@ -252,7 +256,7 @@
 											class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="Suelo" name="Suelo" required="required"
+										<input value="{{buscador.Suelo}}"type="text" id="Suelo" name="Suelo" required="required"
 											class="form-control">
 									</div>
 								</div>
@@ -289,7 +293,7 @@
 										for="Cliente">Cliente:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="Cliente" name="Cliente" required="required"
+										<input value="{{buscador.Cliente}}" type="text" id="Cliente" name="Cliente" required="required"
 											class="form-control">
 									</div>
 								</div>
@@ -298,6 +302,7 @@
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="Arquitectura"
 											id="Constructora">
+											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
 											{{/each}}
@@ -309,6 +314,7 @@
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="Constructora"
 											id="Constructora">
+											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
 											{{/each}}
@@ -320,6 +326,7 @@
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="Revisor"
 											id="Revisor">
+											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
 											{{/each}}
@@ -331,11 +338,11 @@
 										planos:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="number" id="Nplanos" name="Nplanos" required="required"
+										<input  value="{{buscador.Nplanos}}" type="number" id="Nplanos" name="Nplanos" required="required"
 											class="form-control">
 									</div>
 								</div>
-								<div class="form-group row">
+								<!--<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Servicio:</label>
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="Servicio">
@@ -344,7 +351,7 @@
 											{{/each}}
 										</select>
 									</div>
-								</div>
+								</div>-->
 							</div>
 						</div>
 						<div class="ln_solid"></div>

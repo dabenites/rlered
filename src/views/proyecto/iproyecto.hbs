@@ -1,5 +1,50 @@
 <head>
 
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="/resources/demos/style.css">
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+
+	<script>
+		$(function () {
+			$('#nombre').autocomplete({
+				source: function (req, res) {
+
+					$.ajax{
+						url: "iproyecto/autocomplete",
+							dataType: "jsonp",
+								type: "GET",
+									data: req,
+										success: function(data) {
+											res(data)
+
+
+										},
+						error: function(err) {
+							console.log(err.status);
+						}
+					});
+		},
+			minLength: 1,
+			slect: function (event, ui) {
+				if (ui.item) {
+					$('#nombre').text(ui.item.label);
+				}
+			}
+            });
+        });
+
+	</script>
+
+
+
+
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script
@@ -63,7 +108,7 @@
 						<div class="form-group row">
 							<div class="col-md-6 col-sm-6 ">
 
-								<div class="item form-group">
+								<!--<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Año:</label>
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="year" id="year">
@@ -71,6 +116,15 @@
 											<option value="{{id}}">{{year}}</option>
 											{{/each}}
 										</select>
+									</div>
+								</div>-->
+								<div class="item form-group">
+									<label class="col-form-label col-md-3 col-sm-3 label-align"
+										for="year">Año:<span class="required">*</span>
+									</label>
+									<div class="col-md-7 col-sm-7 ">
+										<input type="text" id="year" name="year" required="required"
+											class="form-control">
 									</div>
 								</div>
 								<!--<div class="item form-group">
@@ -106,6 +160,7 @@
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Tipo:</label>
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="Tipo" id="Tipo">
+											<option>Seleccione una opción</option>
 											{{#each tipo}}
 											<option value="{{id}}">{{descripcion}}</option>
 											{{/each}}
@@ -148,13 +203,18 @@
 											class="form-control">
 									</div>
 								</div>
-								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align" for="Pais">Pais:<span
-											class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="Pais" name="Pais" required="required"
-											class="form-control">
+
+
+
+								<div class="form-group row">
+									<label class="col-form-label col-md-3 col-sm-3 label-align">País:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="pais" id="pais">
+											<option>Seleccione una opción</option>
+											{{#each pais}}
+											<option value="{{id}}">{{pais}}</option>
+											{{/each}}
+										</select>
 									</div>
 								</div>
 								<div class="item form-group">
@@ -182,11 +242,11 @@
 									</div>
 								</div>
 
-								<!-- Display latitude and longitude -->
+								<!-- Display latitude and longitude 
 								<div class="latlong-view">
 									<p><b>Latitude:</b> <span id="latitude_view"></span></p>
 									<p><b>Longitude:</b> <span id="longitude_view"></span></p>
-								</div>
+								</div>-->
 
 								<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align" for="Npisos">N°
@@ -209,9 +269,10 @@
 							</div>
 							<div class="col-md-6 col-sm-6 ">
 								<div class="form-group row">
-									<label class="col-form-label col-md-3 col-sm-3 label-align">Director:</label>
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Director de Proyecto:</label>
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="DP" id="DP">
+											<option>Seleccione una opción</option>
 											{{#each usuarios}}
 											<option value="{{idUsuario}}">{{NombreCompleto}}</option>
 											{{/each}}
@@ -223,6 +284,7 @@
 										proyecto:</label>
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="JP" id="JP">
+											<option>Seleccione una opción</option>
 											{{#each usuarios}}
 											<option value="{{idUsuario}}">{{NombreCompleto}}</option>
 											{{/each}}
@@ -298,6 +360,7 @@
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="Arquitectura"
 											id="Constructora">
+											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
 											{{/each}}
@@ -309,6 +372,7 @@
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="Constructora"
 											id="Constructora">
+											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
 											{{/each}}
@@ -320,6 +384,7 @@
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="Revisor"
 											id="Revisor">
+											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
 											{{/each}}

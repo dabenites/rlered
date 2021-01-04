@@ -32,7 +32,7 @@ router.get('/iproyecto', isLoggedIn, async (req, res) => {
 
 
 router.post('/addProyecto', async (req, res) => {
-  const { nombre, year, Tipo,/*Nproyecto*/Estado, Complejidad, SuperficiePPTO, SuperficieAPC, Pais, Ciudad,
+  const { nombre, year, Tipo,/*Nproyecto*/Estado, Complejidad, SuperficiePPTO, SuperficieAPC, pais, Ciudad,
     Ubicacion, Npisos, Nsubterraneo, DP, JP, ValorMC, Zona, Suelo, FechaIni, FechaEnt,
     FechaTer, Cliente, Arquitectura, Constructora, Revisor, Nplanos, Servicio } = req.body; //Obtener datos title,url,description
 
@@ -47,7 +47,7 @@ router.post('/addProyecto', async (req, res) => {
     Complejidad: Complejidad,
     SuperficiePPTO: SuperficiePPTO,
     SuperficieAPC: SuperficieAPC,
-    Pais: Pais,
+    pais: pais,
     Ciudad: Ciudad,
     Ubicacion: Ubicacion,
     Npisos: Npisos,
@@ -165,19 +165,42 @@ router.post('/listPro', isLoggedIn, async (req, res) => {
   // const contacto = await pool.query("SELECT * FROM contacto");
 
 
-  var a = 'l';
+  var a = req.body.nombre;
+  var b = req.body.year;
+  var c = req.body.Tipo;
+  var d = req.body.Estado;
+  var e = req.body.Complejidad;
+  var f = req.body.SuperficiePPTO;
+  var g = req.body.SuperficieAPC;
+  var h = req.body.Pais;
+  var i = req.body.Ciudad;
+  var k = req.body.Npisos;
+  var l = req.body.Nsubterraneo;
+  var m = req.body.DP;
+  var n = req.body.JP;
+  var o = req.body.ValorMC;
+  var p = req.body.Zona;
+  var q = req.body.Suelo;
+  var r = req.body.FechaIni;
+  var s = req.body.FechaEnt;
+  var t = req.body.FechaTer;
+  var u = req.body.Cliente;
+  var v = req.body.Arquitectura;
+  var w = req.body.Constructora;
+  var x = req.body.Revisor;
+  var y = req.body.Nplanos;
+  var z = req.body.Servicio;
+
 
   const buscadores = await pool.query("SELECT * FROM pro_proyectos AS t1 " +
-                                        " WHERE " +
-                                        " t1.nombre = ?", [a] );
-								
+    " WHERE " +
+    " t1.nombre=? OR t1.year=? OR t1.Tipo=? OR t1.Estado=? OR t1.Complejidad=? OR t1.SuperficiePPTO=? OR t1.SuperficieAPC=? OR t1.Pais=? OR t1.Ciudad=?  OR t1.Npisos=? OR t1.Nsubterraneo=? OR t1.DP=? OR t1.JP=? OR t1.ValorMC=? OR t1.Zona=? OR t1.Suelo=? OR t1.FechaIni=? OR t1.FechaEnt=? OR t1.FechaTer=? OR t1.Cliente=? OR t1.Arquitectura=? OR t1.Constructora=? OR t1.Revisor=? OR t1.Nplanos=?  OR t1.Servicio=?", [a, b, c, d, e, f, g, h, i, k, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]);
 
 
+  // console.log(a + "///" + b);
 
 
-
-
-res.render('proyecto/listPro', { req, buscadores, layout: 'template' });
+  res.render('proyecto/listPro', { req, buscadores, layout: 'template' });
 });
 
 
@@ -228,18 +251,20 @@ router.get('/buscador/edit/:id', async (req, res) => {
   const buscadores = await pool.query("SELECT * FROM pro_proyectos ");
   const buscador = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [id]);
 
-  const isEqualHelperHandlerbar = function(a, b, opts) {
-    if (a == b) {
-        return true
-    } else { 
-        return false
-    } 
-};
+  //const isEqualHelperHandlerbar = function (a, b, opts) {
+    //if (a == b) {
+      //return true
+    ////return false
+    //}
+  //};
 
 
 
-  res.render('proyecto/editProyecto', { buscadores, buscador: buscador[0], req, layout: 'template', helpers : {
-    if_equal : isEqualHelperHandlerbar }});
+  res.render('proyecto/editProyecto', {
+    buscadores, buscador: buscador[0], req, layout: 'template'//, helpers: {
+      //if_equal: isEqualHelperHandlerbar
+    //}
+  });
 });
 
 /*router.post('/buscador/edit/:id', async (req, res) => {

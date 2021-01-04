@@ -1,3 +1,23 @@
+<head>
+    <style>
+
+
+
+        table {
+            table-layout: fixed;
+        }
+
+        table td {
+            word-wrap: break-word;
+            max-width: 400%;
+        }
+
+        #grid td {
+            white-space: inherit;
+        }
+    </style>
+</head>
+
 <div class="col-md-12 col-sm-12  ">
     <div class="x_panel">
         <div class="x_title">
@@ -239,9 +259,9 @@
                                 <td>{{fecha}}</td>
                                 <td>{{destinatario}}</td>
                                 <td>
-                                    <button type="button" class="btn btn-info btn-xs"
+                                    <button type="button" class="btn btn-warning btn-xs"
                                         onclick="cargaEstado('Procesando',{{id}})">Procesando</button>
-                                    <button type="button" class="btn btn-info btn-xs"
+                                    <button type="button" class="btn btn-warning btn-xs"
                                         onclick="cargaEstado('Terminado',{{id}})">Terminado</button>
                                 </td>
                             </tr>
@@ -298,6 +318,18 @@
     </div>
 </div>
 
+
+<script>
+    $(document).ready(function() {
+    $('#tablafacturacion').DataTable({
+        "scrolly" : "50vh",
+        "scrollCollapse" : true,
+        "paging": false
+    });
+} );
+</script>
+
+
 <script>
 
     function cargaEstado(estado, key) {
@@ -324,3 +356,4 @@
 
     }
 </script>
+<script>"https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css"</script>

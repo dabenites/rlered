@@ -14,7 +14,7 @@
           <br />
           <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="/proyecto/listPro"
             method="POST">
-       
+
 
             <div class="form-group row">
               <div class="col-md-6 col-sm-6 ">
@@ -33,11 +33,15 @@
                     <input type="text" id="nombre" name="nombre" class="form-control">
                   </div>
                 </div>
-                <div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Tipo">Tipo:<span></span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="text" id="Tipo" name="Tipo" class="form-control">
+                <div class="form-group row">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo:</label>
+                  <div class="col-md-7 col-sm-7">
+                    <select class="select2_single form-control" tabindex="-1" name="Tipo" id="Tipo">
+                      <option>Seleccione una opción</option>
+                      {{#each tipo}}
+                      <option value="{{id}}">{{descripcion}}</option>
+                      {{/each}}
+                    </select>
                   </div>
                 </div>
                 <div class="item form-group">
@@ -107,9 +111,10 @@
 
               <div class="col-md-6 col-sm-6 ">
                 <div class="form-group row">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align">Director:</label>
+                  <label class="col-form-label col-md-3 col-sm-3 label-align">Director de Proyecto:</label>
                   <div class="col-md-7 col-sm-7">
                     <select class="select2_single form-control" tabindex="-1" name="DP" id="DP">
+                      <option>Seleccione una opción</option>
                       {{#each usuarios}}
                       <option value="{{idUsuario}}">{{NombreCompleto}}</option>
                       {{/each}}
@@ -121,6 +126,7 @@
                     proyecto:</label>
                   <div class="col-md-7 col-sm-7">
                     <select class="select2_single form-control" tabindex="-1" name="JP" id="JP">
+                      <option>Seleccione una opción</option>
                       {{#each usuarios}}
                       <option value="{{idUsuario}}">{{NombreCompleto}}</option>
                       {{/each}}
@@ -185,6 +191,7 @@
                   <label class="col-form-label col-md-3 col-sm-3 label-align">Arquitectura:</label>
                   <div class="col-md-7 col-sm-7">
                     <select class="select2_single form-control" tabindex="-1" name="Arquitectura" id="Constructora">
+                      <option>Seleccione una opción</option>
                       {{#each contacto}}
                       <option value="{{id}}">{{name}}</option>
                       {{/each}}
@@ -195,6 +202,7 @@
                   <label class="col-form-label col-md-3 col-sm-3 label-align">Constructora:</label>
                   <div class="col-md-7 col-sm-7">
                     <select class="select2_single form-control" tabindex="-1" name="Constructora" id="Constructora">
+                      <option>Seleccione una opción</option>
                       {{#each contacto}}
                       <option value="{{id}}">{{name}}</option>
                       {{/each}}
@@ -205,6 +213,7 @@
                   <label class="col-form-label col-md-3 col-sm-3 label-align">Revisor:</label>
                   <div class="col-md-7 col-sm-7">
                     <select class="select2_single form-control" tabindex="-1" name="Revisor" id="Revisor">
+                      <option>Seleccione una opción</option>
                       {{#each contacto}}
                       <option value="{{id}}">{{name}}</option>
                       {{/each}}
@@ -219,14 +228,14 @@
                     <input type="number" id="Nplanos" name="Nplanos" class="form-control">
                   </div>
                 </div>
-                <div class="item form-group">
+                <!--<div class="item form-group">
                   <label class="col-form-label col-md-3 col-sm-3 label-align" for="Nplanos">
                     Servicio :<span></span>
                   </label>
                   <div class="col-md-7 col-sm-7 ">
                     <input type="number" id="Servicio" name="Servicio" class="form-control">
                   </div>
-                </div>
+                </div>-->
               </div>
             </div>
 

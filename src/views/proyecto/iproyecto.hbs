@@ -83,6 +83,12 @@
 
 
 	</script>
+
+
+
+
+
+
 </head>
 
 
@@ -107,37 +113,31 @@
 
 						<div class="form-group row">
 							<div class="col-md-6 col-sm-6 ">
-
-								<!--<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align">Año:</label>
-									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="year" id="year">
-											{{#each proye}}
-											<option value="{{id}}">{{year}}</option>
-											{{/each}}
-										</select>
-									</div>
-								</div>-->
 								<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align"
-										for="year">Año:<span class="required">*</span>
+										for="Destinatario">Año:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="form-control" name="year" id="year">
+											<option>Seleccione una opción</option>
+											<script>
+												var d = new Date();
+												var n = d.getFullYear();
+												for (var i = n; i >= 2011; i--)
+													document.write('<option>' + i + '</option>');
+											</script>
+
+										</select>
+									</div>
+								</div>
+								<div class="item form-group">
+									<label class="col-form-label col-md-3 col-sm-3 label-align" for="code">Codigo<span
+											class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="year" name="year" required="required"
+										<input type="number" id="code" name="code" required="required"
 											class="form-control">
 									</div>
 								</div>
-								<!--<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align" for="Proyecto">N°
-										Proyecto:<span class="required">*</span></label>
-									<div class="col-md-7 col-sm-7 ">
-										<select class="form-control" name="idProyecto" id="idProyecto">
-											{{#each proyectos}}
-											<option value="{{id}}">{{year}}-{{code}} : {{nombre}}</option>
-											{{/each}}
-										</select>
-									</div>
-								</div>-->
 								<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align"
 										for="nombre">Nombre:<span class="required">*</span>
@@ -147,19 +147,11 @@
 											class="form-control">
 									</div>
 								</div>
-								<!--<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align" for="code">Codigo<span
-											class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input type="number" id="code" name="code" required="required"
-											class="form-control">
-									</div>
-								</div>-->
 								<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Tipo:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="Tipo" id="Tipo">
+										<select class="select2_single form-control" tabindex="-1" name="id_Tipo"
+											id="id_Tipo">
 											<option>Seleccione una opción</option>
 											{{#each tipo}}
 											<option value="{{id}}">{{descripcion}}</option>
@@ -167,24 +159,46 @@
 										</select>
 									</div>
 								</div>
-								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
-										for="Estado">Estado:<span class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="Estado" name="Estado" required="required"
-											class="form-control">
+								<div class="form-group row">
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Estado:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="id_Estado"
+											id="id_Estado">
+											<option>Seleccione una opción</option>
+											{{#each estado}}
+											<option value="{{id}}">{{descripcion}}</option>
+											{{/each}}
+										</select>
 									</div>
 								</div>
-								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
-										for="Complejidad">Complejidad:<span class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="Complejidad" name="Complejidad" required="required"
-											class="form-control">
+
+
+
+								<!--<div class="form-group row">
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Complejidad:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="id_complejidad"
+											id="id_complejidad">
+											<option>Seleccione una opción</option>
+											{{#each estado}}
+											<option value="{{id}}">{{descripcion}}</option>
+											{{/each}}
+										</select>
 									</div>
 								</div>
+
+
+
+								<div class="item form-group">
+									<label class="col-form-label col-md-3 col-sm-3 label-align"
+										for="id_complejidad">Complejidad:<span class="required">*</span>
+									</label>
+									<div class="col-md-7 col-sm-7 ">
+										<input type="text" id="id_complejidad" name="id_complejidad" required="required"
+											class="form-control">
+									</div>
+								</div>-->
+
 								<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align"
 										for="SuperficiePPTO">Superficie PPTO:<span class="required">*</span>
@@ -209,7 +223,8 @@
 								<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">País:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="pais" id="pais">
+										<select class="select2_single form-control" tabindex="-1" name="id_Pais"
+											id="id_Pais">
 											<option>Seleccione una opción</option>
 											{{#each pais}}
 											<option value="{{id}}">{{pais}}</option>
@@ -269,9 +284,11 @@
 							</div>
 							<div class="col-md-6 col-sm-6 ">
 								<div class="form-group row">
-									<label class="col-form-label col-md-3 col-sm-3 label-align">Director de Proyecto:</label>
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Director de
+										Proyecto:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="DP" id="DP">
+										<select class="select2_single form-control" tabindex="-1"
+											name="id_Director_Proyecto" id="id_Director_Proyecto">
 											<option>Seleccione una opción</option>
 											{{#each usuarios}}
 											<option value="{{idUsuario}}">{{NombreCompleto}}</option>
@@ -283,7 +300,8 @@
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Jefe de
 										proyecto:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="JP" id="JP">
+										<select class="select2_single form-control" tabindex="-1"
+											name="id_Jefe_Proyecto" id="id_Jefe_Proyecto">
 											<option>Seleccione una opción</option>
 											{{#each usuarios}}
 											<option value="{{idUsuario}}">{{NombreCompleto}}</option>
@@ -346,20 +364,26 @@
 									</div>
 
 								</div>
-								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
-										for="Cliente">Cliente:<span class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input type="text" id="Cliente" name="Cliente" required="required"
-											class="form-control">
+
+
+								<div class="form-group row">
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Cliente:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="id_Cliente"
+											id="id_Cliente">
+											<option>Seleccione una opción</option>
+											{{#each contacto}}
+											<option value="{{id}}">{{name}}</option>
+											{{/each}}
+										</select>
 									</div>
 								</div>
+
 								<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Arquitectura:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="Arquitectura"
-											id="Constructora">
+										<select class="select2_single form-control" tabindex="-1" name="id_Arquitectura"
+											id="id_Arquitectura">
 											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
@@ -370,8 +394,8 @@
 								<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Constructora:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="Constructora"
-											id="Constructora">
+										<select class="select2_single form-control" tabindex="-1" name="id_Constructora"
+											id="id_Constructora">
 											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
@@ -382,8 +406,8 @@
 								<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Revisor:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="Revisor"
-											id="Revisor">
+										<select class="select2_single form-control" tabindex="-1" name="id_Revisor"
+											id="id_Revisor">
 											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
@@ -403,7 +427,7 @@
 								<!--<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Servicio:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="Servicio">
+										<select class="select2_single form-control" tabindex="-1" name="id_Servicio">
 											{{#each sucursal}}
 											<option value="{{id_Sucursal}}">{{direccion}}</option>
 											{{/each}}

@@ -57,128 +57,141 @@
 				<div class="x_content">
 					<br />
 					<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
-						action="/proyecto/editProyecto" method="POST">
+						action="/proyecto/edit" method="POST">
 
 
 						<div class="form-group row">
-							<div class="col-md-6 col-sm-6 ">
+							<div class="col-md-8 col-sm-8 ">
+
 
 								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
-										for="year">Año:<span class="required">*</span>
+									<label class="col-form-label col-md-5 col-sm-5 label-align" for="ID">Id<span
+											class="required"></span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.year}}" type="text" id="year" name="year" required="required"
-											class="form-control">
+										<input type="text" id="id" name="id" required="required"
+											class="form-control" value="{{buscador.id}}" Readonly>
 									</div>
 								</div>
 								<!--<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align" for="Proyecto">N°
-										Proyecto:<span class="required">*</span></label>
-									<div class="col-md-7 col-sm-7 ">
-										<select class="form-control" name="idProyecto" id="idProyecto">
-											{{#each proyectos}}
-											<option value="{{id}}">{{year}}-{{code}} : {{nombre}}</option>
-											{{/each}}
+									<label class="col-form-label col-md-5 col-sm-5 label-align"
+										for="Destinatario">Año:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="form-control" name="year" id="year">
+											<option>Seleccione una opción</option>
+											<script>
+												var d = new Date();
+												var n = d.getFullYear();
+												for (var i = n; i >= 2011; i--)
+													document.write('<option>' + i + '</option>');
+											</script>
+
 										</select>
 									</div>
 								</div>-->
 								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
+									<label class="col-form-label col-md-5 col-sm-5 label-align"
 										for="nombre">Nombre:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.nombre}}" type="text" id="nombre" name="nombre" required="required"
-											class="form-control">
-									</div>
-								</div>
-								<!--<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align" for="code">Codigo<span
-											class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input type="number" id="code" name="code" required="required"
-											class="form-control">
-									</div>
-								</div>-->
-								<div class="form-group row">
-									<label class="col-form-label col-md-3 col-sm-3 label-align">Tipo:</label>
-									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="Tipo" id="Tipo">
-											<option>Seleccione una opción</option>
-											{{#each tipo}}
-											<option value="{{buscador}}">{{tipo}}</option>
-											{{/each}}
-										</select>
-									</div>
-								</div>
-								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
-										for="Estado">Estado:<span class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.Estado}}" type="text" id="Estado" name="Estado" required="required"
-											class="form-control">
-									</div>
-								</div>
-								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
-										for="Complejidad">Complejidad:<span class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.Complejidad}}"type="text" id="Complejidad" name="Complejidad" required="required"
-											class="form-control">
-									</div>
-								</div>
-								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
-										for="SuperficiePPTO">Superficie PPTO:<span class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.SuperficiePPTO}}" type="number" id="SuperficiePPTO" name="SuperficiePPTO"
+										<input value="{{buscador.nombre}}" type="text" id="nombre" name="nombre"
 											required="required" class="form-control">
 									</div>
 								</div>
 								<div class="item form-group">
+									<label class="col-form-label col-md-5 col-sm-5 label-align" for="code">Codigo<span
+											class="required">*</span>
+									</label>
+									<div class="col-md-7 col-sm-7 ">
+										<input value="{{buscador.code}}" type="number" id="code" name="code"
+											required="required" class="form-control" Readonly>
+									</div>
+								</div>
+								<!--<div class="form-group row">
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Tipo:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="id_Tipo"
+											id="id_Tipo">
+											<option>Seleccione una opción</option>
+											{{#each buscador}}
+											<option value="{{buscador.id_Tipo}}"></option>
+											{{/each}}
+
+										</select>
+									</div>
+								</div>-->
+								<!--<div class="form-group row">
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Estado:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="id_Estado"
+											id="id_Estado">
+											<option>Seleccione una opción</option>
+											{{#each estado}}
+											<option value="{{id}}">{{descripcion}}</option>
+											{{/each}}
+										</select>
+									</div>
+								</div>-->
+
+								<!--<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align"
+										for="Complejidad">Complejidad:<span class="required">*</span>
+									</label>
+									<div class="col-md-7 col-sm-7 ">
+										<input value="{{buscador.Complejidad}}" type="text" id="Complejidad"
+											name="Complejidad" required="required" class="form-control">
+									</div>
+								</div>-->
+								<div class="item form-group">
+									<label class="col-form-label col-md-5 col-sm-5 label-align"
+										for="SuperficiePPTO">Superficie PPTO:<span class="required">*</span>
+									</label>
+									<div class="col-md-7 col-sm-7 ">
+										<input value="{{buscador.SuperficiePPTO}}" type="number" id="SuperficiePPTO"
+											name="SuperficiePPTO" required="required" class="form-control">
+									</div>
+								</div>
+								<div class="item form-group">
+									<label class="col-form-label col-md-5 col-sm-5 label-align"
 										for="SuperficieAPC">Superficie APC:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.SuperficieAPC}}" type="number" id="SuperficieAPC" name="SuperficieAPC" required="required"
-											class="form-control">
+										<input value="{{buscador.SuperficieAPC}}" type="number" id="SuperficieAPC"
+											name="SuperficieAPC" required="required" class="form-control">
 									</div>
 								</div>
-								<div class="form-group row">
+								<!--<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">País:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="pais" id="pais">
+										<select class="select2_single form-control" tabindex="-1" name="id_Pais"
+											id="id_Pais">
 											<option>Seleccione una opción</option>
 											{{#each pais}}
 											<option value="{{id}}">{{pais}}</option>
 											{{/each}}
 										</select>
 									</div>
-								</div>
+								</div>-->
 								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
+									<label class="col-form-label col-md-5 col-sm-5 label-align"
 										for="Ciudad">Ciudad:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.Ciudad}}" type="text" id="Ciudad" name="Ciudad" required="required"
-											class="form-control">
+										<input value="{{buscador.Ciudad}}" type="text" id="Ciudad" name="Ciudad"
+											required="required" class="form-control">
 									</div>
 								</div>
 
 
 								<!-- Autocomplete location search input -->
 								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
+									<label class="col-form-label col-md-5 col-sm-5 label-align"
 										for="Ubicacion">Ubicación:
 										<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.Ubicacion}}" type="text" class="form-control" id="search_input" name="Ubicacion"
-											placeholder="Escriba la dirección..." />
+										<input value="{{buscador.Ubicacion}}" type="text" class="form-control"
+											id="search_input" name="Ubicacion" placeholder="Escriba la dirección..." />
 										<input type="hidden" id="loc_lat" />
 										<input type="hidden" id="loc_long" />
 									</div>
@@ -191,55 +204,96 @@
 								</div>-->
 
 								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align" for="Npisos">N°
+									<label class="col-form-label col-md-5 col-sm-5 label-align" for="Npisos">N°
 										Pisos:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.Npisos}}"type="number" id="Npisos" name="Npisos" required="required"
-											class="form-control">
+										<input value="{{buscador.Npisos}}" type="number" id="Npisos" name="Npisos"
+											required="required" class="form-control">
 									</div>
 								</div>
 								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align" for="Nsubterraneo">N°
+									<label class="col-form-label col-md-5 col-sm-5 label-align" for="Nsubterraneo">N°
 										Subterraneo:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.Nsubterraneo}}" type="number" id="Nsubterraneo" name="Nsubterraneo" required="required"
-											class="form-control">
-									</div>
-								</div>
-							</div>
-							<div class="col-md-6 col-sm-6 ">
-								<div class="form-group row">
-									<label class="col-form-label col-md-3 col-sm-3 label-align">Director de Proyecto:</label>
-									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="DP" id="DP">
-											<option>Seleccione una opción</option>
-											{{#each usuarios}}
-											<option value="{{idUsuario}}">{{NombreCompleto}}</option>
-											{{/each}}
-										</select>
-									</div>
-								</div>
-								<div class="form-group row">
-									<label class="col-form-label col-md-3 col-sm-3 label-align">Jefe de
-										proyecto:</label>
-									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="JP" id="JP">
-											<option>Seleccione una opción</option>
-											{{#each usuarios}}
-											<option value="{{idUsuario}}">{{NombreCompleto}}</option>
-											{{/each}}
-										</select>
+										<input value="{{buscador.Nsubterraneo}}" type="number" id="Nsubterraneo"
+											name="Nsubterraneo" required="required" class="form-control">
 									</div>
 								</div>
 								<div class="item form-group">
+									<label class="col-form-label col-md-5 col-sm-5 label-align" for="ValorMC">
+										ValorM2:<span class="required">*</span>
+									</label>
+									<div class="col-md-7 col-sm-7 ">
+										<input value="{{buscador.ValorMC}}" type="number" id="ValorMC" name="ValorMC"
+											required="required" class="form-control">
+									</div>
+								</div>
+								<div class="item form-group">
+									<label class="col-form-label col-md-5 col-sm-5 label-align" for="Zona"> Zona:<span
+											class="required">*</span>
+									</label>
+									<div class="col-md-7 col-sm-7 ">
+										<input value="{{buscador.Zona}}" type="text" id="Zona" name="Zona"
+											required="required" class="form-control">
+									</div>
+								</div>
+
+								<div class="item form-group">
+									<label class="col-form-label col-md-5 col-sm-5 label-align" for="Suelo">Suelo:<span
+											class="required">*</span>
+									</label>
+									<div class="col-md-7 col-sm-7 ">
+										<input value="{{buscador.Suelo}}" type="text" id="Suelo" name="Suelo"
+											required="required" class="form-control">
+									</div>
+								</div>
+								<div class="item form-group">
+									<label class="col-form-label col-md-5 col-sm-5 label-align" for="Nplanos">N°de
+										planos:<span class="required">*</span>
+									</label>
+									<div class="col-md-7 col-sm-7 ">
+										<input value="{{buscador.Nplanos}}" type="number" id="Nplanos" name="Nplanos"
+											required="required" class="form-control">
+									</div>
+								</div>
+							</div>
+
+							<!--<div class="col-md-6 col-sm-6 ">
+								<div class="form-group row">
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Director de
+										Proyecto:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1"
+											name="id_Director_Proyecto" id="id_Director_Proyecto">
+											<option>Seleccione una opción</option>
+											{{#each usuarios}}
+											<option value="{{idUsuario}}">{{NombreCompleto}}</option>
+											{{/each}}
+										</select>
+									</div>
+								</div>-->
+							<!--<div class="form-group row">
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Jefe de
+										proyecto:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1"
+											name="id_Jefe_Proyecto" id="id_Jefe_Proyecto">
+											<option>Seleccione una opción</option>
+											{{#each usuarios}}
+											<option value="{{idUsuario}}">{{NombreCompleto}}</option>
+											{{/each}}
+										</select>
+									</div>
+								</div>-->
+							<!--<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align" for="ValorMC">
 										ValorM2:<span class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.ValorMC}}"type="number" id="ValorMC" name="ValorMC" required="required"
-											class="form-control">
+										<input value="{{buscador.ValorMC}}" type="number" id="ValorMC" name="ValorMC"
+											required="required" class="form-control">
 									</div>
 								</div>
 								<div class="item form-group">
@@ -247,8 +301,8 @@
 											class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.Zona}}"type="text" id="Zona" name="Zona" required="required"
-											class="form-control">
+										<input value="{{buscador.Zona}}" type="text" id="Zona" name="Zona"
+											required="required" class="form-control">
 									</div>
 								</div>
 								<div class="item form-group">
@@ -256,93 +310,93 @@
 											class="required">*</span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.Suelo}}"type="text" id="Suelo" name="Suelo" required="required"
-											class="form-control">
+										<input value="{{buscador.Suelo}}" type="text" id="Suelo" name="Suelo"
+											required="required" class="form-control">
 									</div>
-								</div>
-								<div class="item form-group">
+								</div>-->
+							<!--<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaIni"> Fecha
-										inicio:<span class="required">*</span>
+										inicio:<span </span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="date" id="FechaIni" name="FechaIni" required="required"
-											class="form-control">
+										<input  value="{{buscador.FevhaIn}}" type="date" id="FechaIni" name="FechaIni" class="form-control">
 									</div>
 								</div>
 								<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaEnt"> Fecha
-										entrega:<span class="required">*</span>
+										entrega:<span </span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="date" id="FechaEnt" name="FechaEnt" required="required"
-											class="form-control">
+										<input type="date" id="FechaEnt" name="FechaEnt" class="form-control">
 									</div>
 								</div>
 								<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaTer"> Fecha
-										termino:<span class="required">*</span>
+										termino:<span></span>
 									</label>
 									<div class="col-md-7 col-sm-7 ">
-										<input type="date" id="FechaTer" name="FechaTer" required="required"
-											class="form-control">
+										<input type="date" id="FechaTer" name="FechaTer" class="form-control">
 									</div>
 
-								</div>
-								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
-										for="Cliente">Cliente:<span class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input value="{{buscador.Cliente}}" type="text" id="Cliente" name="Cliente" required="required"
-											class="form-control">
+								</div>-->
+							<!--<div class="form-group row">
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Cliente:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="id_Cliente"
+											id="id_Cliente">
+											<option>Seleccione una opción</option>
+											{{#each contacto}}
+											<option value="{{id}}">{{name}}</option>
+											{{/each}}
+										</select>
 									</div>
-								</div>
-								<div class="form-group row">
+								</div>-->
+							<!--<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Arquitectura:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="Arquitectura"
-											id="Constructora">
+										<select class="select2_single form-control" tabindex="-1" name="id_Arquitectura"
+											id="id_Arquitectura">
 											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
 											{{/each}}
 										</select>
 									</div>
-								</div>
-								<div class="form-group row">
+								</div>-->
+							<!--<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Constructora:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="Constructora"
-											id="Constructora">
+										<select class="select2_single form-control" tabindex="-1" name="id_Constructora"
+											id="id_Constructora">
 											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
 											{{/each}}
 										</select>
 									</div>
-								</div>
-								<div class="form-group row">
+								</div>-->
+							<!--<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Revisor:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="Revisor"
-											id="Revisor">
+										<select class="select2_single form-control" tabindex="-1" name="id_Revisor"
+											id="id_Revisor">
 											<option>Seleccione una opción</option>
 											{{#each contacto}}
 											<option value="{{id}}">{{name}}</option>
 											{{/each}}
 										</select>
 									</div>
+								</div>-->
+							<!--<div class="item form-group">
+								<label class="col-form-label col-md-3 col-sm-3 label-align" for="Nplanos">N°de
+									planos:<span class="required">*</span>
+								</label>
+								<div class="col-md-7 col-sm-7 ">
+									<input value="{{buscador.Nplanos}}" type="number" id="Nplanos" name="Nplanos"
+										required="required" class="form-control">
 								</div>
-								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align" for="Nplanos">N°de
-										planos:<span class="required">*</span>
-									</label>
-									<div class="col-md-7 col-sm-7 ">
-										<input  value="{{buscador.Nplanos}}" type="number" id="Nplanos" name="Nplanos" required="required"
-											class="form-control">
-									</div>
-								</div>
-								<!--<div class="form-group row">
+							</div>-->
+							<!--<div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Servicio:</label>
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="Servicio">
@@ -352,18 +406,18 @@
 										</select>
 									</div>
 								</div>-->
-							</div>
 						</div>
-						<div class="ln_solid"></div>
-						<div class="form-group">
-							<div class="col-md-9 col-sm-9 offset-md-5">
-								<button type="submit" class="btn btn-success">Guardar</button>
-							</div>
-						</div>
-					</form>
 				</div>
+				<div class="ln_solid"></div>
+				<div class="form-group">
+					<div class="col-md-9 col-sm-9 offset-md-5">
+						<button type="submit" class="btn btn-warning">Guardar</button>
+					</div>
+				</div>
+				</form>
 			</div>
 		</div>
+	</div>
 	</div>
 
 

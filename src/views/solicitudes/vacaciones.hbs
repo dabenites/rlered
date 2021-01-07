@@ -1,34 +1,34 @@
-  <!--
+<!--
   <link href='../../core/main.css' rel='stylesheet' />
   <link href='../../daygrid/main.css' rel='stylesheet' />
   <link href='../../list/main.css' rel='stylesheet' /> 
   <link href='../../timegrid/main.css' rel='stylesheet' />
   -->
 
-  <!--CSS-->
-  <style>
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 14px;
-    }
+<!--CSS-->
+<style>
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+  }
 
-    #calendar {
-      max-width: 100%;
-      margin: 40px auto;
-    }
+  #calendar {
+    max-width: 100%;
+    margin: 40px auto;
+  }
 
-    .headerToolbar{
-        background-color: #fed300 ;
-  
-    }
-  </style>
+  .headerToolbar {
+    background-color: #fed300;
+
+  }
+</style>
 
 
-  <!--Codigo del FULL CALENDAR-->
-  <!--
+<!--Codigo del FULL CALENDAR-->
+<!--
   <script src='../core/main.js'></script>
   <script src='../interaction/main.js'></script>
   <script src='../../daygrid/main.js'></script>
@@ -48,76 +48,75 @@
 
 
 
-  <!--Funcionalidad y uso de fullcalendar-->
-  <script>
+<!--Funcionalidad y uso de fullcalendar-->
+<script>
 
-   document.addEventListener('DOMContentLoaded', function() {
-  var calendarEl = document.getElementById('calendar');
+  document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
 
-  var calendar = new FullCalendar.Calendar(calendarEl, {
-    headerToolbar: {
-      left: 'prev,next',
-      center: 'title',
-      right: 'Miboton'
-    },
-    initialDate: new Date(),
-    hiddenDays: [0, 6],
-    contentHeight: 650,
-    height: 650,
-    customButtons: {
-          Miboton: {
-            text: "Ingresar Solicitud",
-            click: function () {
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: 'prev,next',
+        center: 'title',
+        right: 'Miboton'
+      },
+      initialDate: new Date(),
+      hiddenDays: [0, 6],
+      contentHeight: 650,
+      height: 650,
+      customButtons: {
+        Miboton: {
+          text: "Ingresar Solicitud",
+          click: function () {
 
-              // ir a la base de datos preguntar lacantidad de dias que entrega 
-              $.ajax({
-                type: 'post',
-                url: '/solicitudes/getDias',
-                data: Object,
-                dataType: 'text'
-              })
-                .done(function (data) {
-                  //console.log(data);
-                  $('#txtfecha').val(data);
-                });
-              $('#exampleModal').modal('toggle'); //Me muestra el formulario si esta oculto
-            }
+            // ir a la base de datos preguntar lacantidad de dias que entrega 
+            $.ajax({
+              type: 'post',
+              url: '/solicitudes/getDias',
+              data: Object,
+              dataType: 'text'
+            })
+              .done(function (data) {
+                //console.log(data);
+                $('#txtfecha').val(data);
+              });
+            $('#exampleModal').modal('toggle'); //Me muestra el formulario si esta oculto
           }
-        },
-    events: '/solicitudes/eventos',
-    //events:[      {        start: '2020-12-15',        display: 'background',        overlap: false      }    ],
-    dateClick: function (info) {
+        }
+      },
+      events: '/solicitudes/eventos',
+      //events:[      {        start: '2020-12-15',        display: 'background',        overlap: false      }    ],
+      dateClick: function (info) {
 
-         // var allEvents = getEvents();
-        
+        // var allEvents = getEvents();
 
-         // console.log(jsEvent);
+
+        // console.log(jsEvent);
         var diaSolicitado = calendar.formatDate(info.dateStr, {
-                                                                year: 'numeric',
-                                                                month: 'numeric',
-                                                                day: 'numeric'
-                                                              });
+          year: 'numeric',
+          month: 'numeric',
+          day: 'numeric'
+        });
 
-         var allEvents = calendar.getEvents();
-         var exists = false;
-         $.each( allEvents, function( index, value ){
-            //  console.log(moment(value.start).format("DD-MM-YYYY HH:mm"));
-            //  calendar.formatDate();
-            //  console.log(formatDate(value.start, 'MM-dd-yyyy'));
+        var allEvents = calendar.getEvents();
+        var exists = false;
+        $.each(allEvents, function (index, value) {
+          //  console.log(moment(value.start).format("DD-MM-YYYY HH:mm"));
+          //  calendar.formatDate();
+          //  console.log(formatDate(value.start, 'MM-dd-yyyy'));
 
-                    var diaEvento = calendar.formatDate(value.start, {
-                                                                year: 'numeric',
-                                                                month: 'numeric',
-                                                                day: 'numeric'
-                                                              });
+          var diaEvento = calendar.formatDate(value.start, {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric'
+          });
 
-                    if (diaSolicitado == diaEvento)
-                      exists = true;
+          if (diaSolicitado == diaEvento)
+            exists = true;
 
-         });
-        
-        if (!exists)
-        {
+        });
+
+        if (!exists) {
           calendar.addEvent({ date: info.dateStr });
 
           var informacion = [];
@@ -132,19 +131,19 @@
             data: JSON.stringify(informacion),
           });
         }
-          
-        },
+
+      },
+    });
+    calendar.setOption('locale', 'es');
+    calendar.render();
   });
-  calendar.setOption('locale', 'es');
-  calendar.render();
-});
 
-  </script>
+</script>
 
 
 
-  <!-- Modal -->
-  <!--<div class="col-md-12 col-sm-12 ">
+<!-- Modal -->
+<!--<div class="col-md-12 col-sm-12 ">
     <div class="x_panel">
       <div class="x_title">
 
@@ -154,16 +153,16 @@
       <div class="x_content">-->
 
 
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle">Vacaciones <small>Ingresar solicitud</small> </h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
-          <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Vacaciones <small>Ingresar solicitud</small> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+        <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
         <form action="/solicitudes/AddIngreso" method="POST">
 
           <div class="x_content">
@@ -216,30 +215,26 @@
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             <button type="submit" id="btnAgregar" class="btn btn-warning">Agregar</button>
           </div>
-        </div>
-        </form>
       </div>
+      </form>
     </div>
   </div>
+</div>
 
-                <div class="x_panel">
-                  <div class="x_title">
-                    <h2>Ingreso de Vacaciones</h2>
-                    <ul class="nav navbar-right panel_toolbox">
-                      
-                      Ingresando&nbsp;<button style=" background-color: rgb(255, 243, 51)"></button>&nbsp;&nbsp;
-                      Solicitado&nbsp;<button style=" background-color: rgb(51, 196, 255)"></button>&nbsp;&nbsp;
-                      Aprobado&nbsp;<button style=" background-color:rgb(51, 255, 88)"></button>
-                    </ul>
-                    <div class="clearfix"></div>
-                    </div>
-                   <div class="x_content">
+<div class="x_panel">
+  <div class="x_title">
+    <h2>Ingreso de Vacaciones</h2>
+    <ul class="nav navbar-right panel_toolbox">
 
-                     <div id='calendar' name="calendar" style="width: 70%;"></div>
+      Ingresando&nbsp;<button style=" background-color: rgb(255, 243, 51)"></button>&nbsp;&nbsp;
+      Solicitado&nbsp;<button style=" background-color: rgb(51, 196, 255)"></button>&nbsp;&nbsp;
+      Aprobado&nbsp;<button style=" background-color:rgb(51, 255, 88)"></button>
+    </ul>
+    <div class="clearfix"></div>
+  </div>
+  <div class="x_content">
 
-                    </div>
-                </div>
+    <div id='calendar' name="calendar" style="width: 70%;"></div>
 
-
-
-      
+  </div>
+</div>

@@ -4,6 +4,8 @@
 	        box-sizing: border-box;
 	outline: none;
 }
+
+
 body {
 	background: url(../images/bg.jpg) no-repeat center center fixed;
     -webkit-background-size: cover;

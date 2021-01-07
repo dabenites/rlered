@@ -1,26 +1,267 @@
+<head>
+  <script>
+
+  </script>
+
+</head>
+
 <body>
   <div class="container">
-    <div class="col-md-15 col-sm-15 ">
-      <div class="x_panel">
-        <div class="x_title">
-          <h2>Buscador
-            <!--<small>Listado de proyectos</small>-->
-          </h2>
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>Proyectos
+          <!--<small>Listado de proyectos</small>-->
+        </h2>
+        <!-- Button trigger modal -->
+        <div style="text-align: right;width:1020px">
+          <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#exampleModal">
+            Filtros avanzados
+          </button>
+        </div>
 
-          <div class="clearfix">
+        <div class="clearfix"></div>
+      </div>
+      <div class="x_content">
+
+        <br />
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Filtros avanzados</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+
+              <div class="form-group row">
+                <div class="col-md-12 col-sm-15 ">
+                  <div class="modal-body">
+                    <div class="form-group row">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align">Estado:</label>
+                      <div class="col-md-7 col-sm-7">
+                        <select class="select2_single form-control" tabindex="-1" name="id_Estado" id="id_Estado">
+                          <option>Seleccione una opción</option>
+                          {{#each estado}}
+                          <option value="{{id}}">{{descripcion}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+
+                    <!--<div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"
+                          for="Complejidad">Complejidad:<span></span>
+                        </label>
+                        <div class="col-md-7 col-sm-7 ">
+                          <input type="text" id="Complejidad" name="Complejidad" class="form-control">
+                        </div>
+                      </div>-->
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="SuperficiePPTO">Superficie
+                        PPTO:<span></span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="number" id="SuperficiePPTO" name="SuperficiePPTO" class="form-control">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="SuperficieAPC">Superficie
+                        APC:<span></span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="number" id="SuperficieAPC" name="SuperficieAPC" class="form-control">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align">País:</label>
+                      <div class="col-md-7 col-sm-7">
+                        <select class="select2_single form-control" tabindex="-1" name="id_Pais" id="id_Pais">
+                          <option>Seleccione una opción</option>
+                          {{#each paises}}
+                          <option value="{{id}}">{{pais}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="Ciudad">Ciudad:<span></span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="text" id="Ciudad" name="Ciudad" class="form-control">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="Npisos">N°
+                        Pisos:<span></span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="number" id="Npisos" name="Npisos" class="form-control">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="Nsubterraneo">N°
+                        Subterraneo:<span></span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="number" id="Nsubterraneo" name="Nsubterraneo" class="form-control">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo:</label>
+                      <div class="col-md-7 col-sm-7">
+                        <select class="select2_single form-control" tabindex="-1" name="id_Tipo" id="id_Tipo">
+                          <option>Seleccione una opción</option>
+                          {{#each tipo}}
+                          <option value="{{id}}">{{descripcion}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align">Director de
+                        Proyecto:</label>
+                      <div class="col-md-7 col-sm-7">
+                        <select class="select2_single form-control" tabindex="-1" name="id_Director_Proyecto"
+                          id="id_Director_Proyecto">
+                          <option>Seleccione una opción</option>
+                          {{#each usuarios}}
+                          <option value="{{idUsuario}}">{{NombreCompleto}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align">Jefe de
+                        proyecto:</label>
+                      <div class="col-md-7 col-sm-7">
+                        <select class="select2_single form-control" tabindex="-1" name="id_Jefe_Proyecto"
+                          id="id_Jefe_Proyecto">
+                          <option>Seleccione una opción</option>
+                          {{#each usuarios}}
+                          <option value="{{idUsuario}}">{{NombreCompleto}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="ValorMC">
+                        ValorM2:<span></span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="number" id="ValorMC" name="ValorMC" class="form-control">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="Zona"> Zona:<span></span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="text" id="Zona" name="Zona" class="form-control">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="Suelo">Suelo:<span></span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="text" id="Suelo" name="Suelo" class="form-control">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaIni"> Fecha
+                        inicio:<span </span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="date" id="FechaIni" name="FechaIni" class="form-control">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaEnt"> Fecha
+                        entrega:<span </span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="date" id="FechaEnt" name="FechaEnt" class="form-control">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaTer"> Fecha
+                        termino:<span </span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="date" id="FechaTer" name="FechaTer" class="form-control">
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align">Cliente:</label>
+                      <div class="col-md-7 col-sm-7">
+                        <select class="select2_single form-control" tabindex="-1" name="id_Cliente" id="id_Cliente">
+                          <option>Seleccione una opción</option>
+                          {{#each contacto}}
+                          <option value="{{id}}">{{name}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align">Arquitectura:</label>
+                      <div class="col-md-7 col-sm-7">
+                        <select class="select2_single form-control" tabindex="-1" name="id_Arquitectura"
+                          id="id_Arquitectura">
+                          <option>Seleccione una opción</option>
+                          {{#each contacto}}
+                          <option value="{{id}}">{{name}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align">Constructora:</label>
+                      <div class="col-md-7 col-sm-7">
+                        <select class="select2_single form-control" tabindex="-1" name="id_Constructora"
+                          id="id_Constructora">
+                          <option>Seleccione una opción</option>
+                          {{#each contacto}}
+                          <option value="{{id}}">{{name}}</option>
+                          {{/each}}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="col-form-label col-md-3 col-sm-3 label-align" for="Nplanos">N°de
+                        planos:<span></span>
+                      </label>
+                      <div class="col-md-7 col-sm-7 ">
+                        <input type="number" id="Nplanos" name="Nplanos" class="form-control">
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                      <button type="button" class="btn btn-warning" onclick="">Filtrar</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
           </div>
         </div>
-        <div class="x_content">
-          <br />
-          <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="/proyecto/listPro"
-            method="POST">
 
 
-            <div class="form-group row">
-              <div class="col-md-8 col-sm-8 ">
+
+        <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="/proyecto/listPro"
+          method="POST">
+
+
+          <div class="form-group row">
+            <div class="col-md-12 col-sm-15 ">
+              <div class="col-md-4 col-sm-4 ">
                 <div class="item form-group">
-                  <label class="col-form-label col-md-5 col-sm-5 label-align" for="Destinatario">Año:</label>
-                  <div class="col-md-7 col-sm-7">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Año:</label>
+                  <div class="col-md-9 col-sm-9">
                     <select class="form-control" name="year" id="year">
                       <option>Seleccione una opción</option>
                       <script>
@@ -34,8 +275,21 @@
                   </div>
                 </div>
                 <div class="form-group row">
-                  <label class="col-form-label col-md-5 col-sm-5 label-align">Código:</label>
-                  <div class="col-md-7 col-sm-7">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo:</label>
+                  <div class="col-md-9 col-sm-9">
+                    <select class="select2_single form-control" tabindex="-1" name="id_Tipo" id="id_Tipo">
+                      <option>Seleccione una opción</option>
+                      {{#each tipo}}
+                      <option value="{{id}}">{{descripcion}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-4 ">
+                <div class="form-group row">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align">Código:</label>
+                  <div class="col-md-9 col-sm-9">
                     <select class="select2_single form-control" tabindex="-1" name="code" id="code">
                       <option>Seleccione una opción</option>
                       {{#each buscadores}}
@@ -45,272 +299,144 @@
                   </div>
                 </div>
                 <div class="item form-group">
-                  <label class="col-form-label col-md-5 col-sm-5 label-align" for="nombre">Nombre:<span></span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="text" id="nombre" name="nombre" class="form-control">
-                  </div>
-                </div>
-
-              
-                  <div class="form-group row">
-                    <label class="col-form-label col-md-5 col-sm-5 label-align">Tipo:</label>
-                    <div class="col-md-7 col-sm-7">
-                      <select class="select2_single form-control" tabindex="-1" name="id_Tipo" id="id_Tipo">
-                        <option>Seleccione una opción</option>
-                        {{#each tipo}}
-                        <option value="{{id}}">{{descripcion}}</option>
-                        {{/each}}
-                      </select>
-                    </div>
-                  </div>
-                  <div class="item form-group">
-                    <label class="col-form-label col-md-5 col-sm-5 label-align" for="Zona"> Zona:<span></span>
-                    </label>
-                    <div class="col-md-7 col-sm-7 ">
-                      <input type="text" id="Zona" name="Zona" class="form-control">
-                    </div>
-                  </div>
-                  <div class="item form-group">
-                    <label class="col-form-label col-md-5 col-sm-5 label-align" for="Suelo">Suelo:<span></span>
-                    </label>
-                    <div class="col-md-7 col-sm-7 ">
-                      <input type="text" id="Suelo" name="Suelo" class="form-control">
-                    </div>
-                  </div>
-                  <!--<div class="form-group row">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align">Estado:</label>
-                  <div class="col-md-7 col-sm-7">
-                    <select class="select2_single form-control" tabindex="-1" name="id_Estado" id="id_Estado">
-                      <option>Seleccione una opción</option>
-                      {{#each estado}}
-                      <option value="{{id}}">{{descripcion}}</option>
-                      {{/each}}
-                    </select>
-                  </div>
-                </div>-->
-                  <!-- <div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align"
-                    for="Complejidad">Complejidad:<span></span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="text" id="Complejidad" name="Complejidad" class="form-control">
-                  </div>
-                </div>-->
-
-                  <!--<div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="SuperficiePPTO">Superficie
-                    PPTO:<span></span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="number" id="SuperficiePPTO" name="SuperficiePPTO" class="form-control">
-                  </div>
-                </div>
-                <div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="SuperficieAPC">Superficie
-                    APC:<span></span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="number" id="SuperficieAPC" name="SuperficieAPC" class="form-control">
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align">País:</label>
-                  <div class="col-md-7 col-sm-7">
-                    <select class="select2_single form-control" tabindex="-1" name="id_Pais" id="id_Pais">
-                      <option>Seleccione una opción</option>
-                      {{#each paises}}
-                      <option value="{{id}}">{{pais}}</option>
-                      {{/each}}
-                    </select>
-                  </div>
-                </div>
-                <div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Ciudad">Ciudad:<span></span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="text" id="Ciudad" name="Ciudad" class="form-control">
-                  </div>
-                </div>
-
-                <div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Npisos">N°
-                    Pisos:<span></span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="number" id="Npisos" name="Npisos" class="form-control">
-                  </div>
-                </div>
-                <div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Nsubterraneo">N°
-                    Subterraneo:<span></span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="number" id="Nsubterraneo" name="Nsubterraneo" class="form-control">
-                  </div>
-                </div>-->
-                </div>
-
-
-                <!--<div class="col-md-6 col-sm-6 ">
-                <div class="form-group row">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo:</label>
-                  <div class="col-md-7 col-sm-7">
-                    <select class="select2_single form-control" tabindex="-1" name="id_Tipo" id="id_Tipo">
-                      <option>Seleccione una opción</option>
-                      {{#each tipo}}
-                      <option value="{{id}}">{{descripcion}}</option>
-                      {{/each}}
-                    </select>
-                  </div>
-                </div>-->
-                <!--<div class="form-group row">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align">Director de
-                    Proyecto:</label>
-                  <div class="col-md-7 col-sm-7">
-                    <select class="select2_single form-control" tabindex="-1" name="id_Director_Proyecto"
-                      id="id_Director_Proyecto">
-                      <option>Seleccione una opción</option>
-                      {{#each usuarios}}
-                      <option value="{{idUsuario}}">{{NombreCompleto}}</option>
-                      {{/each}}
-                    </select>
-                  </div>
-                </div>-->
-                <!--<div class="form-group row">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align">Jefe de
-                    proyecto:</label>
-                  <div class="col-md-7 col-sm-7">
-                    <select class="select2_single form-control" tabindex="-1" name="id_Jefe_Proyecto"
-                      id="id_Jefe_Proyecto">
-                      <option>Seleccione una opción</option>
-                      {{#each usuarios}}
-                      <option value="{{idUsuario}}">{{NombreCompleto}}</option>
-                      {{/each}}
-                    </select>
-                  </div>
-                </div>-->
-                <!--<div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="ValorMC">
-                    ValorM2:<span></span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="number" id="ValorMC" name="ValorMC" class="form-control">
-                  </div>
-                </div>-->
-                <!--<div class="item form-group">
                   <label class="col-form-label col-md-3 col-sm-3 label-align" for="Zona"> Zona:<span></span>
                   </label>
-                  <div class="col-md-7 col-sm-7 ">
+                  <div class="col-md-9 col-sm-9 ">
                     <input type="text" id="Zona" name="Zona" class="form-control">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 col-sm-4 ">
+                <div class="item form-group">
+                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="nombre">Nombre:<span></span>
+                  </label>
+                  <div class="col-md-9 col-sm-9 ">
+                    <input type="text" id="nombre" name="nombre" class="form-control">
                   </div>
                 </div>
                 <div class="item form-group">
                   <label class="col-form-label col-md-3 col-sm-3 label-align" for="Suelo">Suelo:<span></span>
                   </label>
-                  <div class="col-md-7 col-sm-7 ">
+                  <div class="col-md-9 col-sm-9 ">
                     <input type="text" id="Suelo" name="Suelo" class="form-control">
                   </div>
-                </div>-->
-                <!-- <div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaIni"> Fecha
-                    inicio:<span </span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="date" id="FechaIni" name="FechaIni" class="form-control">
-                  </div>
-                </div>-->
-                <!-- <div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaEnt"> Fecha
-                    entrega:<span </span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="date" id="FechaEnt" name="FechaEnt" class="form-control">
-                  </div>
-                </div>-->
-                <!--<div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="FechaTer"> Fecha
-                    termino:<span </span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="date" id="FechaTer" name="FechaTer" class="form-control">
-                  </div>
-
-                </div>-->
-
-                <!--<div class="form-group row">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align">Cliente:</label>
-                  <div class="col-md-7 col-sm-7">
-                    <select class="select2_single form-control" tabindex="-1" name="id_Cliente" id="id_Cliente">
-                      <option>Seleccione una opción</option>
-                      {{#each contacto}}
-                      <option value="{{id}}">{{name}}</option>
-                      {{/each}}
-                    </select>
-                  </div>
-                </div>-->
-                <!--<div class="form-group row">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align">Arquitectura:</label>
-                  <div class="col-md-7 col-sm-7">
-                    <select class="select2_single form-control" tabindex="-1" name="id_Arquitectura"
-                      id="id_Arquitectura">
-                      <option>Seleccione una opción</option>
-                      {{#each contacto}}
-                      <option value="{{id}}">{{name}}</option>
-                      {{/each}}
-                    </select>
-                  </div>
-                </div>-->
-                <!--<div class="form-group row">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align">Constructora:</label>
-                  <div class="col-md-7 col-sm-7">
-                    <select class="select2_single form-control" tabindex="-1" name="id_Constructora"
-                      id="id_Constructora">
-                      <option>Seleccione una opción</option>
-                      {{#each contacto}}
-                      <option value="{{id}}">{{name}}</option>
-                      {{/each}}
-                    </select>
-                  </div>
-                </div>-->
-                <!-- <div class="form-group row">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align">Revisor:</label>
-                  <div class="col-md-7 col-sm-7">
-                    <select class="select2_single form-control" tabindex="-1" name="id_Revisor" id="id_Revisor">
-                      <option>Seleccione una opción</option>
-                      {{#each contacto}}
-                      <option value="{{id}}">{{name}}</option>
-                      {{/each}}
-                    </select>
-                  </div>
-                </div>-->
-                <!--<div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Nplanos">N°de
-                    planos:<span></span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="number" id="Nplanos" name="Nplanos" class="form-control">
-                  </div>
-                </div>-->
-                <!--<div class="item form-group">
-                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Nplanos">
-                    Servicio :<span></span>
-                  </label>
-                  <div class="col-md-7 col-sm-7 ">
-                    <input type="number" id="Servicio" name="Servicio" class="form-control">
-                  </div>
-                </div>-->
+                </div>
               </div>
-            </div>
-
-            <div class="ln_solid"></div>
-            <div class="form-group">
               <div class="col-md-9 col-sm-9  offset-md-5">
-                <button type="submit" class="btn btn-warning">Buscar</button>
+                <button type="button" class="btn btn-warning" onclick="filtradoNo();">Filtrar</button>
               </div>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
+
+
+
+        <table class="table table-hover" id="tablafacturacion" name="tablafacturacion">
+          <thead>
+            <tr>
+              <th style="text-align: center;">Año</th>
+              <th style="text-align: center;">Código</th>
+              <th style="text-align: center;">Nombre</th>
+              <th style="text-align: center;">País</th>
+              <th style="text-align: center;">Zona</th>
+              <th style="text-align: center;">Suelo</th>
+              <th style="text-align: center;">JP</th>
+              <th style="text-align: center;">DP</th>
+              <th style="text-align: center;">N° Pisos</th>
+              <th style="text-align: center;">N° Subterraneo</th>
+              <th style="text-align: center;">Estado</th>
+              <th style="text-align: center;">Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#if buscad }}
+            {{#each buscadores}}
+            <tr>
+              <td style="text-align: center;">{{year}}</td>
+              <td style="text-align: center;">{{code}}</td>
+              <td style="text-align: center;">{{nombre}}</td>
+              <td style="text-align: center;">{{id_Pais}}</td>
+              <td style="text-align: center;">{{Zona}}</td>
+              <td style="text-align: center;">{{Suelo}}</td>
+              <td style="text-align: center;">{{id_Jefe_Proyecto}}</td>
+              <td style="text-align: center;">{{id_Director_Proyecto}}</td>
+              <td style="text-align: center;">{{Npisos}}</td>
+              <td style="text-align: center;">{{Nsubterraneo}}</td>
+              <td style="text-align: center;">{{id_Estado}}</td>
+
+              <td style="padding: .15rem;">
+                <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                  href="../../buscador/edit/{{id}}">
+                  Editar
+                </a>
+                <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                  href="../../buscador/delete/{{id}}">
+                  Borrar
+                </a>
+              </td>
+
+            </tr>
+            {{/each}}
+            {{else}}
+            {{#each buscadores}}
+            <tr>
+              <td style="text-align: center;">{{year}}</td>
+              <td style="text-align: center;">{{code}}</td>
+              <td style="text-align: center;">{{nombre}}</td>
+              <td style="text-align: center;">{{id_Pais}}</td>
+              <td style="text-align: center;">{{Zona}}</td>
+              <td style="text-align: center;">{{Suelo}}</td>
+              <td style="text-align: center;">{{id_Jefe_Proyecto}}</td>
+              <td style="text-align: center;">{{id_Director_Proyecto}}</td>
+              <td style="text-align: center;">{{Npisos}}</td>
+              <td style="text-align: center;">{{Nsubterraneo}}</td>
+              <td style="text-align: center;">{{id_Estado}}</td>
+
+              <td style="padding: .15rem;">
+                <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs" href="buscador/edit/{{id}}">
+                  Editar
+                </a>
+                <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="buscador/delete/{{id}}">
+                  Borrar
+                </a>
+              </td>
+            </tr>
+            {{/each}}
+            {{/if}}
+          </tbody>
+        </table>
       </div>
     </div>
+  </div>
 </body>
+
+
+<script>
+  function filtradoNo() {
+    //alert("filtradoNo");
+
+    var table;
+    if ($.fn.dataTable.isDataTable('#filtradoNo')) {
+      table = $('#filtradoNo').DataTable();
+      table.clear();
+      table.rows.add(jsonData).draw();
+    }
+    else {
+      table = $('#filtradoNo').DataTable({
+        "data": jsonData,
+        "deferRender": true,
+        "pageLength": 25,
+        "retrieve": truesss
+        $.ajax({
+          type: 'post',
+          url: '/proyecto/listPro',
+          contentType: 'application/json',
+          data: JSON.stringify(informacion),
+        });
+
+
+
+      }
+
+
+</script>

@@ -13,7 +13,7 @@ const { Console } = require('console');
 
 
 
-
+//AGREGAR UN PROYECTO
 
 router.get('/iproyecto', isLoggedIn, async (req, res) => {
   // const proyectos = await pool.query("SELECT * FROM pro_proyectos as t1, proyecto_tipo as t2 WHERE t1.Tipo = t2.Descripcion");
@@ -103,64 +103,9 @@ router.get('/buscador', isLoggedIn, async (req, res) => {
 });
 
 
-/*router.post('/editBusca', async (req, res) => {
-  const { id, nombre, year, Tipo, Estado, Complejidad, SuperficiePPTO, SuperficieAPC, Pais, Ciudad,
-    Ubicacion, Npisos, Nsubterraneo, DP, JP, ValorMC, Zona, Suelo, FechaIni, FechaEnt,
-    FechaTer, Cliente, Arquitectura, Constructora, Revisor, Nplanos, Servicio } = req.body; //Obtener datos title,url,description
-
-  const newBuscador = { //Se gurdaran en un nuevo objeto
-    //Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
-    nombre: nombre,
-    year: year,
-    Tipo: Tipo,
-    Estado: Estado,
-    Complejidad: Complejidad,
-    SuperficiePPTO: SuperficiePPTO,
-    SuperficieAPC: SuperficieAPC,
-    Pais: Pais,
-    Ciudad: Ciudad,
-    Ubicacion: Ubicacion,
-    Npisos: Npisos,
-    Nsubterraneo: Nsubterraneo,
-    DP: DP,
-    JP: JP,
-    ValorMC: ValorMC,
-    Zona: Zona,
-    Suelo: Suelo,
-    FechaIni: FechaIni,
-    FechaEnt: FechaEnt,
-    FechaTer: FechaTer,
-    Cliente: Cliente,
-    Arquitectura: Arquitectura,
-    Constructora: Constructora,
-    Revisor: Revisor,
-    Nplanos: Nplanos,
-    Servicio: Servicio
-  };
-  //Guardar datos en la BD     
-  await pool.query('UPDATE pro_proyectos set ? WHERE id = ?', [newBuscador, id]);
-  res.redirect('../proyecto/buscador');
-
-});*/
 
 
-/*router.get('/buscador/delete/:id', async (req, res) => {
-  const { id } = req.params;
-  await pool.query('DELETE FROM pro_proyectos WHERE id = ?', [id]);
-
-
-  res.redirect('/proyecto/buscador');
-
-
-});*/
-
-
-
-
-
-
-//LISTAR
-
+//LISTAR PROYECTOS
 
 
 router.post('/listPro', isLoggedIn, async (req, res) => {
@@ -343,6 +288,15 @@ router.get('/buscador/delete/:id', async (req, res) => {
 
 
 });
+
+
+
+
+
+
+
+
+
 
 
 

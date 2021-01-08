@@ -109,7 +109,7 @@ router.get('/buscador', isLoggedIn, async (req, res) => {
 
 
 router.post('/listPro', isLoggedIn, async (req, res) => {
-  console.log(req);
+  //console.log(req);
   // const buscadores = await pool.query("SELECT * FROM pro_proyectos");
   // const tipo = await pool.query("SELECT * FROM proyecto_tipo");
   // const usuarios = await pool.query("SELECT * FROM sys_usuario");
@@ -156,9 +156,13 @@ router.post('/listPro', isLoggedIn, async (req, res) => {
     " WHERE " +
     " t1.nombre=? OR t1.year=? OR t1.id_Tipo=? OR t1.code=? OR t1.Zona=? OR t1.Zona=? ", [a,b,c,co,p,q]);
 
+    res.json({ 
+      anObject: { item1: "item1val", item2: "item2val" }, 
+      anArray: ["item1", "item2"], 
+      another: "item"
+    });
 
-
-  res.render('proyecto/listPro', { req, buscadores, layout: 'template' });
+  //res.render('proyecto/listPro', { req, buscadores, layout: 'template' });
 });
 
 

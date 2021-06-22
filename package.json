@@ -21,6 +21,7 @@
   "homepage": "https://github.com/dabenites/rlered#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
     "connect-flash": "^0.1.1",
     "dateformat": "^3.0.3",
     "exceljs": "^4.1.1",

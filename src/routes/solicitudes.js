@@ -105,7 +105,32 @@ router.post('/getDias', async (req,res) => {
   
   res.send(d);
 });
+//getDiasIngresados
 
+router.post('/getDiasIngresados', async (req,res) => {
+  
+  const dias = await pool.query("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id FROM sol_selec_dias AS t WHERE t.idUsuario = " + req.user.idUsuario + " AND t.idEstado = 1"); 
+  
+  //console.log("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id FROM sol_selec_dias AS t WHERE t.idUsuario = "+req.user.idUsuario+" AND t.idEstado = 1");
+
+  //console.log(dias);
+  
+  res.render('solicitudes/listadoDias', { req ,dias, layout: 'blanco'});
+
+});
+
+router.post('/getPermisosSolicitados', async (req,res) => {
+  
+  const permisos = await pool.query(" SELECT " +
+                                    " DATE_FORMAT(t2.fecha_inicio, '%Y-%m-%d') AS dia, "+
+                                    " DATE_FORMAT(t2.fecha_inicio, '%H-%i') AS fecha_inicio, " +
+                                    " DATE_FORMAT(t2.fecha_termino, '%H-%i') AS fecha_termino, t1.id "+
+                                    " FROM sol_solicitud AS t1, sol_permiso AS t2 WHERE t1.idTipoSolicitud = 2 AND t1.idEstado = 2 AND t1.idUsuario = "+req.user.idUsuario+" AND t1.id = t2.idSolicitud"); 
+   
+  res.render('solicitudes/listadoPermisos', { req ,permisos, layout: 'blanco'});
+  //console.log(permisos);
+  //res.send("asd");
+});
 
 router.get('/getPermisos', async (req,res) => {
   
@@ -241,10 +266,19 @@ router.post('/ajaxAdd', express.json({type: '/'}), async (req,res) => {
   res.render('solicitudes/vacaciones', { req ,vacacione,layout: 'template'})
 });
 
+//eliminarDia
 
+router.post('/eliminarDia', express.json({type: '/'}), async (req,res) => {
+  //res.json(req.body);
+//  console.log(req.user)
+var id = req.body[0].dia;
 
+//console.log(id);
+const result = await pool.query('DELETE FROM sol_selec_dias WHERE id = ? AND idSolicitud IS NULL ', [id]);
 
+res.send("OK");
 
+});
 
 router.post('/AddIngreso', async (req,res) => {
 
@@ -473,7 +507,7 @@ res.render('proyecto/avacaciones', { soliVacaciones , selecciona , obj :seleccio
 
 router.post('/updateVacaciones', async (req,res) => {
 
-  console.log(req.body.estado);
+  //console.log(req.body.estado);
   switch(req.body.estado)
   {
     case "1":
@@ -492,6 +526,19 @@ router.post('/updateVacaciones', async (req,res) => {
 
 });
 
+//eliminarPermisos
+router.post('/eliminarPermisos', express.json({type: '/'}), async (req,res) => {
+  //res.json(req.body);
+//  console.log(req.user)
+var id = req.body[0].dia;
+
+//console.log(id);
+const result = await pool.query('DELETE FROM sol_permiso WHERE idSolicitud = ? ', [id]);
+const result2 = await pool.query('DELETE FROM sol_solicitud WHERE id = ? ', [id]);
+
+res.send("OK");
+
+});
 
 
 module.exports = router;

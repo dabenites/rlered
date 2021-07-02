@@ -19,7 +19,7 @@ router.get('/listado', isLoggedIn, async (req, res) => {
 
 
     //const contactos  = await pool.query(" SELECT  * FROM contacto ");
-    const contactos  = await pool.query("SELECT * FROM contacto  AS t WHERE t.keys_words != '' LIMIT 10");
+    const contactos  = await pool.query("SELECT * FROM contacto  AS t WHERE t.keys_words != '' ");
 
     contactos.forEach((element, i) => {
         var separa = element["keys_words"].split(",");
@@ -116,10 +116,9 @@ router.post('/addContacto', async (req,res) => {
    const result = pool.query('INSERT INTO contacto set ?', [unContacto]);
     
    //res.send("Cargar nuevamente la informacion con el toask incluido");
-   const contactos  = await pool.query(" SELECT  * FROM contacto");
-                                                
-    res.render('contacto/listado', { contactos , req ,layout: 'template'});
-    
+   //res.redirect("../ploter/ploteo");
+
+    res.send("mensaje");
 
 });
 

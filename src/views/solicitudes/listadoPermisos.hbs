@@ -1,0 +1,26 @@
+<table class="table table-hover" id="tablaDias" name="tablaDias" class="display">
+    <thead>
+        <tr>
+            <th>Dia</th>
+            <th>Horario</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each permisos}}
+            <tr>
+                <td>{{dia}}</td>    
+                <td>{{fecha_inicio}} Hasta {{fecha_termino}}</td>
+                <td><button type="button" class="btn btn-danger btn-sm" onclick="EliminarPermiso({{id}})">Eliminar</button></td>
+            </tr>
+         {{/each}} 
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="2" align="center">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="ReloadPAgina();">Volver</button>
+            </td>
+        </tr>
+
+    </tfoot>
+</table>

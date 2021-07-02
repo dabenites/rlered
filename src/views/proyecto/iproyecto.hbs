@@ -1,22 +1,24 @@
 <head>
-
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-	<link rel="stylesheet" href="/resources/demos/style.css">
+	<!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script
+		src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyCXQ6ltnbOZRP3U7JH3evn5O5OnfR--O4I"></script>
 
-	<script>
+	<!-- <script>
 		$(function () {
 			$('#nombre').autocomplete({
 				source: function (req, res) {
 
-					$.ajax{
+					$.ajax({
 						url: "iproyecto/autocomplete",
 							dataType: "jsonp",
 								type: "GET",
@@ -41,15 +43,7 @@
         });
 
 	</script>
-
-
-
-
-
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script
-		src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyCXQ6ltnbOZRP3U7JH3evn5O5OnfR--O4I"></script>
-
+	-->
 	<script>
 
 		var searchInput = 'search_input';
@@ -70,8 +64,6 @@
 				document.getElementById('longitude_view').innerHTML = near_place.geometry.location.lng();
 			});
 		});
-
-
 
 		$(document).on('change', '#' + searchInput, function () {
 			document.getElementById('loc_lat').value = '';

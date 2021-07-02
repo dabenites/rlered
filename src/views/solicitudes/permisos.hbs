@@ -26,7 +26,7 @@
     headerToolbar: {
       left: 'prev,next',
       center: 'title',
-      right: ''
+      right: 'Miboton'
     },
     businessHours: [ // specify an array instead
         {
@@ -48,6 +48,25 @@
     hiddenDays: [0, 6],
     contentHeight: 650,
     height: 650,
+        customButtons: {
+        Miboton: {
+          text: "Revisar Permisos ",
+          click: function () {
+
+            // ir a la base de datos preguntar lacantidad de dias que entrega 
+            $.ajax({
+              type: 'post',
+              url: '/solicitudes/getPermisosSolicitados',
+              data: Object,
+              dataType: 'text'
+            })
+              .done(function (data) {
+                  $('#listadoPermisos').html(data);
+              });
+            $('#exampleModal2').modal('toggle'); //Me muestra el formulario si esta oculto
+          }
+        }
+      },
     selectable: true,
     select: function(info) {
       //alert('selected ' + info.startStr + ' to ' + info.endStr);
@@ -134,7 +153,7 @@
              <div class="item form-group">
                     
 					    <label>
-								<input type="radio" class="flat" name="tipoP" id="Per" value="Per" checked onclick="validoTipo(this.value);"> Permiso     <br>
+								<input type="radio" name="tipoP" id="Per" value="Per" checked onclick="validoTipo(this.value);"> Permiso     <br>
                 <!-- <input type="radio" class="flat" name="tipoP" id="Act" value="Act" onclick="validoTipo(this.value);"> Actividad no relacionada a proyecto -->
               </label>
              </div>
@@ -196,6 +215,20 @@
       </div>
     </div>
   </div>
+  <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Vacaciones <small>Revisar dias ingresados</small> </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+          <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="listadoPermisos">
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
 
@@ -213,4 +246,24 @@
     
     }
 
+    function EliminarPermiso(id)
+    {
+       var informacion = [];
+          const fecha = {
+            dia: id
+          };
+          informacion.push(fecha);
+
+      $.ajax({
+              type: 'post',
+              url: '/solicitudes/eliminarPermisos',
+              contentType: 'application/json',
+              data: JSON.stringify(informacion),
+            });
+
+    }
+  function ReloadPAgina()
+  {
+    location.reload();
+  }
   </script>

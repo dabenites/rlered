@@ -14,7 +14,7 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
     const usuarios = await pool.query('SELECT * FROM sys_usuario');      
     
     const ploteos =  await pool.query('SELECT * FROM solicitudes ORDER BY id DESC LIMIT 100');      
-    const ploteosPendientes =  await pool.query("SELECT * FROM solicitudes as t WHERE t.estado in ('Pendiente', 'Proceso') ");
+    const ploteosPendientes =  await pool.query("SELECT * FROM solicitudes as t WHERE t.estado in ('Pendiente', 'Procesando') ");
 
     //console.log(ploteos);
     res.render('ploter/ingresar', { proyectos,usuarios,ploteos, ploteosPendientes , req ,layout: 'template'});
@@ -135,28 +135,6 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
 
     const result = pool.query('INSERT INTO solicitudes set ?', [solicitud]);
 
-
-    
-
-    //console.log(mailImpresion);
-
-
-
-
-
-
-
-
-
-    
-    
-    
-
-    
-    
-
-   
-
     var transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
@@ -191,18 +169,6 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
               }
           ]
       }
-      /*
-      transporter.sendMail(mailOptions, (error,info ) => {
-          if(error)
-          {
-              res.status(500).send(error.message);
-          }
-          else{
-              console.log("Email Enviado");
-              res.status(200).jsonp(req.body);
-          }
-      })
-*/
    res.send("Mensaje");
 }); 
 
@@ -218,14 +184,24 @@ router.post('/cambiaEstado',express.json({type: '*/*'}), isLoggedIn, async (req,
         case 'Procesando':
             const pro = await pool.query('UPDATE solicitudes set estado = ? WHERE id = ?', [req.body[0].estado,req.body[0].id]);
             res.send("mensaje");
+            //location.reload();
+            //req.reload();
+            //res.redirect('..');
         break;
         case 'Terminado':
             var hora = dateFormat(new Date(), "HH:MM");
             var fecha = dateFormat(new Date(), "dd-mm-yyyy");
             const ter = await pool.query('UPDATE solicitudes set estado = ? , horat = ? ,fechat = ? WHERE id = ?', [req.body[0].estado,hora,fecha,req.body[0].id]);
             res.send("mensaje");
+            //location.reload();
+            //req.reload();
+            //res.redirect('..');
         break;
     }
+
+    //res.location('http://demo.com');
+
+
 }); 
 
 

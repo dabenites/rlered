@@ -1,8 +1,5 @@
 <head>
     <style>
-
-
-
         table {
             table-layout: fixed;
         }
@@ -221,7 +218,7 @@
                     </form>
                 </div>
                 <div class="tab-pane fade" id="pendiente" role="tabpanel" aria-labelledby="pendiente-tab">
-                    <table class="table table-hover" name="example" id="example">
+                    <table class="table table-hover" name="tablaPendientes" id="tablaPendientes">
                         <thead>
                             <tr>
                                 <th>Nombre Proyecto</th>
@@ -271,7 +268,7 @@
                     </table>
                 </div>
                 <div class="tab-pane fade" id="historial" role="tabpanel" aria-labelledby="historial-tab">
-                    <table class="table table-hover" name="tablafacturacion" id="tablafacturacion">
+                    <table class="table table-hover" name="tablaHistorial" id="tablaHistorial">
                         <thead>
                             <tr>
                                 <th>Nombre Proyecto</th>
@@ -318,10 +315,16 @@
     </div>
 </div>
 
+<script src="../../../template/vendors/jquery/dist/jquery.min.js"></script>
 
 <script>
     $(document).ready(function() {
-    $('#tablafacturacion').DataTable({
+    $('#tablaHistorial').DataTable({
+        "scrolly" : "50vh",
+        "scrollCollapse" : true,
+        "paging": false
+    });
+    $('#tablaPendientes').DataTable({
         "scrolly" : "50vh",
         "scrollCollapse" : true,
         "paging": false
@@ -347,7 +350,8 @@
             contentType: 'application/json',
             data: JSON.stringify(informacion),
             success: function (response) {
-                console.log(response);
+                //console.log(response);
+                location.reload();
             },
             error: function (response) {
                 alert('server error');

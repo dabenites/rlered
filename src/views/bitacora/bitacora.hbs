@@ -1,4 +1,4 @@
-    <style>
+<style>
     html,
     body {
       margin: 0;
@@ -11,12 +11,14 @@
       max-width: 100%;
       margin: 40px auto;
     }
-  </style>
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.css' rel='stylesheet' />
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.js"></script>
-<script src='../core/locales/es.js'></script>
+</style>
 
-  <script>
+
+ <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.css' rel='stylesheet' /> 
+ <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.js"></script> 
+ <script src='../core/locales/es.js'></script>
+
+ <script>
 
    document.addEventListener('DOMContentLoaded', function() {
   var calendarEl = document.getElementById('calendar');
@@ -121,12 +123,13 @@
 
             <div class="x_title">
               <div class="clearfix"></div>
-             <div class="item form-group">
-					    <label>
-							<input type="radio" class="flat" name="tipoP" id="Pro" value="Pro" checked onclick="validoTipo(this.value);"> Actividad relacionada a proyectos     <br>
-                            <input type="radio" class="flat" name="tipoP" id="Act" value="Act" onclick="validoTipo(this.value);"> Actividad no relacionada a proyecto
-                        </label>
-             </div>
+                <div class="item form-group">
+                  <label>
+                     <!-- <input type="radio" class="flat" name="tipoP" id="Pro" value="Pro" checked onclick="validoTipo(this.value);"> Actividad relacionada a proyectos     <br>
+                           <input type="radio" class="flat" name="tipoP" id="Act" value="Act" onclick="validoTipo(this.value);"> Actividad no relacionada a proyecto
+                    -->
+                  </label>
+                </div>
              <div class="item form-group">
                 <label>Perdiodo : </label>
                 <label id="periodo" name="periodo"></label>
@@ -139,7 +142,7 @@
               <div name="proyecto" id="proyecto">
                 <div class="item form-group">
                    <label class="col-form-label col-md-9 col-sm-9 label-align" for="Etapa"> </label>
-                    <p><input type="checkbox" class="flat" name="esmoficacaciones" id="esmoficacaciones">  Modificaciones </p> 
+                    <p><input type="checkbox" name="esmoficacaciones" id="esmoficacaciones">  Modificaciones </p> 
                 </div>
                 <div class="item form-group">
                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Etapa">Proyecto  </label>

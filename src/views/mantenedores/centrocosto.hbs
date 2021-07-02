@@ -1,8 +1,4 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-
-
-
-
 <div class="col-md-6 col-sm-6  ">
     <div class="x_panel">
         <div class="x_title">
@@ -22,40 +18,40 @@
                 </thead>
                 <tbody>
                     {{#if centro }}
-                    {{#each centrosCostos}}
-                    <tr>
-                        <th scope="row">{{id}}</th>
-                        <td>{{centroCosto}}</td>
-                        <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                href="../../centrocosto/edit/{{id}}">
-                                Editar
-                            </a>
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="../../centrocosto/delete/{{id}}">
-                                Borrar
-                            </a>
-                        </td>
-                    </tr>
-                    {{/each}}
+                        {{#each centrosCostos}}
+                            <tr>
+                                <th scope="row">{{id}}</th>
+                                <td>{{centroCosto}}</td>
+                                <td style="padding: .15rem;">
+                                    <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                                        href="../../centrocosto/edit/{{id}}">
+                                        Editar
+                                    </a>
+                                    <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                        href="../../centrocosto/delete/{{id}}">
+                                        Borrar
+                                    </a>
+                                </td>
+                            </tr>
+                        {{/each}}
                     {{else}}
-                    {{#each centrosCostos}}
-                    <tr>
-                        <th scope="row">{{id}}</th>
-                        <td>{{centroCosto}}</td>
-                        <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                href="centrocosto/edit/{{id}}">
-                                Editar
-                            </a>
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="centrocosto/delete/{{id}}">
-                                Borrar
-                            </a>
+                        {{#each centrosCostos}}
+                            <tr>
+                                <th scope="row">{{id}}</th>
+                                <td>{{centroCosto}}</td>
+                                <td style="padding: .15rem;">
+                                    <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                                        href="centrocosto/edit/{{id}}">
+                                        Editar
+                                    </a>
+                                    <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                        href="centrocosto/delete/{{id}}">
+                                        Borrar
+                                    </a>
 
-                        </td>
-                    </tr>
-                    {{/each}}
+                                </td>
+                            </tr>
+                        {{/each}}
                     {{/if}}
                 </tbody>
             </table>
@@ -66,10 +62,9 @@
     <div class="x_panel">
         <div class="x_title">
             {{#if centro }}
-            <h2>Actualizar Centro Costo <small>{{centro.centroCosto}}</small></h2>
+                <h2>Actualizar Centro Costo <small>{{centro.centroCosto}}</small></h2>
             {{else}}
-            <h2>Registrar Centro Costo <!--<small>Se podra seleccionar el centro de costo en el ingreso de una
-                    categoria</small>--></h2>
+                <h2>Registrar Centro Costo </h2>
             {{/if}}
 
             <div class="clearfix"></div>
@@ -88,8 +83,7 @@
                     <input type="text" id="id" class="form-control" value="{{centro.id}}" name="id" readonly />
                     {{/if}}
                     <label for="Nombre Centro Costo">Nombre Centro Costo * :</label>
-                    <input type="text" id="name" class="form-control" value="{{centro.centroCosto}}" name="name"
-                        required />
+                    <input type="text" id="name" class="form-control" value="{{centro.centroCosto}}" name="name" required />
 
                     <br />
                     {{#if centro }}
@@ -97,7 +91,7 @@
                         Actualizar
                     </button>
                     {{else}}
-                    <button type="submit" onvolumechange="" class="btn btn-warning btn-block">
+                    <button type="button" onclick="validarIngreso();" class="btn btn-warning btn-block">
                         Ingresar
                     </button>
                     {{/if}}
@@ -142,3 +136,30 @@
 
 </script>
 {{/if}}
+<script>
+
+function validarIngreso ()
+{
+  nameCentroCosto = $("#demo-form").serialize();
+
+ $.ajax({
+     method:'POST',
+     url : '/mantenedores/ajax-validarNombreCentroCosto',
+     data : nameCentroCosto,
+     success : function(result)
+     {
+         //alert(result);
+         if(!$.trim(result)){
+             // no existe resultado esta en lo correcto
+             document.getElementById("demo-form").submit();
+         }
+         else{
+            toastr.warning('warning', 'No se pueden cargar centros de costos con el mismo nombre.', {
+           "progressBar": true
+             });
+         }
+     }
+    })
+}
+
+</script>

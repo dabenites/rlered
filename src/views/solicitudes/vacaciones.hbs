@@ -58,7 +58,7 @@
       headerToolbar: {
         left: 'prev,next',
         center: 'title',
-        right: 'Miboton'
+        right: 'Miboton,Miboton2'
       },
       initialDate: new Date(),
       hiddenDays: [0, 6],
@@ -82,15 +82,27 @@
               });
             $('#exampleModal').modal('toggle'); //Me muestra el formulario si esta oculto
           }
+        },
+        Miboton2: {
+          text: "Revisar dias Ingresados",
+          click: function () {
+
+            // ir a la base de datos preguntar lacantidad de dias que entrega 
+            $.ajax({
+              type: 'post',
+              url: '/solicitudes/getDiasIngresados',
+              data: Object,
+              dataType: 'text'
+               })
+              .done(function (data) {
+                $('#listadoDias').html(data);
+              });
+            $('#exampleModal2').modal('toggle'); //Me muestra el formulario si esta oculto
+          }
         }
       },
       events: '/solicitudes/eventos',
-      //events:[      {        start: '2020-12-15',        display: 'background',        overlap: false      }    ],
       dateClick: function (info) {
-
-        // var allEvents = getEvents();
-
-
         // console.log(jsEvent);
         var diaSolicitado = calendar.formatDate(info.dateStr, {
           year: 'numeric',
@@ -101,10 +113,6 @@
         var allEvents = calendar.getEvents();
         var exists = false;
         $.each(allEvents, function (index, value) {
-          //  console.log(moment(value.start).format("DD-MM-YYYY HH:mm"));
-          //  calendar.formatDate();
-          //  console.log(formatDate(value.start, 'MM-dd-yyyy'));
-
           var diaEvento = calendar.formatDate(value.start, {
             year: 'numeric',
             month: 'numeric',
@@ -138,20 +146,43 @@
     calendar.render();
   });
 
+  function EliminarDia(id)
+  {
+    var informacion = [];
+          const fecha = {
+            dia: id
+          };
+          informacion.push(fecha);
+
+     $.ajax({
+            type: 'post',
+            url: '/solicitudes/eliminarDia',
+            contentType: 'application/json',
+            data: JSON.stringify(informacion),
+          });
+  }
+
+  function ReloadPAgina()
+  {
+    location.reload();
+  }
 </script>
 
 
-
-<!-- Modal -->
-<!--<div class="col-md-12 col-sm-12 ">
-    <div class="x_panel">
-      <div class="x_title">
-
-        <div class="clearfix">
-        </div>
+<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Vacaciones <small>Revisar dias ingresados</small> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+        <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-      <div class="x_content">-->
-
+      <div class="modal-body" id="listadoDias">
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -180,9 +211,7 @@
 
 
               <label for="Fecha">Días seleccionados:</label>
-              <input type="txt" id="txtfecha" class="form-control" value="{{sol_selec_dias.fecha}}" name="txtfecha"
-                Readonly />
-
+              <input type="txt" id="txtfecha" class="form-control" value="{{sol_selec_dias.fecha}}" name="txtfecha" Readonly />
 
               <label for="Informar">Informar a * :</label>
               <select class=" form-control" name="idInformar" id="idInformar">
@@ -193,12 +222,10 @@
 
 
               <div class="item form-group">
-                <label class="col-form-label col-md-3 col-sm-3 label-align" for="txtComentario">Comentario<span
-                    class="required"></span>
+                <label class="col-form-label col-md-3 col-sm-3 label-align" for="txtComentario">Comentario<span class="required"></span>
                 </label>
                 <div class="col-md-6 col-sm-6 ">
-                  <textarea type="txt" id="comentario" name="comentario" required="required" class="form-control"
-                    rows="5" cols="84"></textarea>
+                  <textarea type="txt" id="comentario" name="comentario" required="required" class="form-control" rows="5" cols="84"></textarea>
                 </div>
               </div>
             </div>

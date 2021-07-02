@@ -13,7 +13,9 @@ router.get('/ingresoHoras', isLoggedIn, async (req, res) => {
     const etapas = await pool.query("SELECT * FROM bita_etapas");
     const proyectos = await pool.query("SELECT * FROM pro_proyectos");
 
+    //res.render('bitacora/bitacora', {etapas, proyectos, req ,layout: 'template'});
     res.render('bitacora/bitacora', {etapas, proyectos, req ,layout: 'template'});
+    //res.send("asd");
 });
 
 router.post('/cargaOpcionesEtapa', isLoggedIn, async (req, res) => {
@@ -38,7 +40,7 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
    // primero saber si es solo un dia de carga 
    //var start = new Date(fechaI);
    //var end = new Date(fechaT);
-   console.log("#################################");
+   //console.log("#################################");
    
    var divFechaI = fechaI.split("/", 3);
    var divFechaT = fechaT.split("/", 3);

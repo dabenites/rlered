@@ -95,25 +95,23 @@
                     <input type="text" id="id" class="form-control" value="{{categoria.id}}" name="id" readonly />
                     {{/if}}
                     <label for="Nombre Categoria">Nombre Categoría * :</label>
-                    <input type="text" id="name" class="form-control" value="{{categoria.categoria}}" name="name"
-                        required />
+                    <input type="text" id="name" class="form-control" value="{{categoria.categoria}}" name="name" required />
                     <label for="Nombre Categoria">Centro Costo* :</label>
                     <!-- <input type="text" id="name" class="form-control" value="{{categoria.categoria}}" name="name" required /> -->
                     <select class="form-control" name="idCentroCosto">
                         {{#if categoria }}
-                        {{#each centrosCostos}}
-                        {{#if (if_equal id ../categoria.idCentroCosto) }}
-                        <option value="{{id}}" selected>{{centroCosto}}</option>
+                            {{#each centrosCostos}}
+                                {{#if (if_equal id ../categoria.idCentroCosto) }}
+                                    <option value="{{id}}" selected>{{centroCosto}}</option>
+                                {{else}}
+                                <option value="{{id}}">{{centroCosto}}</option>
+                                {{/if}}
+                            {{/each}}
                         {{else}}
-                        <option value="{{id}}">{{centroCosto}}</option>
-                        {{/if}}
-
-                        {{/each}}
-                        {{else}}
-                        <option>Seleccione una opción</option>
-                        {{#each centrosCostos}}
-                        <option value="{{id}}">{{centroCosto}}</option>
-                        {{/each}}
+                                <option>Seleccione una opción</option>
+                            {{#each centrosCostos}}
+                                <option value="{{id}}">{{centroCosto}}</option>
+                            {{/each}}
                         {{/if}}
                     </select>
                     <label for="Valor HH"> Valor HH :</label>
@@ -125,7 +123,7 @@
                         Actualizar
                     </button>
                     {{else}}
-                    <button type="submit" onvolumechange="" class="btn btn-warning btn-block">
+                    <button type="button" onclick="validarIngreso();"  class="btn btn-warning btn-block">
                         Ingresar
                     </button>
                     {{/if}}
@@ -170,3 +168,31 @@
 
 </script>
 {{/if}}
+
+<script>
+
+function validarIngreso ()
+{
+  nameCategoria = $("#demo-form").serialize();
+
+ $.ajax({
+     method:'POST',
+     url : '/mantenedores/ajax-validarNombreCategoria',
+     data : nameCategoria,
+     success : function(result)
+     {
+         //alert(result);
+         if(!$.trim(result)){
+             // no existe resultado esta en lo correcto
+             document.getElementById("demo-form").submit();
+         }
+         else{
+            toastr.warning('warning', 'No se pueden cargar una categoria con el mismo nombre.', {
+           "progressBar": true
+             });
+         }
+     }
+    })
+}
+
+</script>

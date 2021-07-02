@@ -81,7 +81,7 @@ router.post('/addProyecto', async (req, res) => {
 
 
 
-  res.render('proyecto/iproyecto', { req, proye, layout: 'template' });
+  res.render('proyecto/buscador', { req, proye, layout: 'template' });
 
 })
 

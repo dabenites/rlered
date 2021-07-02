@@ -40,7 +40,7 @@ router.post('/fileupload', async (req,res) => {
                             {
                                 lectura["informacion"]  = [];
                             }
-                            if (rowNumber == 7 )
+                            if (rowNumber >= 6 )
                             {
                                 const existeCosto =  await pool.query("SELECT * FROM sys_usuario_costo AS t1 WHERE t1.annio = "+ lectura["ano"] +" AND t1.mes = "+lectura["mes"]+" AND t1.idUsuario = "+row.values[2]+"");
                                 const unCosto ={ 
@@ -156,24 +156,42 @@ router.get('/descargarPlanilla', isLoggedIn, async (req, res) => {
     worksheet.getCell('F5').value = "Pais";
     worksheet.getCell('G5').value = "Costo";
 
-    const usuarios  = await pool.query(" SELECT  " +
-		                                        " *  " +
-                                     " FROM  " +
-                                                " sys_usuario  	AS t2 ,  " +
-                                                " sys_categoria 	AS t3 ,  " +
-                                                " centro_costo 	AS t4  " +
-                                    " WHERE  " +
-	 	                                        " t2.idCategoria = t3.id_Categoria  " +
-                                    " AND  " +
-		                                        " t3.idCentroCosto = t4.id ");
-    
-     usuarios.forEach((element, i) => {
+    const usuarios  = await pool.query( " SELECT  " +
+                                                    " t2.idUsuario," +
+                                                    " t2.Nombre," +
+                                                    " t3.categoria," +
+                                                    " t4.centroCosto, " +
+                                                    " t2b.pais, " +
+                                                    " t1.costo " +
+                                        " FROM " +
+                                                    " sys_usuario_costo AS t1, " +
+                                                    " sys_usuario AS t2, " +
+                                                    " sys_sucursal AS t2a, " +
+                                                    " pais AS t2b, " +
+                                                    " categorias AS t3, " +
+                                                    " centro_costo AS t4 " +
+                                        " WHERE  " +
+		                                            " t1.annio = '"+ year+"' " +
+                                        " AND  " +
+		                                            " t1.mes = '"+mes+"' " +
+                                        " AND  " +
+		                                            " t1.idUsuario = t2.idUsuario "+
+                                        " AND  " +
+		                                            " t2.idSucursal = t2a.id_Sucursal " +
+                                        " AND  " +
+		                                            " t2a.id_pais = t2b.id " +
+                                        " AND  " +
+		                                            " t2.idCategoria = t3.id " +
+                                        " AND  " +
+		                                            " t4.id = t3.idCentroCosto");
+                                          
+    usuarios.forEach((element, i) => {
         worksheet.getCell('B'+ (i + 6)).value = element.idUsuario;
-        worksheet.getCell('C'+ (i + 6)).value = element.NombreCompleto;
+        worksheet.getCell('C'+ (i + 6)).value = element.Nombre;
         worksheet.getCell('D'+ (i + 6)).value = element.categoria;
-        worksheet.getCell('E'+ (i + 6)).value = element.categoria;
-        worksheet.getCell('F'+ (i + 6)).value = "Pais";
-        worksheet.getCell('G'+ (i + 6)).value = "";
+        worksheet.getCell('E'+ (i + 6)).value = element.centroCosto;
+        worksheet.getCell('F'+ (i + 6)).value = element.pais;
+        worksheet.getCell('G'+ (i + 6)).value = element.costo;
     });
 
 
@@ -181,10 +199,12 @@ router.get('/descargarPlanilla', isLoggedIn, async (req, res) => {
   // save under export.xlsx
   await workbook.xlsx.writeFile('export.xlsx');
 
+  //_____________________________________________________________________________________
   res.set({
     'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'Content-Disposition': `attachment; filename="export.xlsx"`,
   });
+  //_____________________________________________________________________________________
   
   // write into response
   workbook.xlsx.write(res);
@@ -476,5 +496,11 @@ router.post('/ajax', express.json({type: '*/*'}), async (req,res) => {
     res.send("OK");
 });
 
+//ajaxNombre
+
+router.post('/ajaxNombre', express.json({type: '*/*'}), async (req,res) => {
+    //res.json(req.body);
+    res.send("1");
+});
 
 module.exports = router;

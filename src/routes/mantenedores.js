@@ -238,6 +238,8 @@ router.post('/actualizarUF', isLoggedIn, async (req, ress) => {
         }
     });
     
+    //console.log(valoresUF);
+
     var https = require('https');
 
     https.get('https://mindicador.cl/api/uf/'+ year +'', function(res) {
@@ -260,9 +262,9 @@ router.post('/actualizarUF', isLoggedIn, async (req, ress) => {
                                 valor : informacion.serie[i].valor
                             };
                             //console.log(newValor);
-                            console.log("INSERT INTO INTO moneda_valor (id_moneda,fecha_valor) VALUES (4,'"+ dateFormat(informacion.serie[i].fecha,"yyyy-mm-dd")+"')");
-
-                            
+                            //console.log("INSERT INTO moneda_valor (id_moneda,fecha_valor) VALUES (4,'"+ dateFormat(informacion.serie[i].fecha,"yyyy-mm-dd")+"')");
+                            //const r = await pool.query("INSERT INTO moneda_valor (id_moneda,fecha_valor) VALUES (4,'"+ dateFormat(informacion.serie[i].fecha,"yyyy-mm-dd")+"')");
+                            const result = await pool.query('INSERT INTO moneda_valor set ?', [newValor]);
                         }
               }
             ress.redirect('../mantenedores/valoruf');
@@ -718,7 +720,8 @@ router.post('/eddCategoria', async (req,res) => {
   //res.redirect('../mantenedores/categoria');
 
   const categorias = await pool.query('SELECT * FROM categorias');
-  //console.log(usuarios);
+  const centrosCostos = await pool.query('SELECT * FROM centro_costo');
+  //console.log(categorias);
 
   
   const verToask = {
@@ -727,7 +730,7 @@ router.post('/eddCategoria', async (req,res) => {
       tipo   : "Crear"
   };
   //console.log(verToask);
-  res.render('mantenedores/categoria', { verToask, req ,categorias,layout: 'template'});
+  res.render('mantenedores/categoria', { verToask, req ,categorias,centrosCostos,layout: 'template'});
 
 })
 
@@ -956,5 +959,47 @@ router.get('/tipoProyecto/delete/:id', async (req, res) => {
 })
 
 
+router.post('/ajax-validarNombreCentroCosto', async (req,res) => {
+    
+    const nombreACargar = req.body.name;
+
+    const nombreCentroCostos = await pool.query('SELECT * FROM centro_costo WHERE centroCosto = ?',[nombreACargar]);
+
+    //console.log(nombreCentroCostos);
+
+    res.send(nombreCentroCostos);
+})
+
+//ajax-validarNombrePais
+
+router.post('/ajax-validarNombrePais', async (req,res) => {
+    
+    const nombreACargar = req.body.name;
+
+    const nombrePaises = await pool.query('SELECT * FROM pais WHERE pais = ?',[nombreACargar]);
+
+    res.send(nombrePaises);
+})
+
+//ajax-validarNombreTipoProyecto
+
+router.post('/ajax-validarNombreTipoProyecto', async (req,res) => {
+    
+    const nombreACargar = req.body.descripcion;
+
+    const nombreTipoProyecto = await pool.query('SELECT * FROM proyecto_tipo WHERE descripcion = ?',[nombreACargar]);
+
+    res.send(nombreTipoProyecto);
+})
+
+
+router.post('/ajax-validarNombreCategoria', async (req,res) => {
+    
+    const nombreACargar = req.body.name;
+
+    const nombreCategoria = await pool.query('SELECT * FROM categorias WHERE categoria = ?',[nombreACargar]);
+
+    res.send(nombreCategoria);
+})
 
 module.exports = router;

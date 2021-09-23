@@ -532,7 +532,7 @@ router.get('/pais/edit/:id', async (req, res) => {
 router.get('/pais/delete/:id', async (req, res) => {
     const { id } = req.params;
     const nombre = await pool.query('SELECT pais FROM pais WHERE id = ?', [id]);
-    console.log(nombre);
+    //console.log(nombre);
 
     await pool.query('DELETE FROM pais WHERE ID = ?', [id]);
 
@@ -638,7 +638,9 @@ router.get('/centrocosto/delete/:id', async (req, res) => {
         tipo   : "Eliminar"
     };
     //console.log(centro_costo);
-    res.render('mantenedores/centrocosto', { verToask, req ,centrosCostos,layout: 'template'});
+    const centroEliminado = id;
+    //console.log(centroEliminado);
+    res.render('mantenedores/centrocosto', { verToask, req ,centroEliminado,centrosCostos,layout: 'template'});
 
 })
 

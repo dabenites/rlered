@@ -220,7 +220,6 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLongTitle">Vacaciones <small>Revisar dias ingresados</small> </h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
           <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -261,6 +260,15 @@
               data: JSON.stringify(informacion),
             });
 
+      $.ajax({
+              type: 'post',
+              url: '/solicitudes/getPermisosSolicitados',
+              data: Object,
+              dataType: 'text'
+            })
+              .done(function (data) {
+                  $('#listadoPermisos').html(data);
+              });
     }
   function ReloadPAgina()
   {

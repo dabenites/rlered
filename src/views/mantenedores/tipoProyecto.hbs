@@ -13,7 +13,6 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Descripción</th>
                         <th>Opciones</th>
                     </tr>
@@ -22,7 +21,6 @@
                     {{#if proyecto }}
                     {{#each proyectos}}
                     <tr>
-                        <th scope="row">{{id}}</th>
                         <td>{{descripcion}}</td>
                         <td style="padding: .15rem;">
                             <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
@@ -37,22 +35,39 @@
                     </tr>
                     {{/each}}
                     {{else}}
-                    {{#each proyectos}}
-                    <tr>
-                        <th scope="row">{{id}}</th>
-                        <td>{{descripcion}}</td>
-                        <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                href="tipoProyecto/edit/{{id}}">
-                                Editar
-                            </a>
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="tipoProyecto/delete/{{id}}">
-                                Borrar
-                            </a>
-                        </td>
-                    </tr>
-                    {{/each}}
+                        {{#if verToask }}
+                                {{#each proyectos}}
+                                    <tr>
+                                        <td>{{descripcion}}</td>
+                                        <td style="padding: .15rem;">
+                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                                                href="../../tipoProyecto/edit/{{id}}">
+                                                Editar
+                                            </a>
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                                href="../../tipoProyecto/delete/{{id}}">
+                                                Borrar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{/each}}
+                            {{else}}
+                                {{#each proyectos}}
+                                    <tr>
+                                        <td>{{descripcion}}</td>
+                                        <td style="padding: .15rem;">
+                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                                                href="tipoProyecto/edit/{{id}}">
+                                                Editar
+                                            </a>
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                                href="tipoProyecto/delete/{{id}}">
+                                                Borrar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{/each}}
+                            {{/if}}
                     {{/if}}
                 </tbody>
             </table>

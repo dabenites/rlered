@@ -420,16 +420,19 @@ router.get('/avacaciones', isLoggedIn, async (req, res) => {
                                   " WHERE  " +
                                                " t1.idTipoSolicitud = t1.idTipoSolicitud " +
                                   " AND  " +
-                                              " t1.idUsuario = " +  req.user.idUsuario +  "" +
+                                              " t1.idAprobador = " +  req.user.idUsuario +  "" +
                                   " AND  " +
                                               " t1.idEstado = t1.idEstado "+
                                   " AND  " +
                                               " t1.id = t2.idSolicitud"+
                                   " AND  " +
+                                              " t1.idEstado in (1,2)"+
+                                  " AND  " +
                                               " t1.idUsuario = t3.idUsuario "+ 
                                   "   GROUP BY t2.idSolicitud ");
                                   
   //console.log(soliVacaciones);
+  //console.log(req.user);
   res.render('proyecto/avacaciones', {soliVacaciones , req , layout: 'template'});
 });
 
@@ -507,7 +510,8 @@ res.render('proyecto/avacaciones', { soliVacaciones , selecciona , obj :seleccio
 
 router.post('/updateVacaciones', async (req,res) => {
 
-  //console.log(req.body.estado);
+  //console.log(req.body);
+
   switch(req.body.estado)
   {
     case "1":
@@ -522,7 +526,7 @@ router.post('/updateVacaciones', async (req,res) => {
   }
   
   res.redirect("../solicitudes/avacaciones");
-  
+  //res.send("asdd");
 
 });
 

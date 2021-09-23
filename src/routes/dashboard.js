@@ -7,7 +7,6 @@ const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
 
 router.get('/', isLoggedIn, async (req, res) => {
-    
     /*
     switch(req.user.idCategoria)
     {
@@ -22,6 +21,7 @@ router.get('/', isLoggedIn, async (req, res) => {
     }
     */
    res.render('dashboard/idi', { req ,layout: 'template'});
+  
 });
 
 module.exports = router;

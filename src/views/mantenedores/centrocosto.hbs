@@ -11,7 +11,6 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Nombre</th>
                         <th>Opciones</th>
                     </tr>
@@ -20,7 +19,6 @@
                     {{#if centro }}
                         {{#each centrosCostos}}
                             <tr>
-                                <th scope="row">{{id}}</th>
                                 <td>{{centroCosto}}</td>
                                 <td style="padding: .15rem;">
                                     <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
@@ -35,23 +33,41 @@
                             </tr>
                         {{/each}}
                     {{else}}
-                        {{#each centrosCostos}}
-                            <tr>
-                                <th scope="row">{{id}}</th>
-                                <td>{{centroCosto}}</td>
-                                <td style="padding: .15rem;">
-                                    <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                        href="centrocosto/edit/{{id}}">
-                                        Editar
-                                    </a>
-                                    <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                        href="centrocosto/delete/{{id}}">
-                                        Borrar
-                                    </a>
-
-                                </td>
-                            </tr>
-                        {{/each}}
+                        {{#if centroEliminado}}
+                            {{#each centrosCostos}}
+                                <tr>
+                                    <td>{{centroCosto}}</td>
+                                
+                                        <td style="padding: .15rem;">
+                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                                                href="../../centrocosto/edit/{{id}}">
+                                                Editar
+                                            </a>
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                                href="../../centrocosto/delete/{{id}}">
+                                                Borrar
+                                            </a>
+                                    </td>
+                                </tr>
+                            {{/each}}
+                        {{else}}
+                            {{#each centrosCostos}}
+                                <tr>
+                                    <td>{{centroCosto}}</td>
+                                
+                                        <td style="padding: .15rem;">
+                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                                                href="centrocosto/edit/{{id}}">
+                                                Editar
+                                            </a>
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                                href="centrocosto/delete/{{id}}">
+                                                Borrar
+                                            </a>
+                                    </td>
+                                </tr>
+                            {{/each}}
+                        {{/if}}
                     {{/if}}
                 </tbody>
             </table>

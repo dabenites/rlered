@@ -30,6 +30,9 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
+
+  // Buscar la información solo de los modulos que esten operativos. 
+
   const rows = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [id]);
   const modulos = await pool.query('SELECT ' +
                                           't1.* , t2.Nombre as grupoNombre , '+
@@ -40,6 +43,8 @@ passport.deserializeUser(async (id, done) => {
                                           ' sys_permiso AS t3 ' +
                                   ' WHERE ' +
                                           ' t1.idGrupo = t2.idGrupo ' +
+                                  ' AND ' +
+                                          " t1.operativo = 'Y' " +
                                   ' AND ' +
                                           ' t3.idModulo = t1.idModulo' + 
                                   ' AND ' +

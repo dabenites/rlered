@@ -29,7 +29,6 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Nombre</th>
                             <th>Opciones</th>
                         </tr>
@@ -38,7 +37,6 @@
                         {{#if pais }}
                         {{#each paises}}
                         <tr>
-                            <th scope="row">{{id}}</th>
                             <td>{{pais}}</td>
                             <td style="padding: .15rem;">
                                 <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
@@ -53,23 +51,41 @@
                         </tr>
                         {{/each}}
                         {{else}}
-                        {{#each paises}}
-                        <tr>
-                            <th scope="row">{{id}}</th>
-                            <td>{{pais}}</td>
-                            <td style="padding: .15rem;">
-                                <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                    href="pais/edit/{{id}}">
-                                    Editar
-                                </a>
-                                <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                    href="pais/delete/{{id}}">
-                                    Borrar
-                                </a>
+                            {{#if verToask }}
+                            {{#each paises}}
+                                    <tr>
+                                        <td>{{pais}}</td>
+                                        <td style="padding: .15rem;">
+                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                                                href="../../pais/edit/{{id}}">
+                                                Editar
+                                            </a>
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                                href="../../pais/delete/{{id}}">
+                                                Borrar
+                                            </a>
 
-                            </td>
-                        </tr>
-                        {{/each}}
+                                        </td>
+                                    </tr>
+                                {{/each}}
+                            {{else}}
+                                {{#each paises}}
+                                    <tr>
+                                        <td>{{pais}}</td>
+                                        <td style="padding: .15rem;">
+                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
+                                                href="pais/edit/{{id}}">
+                                                Editar
+                                            </a>
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                                href="pais/delete/{{id}}">
+                                                Borrar
+                                            </a>
+
+                                        </td>
+                                    </tr>
+                                {{/each}}
+                            {{/if}}
                         {{/if}}
                     </tbody>
                 </table>

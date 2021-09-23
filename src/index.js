@@ -30,7 +30,8 @@ app.engine('.hbs', exphbs({
 }))
 app.set('view engine', '.hbs');
 
-
+//console.log(__dirname);
+//console.log(process.cwd());
 // Middlewares
 app.use(session({
   secret: 'faztmysqlnodemysql',
@@ -56,6 +57,17 @@ app.use((req, res, next) => {
   next();
 });
 
+//RUTAS Librerias externas dentro del codigo. 
+app.use('/bootstrap', express.static(path.join(process.cwd(), 'node_modules/bootstrap/dist/')))
+app.use('/buttons-bs', express.static(path.join(process.cwd(), 'node_modules/datatables.net-buttons-bs/')))
+app.use('/buttons-Fixers', express.static(path.join(process.cwd(), 'node_modules/datatables.net-fixedheader-bs/')))
+app.use('/buttons-Responsive', express.static(path.join(process.cwd(), 'node_modules/datatables.net-responsive-bs/')))
+app.use('/buttons-scroller', express.static(path.join(process.cwd(), 'node_modules/datatables.net-scroller-bs/')))
+app.use('/datatables-bootstrap', express.static(path.join(process.cwd(), 'node_modules/datatables.net-bs/')))
+
+// JS
+app.use('/jquery', express.static(path.join(process.cwd(), 'node_modules/jquery/dist/')))
+
 //Rutas
 app.use(require('./routes/index'));
 app.use(require('./routes/authentication'));
@@ -71,6 +83,8 @@ app.use('/ploter', require('./routes/ploter'));
 app.use('/bitacora', require('./routes/bitacora'));
 app.use('/proyecto', require('./routes/proyecto'));
 //app.use('/mantenedores/usuario', require('./routes/mantenedores'));
+
+
 
 //Archivos publicos 
 // app.use(express.static(path.join("netoffice.herokuapp.com", 'public')));

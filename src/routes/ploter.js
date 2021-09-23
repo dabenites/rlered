@@ -131,7 +131,7 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
         comen : ''
     };
 
-    //console.log('INSERT INTO solicitudes set ?', [solicitud]);
+    console.log('INSERT INTO solicitudes set ?', [solicitud]);
 
     const result = pool.query('INSERT INTO solicitudes set ?', [solicitud]);
 
@@ -169,7 +169,17 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
               }
           ]
       }
-   res.send("Mensaje");
+  // res.send("Mensaje");
+  
+    const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");       
+    const usuarios = await pool.query('SELECT * FROM sys_usuario');      
+    
+    const ploteos =  await pool.query('SELECT * FROM solicitudes ORDER BY id DESC LIMIT 100');      
+    const ploteosPendientes =  await pool.query("SELECT * FROM solicitudes as t WHERE t.estado in ('Pendiente', 'Procesando') ");
+
+    //console.log(ploteos);
+    res.render('ploter/ingresar', { proyectos,usuarios,ploteos, ploteosPendientes , req ,layout: 'template'});
+
 }); 
 
 

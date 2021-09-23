@@ -449,9 +449,10 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
    " WHERE  " +
                 " t1.idTipoSolicitud = t1.idTipoSolicitud " +
    " AND  " +
-               " t1.idUsuario = " +  req.user.idUsuario +  "" +
+               " t1.idAprobador = " +  req.user.idUsuario +  "" +
    " AND  " +
-               " t1.idEstado = t1.idEstado "+
+               " t1.idEstado in (1,2) "+
+
    " AND  " +
                " t1.id = t2.idSolicitud"+
    " AND  " +

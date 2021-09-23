@@ -355,7 +355,7 @@ router.get('/valoruf', isLoggedIn, async (req, ress) => {
 
 
 router.get('/pais', isLoggedIn, async (req, res) => {
-    const paises = await pool.query('SELECT * FROM pais');
+    const paises = await pool.query('SELECT * FROM pais as t1 ORDER BY t1.pais');
     res.render('mantenedores/pais', { req ,paises, layout: 'template'});
 });
 
@@ -556,7 +556,7 @@ router.get('/pais/delete/:id', async (req, res) => {
 
 
 router.get('/centrocosto', isLoggedIn, async (req, res) => {
-    const centrosCostos = await pool.query('SELECT * FROM centro_costo');
+    const centrosCostos = await pool.query('SELECT * FROM centro_costo as t1 ORDER BY t1.centroCosto ASC');
     res.render('mantenedores/centrocosto', { req ,centrosCostos, layout: 'template'});
 });
 
@@ -645,7 +645,7 @@ router.get('/centrocosto/delete/:id', async (req, res) => {
 })
 
 router.get('/categoria', isLoggedIn, async (req, res) => {
-    const categorias = await pool.query('SELECT t1.*, t2.centroCosto FROM categorias as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id');
+    const categorias = await pool.query('SELECT t1.*, t2.centroCosto FROM categorias as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id ORDER BY t1.categoria ASC');
     const centrosCostos = await pool.query('SELECT * FROM centro_costo');
     //console.log(centrosCostos);
     const isEqualHelperHandlerbar = function(a, b, opts) {
@@ -663,7 +663,7 @@ router.get('/categoria', isLoggedIn, async (req, res) => {
 
 router.get('/categoria/edit/:id', async (req, res) => {
     const { id } = req.params;
-    const categorias = await pool.query('SELECT * FROM categorias as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id');
+    const categorias = await pool.query('SELECT * FROM categorias as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id ORDER BY t1.categoria ASC');
     const centrosCostos = await pool.query('SELECT * FROM centro_costo');
     const categoria = await pool.query('SELECT * FROM categorias WHERE id = ?', [id]);
     //console.log(categoria[0]);

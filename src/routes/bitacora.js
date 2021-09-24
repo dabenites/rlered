@@ -263,7 +263,16 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
 
 router.get('/getBitacora', async (req,res) => {
 
-    const horas = await pool.query('SELECT * FROM bita_horas AS t , pro_proyectos as t2 WHERE  t2.id = t.id_project AND  t.id_session = '+req.user.idUsuario+' '); 
+   // const horas = await pool.query('SELECT * FROM bita_horas AS t , pro_proyectos as t2 WHERE  t2.id = t.id_project AND  t.id_session = '+req.user.idUsuario+' '); 
+   const horas = await pool.query(' SELECT t.id_bitacora_time, '+
+    " DATE_FORMAT(t.ini_time,'%Y-%m-%e %H:%i') AS ini_time, "+
+    " DATE_FORMAT(t.fin_time,'%Y-%m-%e %H:%i') AS  fin_time, " +
+    " t.title, "+
+    " t.body, "+
+    " t2.year, "+
+    " t2.code, "+
+    ' t2.nombre FROM bita_horas AS t , pro_proyectos as t2 WHERE  t2.id = t.id_project AND  t.id_session = '+req.user.idUsuario+' ');
+
     const HorasRegsitradas = [];
     horas.forEach(element => {
 
@@ -279,7 +288,9 @@ router.get('/getBitacora', async (req,res) => {
   
         
     });
-  
+
+  ////console.log("error");
+
    res.send(HorasRegsitradas);
   }); 
 

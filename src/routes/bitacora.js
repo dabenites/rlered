@@ -289,7 +289,7 @@ router.get('/getBitacora', async (req,res) => {
         
     });
 
-  //console.log("error");
+  ////console.log("error");
 
    res.send(HorasRegsitradas);
   }); 

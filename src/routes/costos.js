@@ -95,29 +95,33 @@ router.get('/duplicarAnterior', isLoggedIn, async (req, res) => {
     // Primero preguntar si tengo la informacion en el mes mencionado.
     
         // Buscar la informacion de los usuarios.
-        const costos  = await pool.query("SELECT t1.* " +
-        " FROM    " +
-                        " sys_usuario_costo AS t1," + 
-                        " sys_usuario  AS t2, " +
-                        " sys_categoria AS t3," +
-                        " centro_costo AS t4, " +
-                        " sys_sucursal AS t5" + 
-        " WHERE     " + 
-                        " t1.annio = "+ yearA +" " +
-        " AND       " +
-                        " t1.mes = "+ mesA +"  " +
-        " AND       " +
-                        " t1.idUsuario = t2.idUsuario" +
-        " AND       " + 
-                        " t2.idCategoria = t3.id_Categoria"+
-        " AND       " +
-                        "t3.idCentroCosto = t4.id" +
-        " AND       " +
-                        "t5.id_Sucursal = t2.idSucursal");
+        const costos  = await pool.query(" SELECT " +
+                                                    " t2.*, " +
+                                                    " t1.idUsuario," +
+                                                    " t1.Nombre," +
+                                                    " t4.categoria," +
+                                                    " t5.centroCosto, " +
+                                                    " t6.pais, " +
+                                                    " t2.costo " +
+                                        " FROM  " +
+                                                    " sys_usuario AS t1 " +
+                                        " LEFT JOIN sys_usuario_costo AS t2 ON ( t1.idUsuario = t2.idUsuario AND t2.annio =  "+ yearA +" AND t2.mes = "+ mesA +"), "+
+                                        " sys_sucursal AS t3, " +
+                                        " sys_categoria AS t4, " +
+                                        " centro_costo AS t5, " +
+                                        " pais AS t6 "  +
+                                        " WHERE  " +
+                                                " t1.idSucursal = t3.id_Sucursal " +
+                                        " AND  " +
+                                                " t1.idCategoria = t4.id_Categoria " +
+                                        " AND  " +
+                                                " t3.id_pais = t6.id " +
+                                        " AND  " +
+                                                " t4.idCentroCosto = t5.id ");
 
         // borro la informacion completa del mes para duplicar el anterior
         const result = pool.query("DELETE FROM sys_usuario_costo WHERE annio = "+year+" AND mes = "+mes+""); 
-        //console.log(result);
+        //console.log(costos);
 
         costos.forEach(function(elemento, indice, array) {
             // carga la informacion del mes anterior.
@@ -156,35 +160,31 @@ router.get('/descargarPlanilla', isLoggedIn, async (req, res) => {
     worksheet.getCell('F5').value = "Pais";
     worksheet.getCell('G5').value = "Costo";
 
-    const usuarios  = await pool.query( " SELECT  " +
-                                                    " t2.idUsuario," +
-                                                    " t2.Nombre," +
-                                                    " t3.categoria," +
-                                                    " t4.centroCosto, " +
-                                                    " t2b.pais, " +
-                                                    " t1.costo " +
-                                        " FROM " +
-                                                    " sys_usuario_costo AS t1, " +
-                                                    " sys_usuario AS t2, " +
-                                                    " sys_sucursal AS t2a, " +
-                                                    " pais AS t2b, " +
-                                                    " categorias AS t3, " +
-                                                    " centro_costo AS t4 " +
+    
+    const usuarios  = await pool.query(" SELECT " +
+                                                    " *, " +
+                                                    " t1.idUsuario," +
+                                                    " t1.Nombre," +
+                                                    " t4.categoria," +
+                                                    " t5.centroCosto, " +
+                                                    " t6.pais, " +
+                                                    " t2.costo " +
+                                        " FROM  " +
+                                                    " sys_usuario AS t1 " +
+                                        " LEFT JOIN sys_usuario_costo AS t2 ON ( t1.idUsuario = t2.idUsuario AND t2.annio =  "+ year +" AND t2.mes = "+ mes +"), "+
+                                        " sys_sucursal AS t3, " +
+                                        " sys_categoria AS t4, " +
+                                        " centro_costo AS t5, " +
+                                        " pais AS t6 "  +
                                         " WHERE  " +
-		                                            " t1.annio = '"+ year+"' " +
+                                                " t1.idSucursal = t3.id_Sucursal " +
                                         " AND  " +
-		                                            " t1.mes = '"+mes+"' " +
+                                                " t1.idCategoria = t4.id_Categoria " +
                                         " AND  " +
-		                                            " t1.idUsuario = t2.idUsuario "+
+                                                " t3.id_pais = t6.id " +
                                         " AND  " +
-		                                            " t2.idSucursal = t2a.id_Sucursal " +
-                                        " AND  " +
-		                                            " t2a.id_pais = t2b.id " +
-                                        " AND  " +
-		                                            " t2.idCategoria = t3.id " +
-                                        " AND  " +
-		                                            " t4.id = t3.idCentroCosto");
-                                          
+                                                " t4.idCentroCosto = t5.id ");
+
     usuarios.forEach((element, i) => {
         worksheet.getCell('B'+ (i + 6)).value = element.idUsuario;
         worksheet.getCell('C'+ (i + 6)).value = element.Nombre;
@@ -258,7 +258,8 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
     });
 
     // Buscar la informacion de los usuarios.
-    const costos  = await pool.query("SELECT * ," +
+
+   /* const costos  = await pool.query("SELECT * ," +
                                      "FORMAT(t1.costo,2) AS costoFormat" +
                                     " FROM    " +
                                                     " sys_usuario_costo AS t1," + 
@@ -278,6 +279,26 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
                                                     "t3.idCentroCosto = t4.id" +
                                     " AND       " +
                                                     "t5.id_Sucursal = t2.idSucursal");
+                                                    */
+
+
+        const costos  = await pool.query(" SELECT " +
+                                                    " *, " +
+                                        " FORMAT(t2.costo,2) AS costoFormat " +
+                                        " FROM  " +
+                                                    " sys_usuario AS t1 " +
+                                        " LEFT JOIN sys_usuario_costo AS t2 ON ( t1.idUsuario = t2.idUsuario AND t2.annio =  "+ year +" AND t2.mes = "+ mes +"), "+
+                                        " sys_sucursal AS t3, " +
+                                        " sys_categoria AS t4, " +
+                                        " centro_costo AS t5 " +
+                                        " WHERE  " +
+                                                " t1.idSucursal = t3.id_Sucursal " +
+                                        " AND  " +
+                                                " t1.idCategoria = t4.id_Categoria " +
+                                        " AND  " +
+                                                " t4.idCentroCosto = t5.id ");
+    // Revisar la Query de los costos.
+
                                                     
     res.render('costos/usuario', { annios, messes, costos,year,mes, req ,layout: 'template'});
 }); 

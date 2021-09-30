@@ -160,7 +160,7 @@ router.get('/usuario/permisos/:id', async (req, res) => {
 
     var query = "SELECT t1.*, t2.Nombre AS nomGrupo, if (t3.idPermiso > 0,1,0) AS estado " +
                 " FROM sys_grupo_modulo AS t2 , sys_modulo AS t1 " +
-                " LEFT JOIN sys_permiso AS t3 ON t3.idUsuario = "+ id +" AND t3.idModulo = t1.idModulo   WHERE t1.idGrupo = t2.idGrupo ";
+                " LEFT JOIN sys_permiso AS t3 ON t3.idUsuario = "+ id +" AND t3.idModulo = t1.idModulo   WHERE t1.idGrupo = t2.idGrupo ORDER BY nomGrupo ASC,t1.Nombre ASC ";
     
     const permisos = await pool.query(query);
 

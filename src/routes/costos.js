@@ -21,6 +21,7 @@ router.post('/fileupload', async (req,res) => {
         fs.rename(oldpath, newpath, function (err) {
             if (err) throw err;
             var workbook = new Excel.Workbook(); 
+            var idLogDetalle = 0 ;
             workbook.xlsx.readFile(newpath)
                 .then(function() {
                     var worksheet = workbook.getWorksheet(1);
@@ -40,8 +41,25 @@ router.post('/fileupload', async (req,res) => {
                             {
                                 lectura["informacion"]  = [];
                             }
+
                             if (rowNumber >= 6 )
                             {
+                                // Cargar el log de carga de la información
+                                if (rowNumber == 6)
+                                {
+                                    unLogIngreso = {
+                                        id_user : req.user.idUsuario,
+                                        fecha : new Date(),
+                                        annio : lectura["ano"] ,
+                                        mes : lectura["mes"]
+
+                                    };
+                                    const idLogIngreso = await pool.query('INSERT INTO sys_usuario_costo_ingreso set ?', [unLogIngreso]);
+                                    idLogDetalle = idLogIngreso.insertId;
+                                }
+                                
+
+
                                 const existeCosto =  await pool.query("SELECT * FROM sys_usuario_costo AS t1 WHERE t1.annio = "+ lectura["ano"] +" AND t1.mes = "+lectura["mes"]+" AND t1.idUsuario = "+row.values[2]+"");
                                 const unCosto ={ 
                                     annio :  lectura["ano"],
@@ -49,17 +67,31 @@ router.post('/fileupload', async (req,res) => {
                                     idUsuario :  row.values[2] ,
                                     costo : row.values[7]
                                    }; 
+                                   
+                                const unCostoLog ={ 
+                                    id_costo_ingreso : idLogDetalle,
+                                    annio :  lectura["ano"],
+                                    mes   :  lectura["mes"],
+                                    idUsuario :  row.values[2] ,
+                                    costo : row.values[7]
+                                   };
+
                                 var tieneResitros = false;        
                                 existeCosto.forEach(function(elemento, indice, array) {
                                     tieneResitros = true;
                                 });
                                 if(tieneResitros)
                                 {
-                                    const result = await pool.query('UPDATE sys_usuario_costo set costo = ? WHERE annio = ? , mes = ? , idUsuario = ? ', [row.values[7],lectura["ano"],lectura["mes"],row.values[2]]);
+                                    //const result = await pool.query('UPDATE sys_usuario_costo set costo = ? WHERE annio = ? , mes = ? , idUsuario = ? ', [row.values[7],lectura["ano"],lectura["mes"],row.values[2]]);
+                                    // lectura["ano"],lectura["mes"],row.values[2]]
+                                    //console.log("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
+                                    const result = await pool.query("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
+                                    const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
                                 }
                                 else
                                 {
                                     const result = await pool.query('INSERT INTO sys_usuario_costo set ?', [unCosto]);
+                                    const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
                                 }  
                             }          
                             //
@@ -138,6 +170,30 @@ router.get('/duplicarAnterior', isLoggedIn, async (req, res) => {
     res.redirect("../costos/usuario?anio="+year+"&mes="+mes+"");
 
 });
+
+router.get('/historial', isLoggedIn, async (req, res) => {
+  
+    const costos =  await pool.query("SELECT * ,DATE_FORMAT(t1.fecha, '%Y-%m-%d') AS fecha FROM sys_usuario_costo_ingreso AS t1, sys_usuario AS t2 WHERE t1.id_user = t2.idUsuario ORDER BY t1.id DESC");
+
+    res.render('costos/historial', { costos,req ,layout: 'template'});
+
+}); 
+
+
+router.get('/historial/:id', async (req, res) => {
+    const { id } = req.params;
+    
+    const costos =  await pool.query("SELECT * ,DATE_FORMAT(t1.fecha, '%Y-%m-%d') AS fecha FROM sys_usuario_costo_ingreso AS t1, sys_usuario AS t2 WHERE t1.id_user = t2.idUsuario ORDER BY t1.id DESC");
+    const detalle = await pool.query("SELECT * FROM sys_usuario_costo_ingreso_detalle AS t1, sys_usuario AS t2 WHERE t1.id_costo_ingreso = 16 AND  t1.idUsuario = t2.idUsuario");
+
+    
+    // detalles 
+
+
+    res.render('costos/historial', { costos,detalle,req ,layout: 'template'});
+
+});
+
 
 router.get('/descargarPlanilla', isLoggedIn, async (req, res) => {
 

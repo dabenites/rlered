@@ -1,10 +1,9 @@
-							<div class="x_panel">
-								<div class="x_title">
-									<h2>Costos Usuario<!--<small>Los costos seran por mes</small></h2>-->
-									<div class="clearfix"></div>
-								</div>
+<div class="x_panel">
+    <div class="x_title">
+	    <h2>Costos Usuario </h2><!--<small>Los costos seran por mes</small></h2>-->	
+        <div class="clearfix"></div>
+	</div>
 								<div class="x_content">
-									<br />
 									<form class="form-label-left input_mask" action="/costos/usuario" method="GET">
 										<div class="form-group row">
 											<label class="col-form-label col-md-1 col-sm-1 label-align">Año</label>
@@ -28,11 +27,12 @@
                                                         {{/each}} 
                                                     </select>
                                                 </div>
-                                                <div class="col-md-4 col-sm-4 ">
+                                                <div class="col-md-5 col-sm-5 ">
 												    <button type="submit" class="btn btn-warning">Revisar</button>
                                                      <a href="/costos/descargarPlanilla?anio={{year}}&mes={{mes}}"><button type="button" class="btn btn-success">Descargar </button></a>
 												    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target=".bs-example-modal-sm">Cargar</button>
                                                     <a href="/costos/duplicarAnterior?anio={{year}}&mes={{mes}}"><button type="button" class="btn btn-info">Replicar Mes anterior</button></a>
+                                                    <a href="/costos/historial"><button type="button" class="btn btn-success">Historial</button></a>
 											    </div>
 										</div>
 										<div class="ln_solid"></div>
@@ -86,7 +86,6 @@
                                                         </div>
                                          </div>
 								        </div>
-							</div>
                <div class="x_panel">
 						<div class="x_content">
 							<br />

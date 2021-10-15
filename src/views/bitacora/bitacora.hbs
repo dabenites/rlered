@@ -13,7 +13,6 @@
     }
 </style>
 
-
  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.css' rel='stylesheet' /> 
  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.js"></script> 
  <script src='../core/locales/es.js'></script>
@@ -87,14 +86,22 @@
       $('#exampleModal').modal('toggle'); 
     },
     events: '/bitacora/getBitacora',
-  });
+    eventClick: function(event) {
+        if (event.event._def.extendedProps.myId) {
+            // 
+           $('#exampleModalEliminar').modal('toggle');  
+           $('#idEliminar').val(event.event._def.extendedProps.myId);  
+           
+        }
+    }
+    });
  
   calendar.setOption('locale', 'es');
   calendar.render();
 });
 
   </script>
-
+<body>
 <div class="x_panel">
                   <div class="x_title">
                     <h2>Ingreso de Horas Bitacora</h2>
@@ -106,6 +113,26 @@
 
                   </div>
 </div>
+  <div class="modal fade" id="exampleModalEliminar" tabindex="-1" aria-labelledby="exampleModalLabelEliminar" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form action="/bitacora/eliminarHoras" method="POST" id="eliminarHora" name="eliminarHora">
+        <input id="idEliminar" name="idEliminar" type="hidden" value="">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Quieres borrar el registro de la bitacora ? </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+          <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      <div class="modal-footer">
+
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            <button type="submit" id="btnEliminar" class="btn btn-danger">Eliminar</button>
+          </div>
+        </div>  
+        </form>
+    </div>
+  </div>
 
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -117,7 +144,7 @@
           </button>
         </div>
         <div class="modal-body">
-        <form action="/bitacora/cargarHoras" method="POST">
+        <form action="/bitacora/cargarHoras" method="POST" id="llenadoBitacora" name="llenadoBitacora">
 
           <div class="x_content">
 
@@ -137,22 +164,39 @@
                 <input id="horaI" name="horaI" type="hidden" value="">
                 <input id="fechaT" name="fechaT" type="hidden" value="">
                 <input id="horaT" name="horaT" type="hidden" value="">
-             </div>
 
+                <input id="tipoIngreso" name="tipoIngreso" type="hidden" value="">
+             </div>
+             
               <div name="proyecto" id="proyecto">
                 <div class="item form-group">
-                   <label class="col-form-label col-md-9 col-sm-9 label-align" for="Etapa"> </label>
-                    <p><input type="checkbox" name="esmoficacaciones" id="esmoficacaciones">  Modificaciones </p> 
+                   <label class="col-form-label col-md-1 col-sm-1 label-align" for="Etapa"> </label>
+                   <p><input type="checkbox" name="esRelacionada" id="esRelacionada" onclick="CargaInformacion();">  Actividada No relacionada a proyecto </p> 
+
+                    <label class="col-form-label col-md-1 col-sm-1 label-align" for="Etapa"> </label>
+                    <p style="visibility: show" name="mod" id="mod"><input type="checkbox" name="esmoficacaciones" id="esmoficacaciones">  Modificaciones </p> 
                 </div>
-                <div class="item form-group">
+                <div class="item form-group" id="divActividades" name="divActividades" style="visibility: hidden">
+                 <label class="col-form-label col-md-3 col-sm-3 label-align" for="Etapa">Actividades  </label>
+                  <select class=" form-control" name="actividad" id="actividad">
+                      <option value="0" selected>Seleccione</option>
+                      <option value="-1">Actividad RLE</option>
+                      <option value="-2">Permiso NO recuperable</option>
+                      <option value="-3">Capacitacion</option>
+                      <option value="-5">Seminario/Congreso</option>
+                      <option value="-6">Reunion Coordinacion NAP</option>
+                  </select>
+                </div>
+
+                <div class="item form-group" id="divProyecto" name="divProyecto">
                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Etapa">Proyecto  </label>
-                  <select class=" form-control" name="idProyecto" id="idProyecto" >
+                  <select class=" form-control" name="idProyecto" id="idProyecto">
                         {{#each proyectos}}
                             <option value="{{id}}">{{year}}-{{code}} : {{nombre}}</option>
                          {{/each}}
                   </select>
                 </div>
-               <div class="item form-group">
+               <div class="item form-group" id="divEtapa" name="divEtapa">
                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Etapa">Etapa  </label>
                   <select class=" form-control" name="idEtapaProyecto" id="idEtapaProyecto" onchange="CargaTareas(this.value);">
                         <option value="0">Selecione</option>
@@ -161,7 +205,7 @@
                          {{/each}}
                   </select>
                </div>
-               <div class="item form-group">
+               <div class="item form-group" id="divTarea" name="divTarea">
                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Etapa">Tarea  </label>
                   <select class=" form-control" name="idTarea" id="idTarea">
                   </select>
@@ -197,15 +241,78 @@
           <div class="modal-footer">
 
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-            <button type="submit" id="btnSolicitar" class="btn btn-success">Solicitar</button>
+            <button type="button" onclick="ValidarIngreso();" id="btnSolicitar" class="btn btn-success">Ingresar</button>
           </div>
         </div>
         </form>
       </div>
     </div>
   </div>
-
+</body>
   <script>
+
+function ValidarIngreso()
+{
+  // validar la información 
+  if($('input[name="esRelacionada"]').is(':checked'))
+  {
+    // validar que tenga la informacion no relacionada a proyecto. 
+    var actvidad = $('#actividad option:selected').val();
+    if (actvidad == 0 )
+    {
+       alert ("Seleccione Actividad"); 
+    }
+    else
+    {
+      // enviar el submit 
+      $('#tipoIngreso').val(2);
+       document.llenadoBitacora.submit();
+    }
+  }
+  else
+  {
+    var proyecto = $('#idProyecto option:selected').val();
+    var etapa = $('#idEtapaProyecto option:selected').val();
+    var tarea = $('#idTarea option:selected').val();
+
+     if (proyecto != 0 && etapa != 0 && tarea != 0)
+     {
+        // enviar el submit 
+        
+        $('#tipoIngreso').val(1);
+         document.llenadoBitacora.submit();
+        //$( "#llenadoBitacora" ).submit();
+     }
+     else
+     {
+        alert ("Tiene que ingresar los valores de proyecto // etapa // tarea"); 
+     }
+
+
+  }
+
+}
+
+function CargaInformacion()
+{
+    if($('input[name="esRelacionada"]').is(':checked'))
+    {
+      $('#divProyecto').hide();
+      $('#divEtapa').hide();
+      $('#divTarea').hide(); 
+      $('#mod').hide();
+      $('#divActividades').show(); 
+      $("#divActividades").css('visibility', 'visible');
+      }else
+    {
+    $('#divProyecto').show();
+    $('#divEtapa').show();
+    $('#divTarea').show();
+    $('#mod').show();
+    $('#divActividades').hide(); 
+    }
+
+}
 
     function validoTipo(valor)
     {

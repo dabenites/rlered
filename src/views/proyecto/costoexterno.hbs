@@ -57,7 +57,7 @@
             <div class="item form-group">
 				<label class="col-form-label col-md-3 col-sm-3 label-align" for="Num HH">Nº HH aprox<span class="required">*</span></label>
 				<div class="col-md-6 col-sm-6 ">
-                    <input type="text" id="numhh" class="form-control" value="" placeholder="Ingrese numero de HH." name="numhh" required />
+                    <input type="text" id="numhh" class="form-control" value="" placeholder="Ingrese numero de HH." name="numhh" onkeypress='return event.charCode >= 48 && event.charCode <= 57' required />
 				</div>
     		</div>
            <div class="item form-group">
@@ -91,15 +91,21 @@
             <table class="table table-hover" id="ListadoCostoExterno" name="ListadoCostoExterno">
                 <thead>
                     <tr>
+                        <th>OC</th>
                         <th>Proyecto</th>
+                        <th>Proveedor</th>
+                        <th>Monto</th>
                         <th>Estado</th>
                         <th>Fecha Ingreso</th>
                     </tr>
                 </thead>
                     <tbody>
                         {{#each costosExternos}}
-                            <tr > 
+                            <tr> 
+                                <td>{{numOC}}</td>
                                 <td>{{year}}-{{code}} : {{nombre}}</td>
+                                <td>{{proveedor}}</td>
+                                <td>{{costo}}</td>
                                 <td>{{descripcion}}</td>
                                 <td>{{fechaIngreso}}</td>
                             </tr>

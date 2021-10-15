@@ -10,7 +10,7 @@
             <table class="table table-hover" class="table table-hover" id="tablaProveedores" class="display">
                 <thead>
                     <tr>
-                        <th>Nombre</th>
+                        <th>Nombre / Empresa</th>
                         <th>Fono</th>
                         <th>Mail</th>
                         <th>Opciones</th>
@@ -29,7 +29,7 @@
                                 Editar
                             </a>
                             <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="../../externo/delete/{{id}}">
+                                href="../../externo/delete/{{id}}" onclick="return confirm('¿Esta seguro de borrar al proveedor {{nombre}} ?')">
                                 Borrar
                             </a>
                         </td>
@@ -47,7 +47,7 @@
                                 Editar
                             </a>
                             <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="externo/delete/{{id}}">
+                                href="externo/delete/{{id}}" onclick="return confirm('¿Esta seguro de borrar al proveedor {{nombre}} ?')">
                                 Borrar
                             </a>
                         </td>
@@ -104,13 +104,17 @@
                     <input type="text" id="mail" class="form-control" value="{{proveedor.mail}}" name="mail" required />
 
                     <label for="Direccion ">Dirección * :</label>
-                    <input type="text" id="direccion" class="form-control" value="{{proveedor.mail}}" name="direccion"
+                    <input type="text" id="direccion" class="form-control" value="{{proveedor.direccion}}" name="direccion"
                         required />
 
                     <br />
                     {{#if proveedor }}
                     <button type="submit" class="btn btn-warning btn-block">
                         Actualizar
+                    </button>
+                     <button type="submit" class="btn btn-success btn-block"><a href="/proveedor/externo">
+                        Volver
+                     </a>
                     </button>
                     {{else}}
                     <button type="submit" onvolumechange="" class="btn btn-warning btn-block">

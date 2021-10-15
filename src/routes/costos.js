@@ -124,10 +124,10 @@ router.get('/duplicarAnterior', isLoggedIn, async (req, res) => {
 
     //res.send("Mensaje de informacion year" + year + " MEs " + mes);
 
-    // Primero preguntar si tengo la informacion en el mes mencionado.
+    //Primero preguntar si tengo la informacion en el mes mencionado.
     
-        // Buscar la informacion de los usuarios.
-        const costos  = await pool.query(" SELECT " +
+    //Buscar la informacion de los usuarios.
+    const costos  = await pool.query(" SELECT " +
                                                     " t2.*, " +
                                                     " t1.idUsuario," +
                                                     " t1.Nombre," +
@@ -371,11 +371,14 @@ router.get('/eproyectos', isLoggedIn, async (req, res) => {
     const costosExternos = await pool.query("SELECT " + 
                                             "* " +
                                             " , DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso " +
+                                            " , t4.nombre as proveedor, t2.nombre as nomProyecto" +
                                             " FROM pro_costo_externo as t1,"+
                                             " pro_proyectos as t2, " +
+                                            " prov_externo as t4, " +
                                             " pro_costo_externo_estado as t3 " +
                                             " WHERE t1.id_ingreso = "+req.user.idUsuario+"" + 
                                             " AND t1.id_proyecto = t2.id" +
+                                            " AND t1.id_prov_externo = t4.id" +
                                             " AND t1.id_estado = t3.id");
 
     res.render('proyecto/costoexterno', {proveedores,centros,monedas, proyectos ,costosExternos, req ,layout: 'template'});
@@ -389,7 +392,7 @@ router.get('/aproyectos', isLoggedIn, async (req, res) => {
 
     // Seleccicionar los costos que el ha ingresado
     const costosExternos = await pool.query("SELECT " + 
-                                            "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso , t5.nombre as proveedor" +
+                                            "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso , t5.nombre as proveedor,  t2.nombre as nomProyecto" +
                                             " FROM pro_costo_externo as t1, "+
                                             " pro_proyectos as t2, " +
                                             " pro_costo_externo_estado as t3, " +
@@ -409,7 +412,7 @@ router.get('/costoexterno/revisar/:id', async (req, res) => {
     const { id } = req.params;
     
     const costosExternos = await pool.query("SELECT " + 
-    "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso , t5.nombre as proveedor" +
+    "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso , t5.nombre as proveedor, t2.nombre as nomProyecto" +
     " FROM pro_costo_externo as t1, "+
     " pro_proyectos as t2, " +
     " pro_costo_externo_estado as t3, " +
@@ -449,7 +452,7 @@ router.get('/costoexterno/revisar/:id', async (req, res) => {
     " AND t1.id_centro_costo = t6.id"+
     " AND t1.id_ingreso = t4.idUsuario");
     
-
+    //console.log(costosExternos[0]);
     res.render('proyecto/acostoexterno', {costosExternos,  costoExterno: costoExterno[0],costosAnteriores, req ,layout: 'template'});
 
 
@@ -489,14 +492,17 @@ router.post('/updateCostoExterno', isLoggedIn, async (req, res) => {
 
     // Ponerle el toask.
     const costosExternos = await pool.query("SELECT " + 
-                                            "* , t1.id as idCostoExterno FROM pro_costo_externo as t1, "+
+                                            "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso , t5.nombre as proveedor,  t2.nombre as nomProyecto" +
+                                            " FROM pro_costo_externo as t1, "+
                                             " pro_proyectos as t2, " +
                                             " pro_costo_externo_estado as t3, " +
-                                            " sys_usuario as t4 " +
+                                            " sys_usuario as t4, " +
+                                            " prov_externo as t5 " + 
                                             " WHERE t1.id_estado = 1" + 
                                             " AND t1.id_proyecto = t2.id" +
                                             " AND t1.id_estado = t3.id"+ 
-                                            " AND t1.id_ingreso = t4.idUsuario");
+                                            " AND t1.id_ingreso = t4.idUsuario" + 
+                                            " AND t5.id = t1.id_prov_externo" );
 
     res.render('proyecto/acostoexterno', {costosExternos, req ,layout: 'template'});
 

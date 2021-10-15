@@ -172,6 +172,8 @@ router.get('/usuario/permisos/:id', async (req, res) => {
              return false
          } 
      };
+     
+
 
     res.render('mantenedores/permisos', { permisos, usuario: usuario[0],req ,layout: 'template', helpers : {
         if_equal : isEqualHelperHandlerbar
@@ -180,34 +182,45 @@ router.get('/usuario/permisos/:id', async (req, res) => {
 });
 
 router.post('/usuario/permisos', async (req,res) => {
-    //console.log(req.body.items);
+    
     
     //console.log(res.json(req.body));
+    //__________________
+
+    
     var parametros = JSON.stringify(req.body);
     var informacion = parametros.split(',');
-    
+    //console.log(informacion);
+
     var permisosUsuario = [];
     var idUsuario = 0;
     informacion.forEach(element => {
         var datos = element.split(':');
         var especificos = datos[0].split('_');
-        //permisosUsuario.push(datos[1]);
-        idUsuario = especificos[2].replace(/["']/g, "");
-        const permiso = {
-            idUsuario : idUsuario,
+        //var especificos_2 = datos[0].split(',');
+        //console.log(especificos[1] + "////" + especificos[2]);
+        //___________________________________
+        if (esNumero(especificos[1]))
+        {
+            const permiso = {
+            idUsuario : especificos[2].substring(0, especificos[2].length - 1) ,
             idModulo  : especificos[1]
-        }
-        permisosUsuario.push(permiso);
-    });
+            }
+       
+            permisosUsuario.push(permiso);
 
+        }
+    });
+//    permisosUsuario[0].idUsuario;
    // console.log(permisosUsuario);
-    const borrar = pool.query(' DELETE FROM  sys_permiso WHERE  idUsuario = ?', [idUsuario]); 
+    const borrar = pool.query(' DELETE FROM  sys_permiso WHERE  idUsuario = ?', [permisosUsuario[0].idUsuario]); 
     permisosUsuario.forEach(permiso => {
+       // console.log(permiso);
     const result = pool.query('INSERT INTO  sys_permiso set ?', [permiso]);
     });
 
-    const usuario = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [idUsuario]);
-
+    const usuario = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [permisosUsuario[0].idUsuario]);
+    
     const verToask = {
         titulo : usuario[0].NombreCompleto,
         body   : "Se le han dado los permisos necesarios ",
@@ -215,8 +228,10 @@ router.post('/usuario/permisos', async (req,res) => {
     };
     //console.log(verToask);
 
-    const usuarios = await pool.query('SELECT * FROM sys_usuario');
+    //const usuarios = await pool.query('SELECT * FROM sys_usuario');
+    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
 
+    
 
     res.render('mantenedores/usuarios', { verToask, req ,usuarios,layout: 'template'});
 
@@ -1003,5 +1018,30 @@ router.post('/ajax-validarNombreCategoria', async (req,res) => {
 
     res.send(nombreCategoria);
 })
+
+function esNumero (dato){
+    /*Definición de los valores aceptados*/
+    var valoresAceptados = /^[0-9]+$/;
+    if (dato.indexOf(".") === -1 ){
+        if (dato.match(valoresAceptados)){
+           return true;
+        }else{
+           return false;
+        }
+    }else{
+        //dividir la expresión por el punto en un array
+        var particion = dato.split(".");
+        //evaluamos la primera parte de la división (parte entera)
+        if (particion[0].match(valoresAceptados) || particion[0]==""){
+            if (particion[1].match(valoresAceptados)){
+                return true;
+            }else {
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+}
 
 module.exports = router;

@@ -7,16 +7,6 @@ var dateFormat = require('dateformat');
 
 router.post('/ingresoTrackingFactura', isLoggedIn, async (req, res) => {
 
-    /*
-    const { empresa }    = req.body.empresa;
-    const { numFactura } = req.body.numFactura;
-    const { fechaFactura } = req.body.fechaFactura;
-    const { comentario } = req.body.comentario;
-    const { fechaPagoFactura } = req.body.fechaPagoFactura;
-    const { comentarioCobranza } = req.body.comentarioCobranza;
-*/
-    //console.log(req.body);
-
     const { estado ,id}    = req.body;    
     switch(estado)
     {
@@ -266,7 +256,7 @@ router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
 
     // HISTORIAL DE LA FACTURACION 
     const historial =  await pool.query( " SELECT  " +
-                                            "    t2a.NombreCompleto AS solicitante," +
+                                            "    t2a.Nombre AS solicitante," +
                                             "    t2.fecha_solicitud, " +
                                             "    t2.monto_a_facturar, " +
                                             "    t2.porc_ppto, " +
@@ -314,6 +304,7 @@ router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
              return false
          } 
      };
+
 
     res.render('facturacion/editar', { factura:factura[0],proyecto:proyecto[0],historial,req ,layout: 'template', helpers : {
         if_equal : isEqualHelperHandlerbar

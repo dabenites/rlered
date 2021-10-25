@@ -8,46 +8,35 @@
             <h2>Listar Usuarios<small></small></h2>
             <ul class="nav navbar-right panel_toolbox">
                 <td style="text-align: right;width:220px">
-                    <a style="padding: .50rem;" type="button" class="btn btn-info"
-                        href="/mantenedores/usuario/crear">Crear usuarios</a>
+                   <a style="padding: .50rem;" type="button" class="btn btn-info" href="#">Crear Proyectos</a> 
                 </td>
             </ul>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            <table class="table table-hover" id="tablaUsuario" name="tablaUsuario">
+            <table class="table table-hover" id="tablaProyectos" name="tablaProyectos">
                 <thead>
                     <tr>
-                        <th>Nombre</th>
-                        <th>Login</th>
-                        <th>E-mail</th>
-                        <th>Teléfono</th>
-                        <th>Categoría</th>
-                        <th>Sucursal</t>
+                        <th>Proyecto</th>
+                        <th>Cliente</th>
+                        <th>Director / Jefe</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {{#each usuarios}}
+                    {{#each proyectos}}
                     <tr>
-                        <td>{{Nombre}}</td>
-                        <td>{{login}}</td>
-                        <td>{{Email}}</td>
-                        <td>{{Telefono}}</td>
-                        <td>{{categoria}}</td>
-                        <td>{{direccion}}</td>
+                        <td>{{year}}-{{code}} : {{nombre}}</td>
+                        <td></td>
+                        <td></td>
                         <td style="padding: .15rem;">
                             <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                href="usuario/editar/{{idUsuario}}">
+                                href="#">
                                 Editar
                             </a>
                             <a style="padding: .25rem;" type="button" class="btn btn-warning btn-xs"
-                                href="usuario/permisos/{{idUsuario}}">
-                                Permisos
-                            </a>
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="usuario/delete/{{idUsuario}}">
-                                Borrar
+                                href="facturar/{{id}}">
+                                Facturar
                             </a>
                         </td>
                     </tr>
@@ -104,8 +93,8 @@
 
 <script>
 
-        $('#tablaUsuario thead tr').clone(true).appendTo('#tablaUsuario thead');
-        $('#tablaUsuario thead tr:eq(1) th').each(function (i) {
+        $('#tablaProyectos thead tr').clone(true).appendTo('#tablaProyectos thead');
+        $('#tablaProyectos thead tr:eq(1) th').each(function (i) {
             var title = $(this).text();
             $(this).html('<input type="text" placeholder="Search ' + title + '" />');
 
@@ -119,7 +108,7 @@
             });
         });
 
-        var table = $('#tablaUsuario').DataTable({
+        var table = $('#tablaProyectos').DataTable({
             orderCellsTop: true,
             fixedHeader: true,
             "scrollX": true,

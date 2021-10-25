@@ -10,40 +10,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script
-		src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyCXQ6ltnbOZRP3U7JH3evn5O5OnfR--O4I"></script>
-
-	<!-- <script>
-		$(function () {
-			$('#nombre').autocomplete({
-				source: function (req, res) {
-
-					$.ajax({
-						url: "iproyecto/autocomplete",
-							dataType: "jsonp",
-								type: "GET",
-									data: req,
-										success: function(data) {
-											res(data)
-
-
-										},
-						error: function(err) {
-							console.log(err.status);
-						}
-					});
-		},
-			minLength: 1,
-			slect: function (event, ui) {
-				if (ui.item) {
-					$('#nombre').text(ui.item.label);
-				}
-			}
-            });
-        });
-
-	</script>
-	-->
+	<script	src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyCXQ6ltnbOZRP3U7JH3evn5O5OnfR--O4I"></script>
 	<script>
 
 		var searchInput = 'search_input';
@@ -106,20 +73,19 @@
 						<div class="form-group row">
 							<div class="col-md-6 col-sm-6 ">
 								<div class="item form-group">
-									<label class="col-form-label col-md-3 col-sm-3 label-align"
-										for="Destinatario">Año:</label>
-									<div class="col-md-7 col-sm-7">
-										<select class="form-control" name="year" id="year">
-											<option>Seleccione una opción</option>
-											<script>
-												var d = new Date();
-												var n = d.getFullYear();
-												for (var i = n; i >= 2011; i--)
-													document.write('<option>' + i + '</option>');
-											</script>
+									<label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Año:</label>
+											<div class="col-md-7 col-sm-7">
+												<select class="form-control" name="year" id="year">
+													<option>Seleccione una opción</option>
+													<script>
+														var d = new Date();
+														var n = d.getFullYear();
+														for (var i = n; i >= 2011; i--)
+															document.write('<option>' + i + '</option>');
+													</script>
 
-										</select>
-									</div>
+												</select>
+											</div>
 								</div>
 								<div class="item form-group">
 									<label class="col-form-label col-md-3 col-sm-3 label-align" for="code">Codigo<span

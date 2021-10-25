@@ -24,7 +24,8 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
 router.get('/usuario/editar/:id', isLoggedIn, async (req, res) => {
     const { id } = req.params;
     //console.log(req.params);
-    const usuarios = await pool.query('SELECT * FROM sys_usuario');
+    //const usuarios = await pool.query('SELECT * FROM sys_usuario');
+    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
     const usuario = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [id]);
     const categoria = await pool.query('SELECT * FROM sys_categoria');
     const sucursal = await pool.query('SELECT * FROM sys_sucursal');
@@ -36,7 +37,7 @@ router.get('/usuario/editar/:id', isLoggedIn, async (req, res) => {
              return false
          } 
      };
-     console.log(usuario);
+    // console.log(usuario);
     res.render('mantenedores/editarUsuario', { req , usuarios,categoria,sucursal, usuario: usuario[0], layout: 'template', helpers : {
         if_equal : isEqualHelperHandlerbar
     }});
@@ -50,36 +51,28 @@ router.get('/usuario/crear/', isLoggedIn, async (req, res) => {
     res.render('mantenedores/crearUsuario', { req ,usuarios,categoria,sucursal, layout: 'template'});
 });
 
-
-
 router.post('/editarUsuarios', async (req, res) => {
-    const { idUsuario,Nombre,NombreCompleto,Email,Telefono,login,idCategoria,idSucursal,aPaterno,aMaterno,
-    pNombre,sNombre,titulo } = req.body;
+    const { idUsuario,Nombre,Email,Telefono,login,idCategoria,idSucursal,titulo } = req.body;
 
    const newUsario  ={ //Se gurdaran en un nuevo objeto
     Nombre:Nombre,
-    NombreCompleto:NombreCompleto,
     Email:Email,
     Telefono:Telefono,
     login:login,
     idCategoria:idCategoria,
     idSucursal:idSucursal ,
-    aPaterno:aPaterno,
-    aMaterno:aMaterno,
-    pNombre:pNombre,
-    sNombre :sNombre,
     titulo:titulo
 };
 
-    //console.log(req.body);
    const result = await pool.query('UPDATE sys_usuario set ? WHERE idUsuario = ?', [newUsario, idUsuario]);
 
-   const usuarios = await pool.query('SELECT * FROM sys_usuario');
+  // const usuarios = await pool.query('SELECT * FROM sys_usuario');
+  const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
    //console.log(usuarios);
 
    
    const verToask = {
-       titulo : NombreCompleto,
+       titulo : Nombre,
        body   : "Se ha editado correctamente",
        tipo   : "Editar"
    };
@@ -89,21 +82,15 @@ router.post('/editarUsuarios', async (req, res) => {
 })
 
 router.post('/addUsuario', async (req, res) => {
-    const { Nombre,NombreCompleto,Email,Telefono,login,idCategoria,idSucursal,aPaterno,aMaterno,
-    pNombre,sNombre,titulo } = req.body;
+    const { Nombre,Email,Telefono,login,idCategoria,idSucursal, titulo } = req.body;
 
    const newUsario  ={ //Se gurdaran en un nuevo objeto
     Nombre:Nombre,
-    NombreCompleto:NombreCompleto,
     Email:Email,
     Telefono:Telefono,
     login:login,
     idCategoria:idCategoria,
     idSucursal:idSucursal ,
-    aPaterno:aPaterno,
-    aMaterno:aMaterno,
-    pNombre:pNombre,
-    sNombre :sNombre,
     titulo:titulo
 };
 
@@ -985,7 +972,23 @@ router.post('/ajax-validarNombreCentroCosto', async (req,res) => {
     //console.log(nombreCentroCostos);
 
     res.send(nombreCentroCostos);
-})
+});
+
+router.post('/ajax-validarNombreLogin', async (req,res) => {
+    
+    const nombreACargar = req.body.login;
+
+    const nombreLogin = await pool.query('SELECT * FROM sys_usuario WHERE login = ?',[nombreACargar]);
+
+    //console.log(nombreCentroCostos);
+    //console.log(req.body);
+
+    res.send(nombreLogin);
+});
+
+
+
+
 
 //ajax-validarNombrePais
 

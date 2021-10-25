@@ -1,0 +1,351 @@
+
+<!--LISTAR-->
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+  <script	src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyCXQ6ltnbOZRP3U7JH3evn5O5OnfR--O4I"></script>
+
+  <script>
+        var nuevoalias = jQuery.noConflict();
+	    nuevoalias(document).ready(function() {
+	      nuevoalias( function() {
+                nuevoalias( "#director" ).autocomplete({
+                source: "buscarDirector/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_director').val(ui.item.id);
+                }
+                });
+                nuevoalias( "#jefe" ).autocomplete({
+                source: "buscarJefe/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_jefe').val(ui.item.id);
+                }
+                });
+                nuevoalias( "#mandante" ).autocomplete({
+                source: "buscarMandante/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_mandante').val(ui.item.id);
+                }
+                });
+                nuevoalias( "#cliente" ).autocomplete({
+                source: "buscarCliente/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_cliente').val(ui.item.id);
+                }
+                });
+                nuevoalias( "#arquitecto" ).autocomplete({
+                source: "buscarArquitecto/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_arquitecto').val(ui.item.id);
+                }
+                });
+                nuevoalias( "#revisor" ).autocomplete({
+                source: "buscarRevisor/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_revisor').val(ui.item.id);
+                }
+                });
+            } );
+
+            // 
+            var searchInput = 'direccion';
+            var autocomplete;
+			    autocomplete = new google.maps.places.Autocomplete((document.getElementById(searchInput)), {
+				                types: ['geocode'],
+			});
+
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
+				var near_place = autocomplete.getPlace();
+                nuevoalias('#loc_lat').val(near_place.geometry.location.lat());
+                nuevoalias('#loc_long').val(near_place.geometry.location.lng());
+			});
+
+
+	});
+  </script>
+
+
+
+<div class="col-md-12 col-sm-12 ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Crear Proyecto<small></small></h2>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="/proyecto/cargarProyecto" method="POST">
+            <!-- Nav tabs -->
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Datos Generales</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Datos Financieros</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="messages-tab" data-toggle="tab" href="#messages" role="tab" aria-controls="messages" aria-selected="false">Equipo Proyecto</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Opcionales</a>
+  </li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab">
+      <div class="form-group row">
+          &nbsp;
+      </div>
+            <div class="form-group row">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Año:</label>
+							<div class="col-md-7 col-sm-7">
+							    <select class="form-control" name="year" id="year">
+								    <option>Ingrese año</option>
+									<script>
+										var d = new Date();
+										var n = d.getFullYear();
+										for (var i = n; i >= 2011; i--)
+											document.write('<option>' + i + '</option>');
+									</script>
+
+								</select>
+							</div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Codigo:</label>
+							<div class="col-md-7 col-sm-7">
+							    <select class="form-control" name="code" id="code">
+								    <option>Ingrese código</option>
+									<script>
+										var n = 600;
+										for (var i = n; i >= 1; i--)
+											document.write('<option>' + i + '</option>');
+									</script>
+
+								</select>
+							</div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Nombre:</label>
+							<div class="col-md-7 col-sm-7">
+							    <input type="text" id="nombre" name="nombre"  class="form-control">
+							</div>
+                    </div>
+                    <div class="form-group row">
+                         <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo Proyecto:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="id_tipo_proyecto"
+											id="id_tipo_proyecto">
+											<option>Seleccione una opción</option>
+											{{#each tipo}}
+											<option value="{{id}}">{{descripcion}}</option>
+											{{/each}}
+										</select>
+									</div>
+                     </div>
+                     <div class="form-group row">
+                         <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo Servicio:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="id_servicio" id="id_servicio">
+                                                <option value="0">Ninguno</option>
+                                                <option value="1">Proyecto Internacional</option>
+                                                <option value="2">Revision</option>
+                                                <option value="3">Proyecto TI</option>
+                                                <option value="4">Proyecto Nacional</option>
+                                                <option value="5">Proyecto Perú</option>
+                                        </select>
+									</div>
+                     </div>
+                     <div class="form-group row">
+									<label class="col-form-label col-md-3 col-sm-3 label-align">Estado:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="id_Estado"
+											id="id_Estado">
+											<option>Seleccione una opción</option>
+											{{#each estado}}
+											<option value="{{id}}">{{descripcion}}</option>
+											{{/each}}
+										</select>
+									</div>
+					</div>
+                        <div class="form-group row">
+                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Dirección:</label>
+                            <div class="col-md-7 col-sm-7">
+                                <input type="text" id="direccion" name="direccion"  class="form-control">
+                                    <input type="hidden" name="loc_lat" id="loc_lat" />
+								    <input type="hidden" name="loc_long" id="loc_long" />
+                            </div>
+                        </div>
+  </div>
+  <div class="tab-pane" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <div class="form-group row">
+            &nbsp;
+        </div>
+        <div class="form-group row">
+            <div class="col-md-12 col-sm-12 ">
+                <div class="col-md-6 col-sm-6 ">
+                    <div class="form-group row">
+                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Valor x m2:</label>
+                                <div class="col-md-6 col-sm-6">
+                                    <input type="text" id="valor_x_m2" name="valor_x_m2"  class="form-control">
+                                </div>
+                    </div>
+                    <div class="form-group row">
+                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Valor del Proyecto:</label>
+                                <div class="col-md-6 col-sm-6">
+                                    <input type="text" id="valor_proyecto" name="valor_proyecto"  class="form-control">
+                                </div>
+                    </div>
+                    <div class="form-group row">
+                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie :</label>
+                                <div class="col-md-6 col-sm-6">
+                                    <input type="text" id="superficie" name="superficie" class="form-control">
+                                </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 ">
+                        <div class="form-group row">
+                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Inicio:</label>
+                                <div class="col-md-6 col-sm-6">
+                                    <input type="date" id="fecha_inicio" name="fecha_inicio"  class="form-control">
+                                </div>
+                        </div>
+                        <div class="form-group row">
+                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Entrega:</label>
+                                <div class="col-md-6 col-sm-6">
+                                    <input type="date" id="fecha_entrega" name="fecha_entrega"  class="form-control">
+                                </div>
+                        </div>
+                        <div class="form-group row">
+                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Termino:</label>
+                                <div class="col-md-6 col-sm-6">
+                                    <input type="date" id="fecha_termino" name="fecha_termino"  class="form-control">
+                                </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+  </div>
+  <div class="tab-pane" id="messages" role="tabpanel" aria-labelledby="messages-tab">
+      <div class="form-group row">
+          &nbsp;
+      </div>
+                          <div class="form-group row">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Director :</label>
+							<div class="col-md-9 col-sm-9">
+							    <input id="director" name="director"  class="form-control">
+                                <input type="hidden" id="id_director" name="id_director">
+							</div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Jefe:</label>
+							<div class="col-md-9 col-sm-9">
+							    <input id="jefe" name="jefe"  class="form-control">
+                                <input type="hidden" id="id_jefe" name="id_jefe">
+							</div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Mandante:</label>
+							<div class="col-md-9 col-sm-9">
+							    <input id="mandante" name="mandante"  class="form-control">
+                                <input type="hidden" id="id_mandante" name="id_mandante"  class="form-control">
+							</div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Cliente:</label>
+							<div class="col-md-9 col-sm-9">
+							    <input id="cliente" name="cliente"  class="form-control">
+                                <input type="hidden" id="id_cliente" name="id_cliente" required="required" class="form-control">
+							</div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Arquitecto:</label>
+							<div class="col-md-9 col-sm-9">
+							    <input id="arquitecto" name="arquitecto" class="form-control">
+                                <input type="hidden" id="id_arquitecto" name="id_arquitecto"  class="form-control">
+							</div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Revisor:</label>
+							<div class="col-md-9 col-sm-9">
+							    <input id="revisor" name="revisor"  class="form-control">
+                                <input type="hidden" id="id_revisor" name="id_revisor" class="form-control">
+							</div>
+                    </div>
+  </div>
+  <div class="tab-pane" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+      <div class="form-group row">
+          &nbsp;
+      </div>
+        <div class="form-group row">
+				<label class="col-form-label col-md-3 col-sm-3 label-align">Complejidad:</label>
+				<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="id_Complejidad" id="id_Complejidad">
+											<option>Seleccione una opción</option>
+											
+											<option value="1">Baja</option>
+                                            <option value="2">Media</option>
+                                            <option value="3">Alta</option>
+											
+										</select>
+		        </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie Ppto</label>
+				<div class="col-md-7 col-sm-7">
+				    <input type="text" id="superficie_ppto" name="superficie_ppto"  class="form-control">
+				</div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Nº Pisos</label>
+				<div class="col-md-7 col-sm-7">
+				    <input type="text" id="num_pisos" name="num_pisos"  class="form-control">
+				</div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Nº Subterraneos</label>
+				<div class="col-md-7 col-sm-7">
+				    <input type="text" id="num_subte" name="num_subte"  class="form-control">
+				</div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Zona</label>
+				<div class="col-md-7 col-sm-7">
+				    <input type="text" id="zona" name="zona"  class="form-control">
+				</div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Suelo</label>
+				<div class="col-md-7 col-sm-7">
+				    <input type="text" id="suelo" name="suelo"  class="form-control">
+				</div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Nº Planos Estimado</label>
+				<div class="col-md-7 col-sm-7">
+				    <input type="text" id="num_planos_estimado" name="num_planos_estimado"  class="form-control">
+				</div>
+        </div>
+
+</div>
+            
+            
+                <div class="form-group row">
+                    <div class="col-md-5 col-sm-5">
+                        
+                    </div>
+                    <div class="col-md-5 col-sm-5">
+                        <button type="submit" class="btn btn-success btn-sm">Ingresar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

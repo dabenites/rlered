@@ -323,7 +323,7 @@ router.post('/AddIngreso', async (req,res) => {
 
 router.get('/apermisos', async (req,res) => {
 
-  const permisos  = await pool.query(' SELECT t2.NombreCompleto, '+
+  const permisos  = await pool.query(' SELECT t2.Nombre, '+
                                     "DATE_FORMAT(t1.fecha,'%Y-%m-%d') AS fecha, " +
                                     "DATE_FORMAT(t3.fecha_inicio,'%Y-%m-%d' ) AS fecha_per," +
                                     "DATE_FORMAT(t3.fecha_inicio,'%H:%i' ) AS fecha_inicio," +
@@ -343,7 +343,7 @@ router.get('/solicitudes/revisar/:id', async (req, res) => {
 
   const { id } = req.params;
 
-  const permisos  = await pool.query(' SELECT t2.NombreCompleto, '+
+  const permisos  = await pool.query(' SELECT t2.Nombre, '+
                                     "DATE_FORMAT(t1.fecha,'%Y-%m-%d') AS fecha, " +
                                     "DATE_FORMAT(t3.fecha_inicio,'%Y-%m-%d' ) AS fecha_per," +
                                     "DATE_FORMAT(t3.fecha_inicio,'%H:%i' ) AS fecha_inicio," +
@@ -355,7 +355,7 @@ router.get('/solicitudes/revisar/:id', async (req, res) => {
                                      ' AND ' + 
                                      " t1.idAprobador = "+ req.user.idUsuario +"");
 
-  const permiso = await pool.query(' SELECT t2.NombreCompleto, '+
+  const permiso = await pool.query(' SELECT t2.Nombre, '+
                                     "DATE_FORMAT(t1.fecha,'%Y-%m-%d') AS fechaI, " +
                                     "DATE_FORMAT(t3.fecha_inicio,'%Y-%m-%d' ) AS fecha_per," +
                                     "DATE_FORMAT(t3.fecha_inicio,'%H:%i' ) AS fecha_inicio," +
@@ -368,7 +368,7 @@ router.get('/solicitudes/revisar/:id', async (req, res) => {
                                     ' AND ' + 
                                     " t1.id = "+ id+"");
 
-  const permisoAnteriores = await pool.query(' SELECT t2.NombreCompleto, '+
+  const permisoAnteriores = await pool.query(' SELECT t2.Nombre, '+
                                     "DATE_FORMAT(t1.fecha,'%Y-%m-%d') AS fechaI, " +
                                     "DATE_FORMAT(t3.fecha_inicio,'%Y-%m-%d' ) AS fecha_per," +
                                     "DATE_FORMAT(t3.fecha_inicio,'%H:%i' ) AS fecha_inicio," +

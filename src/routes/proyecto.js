@@ -300,10 +300,11 @@ router.get('/addPro', async (req, res) => {
 
   const tipo = await pool.query("SELECT * FROM proyecto_tipo");
   const estado = await pool.query("SELECT * FROM pro_costo_externo_estado");
+  
+  // // 
 
   res.render('proyecto/addProyecto', { tipo,estado, req, layout: 'template' });
-  //res.render('proyecto/iproyecto', { tipo,estado, req, layout: 'template' });
-
+  
 });
 
 
@@ -360,16 +361,25 @@ router.get('/facturar/:id', async (req, res) => {
     id_revisor,id_complejidad,latitud,altitud,direccion,superficie_ppto,superficie,valor_proyecto,valor_metro_cuadrado,fecha_inicio,
     fecha_entrega,fecha_termino,num_pisos,num_subterraneo,zona,suelo,num_plano_estimado} = proyectos[0];
 
-  console.log(nombre);
+  // console.log(nombre);
+
+  const monedas = await pool.query("SELECT * FROM moneda_tipo AS t1 WHERE t1.factura = 'Y'");
+  const tipoCobro = await pool.query("SELECT * FROM fact_tipo_cobro");
+
+  var  estado  = true;
+
+  // validaciones del equipo 
+  if (id_jefe === 0 || id_jefe === null || id_jefe === undefined)  estado = false;
+
+  if (estado)
+  res.render('proyecto/facturar', { factura:true,facturacion,monedas,tipoCobro, proyecto: proyectos[0], req, layout: 'template' });
+  else
+  res.render('proyecto/facturar', { facturacion,monedas,tipoCobro, proyecto: proyectos[0], req, layout: 'template' });
 
 
-
-
-
-
-
-  res.render('proyecto/facturar', { facturacion, proyecto: proyectos[0], req, layout: 'template' });
-
+  
+  
+  
 
 
 
@@ -452,6 +462,36 @@ router.get('/buscarRevisor/:find', async (req, res) => {
 
 });
 
+
+//cargarFactura
+router.post('/cargarFactura', async (req, res) => {
+
+  const {numPpto,monto,porc_presupuesto,esroc,numroc,fecha_cobro,comentario,tipoCobro,tipoMoneda,id_proyecto} = req.body;
+
+  var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
+
+  const newFactura = { //Se gurdaran en un nuevo objeto
+    // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
+    fecha_solicitud: fecha_ingreso,
+    id_proyecto: id_proyecto,
+    id_tipo_moneda:tipoMoneda,
+    id_estado: 0,
+    id_tipo_cobro: tipoCobro,
+    num_ppto: numPpto,
+    monto_a_facturar: monto,
+    porc_ppto: porc_presupuesto,
+    id_solicitante: req.user.idUsuario,
+    fecha_cobro: fecha_cobro,
+    es_roc: esroc,
+    roc: numroc,
+    comentarios :comentario };
+
+   const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]);
+
+  
+res.redirect('/proyecto/facturar/'+id_proyecto);
+
+});
 
 
 // CARGAR PROYECTO 20/10/2021

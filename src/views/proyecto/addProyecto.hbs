@@ -79,7 +79,7 @@
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="/proyecto/cargarProyecto" method="POST">
+            <form id="cargaProyecto" name="cargaProyecto" data-parsley-validate class="form-horizontal form-label-left" action="/proyecto/cargarProyecto" method="POST">
             <!-- Nav tabs -->
 <ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item">
@@ -106,14 +106,13 @@
                         <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Año:</label>
 							<div class="col-md-7 col-sm-7">
 							    <select class="form-control" name="year" id="year">
-								    <option>Ingrese año</option>
+								    <option value="0">Ingrese año</option>
 									<script>
 										var d = new Date();
 										var n = d.getFullYear();
 										for (var i = n; i >= 2011; i--)
-											document.write('<option>' + i + '</option>');
+											document.write('<option value= '+i+'>' + i + '</option>');
 									</script>
-
 								</select>
 							</div>
                     </div>
@@ -121,7 +120,7 @@
                         <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Codigo:</label>
 							<div class="col-md-7 col-sm-7">
 							    <select class="form-control" name="code" id="code">
-								    <option>Ingrese código</option>
+								    <option value="0">Ingrese código</option>
 									<script>
 										var n = 600;
 										for (var i = n; i >= 1; i--)
@@ -140,9 +139,8 @@
                     <div class="form-group row">
                          <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo Proyecto:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="id_tipo_proyecto"
-											id="id_tipo_proyecto">
-											<option>Seleccione una opción</option>
+										<select class="select2_single form-control" tabindex="-1" name="id_tipo_proyecto" id="id_tipo_proyecto">
+											<option value="0">Seleccione una opción</option>
 											{{#each tipo}}
 											<option value="{{id}}">{{descripcion}}</option>
 											{{/each}}
@@ -165,9 +163,8 @@
                      <div class="form-group row">
 									<label class="col-form-label col-md-3 col-sm-3 label-align">Estado:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="id_Estado"
-											id="id_Estado">
-											<option>Seleccione una opción</option>
+										<select class="select2_single form-control" tabindex="-1" name="id_Estado" id="id_Estado">
+											<option value="0">Seleccione una opción</option>
 											{{#each estado}}
 											<option value="{{id}}">{{descripcion}}</option>
 											{{/each}}
@@ -175,7 +172,7 @@
 									</div>
 					</div>
                         <div class="form-group row">
-                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Dirección:</label>
+                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Direccion">Dirección:</label>
                             <div class="col-md-7 col-sm-7">
                                 <input type="text" id="direccion" name="direccion"  class="form-control">
                                     <input type="hidden" name="loc_lat" id="loc_lat" />
@@ -287,7 +284,7 @@
 				<label class="col-form-label col-md-3 col-sm-3 label-align">Complejidad:</label>
 				<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="id_Complejidad" id="id_Complejidad">
-											<option>Seleccione una opción</option>
+											<option value="0">Seleccione una opción</option>
 											
 											<option value="1">Baja</option>
                                             <option value="2">Media</option>
@@ -341,11 +338,77 @@
                         
                     </div>
                     <div class="col-md-5 col-sm-5">
-                        <button type="submit" class="btn btn-success btn-sm">Ingresar</button>
+                        <button type="button" class="btn btn-success btn-sm" onclick="validarFormulario();">Ingresar</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<script>
+function validarFormulario()
+{
+    // DATOS GENERALES 
+    var annio           = $( "#year" ).val();
+    var codigo          = $( "#code" ).val();
+    var nombre          = $( "#nombre" ).val();
+    var tipoProyecto    = $( "#id_tipo_proyecto" ).val();
+    var tipoServicio    = $( "#id_servicio" ).val();
+    var estado          = $( "#id_Estado" ).val();
+    var direccion       = $( "#direccion" ).val();
+
+
+    var estadoEnvio = true;
+
+   // validar 
+   //$("#year").css({'border-color': '#dc3545'}); // ROJO #dc3545  // VERDE #28a745
+   // alert(codigo);
+    if(annio !== null && annio !== '' && annio !== '0') {$("#year").css({'border-color': '#28a745'});} else {$("#year").css({'border-color': '#dc3545'}); estadoEnvio = false;} 
+    if(codigo !== null && codigo !== '' && codigo !== '0') {$("#code").css({'border-color': '#28a745'});} else {$("#code").css({'border-color': '#dc3545'}); estadoEnvio = false;}
+    if(nombre !== null && nombre !== '') {$("#nombre").css({'border-color': '#28a745'});} else {$("#nombre").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(tipoProyecto !== null && tipoProyecto !== '' && tipoProyecto !== '0') {$("#id_tipo_proyecto").css({'border-color': '#28a745'});} else {$("#id_tipo_proyecto").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(tipoServicio !== null && tipoServicio !== '' && tipoServicio !== '0') {$("#id_servicio").css({'border-color': '#28a745'});} else {$("#id_servicio").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(estado !== null && estado !== '' && estado !== '0') {$("#id_Estado").css({'border-color': '#28a745'});} else {$("#id_Estado").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(direccion !== null && direccion !== '' ) {$("#direccion").css({'border-color': '#28a745'});} else {$("#direccion").css({'border-color': '#dc3545'});estadoEnvio = false;}
+
+    // DATOS FINANCIEROS 
+    var valorxmts     = $( "#valor_x_m2" ).val();
+    var valorproyecto = $( "#valor_proyecto" ).val();
+    var superficie    = $( "#superficie" ).val();
+    var finicio       = $( "#fecha_inicio" ).val();
+    var fentrega      = $( "#fecha_entrega" ).val();
+    var ftermino      = $( "#fecha_termino" ).val();
+
+    if(valorxmts !== null && valorxmts !== '' ) {$("#valor_x_m2").css({'border-color': '#28a745'});} else {$("#valor_x_m2").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(valorproyecto !== null && valorproyecto !== '' ) {$("#valor_proyecto").css({'border-color': '#28a745'});} else {$("#valor_proyecto").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(superficie !== null && superficie !== '' ) {$("#superficie").css({'border-color': '#28a745'});} else {$("#superficie").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(finicio !== null && finicio !== '' ) {$("#fecha_inicio").css({'border-color': '#28a745'});} else {$("#fecha_inicio").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(fentrega !== null && fentrega !== '' ) {$("#fecha_entrega").css({'border-color': '#28a745'});} else {$("#fecha_entrega").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(ftermino !== null && ftermino !== '' ) {$("#fecha_termino").css({'border-color': '#28a745'});} else {$("#fecha_termino").css({'border-color': '#dc3545'});estadoEnvio = false;}
+
+    // EQUIPO PROYECTO 
+     var director       = $( "#id_director" ).val();
+     var jefe           = $( "#id_jefe" ).val();
+     var mandante       = $( "#id_mandante" ).val();
+     var cliente        = $( "#id_cliente" ).val();
+     var arquitecto     = $( "#id_arquitecto" ).val();
+     var revisor        = $( "#id_revisor" ).val();
+
+    if(director !== null && director !== '' ) {$("#director").css({'border-color': '#28a745'});} else {$("#director").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(jefe !== null && jefe !== '' ) {$("#jefe").css({'border-color': '#28a745'});} else {$("#jefe").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(mandante !== null && mandante !== '' ) {$("#mandante").css({'border-color': '#28a745'});} else {$("#mandante").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(cliente !== null && cliente !== '' ) {$("#cliente").css({'border-color': '#28a745'});} else {$("#cliente").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(arquitecto !== null && arquitecto !== '' ) {$("#arquitecto").css({'border-color': '#28a745'});} else {$("#arquitecto").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(revisor !== null && revisor !== '' ) {$("#revisor").css({'border-color': '#28a745'});} else {$("#revisor").css({'border-color': '#dc3545'});estadoEnvio = false;}
+
+    // 
+
+    if (estadoEnvio)
+    {
+        // realizar el envio 
+        $( "#cargaProyecto" ).submit();
+    }
+}
+
+</script>
 

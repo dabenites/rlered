@@ -37,6 +37,38 @@ router.get('/listado', isLoggedIn, async (req, res) => {
     res.render('contacto/listado', { contactos , req ,layout: 'template'});
 }); 
 
+router.get('/listadov', isLoggedIn, async (req, res) => {
+
+    const keys_words  = await pool.query("SELECT * FROM contacto_key");
+    const infokeys = {};
+    keys_words.forEach(function(elemento, indice, array) {
+        if (infokeys[elemento.id_contacto_key] === undefined)
+        {
+            infokeys[elemento.id_contacto_key] = elemento.descripcion;
+        }
+    });
+
+
+    //const contactos  = await pool.query(" SELECT  * FROM contacto ");
+    const contactos  = await pool.query("SELECT * FROM contacto  AS t WHERE t.keys_words != '' ");
+
+    contactos.forEach((element, i) => {
+        var separa = element["keys_words"].split(",");
+        //console.log(separa);
+        var categoria = "";
+        separa.forEach(element => {
+            if (element != "")
+            {
+                categoria = categoria + infokeys[element] + " ,";
+            }
+        });
+        contactos[i]["keys_words"] = categoria;
+    });
+
+    res.render('contacto/listado', { visor:true, contactos , req ,layout: 'template'});
+}); 
+
+
 router.post('/ajaxNombre', async (req,res) => {
     
     //console.log(req.body['NombreContacto']);

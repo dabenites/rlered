@@ -49,21 +49,7 @@ passport.deserializeUser(async (id, done) => {
                                           ' t3.idModulo = t1.idModulo' + 
                                   ' AND ' +
                                           ' t3.idUsuario = ?',[id]);
-                                          console.log('SELECT ' +
-                                          't1.* , t2.Nombre as grupoNombre , '+
-                                          ' t2.icon as grupoIcon ' +
-                                  ' FROM ' +
-                                          ' sys_modulo as t1, ' +
-                                          ' sys_grupo_modulo as t2 ,' +
-                                          ' sys_permiso AS t3 ' +
-                                  ' WHERE ' +
-                                          ' t1.idGrupo = t2.idGrupo ' +
-                                  ' AND ' +
-                                          " t1.operativo = 'Y' " +
-                                  ' AND ' +
-                                          ' t3.idModulo = t1.idModulo' + 
-                                  ' AND ' +
-                                          ' t3.idUsuario = ?',[id]);
+
   const modulosHTML = {};
   modulos.forEach(function(elemento, indice, array) {
       if (modulosHTML[elemento.grupoNombre] === undefined)

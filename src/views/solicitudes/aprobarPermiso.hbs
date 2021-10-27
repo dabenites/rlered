@@ -20,7 +20,7 @@
                         {{#if permiso }}
                             {{#each permisos}}
                                 <tr > 
-                                    <td>{{NombreCompleto}}</td>
+                                    <td>{{Nombre}}</td>
                                     <td>{{fecha}}</td>
                                     <td>{{fecha_per}} : {{fecha_inicio}} hasta {{fecha_termino}}</td>
                                     <td>
@@ -33,7 +33,7 @@
                         {{else}}
                             {{#each permisos}}
                                 <tr > 
-                                    <td>{{NombreCompleto}}</td>
+                                    <td>{{Nombre}}</td>
                                     <td>{{fecha}}</td>
                                     <td>{{fecha_per}} : {{fecha_inicio}} hasta {{fecha_termino}}</td>
                                     <td>
@@ -71,7 +71,7 @@
                             <div class="item form-group">
                                 <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name">Solicitante <span class="required">*</span></label>
                                 <div class="col-md-6 col-sm-6 ">
-                                    <input type="text" id="solicitante" class="form-control" value="{{permiso.NombreCompleto}}" name="solicitante" readonly />
+                                    <input type="text" id="solicitante" class="form-control" value="{{permiso.Nombre}}" name="solicitante" readonly />
                                 </div>
                             </div>
                             <div class="item form-group">
@@ -132,7 +132,7 @@
                                     <tbody>
                                             {{#each permisoAnteriores}}
                                                 <tr> 
-                                                    <td>{{NombreCompleto}}</td>
+                                                    <td>{{Nombre}}</td>
                                                     <td>{{fechaI}}</td>
                                                     <td>{{fecha_per}} - {{fecha_inicio}} : {{fecha_termino}}</td>
                                                     <td>{{comentario}}</td>

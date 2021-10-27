@@ -5,7 +5,11 @@
 		
 		</div>
 		<ul class="nav navbar-right panel_toolbox">
-			<a data-toggle="modal" data-target=".bs-example-modal-lg"><button class="btn btn-success"> <i class="fa fa-user"> Agregar Contacto </i> </button> </a>
+			{{#if visor }}
+				
+			{{else}}	
+				<a data-toggle="modal" data-target=".bs-example-modal-lg"><button class="btn btn-success"> <i class="fa fa-user"> Agregar Contacto </i> </button> </a>
+			{{/if}}
         </ul>
 	    <div class="clearfix"></div>
     </div>

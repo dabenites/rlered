@@ -1,0 +1,29 @@
+ {{#each informacionDias}}
+        <div class="form-group row">
+                <label for="staticEmail" class="col-sm-3 col-form-label"></label>
+                <div class="col-sm-9">
+                    <div class="col-sm-8">
+                        <label><input type="checkbox" id="dia_{{id}}" name="dia_{{id}}" onchange="mostrarTipo({{id}});"> {{fecha}} ¿Medio Dia?</label>
+                        </div>
+                        <div class="col-sm-4">
+                            <select name="tipodia_{{id}}" id="tipodia_{{id}}" style="visibility: hidden;">
+                                <option value="1">Mañana</option>
+                                <option value="2">Tarde</option>
+                            </select>
+                        </div>
+                </div>
+        </div>
+  {{/each}}
+  <script>
+      function mostrarTipo(id)
+      {
+          if ($('#dia_' + id).is(":checked"))
+          {
+                $('#tipodia_' + id).css("visibility", "visible");  
+          }
+          else
+          {
+                $('#tipodia_' + id).css("visibility", "hidden");  
+          }
+      }
+  </script>

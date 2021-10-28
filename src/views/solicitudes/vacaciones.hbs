@@ -24,6 +24,24 @@
     background-color: #fed300;
 
   }
+  .close {
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+}
+.close:not(:disabled):not(.disabled) {
+    cursor: pointer;
+}
+button.close {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    -webkit-appearance: none;
+}
 </style>
 
 
@@ -80,6 +98,21 @@
                 //console.log(data);
                 $('#txtfecha').val(data);
               });
+
+            // crear objeto dinamico que me entregue la información 
+            
+            $.ajax({
+              type: 'post',
+              url: '/solicitudes/getDiasEs',
+              data: Object,
+              dataType: 'text'
+            })
+              .done(function (data) {
+                //console.log(data);
+                $('#dinamicoDias').html(data);
+              });
+
+
             $('#exampleModal').modal('toggle'); //Me muestra el formulario si esta oculto
           }
         },
@@ -199,8 +232,10 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLongTitle">Vacaciones <small>Ingresar solicitud</small> </h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
-        <span aria-hidden="true">&times;</span>
+        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button> -->
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
         </button>
       </div>
       <div class="modal-body">
@@ -211,33 +246,41 @@
             <div class="x_title">
               <div class="clearfix"></div>
               <br />
-
-              <label for="Nombre Aprobador">Aprobador * :</label>
-              <select class=" form-control" name="idAprobador" id="idAprobador">
-                {{#each usuarios}}
-                <option value="{{idUsuario}}">{{NombreCompleto}}</option>
-                {{/each}}
-              </select>
-
-
-              <label for="Fecha">Días seleccionados:</label>
-              <input type="txt" id="txtfecha" class="form-control" value="{{sol_selec_dias.fecha}}" name="txtfecha" Readonly />
-
-              <label for="Informar">Informar a * :</label>
-              <select class=" form-control" name="idInformar" id="idInformar">
-                {{#each usuarios}}
-                <option value="{{idUsuario}}">{{NombreCompleto}}</option>
-                {{/each}}
-              </select>
-
-
-              <div class="item form-group">
-                <label class="col-form-label col-md-3 col-sm-3 label-align" for="txtComentario">Comentario<span class="required"></span>
-                </label>
-                <div class="col-md-6 col-sm-6 ">
-                  <textarea type="txt" id="comentario" name="comentario" required="required" class="form-control" rows="5" cols="84"></textarea>
-                </div>
-              </div>
+               <div class="form-group row">
+                  <label for="staticEmail" class="col-sm-3 col-form-label">Aprobador * :</label>
+                  <div class="col-sm-9">
+                  <select class=" form-control" name="idAprobador" id="idAprobador">
+                    {{#each usuarios}}
+                        <option value="{{idUsuario}}">{{Nombre}}</option>
+                    {{/each}}
+                  </select>
+                  </div>
+               </div>  
+               <div class="form-group row">
+                 <label for="staticEmail" class="col-sm-3 col-form-label">Nº Dias * :</label>
+                 <div class="col-sm-9">
+                    <input type="txt" id="txtfecha" class="form-control" value="{{sol_selec_dias.fecha}}" name="txtfecha" Readonly />
+                 </div>
+               </div>
+               <div id="dinamicoDias" name="dinamicoDias">
+                  mostrar los dias dinamicamente 
+               </div>
+               <div class="form-group row">
+                 <label for="staticEmail" class="col-sm-3 col-form-label">Informar * :</label>
+                 <div class="col-sm-9">
+                    <select class=" form-control" name="idInformar" id="idInformar">
+                        {{#each usuarios}}
+                        <option value="{{idUsuario}}">{{Nombre}}</option>
+                        {{/each}}
+                    </select>
+                 </div>
+               </div>           
+               <div class="form-group row">
+                  <label for="staticEmail" class="col-sm-3 col-form-label">Comentario * :</label>
+                  <div class="col-sm-9">
+                      <textarea type="txt" id="comentario" name="comentario" required="required" class="form-control" rows="5" cols="84"></textarea>
+                  </div>
+               </div>
             </div>
           </div>
 

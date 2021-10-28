@@ -105,6 +105,23 @@ router.post('/getDias', async (req,res) => {
   
   res.send(d);
 });
+
+router.post('/getDiasEs', async (req,res) => {
+  //res.json(req.body);
+  //console.log(req.user);
+
+  // ir a preguntar a la base de datoscuantos dias tiene solicitado el usuario.
+
+   const informacionDias = await pool.query("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id " +
+                                            "  FROM sol_selec_dias AS t WHERE t.idUsuario = "+req.user.idUsuario+" AND t.idEstado = 1 "); 
+  
+
+
+  res.render('solicitudes/dias', { req ,informacionDias, layout: 'blanco'});
+
+});
+
+//getDiasEs
 //getDiasIngresados
 
 router.post('/getDiasIngresados', async (req,res) => {
@@ -290,10 +307,16 @@ router.post('/AddIngreso', async (req,res) => {
   var comentario = req.body.comentario;
   var fecha = new Date();
 
-  
-  //console.log(req.body);comentario
 
-  const vaca  ={ //Se gurdaran en un nuevo objeto
+  var variables = req.body.split(",");
+
+
+  console.log("asdad");
+  console.log(variables);comentario
+
+  //Se gurdaran en un nuevo objeto
+  /*
+  const vaca  ={ 
 
     idUsuario :  idUsuario,
     idAprobador: idAprobador,
@@ -303,18 +326,19 @@ router.post('/AddIngreso', async (req,res) => {
     comentario:comentario,
     idEstado: '1'
   }
+  */
     //Guardar datos en la BD      
 
-    const infoSolicitud = await pool.query('INSERT INTO sol_solicitud  set ? ', [vaca]);
+  //  const infoSolicitud = await pool.query('INSERT INTO sol_solicitud  set ? ', [vaca]);
 
     
-    var key = infoSolicitud.insertId
+   // var key = infoSolicitud.insertId
 
     //console.log("UPDATE sol_selec_dias set idEstado = 2 , idSolicitud = "+key+"  WHERE idEstado = 1 AND idUsuario = "+idUsuario+" ");
-    const result = await pool.query("UPDATE sol_selec_dias set idEstado = 2 , idSolicitud = "+key+"  WHERE idEstado = 1 AND idUsuario = "+idUsuario+" ");
+  //  const result = await pool.query("UPDATE sol_selec_dias set idEstado = 2 , idSolicitud = "+key+"  WHERE idEstado = 1 AND idUsuario = "+idUsuario+" ");
 
 
-    res.redirect("../solicitudes/vacaciones");
+   // res.redirect("../solicitudes/vacaciones");
 
 
 });

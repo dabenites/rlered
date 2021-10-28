@@ -87,12 +87,20 @@
     },
     events: '/bitacora/getBitacora',
     eventClick: function(event) {
+      if(event.event._def.extendedProps.tipoObjeto === 1 )
+      {
         if (event.event._def.extendedProps.myId) {
-            // 
-           $('#exampleModalEliminar').modal('toggle');  
-           $('#idEliminar').val(event.event._def.extendedProps.myId);  
-           
-        }
+                    // 
+                  $('#exampleModalEliminar').modal('toggle');  
+                  $('#idEliminar').val(event.event._def.extendedProps.myId);  
+                  
+                }
+      }
+      else
+      {
+        alert("Los permisos no pueden ser elminados en la bitacora");
+      }
+        
     }
     });
  

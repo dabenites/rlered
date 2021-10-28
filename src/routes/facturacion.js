@@ -277,7 +277,7 @@ router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
 		                                        " t4.id = t2.id_tipo_cobro");
 
     // informacion del proyecto 
-
+    
     const proyecto = await pool.query( " SELECT  " +
                                             "    t3.nombre,"+
                                             "    t3.year, "+
@@ -286,13 +286,14 @@ router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
                                             "    t3b.Nombre AS directorProyecto "+
                                        " FROM " +
                                                 " fact_facturas AS t2, " +
-                                                " pro_proyectos AS t3 LEFT JOIN sys_usuario AS t3a ON (t3.id_Jefe_Proyecto = t3a.idUsuario) "+
-                                                " LEFT JOIN sys_usuario AS t3b ON (t3.id_Director_Proyecto = t3b.idUsuario) "+
+                                                " pro_proyectos AS t3 LEFT JOIN sys_usuario AS t3a ON (t3.id_jefe = t3a.idUsuario) "+
+                                                " LEFT JOIN sys_usuario AS t3b ON (t3.id_director = t3b.idUsuario) "+
                                        " WHERE  " +
                                                 " t2.id = "+idFacturacion+"  " +
                                         " AND  " +
                                                 " t2.id_proyecto = t3.id " );
 
+    console.log("1");
     // factura 
     const factura = await pool.query( " SELECT *,t1.id as id_facturacion FROM fact_facturas AS t1, fact_estados AS t2 WHERE t1.id = "+idFacturacion+" AND t1.id_estado = t2.id");
 

@@ -415,25 +415,38 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
 
 router.get('/getBitacora', async (req,res) => {
 
-   // const horas = await pool.query('SELECT * FROM bita_horas AS t , pro_proyectos as t2 WHERE  t2.id = t.id_project AND  t.id_session = '+req.user.idUsuario+' '); 
-   //const horas = await pool.query(' SELECT t.id_bitacora_time, '+
-   // " DATE_FORMAT(t.ini_time,'%Y-%m-%e %H:%i') AS ini_time, "+
-   // " DATE_FORMAT(t.fin_time,'%Y-%m-%e %H:%i') AS  fin_time, " +
-   // " t.title, "+
-   // " t.body, "+
-   // " t2.year, "+
-   // " t2.code, "+
-   // ' t2.nombre FROM bita_horas AS t , pro_proyectos as t2 WHERE  t2.id = t.id_project AND  t.id_session = '+req.user.idUsuario+' ');
-
 
     const horas = await pool.query(" SELECT t.id_bitacora_time,  DATE_FORMAT(t.ini_time,'%Y-%m-%e %H:%i') AS ini_time,   " +
-                                    " DATE_FORMAT(t.fin_time,'%Y-%m-%e %H:%i') AS  fin_time,  t.title,  t.body,  t2.year,  t2.code,  t2.nombre  " +
+                                    " DATE_FORMAT(t.fin_time,'%Y-%m-%e %H:%i') AS  fin_time,  t.title,  t.body,  t2.year,  t2.code,  t2.nombre  , 1 as tipo" +
                                     " FROM bita_horas AS t , pro_proyectos as t2 WHERE  t2.id = t.id_project AND  t.id_session = "+req.user.idUsuario+" " +
                                     " UNION " +
                                     " SELECT t.id_bitacora_time,  DATE_FORMAT(t.ini_time,'%Y-%m-%e %H:%i') AS ini_time,   " +
-                                    " DATE_FORMAT(t.fin_time,'%Y-%m-%e %H:%i') AS  fin_time,  t.title,  t.body,  'Actividad No relacionada a Proyecto',  '',  '' AS nombre " +
-                                    " FROM bita_horas AS t  WHERE   t.id_session =  "+req.user.idUsuario+" AND t.id_tipo = 2" );
-
+                                    " DATE_FORMAT(t.fin_time,'%Y-%m-%e %H:%i') AS  fin_time,  t.title,  t.body,  'Actividad No relacionada a Proyecto',  '',  '' AS nombre , 1 as tipo" +
+                                    " FROM bita_horas AS t  WHERE   t.id_session =  "+req.user.idUsuario+" AND t.id_tipo = 2"+
+                                    " UNION " +
+                                    " SELECT  " +
+	                                " t1.id as id_bitacora_time,   " +
+	                                " DATE_FORMAT(t3.fecha_inicio,'%Y-%m-%e %H:%i') AS ini_time,    " +
+	                                " DATE_FORMAT(t3.fecha_termino,'%Y-%m-%e %H:%i') AS  fin_time,  " +
+	                                " 'Permiso' AS title,  " +
+ 	                                " t1.comentario AS body, " +
+	                                " 'Permiso' AS year, " +
+	                                " '' AS code, " +
+	                                " t1.comentario AS nombre , 2 as tipo" +
+                                    " FROM  " +
+	                                " sol_solicitud AS t1 ,  " +
+	                                " sol_tipo_solicitud AS t2, " +
+	                                " sol_permiso AS t3  " +
+                                    " WHERE  " +
+	                                " t1.idTipoSolicitud = 2 " +
+                                    " AND  " +
+	                                " t1.idTipoSolicitud = t2.id " +
+                                    " AND  " +
+	                                " t1.idEstado = 3 " +
+                                    " AND  " +
+	                                " t1.id = t3.idSolicitud " +
+                                    " AND  " +
+	                                " t1.idUsuario = "+req.user.idUsuario+" " );
 
 
     const HorasRegsitradas = [];
@@ -444,7 +457,8 @@ router.get('/getBitacora', async (req,res) => {
                 start : element.ini_time,
                 end: element.fin_time,
                 description: 'Lecture',
-                myId : element.id_bitacora_time
+                myId : element.id_bitacora_time,
+                tipoObjeto : element.tipo
             }
          
               HorasRegsitradas.push(registro);

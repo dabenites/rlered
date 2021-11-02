@@ -42,6 +42,12 @@ button.close {
     border: 0;
     -webkit-appearance: none;
 }
+.fc-day-today {
+    background: #FFF !important;
+    border: none !important;
+    border-top: 1px solid #ddd !important;
+    font-weight: bold;
+} 
 </style>
 
 
@@ -117,7 +123,7 @@ button.close {
           }
         },
         Miboton2: {
-          text: "Revisar dias Ingresados",
+          text: "Revisar Dias Seleccionados",
           click: function () {
 
             // ir a la base de datos preguntar lacantidad de dias que entrega 
@@ -217,8 +223,9 @@ button.close {
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Vacaciones <small>Revisar dias ingresados</small> </h5>
-        <span aria-hidden="true">&times;</span>
+        <h5 class="modal-title" id="exampleModalLongTitle"> <small>Revisar dias ingresados</small> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body" id="listadoDias">
@@ -236,7 +243,7 @@ button.close {
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        </button>
+        
       </div>
       <div class="modal-body">
         <form action="/solicitudes/AddIngreso" method="POST">
@@ -306,8 +313,8 @@ button.close {
     <h2>Ingreso de Vacaciones</h2>
     <ul class="nav navbar-right panel_toolbox">
 
-      Ingresando&nbsp;<button style=" background-color: rgb(255, 243, 51)"></button>&nbsp;&nbsp;
-      Solicitado&nbsp;<button style=" background-color: rgb(51, 196, 255)"></button>&nbsp;&nbsp;
+      Seleccionado&nbsp;<button style=" background-color: rgb(5, 54, 214)"></button>&nbsp;&nbsp;
+      Pendiente Aprobación&nbsp;<button style=" background-color: rgb(233, 159, 0)"></button>&nbsp;&nbsp;
       Aprobado&nbsp;<button style=" background-color:rgb(51, 255, 88)"></button>
     </ul>
     <div class="clearfix"></div>

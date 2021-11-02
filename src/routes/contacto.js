@@ -18,19 +18,27 @@ router.get('/listado', isLoggedIn, async (req, res) => {
     });
 
 
-    //const contactos  = await pool.query(" SELECT  * FROM contacto ");
-    const contactos  = await pool.query("SELECT * FROM contacto  AS t WHERE t.keys_words != '' ");
+    const contactos  = await pool.query(" SELECT  * FROM contacto ");
+    //const contactos  = await pool.query("SELECT * FROM contacto  AS t WHERE t.keys_words != '' ");
 
     contactos.forEach((element, i) => {
-        var separa = element["keys_words"].split(",");
+        
         //console.log(separa);
         var categoria = "";
-        separa.forEach(element => {
-            if (element != "")
-            {
-                categoria = categoria + infokeys[element] + " ,";
-            }
-        });
+        if (element["keys_words"] != null)
+        {
+            var separa = element["keys_words"].split(",");
+            separa.forEach(element => {
+                if (element != "")
+                {
+                    categoria = categoria + infokeys[element] + " ,";
+                }
+            });
+        }
+        if (categoria.length > 0)
+        {
+            categoria = categoria.substring(0,categoria.length - 1);
+        }
         contactos[i]["keys_words"] = categoria;
     });
 
@@ -49,22 +57,32 @@ router.get('/listadov', isLoggedIn, async (req, res) => {
     });
 
 
-    //const contactos  = await pool.query(" SELECT  * FROM contacto ");
-    const contactos  = await pool.query("SELECT * FROM contacto  AS t WHERE t.keys_words != '' ");
+    const contactos  = await pool.query(" SELECT  * FROM contacto ");
+    //const contactos  = await pool.query("SELECT * FROM contacto  AS t WHERE t.keys_words != '' ");
 
     contactos.forEach((element, i) => {
-        var separa = element["keys_words"].split(",");
         //console.log(separa);
         var categoria = "";
-        separa.forEach(element => {
-            if (element != "")
-            {
-                categoria = categoria + infokeys[element] + " ,";
-            }
-        });
+        if (element["keys_words"] != null)
+        {
+            var separa = element["keys_words"].split(",");
+
+            separa.forEach(element => {
+                if (element != "")
+                {
+                    categoria = categoria + infokeys[element] + " ,";
+                }
+            });
+        }
+        if (categoria.length > 0)
+        {
+            categoria = categoria.substring(0,categoria.length - 1);
+        }
         contactos[i]["keys_words"] = categoria;
     });
 
+
+    
     res.render('contacto/listado', { visor:true, contactos , req ,layout: 'template'});
 }); 
 
@@ -154,5 +172,63 @@ router.post('/addContacto', async (req,res) => {
 
 });
 
+// /contacto/delete/2475
+router.get('/contacto/delete/:id', async (req, res) => {
+    const { id } = req.params;
+    
+
+    const nombre = await pool.query('SELECT * FROM contacto WHERE id = ?', [id]);
+   //console.log(nombre);
+
+    await pool.query('DELETE FROM contacto WHERE id = ?', [id]);
+    //res.redirect('/mantenedores/usuario');
+
+    
+    const verToask = {
+    
+        titulo : nombre[0].name,
+        body   : "Se ha eliminado correctamente ",
+        tipo   : "Eliminar"
+    };
+
+  
+    const keys_words  = await pool.query("SELECT * FROM contacto_key");
+    const infokeys = {};
+    keys_words.forEach(function(elemento, indice, array) {
+        if (infokeys[elemento.id_contacto_key] === undefined)
+        {
+            infokeys[elemento.id_contacto_key] = elemento.descripcion;
+        }
+    });
+
+
+    const contactos  = await pool.query(" SELECT  * FROM contacto ");
+    //const contactos  = await pool.query("SELECT * FROM contacto  AS t WHERE t.keys_words != '' ");
+
+    contactos.forEach((element, i) => {
+        
+        //console.log(separa);
+        var categoria = "";
+        if (element["keys_words"] != null)
+        {
+            var separa = element["keys_words"].split(",");
+            separa.forEach(element => {
+                if (element != "")
+                {
+                    categoria = categoria + infokeys[element] + " ,";
+                }
+            });
+        }
+        if (categoria.length > 0)
+        {
+            categoria = categoria.substring(0,categoria.length - 1);
+        }
+        contactos[i]["keys_words"] = categoria;
+    });
+
+    res.render('contacto/listado', { verToask, contactos , req ,layout: 'template'});
+
+    
+});
 
 module.exports = router;

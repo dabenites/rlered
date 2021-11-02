@@ -200,6 +200,7 @@
 function cargaTrackingFacura ( idEstado)
 {
     // 
+    //alert(idEstado);
     switch(idEstado)
     {
         case 0:
@@ -208,13 +209,39 @@ function cargaTrackingFacura ( idEstado)
         document.ingresoTrackingFactura.submit();
         break;
         case 1:
-        $("#estado").val(idEstado);
-        document.ingresoTrackingFactura.submit();
+        // tengo que validar todos los campos que son requeridos. 
+        //alert("Validar los campos");
+        var id_empresa  = $("#empresa").val();
+        var fecha_fact  = $("#fechaFactura").val(); 
+        var numFactura  = $("#numFactura").val(); 
+        var valorUF     = $("#valorUF").val();
+
+        if (id_empresa !== 0 && fecha_fact !== "" && numFactura !== "" && valorUF !== "")
+        {
+            //alert(id_empresa + " //// " + fecha_fact);
+            $("#estado").val(idEstado);
+            document.ingresoTrackingFactura.submit();
+        }
+        else
+        {
+            alert("Ingresar los datos de contabilidad");
+        }
+
+        
         break;
         case 2:
         // Passar la factura a pagada 
         $("#estado").val(idEstado);
-         document.ingresoTrackingFactura.submit();
+        var fechaPagoFactura  = $("#fechaPagoFactura").val();
+        if ( fecha_fact !== "")
+        {
+            document.ingresoTrackingFactura.submit();
+        }
+        else
+        {
+            alert("Ingresar la fecha de pago");
+        }
+         
         break;
         case 3:
         // Passar la factura a Suspendida 

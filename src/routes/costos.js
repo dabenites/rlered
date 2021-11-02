@@ -9,6 +9,7 @@ var dateFormat = require('dateformat');
 const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
 const { isArray } = require('util');
+const { isEmptyObject } = require('jquery');
 
 router.post('/fileupload', async (req,res) => {
    
@@ -583,7 +584,33 @@ router.post('/ajax', express.json({type: '*/*'}), async (req,res) => {
 
 router.post('/ajaxNombre', express.json({type: '*/*'}), async (req,res) => {
     //res.json(req.body);
-    res.send("1");
+
+    // validar no exista un valor con el mismo nombre que se ingreso. 
+
+    const {NombreContacto} =     req.body;
+
+    //console.log(NombreContacto);
+    const contactos = await pool.query("SELECT  * FROM contacto where name = '"+NombreContacto+"'"  );
+    if (contactos.length === 0)
+    {
+        if (NombreContacto === "")
+        {
+            res.send("Ingresar un nombre de contacto valido");
+        }
+        else
+        {
+            res.send("1");
+        }
+        
+    }
+    else
+    {
+        //alert("Existe un contacto con el mismo nombre");
+        //console.log("existe un contacto con el mismo nombre");
+        res.send("Existe un contacto con el mismo nombre");
+    }
+
+    
 });
 
 module.exports = router;

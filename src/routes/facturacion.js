@@ -7,7 +7,11 @@ var dateFormat = require('dateformat');
 
 router.post('/ingresoTrackingFactura', isLoggedIn, async (req, res) => {
 
+
+    
+
     const { estado ,id}    = req.body;    
+    //console.log(req.body);
     switch(estado)
     {
         case "0":
@@ -34,7 +38,8 @@ router.post('/ingresoTrackingFactura', isLoggedIn, async (req, res) => {
             " WHERE id = "+id+"");
 
         break;
-        case "0":
+        case "1":
+            //console.log(req.body);
             var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
             const newTrackingFacturacion4  ={ //Se gurdaran en un nuevo objeto
                 id_factura:id,
@@ -50,14 +55,13 @@ router.post('/ingresoTrackingFactura', isLoggedIn, async (req, res) => {
             };
             //    
             //console.log(req.body);
-            const result6 = await pool.query('INSERT INTO fact_facturas_tracking set ? ', [newTrackingFacturacion3]); // pasar a informacion 
+            const result6 = await pool.query('INSERT INTO fact_facturas_tracking set ? ', [newTrackingFacturacion4]); // pasar a informacion 
             const result7 = await pool.query("UPDATE " +
             " fact_facturas " +
             " set id_estado = 2 , " +
             " num_factura = '" + req.body.numFactura+ "', " +
             " fecha_factura = '" + req.body.fechaFactura+ "', " +
-            " uf_dia = '" + req.body.valorUF+ "', " +
-            " comentario = '" + req.body.comentarios+ "' " +
+            " uf_dia = '" + req.body.valorUF+ "' " +
             " WHERE id = "+id+"");
 
         break;
@@ -142,11 +146,12 @@ router.post('/ingresoTrackingFactura', isLoggedIn, async (req, res) => {
          } 
      };
 
-     //console.log(facturacion);
 
+     
     res.render('facturacion/facturas', {facturacion , estados, req ,layout: 'template', helpers : {
         if_equal : isEqualHelperHandlerbar
     }});
+    
 
 
 }); 

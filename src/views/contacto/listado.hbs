@@ -1,3 +1,23 @@
+<style>
+	.close {
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+}
+.close:not(:disabled):not(.disabled) {
+    cursor: pointer;
+}
+button.close {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    -webkit-appearance: none;
+}
+</style>
 <div class="x_panel">
 	<div class="x_title">
 	    <h2>Lista de contactos<small></small></h2>
@@ -8,7 +28,7 @@
 			{{#if visor }}
 				
 			{{else}}	
-				<a data-toggle="modal" data-target=".bs-example-modal-lg"><button class="btn btn-success"> <i class="fa fa-user"> Agregar Contacto </i> </button> </a>
+				<a data-toggle="modal" data-target=".bs-example-modal-lg"><button class="btn btn-success" onclick="verFormulario();"> <i class="fa fa-user"> Agregar Contacto </i> </button> </a>
 			{{/if}}
         </ul>
 	    <div class="clearfix"></div>
@@ -23,6 +43,11 @@
                                     <th>Celular</th>
                                     <th>Comentario</th>
                                     <th>Categoría</th>
+									{{#if visor }}
+				
+									{{else}}	
+										<th>Opciones</th>
+									{{/if}}
                                 </tr>
                             </thead>
                             <tbody>
@@ -34,6 +59,13 @@
                                     <td>{{movil}}</td>
                                     <td>{{comments}}</td>
                                     <td>{{keys_words}}</td>
+									{{#if visor }}
+				
+									{{else}}	
+										<td>
+											<a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="contacto/delete/{{id}}" > Eliminar</a>
+										</td>
+									{{/if}}
                                 </tr>
                                 {{/each}} 
                             </tbody>
@@ -43,7 +75,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel" >Agregar Contactcos</h4>
+                    <h4 class="modal-title" id="myModalLabel" >Agregar Contactos</h4>
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
                     </button>
                 </div>
@@ -54,7 +86,7 @@
 								<td></td>
 								<td style="padding-right:5px;" align=right class="PopUpCheck">Nombre</td>
 								<td colspan="3" class="PopUpCheck"> 
-									<input class="form-control" placeholder="Nombre Contancto" id="iNombreContacto" name="iNombreContacto" onkeypress="desactivaIngreso();"> 
+									<input class="form-control" placeholder="Nombre Contancto" id="iNombreContacto" required name="iNombreContacto" onkeypress="desactivaIngreso();"> 
 								</td>
 							</tr>
 							<tr>
@@ -78,8 +110,8 @@
                 </div>
 				<div class="modal-footer">
 						<!-- <button type="button" class="btn btn-default" id="buttonVolver" name="buttonVolver" onclick="VerificarIngresoPopUp();" style="display:none;">Volver</button> -->
-						<button type="button" class="btn btn-secondary" id="buttonCerrar" name="buttonCerrar" data-dismiss="modal" onclick="habilitarIngreso();">Cerrar</button>
-					    <button type="button" class="btn btn-primary" id="buttonInsertContacto" name="buttonInsertContacto" disabled onclick="FormIngresoContacto();">Siguiente</button>
+						<!-- <button type="button" class="btn btn-secondary" id="buttonCerrar" name="buttonCerrar" data-dismiss="modal" onclick="habilitarIngreso();">Cerrar</button> -->
+					    <!-- <button type="button" class="btn btn-primary" id="buttonInsertContacto" name="buttonInsertContacto" disabled onclick="FormIngresoContacto();">Siguiente</button> -->
 				</div>
 
             </div>
@@ -95,6 +127,13 @@
 <script src="../../../template/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
 
 <script>
+function verFormulario()
+{
+$('.PopUpCheck').show();
+$('#respVerificacion').html('');
+$('#iNombreContacto').val(''); 
+
+}
 function VerificarIngreso ( )
 {
 	
@@ -119,7 +158,7 @@ function VerificarIngreso ( )
 								} 
 						});
 						
-		if (TableContactoForm == "1")
+		if (TableContactoForm === "1")
 		{
 			document.getElementById("respVerificacion").innerHTML = "";
 			FormIngresoContacto();
@@ -154,7 +193,7 @@ function desactivaIngreso ()
 
 function habilitarIngreso ( )
 {
-	document.getElementById("respVerificacion").innerHTML = '';	
+	//	document.getElementById("respVerificacion").innerHTML = '';	
 }
 
 

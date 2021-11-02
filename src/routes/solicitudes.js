@@ -126,9 +126,9 @@ router.post('/getDiasEs', async (req,res) => {
 
 router.post('/getDiasIngresados', async (req,res) => {
   
-  const dias = await pool.query("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id FROM sol_selec_dias AS t WHERE t.idUsuario = " + req.user.idUsuario + " AND t.idEstado = 1"); 
+  const dias = await pool.query("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id FROM sol_selec_dias AS t WHERE t.idUsuario = " + req.user.idUsuario + " AND t.idEstado = 1 ORDER BY fecha DESC"); 
   
-  //console.log("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id FROM sol_selec_dias AS t WHERE t.idUsuario = "+req.user.idUsuario+" AND t.idEstado = 1");
+  //console.log("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id FROM sol_selec_dias AS t WHERE t.idUsuario = " + req.user.idUsuario + " AND t.idEstado = 1");
 
   //console.log(dias);
   
@@ -201,7 +201,7 @@ router.get('/eventos', async (req,res) => {
             start : dateFormat(element.fecha, "yyyy-mm-dd"),
             display : 'background',
             overlap: false,
-            color: '#FFF333'
+            color:  '#0d6efd'
         }
           diaSolicitados.push(ingresando);
         break;  
@@ -210,7 +210,7 @@ router.get('/eventos', async (req,res) => {
             start : dateFormat(element.fecha, "yyyy-mm-dd"),
             display : 'background',
             overlap: false,
-            color: '#33C4FF'
+            color: '#de980b'
         }
         diaSolicitados.push(solicitado);
           break;
@@ -239,16 +239,20 @@ router.get('/vacacionesDiaRle', async (req,res) => {
   dias.forEach(element => {
     
         
-          const diaVacaciones = {
+          const background = {
             start : dateFormat(element.fecha, "yyyy-mm-dd"),
             display : 'background',
             overlap: false,
-            color: '#33FF58',
-            title : element.NombreCompleto
-            
-            
+            color: '#33FF58',           
         }
-        vacacionesRLE.push(diaVacaciones);
+        const eventos = {
+          start : dateFormat(element.fecha, "yyyy-mm-dd"),
+          color: '#black',
+          title : element.Nombre,
+          background:"#33FF58"           
+      }
+        vacacionesRLE.push(background);
+        vacacionesRLE.push(eventos);
         
 
       
@@ -300,22 +304,50 @@ res.send("OK");
 router.post('/AddIngreso', async (req,res) => {
 
   
-  console.log(req.body)
+  //onsole.log(req.body)
   var idUsuario =  req.user.idUsuario;
   var idAprobador =  req.body.idAprobador;
   var idInformar = req.body.idInformar;
   var comentario = req.body.comentario;
   var fecha = new Date();
 
+  const datos = JSON.parse(JSON.stringify(req.body));
 
-  var variables = req.body.split(",");
+  let informacion = [];
 
+  for (const property in datos) {
+    var arrPartes = property.split('_');
+    if (arrPartes.length === 2)
+    {
+      if (arrPartes[0] === 'tipodia')
+      {
+          if (datos ['dia_'+arrPartes[1]] === undefined)
+          {
+            // dia completo.
+            const vaca  ={ 
 
-  console.log("asdad");
-  console.log(variables);comentario
-
+              mediodia :  'N',
+              id: arrPartes[1],
+              hora : 'AM'
+            };
+            informacion.push(vaca);
+          }
+          else
+          {
+            // medio dia. 
+            const vaca  ={ 
+              mediodia :  'Y',
+              id: arrPartes[1],
+              hora : datos[property]
+            };
+            informacion.push(vaca);
+          }
+      }
+    }
+  }
+  
   //Se gurdaran en un nuevo objeto
-  /*
+  
   const vaca  ={ 
 
     idUsuario :  idUsuario,
@@ -326,19 +358,22 @@ router.post('/AddIngreso', async (req,res) => {
     comentario:comentario,
     idEstado: '1'
   }
-  */
+  
     //Guardar datos en la BD      
 
-  //  const infoSolicitud = await pool.query('INSERT INTO sol_solicitud  set ? ', [vaca]);
+   const infoSolicitud = await pool.query('INSERT INTO sol_solicitud  set ? ', [vaca]);
 
     
-   // var key = infoSolicitud.insertId
+   var key = infoSolicitud.insertId
 
     //console.log("UPDATE sol_selec_dias set idEstado = 2 , idSolicitud = "+key+"  WHERE idEstado = 1 AND idUsuario = "+idUsuario+" ");
   //  const result = await pool.query("UPDATE sol_selec_dias set idEstado = 2 , idSolicitud = "+key+"  WHERE idEstado = 1 AND idUsuario = "+idUsuario+" ");
 
+  informacion.forEach(element => {
+    const result = pool.query("UPDATE sol_selec_dias set idEstado = 2 , idSolicitud = "+key+" , medioDia = '"+element.mediodia+"', hora = '"+element.hora+"'  WHERE idEstado = 1 AND id = "+element.id+" ");
+  });
 
-   // res.redirect("../solicitudes/vacaciones");
+   res.redirect("../solicitudes/vacaciones");
 
 
 });
@@ -521,9 +556,9 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
                                               
                                             " GROUP BY t2.idSolicitud ");
 
-
-
-  const diasFecha = await pool.query("SELECT  DATE_FORMAT(t1.fecha, '%Y-%m-%d') as fecha " +
+  const diasFecha = await pool.query("SELECT  DATE_FORMAT(t1.fecha, '%Y-%m-%d') as fecha, " +
+                                     "   if (t1.medioDia = 'Y', ' Medio dia', ' Dia completo') AS mediodia, " +
+                                     " if (t1.medioDia = 'Y', if(t1.hora = 'AM', ' Mañana',' Tarde'), '') AS hora " +
                                      " FROM  " +
                                               " sol_selec_dias AS t1 " +
                                      " WHERE  " +

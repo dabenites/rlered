@@ -59,7 +59,7 @@ button.close {
                                     <td>{{movil}}</td>
                                     <td>{{comments}}</td>
                                     <td>{{keys_words}}</td>
-									{{#if visor }}
+									{{#if ../visor }}
 				
 									{{else}}	
 										<td>
@@ -336,7 +336,35 @@ function creaObjetoContacto ()
                     }
                 } );
             } );
+	
+	/*$('#tablaContacto tfoot th').each( function () {
+        var title = $(this).text();
+        $(this).html( '<input type="text" placeholder="'+title+'" />' );
+    } );
+	*/
 
+	    // DataTable
+   /*
+    var table = $('#tablaContacto').DataTable({
+		fixedHeader: true,
+		orderCellsTop: false,
+        initComplete: function () {
+            // Apply the search
+            this.api().columns().every( function () {
+                var that = this;
+ 
+                $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                    if ( that.search() !== this.value ) {
+                        that
+                            .search( this.value )
+                            .draw();
+                    }
+                } );
+            } );
+        }
+    });
+	*/
+	
     var table =  $('#tablaContacto').DataTable({
            orderCellsTop: true,
         fixedHeader: true,
@@ -362,4 +390,5 @@ function creaObjetoContacto ()
             "previous": "Anterior"
         }
     }});
+	
 </script>

@@ -312,7 +312,7 @@ router.get('/addPro', async (req, res) => {
 // listado
 router.get('/listado', async (req, res) => {
 
-  const proyectos = await pool.query("SELECT * FROM pro_proyectos AS t1  ORDER BY t1.id  DESC LIMIT 1000");
+  const proyectos = await pool.query("SELECT * FROM pro_proyectos AS t1  ORDER BY t1.id");
 
   res.render('proyecto/listado', { proyectos, req, layout: 'template' });
 
@@ -350,13 +350,7 @@ router.get('/facturar/:id', async (req, res) => {
                                         " ORDER BY fechaSolicitante DESC");
 
   
-                                        
-  // validar que el proyecto pueda realizar una facturacion 
-  //console.log("Verificar los parametros del proyecto");
-  // para poder realizar una facturacion es necesario todos los campos de proyectos enviados en mail.
-
-  //console.log(proyectos[0]);
-
+                                      
   const { nombre,year, code,id_tipo_proyecto,id_tipo_servicio,id_estado,id_director,id_jefe,id_mandante,id_cliente,id_arquitecto,
     id_revisor,id_complejidad,latitud,altitud,direccion,superficie_ppto,superficie,valor_proyecto,valor_metro_cuadrado,fecha_inicio,
     fecha_entrega,fecha_termino,num_pisos,num_subterraneo,zona,suelo,num_plano_estimado} = proyectos[0];
@@ -375,16 +369,23 @@ router.get('/facturar/:id', async (req, res) => {
   res.render('proyecto/facturar', { factura:true,facturacion,monedas,tipoCobro, proyecto: proyectos[0], req, layout: 'template' });
   else
   res.render('proyecto/facturar', { facturacion,monedas,tipoCobro, proyecto: proyectos[0], req, layout: 'template' });
+});
 
+router.get('/editar/:id', async (req, res) => {
+  const { id } = req.params;
+ 
+  const tipo = await pool.query("SELECT * FROM proyecto_tipo");
+  const estado = await pool.query("SELECT * FROM pro_costo_externo_estado");
+  
+  // // 
 
-  
-  
-  
+  const proyectos = await pool.query("SELECT * FROM pro_proyectos AS t1 WHERE t1.id = ?",[id]);
 
+  console.log(proyectos[0]);
+  res.render('proyecto/uptProyecto', { proyecto:proyectos[0], tipo,estado, req, layout: 'template' });
 
 
 });
-
 
 router.get('/buscarDirector/:find', async (req, res) => {
   
@@ -501,7 +502,7 @@ router.post('/cargarProyecto', async (req, res) => {
 
   const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie,id_director,id_jefe,
     id_mandante,id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_ppto,
-    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,num_planos_estimado} = req.body;
+    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado} = req.body;
 
     //console.log(req.body);
 
@@ -534,6 +535,7 @@ router.post('/cargarProyecto', async (req, res) => {
        num_subterraneo : num_subte,
        zona : zona,
        suelo : suelo,
+       categoria : categoria,
        num_plano_estimado : num_planos_estimado
      };
   
@@ -571,6 +573,7 @@ router.post('/cargarProyecto', async (req, res) => {
      num_subterraneo : num_subte,
      zona : zona,
      suelo : suelo,
+     categoria : categoria,
      num_plano_estimado : num_planos_estimado,
      fecha_estado : fecha_ingreso,
      id_usuario : req.user.idUsuario
@@ -580,7 +583,7 @@ router.post('/cargarProyecto', async (req, res) => {
 
 
   const tipo = await pool.query("SELECT * FROM proyecto_tipo");
-  const estado = await pool.query("SELECT * FROM pro_costo_externo_estado");
+  const estado = await pool.query("SELECT * FROM pro_costo_externo_estado"); // REVISAR 
 
   res.render('proyecto/addProyecto', { tipo,estado, req, layout: 'template' });
   

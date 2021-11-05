@@ -471,7 +471,7 @@ router.get('/avacaciones', isLoggedIn, async (req, res) => {
 
 
   // Seleccicionar los días que el ha ingresado
-  const soliVacaciones  = await pool.query(" SELECT COUNT (*) AS Dias, t3.*, t1.id"+
+  const soliVacaciones  = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id"+
                                   " FROM  " +
                                               " sol_solicitud AS t1 ,  " +
                                               " sol_selec_dias AS t2 ,  " +
@@ -489,8 +489,7 @@ router.get('/avacaciones', isLoggedIn, async (req, res) => {
                                   " AND  " +
                                               " t1.idUsuario = t3.idUsuario "+ 
                                   "   GROUP BY t2.idSolicitud ");
-                                  
-  //console.log(soliVacaciones);
+
   //console.log(req.user);
   res.render('proyecto/avacaciones', {soliVacaciones , req , layout: 'template'});
 });
@@ -500,7 +499,7 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
   //console.log(req.body);
   const { id } = req.params;
    // Seleccicionar los días que el ha ingresado
-   const soliVacaciones  = await pool.query(" SELECT COUNT (*) AS Dias, t3.*, t1.id"+
+   const soliVacaciones  = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id"+
    " FROM  " +
                " sol_solicitud AS t1 ,  " +
                " sol_selec_dias AS t2 ,  " +
@@ -518,7 +517,7 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
                " t1.idUsuario = t3.idUsuario "+
    " GROUP BY t2.idSolicitud ");
 
-  const selecciona = await pool.query(" SELECT COUNT (*) AS Dias, t3.*, t1.id, t1.fecha , t1.comentario, t1.fecha, DATE_FORMAT(t1.fecha, '%Y-%m-%d') as fecha "+
+  const selecciona = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t1.fecha , t1.comentario, t1.fecha, DATE_FORMAT(t1.fecha, '%Y-%m-%d') as fecha "+
   " FROM  " +
               " sol_solicitud AS t1 ,  " +
               " sol_selec_dias AS t2 ,  " +
@@ -536,7 +535,7 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
 
 
 
-  const seleccionaList = await pool.query(" SELECT COUNT (*) AS Dias, t3.*, t1.id, t1.fecha, DATE_FORMAT(t1.fecha, '%d-%m-%Y') as fecha"+
+  const seleccionaList = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t1.fecha, DATE_FORMAT(t1.fecha, '%d-%m-%Y') as fecha"+
   
                                             " FROM  " +
                                                         " sol_solicitud AS t1 ,  " +

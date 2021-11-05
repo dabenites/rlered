@@ -161,17 +161,18 @@ router.get('/facturas', isLoggedIn, async (req, res) => {
 
     // buscar el listado de todas las facturas.
 
-    const estados =  await pool.query("SELECT * FROM fact_estados as t1");
+    const estados =  await pool.query("SELECT * FROM fact_estados as t1 UNION SELECT '%', 'Todos' FROM fact_estados WHERE id = 0");
     const facturacion =  await pool.query("SELECT " +
                                                     " *, " +
                                                     " t1.id as idFacturacion," +
                                                     " t2.nombre As nomPro ," +
                                                     " DATE_FORMAT(t1.fecha_solicitud, '%Y-%m-%d') as fechaSolicitante ," +
                                                     " t5.descripcion As estadoDes," +
-                                                    " t6.descripcion As tipoCobroDes" +
+                                                    " t6.descripcion As tipoCobroDes ," +  
+                                                    " t2a.name As nameCliente " +
                                           " FROM " +
                                                       "fact_facturas as t1 LEFT JOIN  sys_usuario as t4 ON t1.id_solicitante = t4.idUsuario, " +
-                                                      "pro_proyectos as t2, "+ 
+                                                      "pro_proyectos as t2 LEFT JOIN  contacto as t2a ON t2.id_cliente = t2a.id, "+ 
                                                       "moneda_tipo as t3, "+ 
                                                       "fact_estados as t5, "+ 
                                                       "fact_tipo_cobro as t6 "+
@@ -212,17 +213,26 @@ router.post('/facturas', isLoggedIn, async (req, res) => {
     // buscar el listado de todas las facturas.
     const { estado } = req.body; 
     //console.log(estado);
-    const estados =  await pool.query("SELECT * FROM fact_estados as t1");
+
+    var estadoLogica =  " AND t5.id = "+estado+" ";
+    if (estado == "%")
+    {
+        estadoLogica = " ";
+    }
+
+    const estados =  await pool.query("SELECT * FROM fact_estados as t1 UNION SELECT '%', 'Todos' FROM fact_estados WHERE id = 0");
+
     const facturacion =  await pool.query("SELECT " +
                                                     " *, " +
                                                     " t1.id as idFacturacion," +
                                                     " t2.nombre As nomPro ," +
                                                     " DATE_FORMAT(t1.fecha_solicitud, '%Y-%m-%d') as fechaSolicitante ," +
                                                     " t5.descripcion As estadoDes," +
-                                                    " t6.descripcion As tipoCobroDes" +
+                                                    " t6.descripcion As tipoCobroDes," +
+                                                    " t2a.name As nameCliente" +
                                           " FROM " +
                                                       "fact_facturas as t1 LEFT JOIN  sys_usuario as t4 ON t1.id_solicitante = t4.idUsuario, " +
-                                                      "pro_proyectos as t2, "+ 
+                                                      "pro_proyectos as t2 LEFT JOIN  contacto as t2a ON t2.id_cliente = t2a.id, "+ 
                                                       "moneda_tipo as t3, "+ 
                                                       "fact_estados as t5, "+ 
                                                       "fact_tipo_cobro as t6 "+
@@ -232,8 +242,7 @@ router.post('/facturas', isLoggedIn, async (req, res) => {
                                                     " t1.id_tipo_moneda = t3.id_moneda"+
                                         " AND " + 
                                                     " t5.id = t1.id_estado"+
-                                        " AND " + 
-                                                    " t5.id = "+estado+""+
+                                                    estadoLogica +
                                         " AND " + 
                                                     " t6.id = t1.id_tipo_cobro"+
                                         " ORDER BY fechaSolicitante DESC");

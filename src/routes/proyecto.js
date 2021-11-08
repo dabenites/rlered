@@ -375,14 +375,46 @@ router.get('/editar/:id', async (req, res) => {
   const { id } = req.params;
  
   const tipo = await pool.query("SELECT * FROM proyecto_tipo");
-  const estado = await pool.query("SELECT * FROM pro_costo_externo_estado");
+
+  const servicio = await pool.query("SELECT * FROM proyecto_servicio");
+
+  const complejidad = await pool.query("SELECT * FROM proyecto_complejidad");
+
+  const estado = await pool.query("SELECT * FROM proyecto_estado");
+
+  
   
   // // 
 
-  const proyectos = await pool.query("SELECT * FROM pro_proyectos AS t1 WHERE t1.id = ?",[id]);
+  const proyectos = await pool.query("SELECT * , t1.id as idPro, " +
+                                    " t1a.idUsuario AS idDir, " +
+                                     " t1a.Nombre AS nomDir, " +
+                                     " t1b.idUsuario AS idJefe, t1b.Nombre AS nomJefe, " +
+                                     " t1c.id AS idMan , t1c.name nomMan, " +
+                                     " t1d.id AS idCli , t1d.name nomCli, " +
+                                     " t1e.id AS idArq , t1e.name nomArq, " +
+                                     " t1f.id AS idRev , t1f.name nomRev " +
+                                     " FROM pro_proyectos AS t1 " +
+                                     " LEFT JOIN sys_usuario AS t1a ON t1.id_director = t1a.idUsuario " +
+                                     " LEFT JOIN sys_usuario AS t1b ON t1.id_jefe = t1b.idUsuario " +
+                                     " LEFT JOIN contacto AS t1c ON t1.id_mandante = t1c.id " +
+                                     " LEFT JOIN contacto AS t1d ON t1.id_cliente = t1d.id " +
+                                     " LEFT JOIN contacto AS t1e ON t1.id_arquitecto = t1e.id " +
+                                     " LEFT JOIN contacto AS t1f ON t1.id_revisor = t1f.id " +
+                                     " WHERE t1.id = ?",[id]);
 
   console.log(proyectos[0]);
-  res.render('proyecto/uptProyecto', { proyecto:proyectos[0], tipo,estado, req, layout: 'template' });
+
+  const isEqualHelperHandlerbar = function(a, b, opts) {
+          if (a == b) {
+              return true
+          } else { 
+              return false
+          } 
+      };
+
+
+  res.render('proyecto/uptProyecto', { proyecto:proyectos[0], tipo, complejidad, servicio, estado, req, layout: 'template' , helpers : { if_equal : isEqualHelperHandlerbar}});
 
 
 });
@@ -589,6 +621,101 @@ router.post('/cargarProyecto', async (req, res) => {
   
 
 });
+
+
+router.post('/ActualizarProyecto', async (req, res) => {
+
+  const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie,id_director,id_jefe,
+    id_mandante,id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_ppto,
+    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado , id} = req.body;
+
+  
+  var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
+  //req.user.idUsuario
+
+  const Proyecto = { //Se gurdaran en un nuevo objeto
+    // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
+     nombre: nombre,
+     year: year,
+     code:code,
+     id_tipo_proyecto: id_tipo_proyecto,
+     id_tipo_servicio: id_servicio,
+     id_estado: id_Estado,
+     id_director: id_director,
+     id_jefe: id_jefe,
+     id_mandante: id_mandante,
+     id_cliente: id_cliente,
+     id_arquitecto: id_arquitecto,
+     id_revisor: id_revisor,
+     latitud :loc_lat,
+     altitud : loc_long,
+     direccion : direccion,
+     id_complejidad : id_Complejidad,
+     superficie : superficie,
+     superficie_ppto : superficie_ppto,
+     valor_proyecto : valor_proyecto,
+     valor_metro_cuadrado : valor_x_m2,
+     fecha_inicio : fecha_inicio,
+     fecha_entrega : fecha_entrega,
+     fecha_termino : fecha_termino,
+     num_pisos : num_pisos,
+     num_subterraneo : num_subte,
+     zona : zona,
+     suelo : suelo,
+     categoria : categoria,
+     num_plano_estimado : num_planos_estimado
+   };
+
+   const resultTrackingProyecto = await pool.query('UPDATE pro_proyectos set ? WHERE id = ?', [Proyecto,id]);
+
+
+  const newProyectoTracking = { //Se gurdaran en un nuevo objeto
+    // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
+     nombre: nombre,
+     year: year,
+     code:code,
+     id_tipo_proyecto: id_tipo_proyecto,
+     id_tipo_servicio: id_servicio,
+     id_estado: id_Estado,
+     id_director: id_director,
+     id_jefe: id_jefe,
+     id_mandante: id_mandante,
+     id_cliente: id_cliente,
+     id_arquitecto: id_arquitecto,
+     id_revisor: id_revisor,
+     latitud :loc_lat,
+     altitud : loc_long,
+     direccion : direccion,
+     id_complejidad : id_Complejidad,
+     superficie : superficie,
+     superficie_ppto : superficie_ppto,
+     valor_proyecto : valor_proyecto,
+     valor_metro_cuadrado : valor_x_m2,
+     fecha_inicio : fecha_inicio,
+     fecha_entrega : fecha_entrega,
+     fecha_termino : fecha_termino,
+     num_pisos : num_pisos,
+     num_subterraneo : num_subte,
+     zona : zona,
+     suelo : suelo,
+     categoria : categoria,
+     num_plano_estimado : num_planos_estimado,
+     fecha_estado : fecha_ingreso,
+     id_usuario : req.user.idUsuario
+   };
+
+   const resultTracking = await pool.query('INSERT INTO pro_proyectos_tracking set ?', [newProyectoTracking]);
+
+  /*
+  const tipo = await pool.query("SELECT * FROM proyecto_tipo");
+  const estado = await pool.query("SELECT * FROM pro_costo_externo_estado"); // REVISAR 
+*/
+  
+//proyecto/listado
+res.redirect('/proyecto/listado');
+
+});
+//ActualizarProyecto
 
 
 

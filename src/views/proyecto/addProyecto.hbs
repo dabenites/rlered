@@ -188,22 +188,36 @@
             <div class="col-md-12 col-sm-12 ">
                 <div class="col-md-6 col-sm-6 ">
                     <div class="form-group row">
-                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Valor x m2:</label>
-                                <div class="col-md-6 col-sm-6">
-                                    <input type="text" id="valor_x_m2" name="valor_x_m2"  class="form-control">
+                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Tipo Moneda Cobro:</label>
+                                <div class="col-md-5 col-sm-5">
+                                    <select class="select2_single form-control" tabindex="-1" name="id_tipo_cobro" id="id_tipo_cobro" onchange="ModificaTipoCobro();">
+                                        <option value="1">Pesos Chilenos</option>
+                                        <option value="2">Dolar americano</option>
+                                        <option value="4" selected >Unidad de Fomento</option>
+                                        <option value="10">Sol</option>
+                                    </select>
                                 </div>
+                    </div>
+                    <div class="form-group row">
+                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Valor x m2:</label>
+                                <div class="col-md-5 col-sm-5">
+                                    <input type="text" id="valor_x_m2" name="valor_x_m2"  class="form-control" onchange="ModificaValorProyecto();">
+                                </div>
+                                <label class="col-form-label col-md-2 col-sm-2" for="Destinatario" id="monedaM2" name="monedaM2">UF/ m<sup>2</sup></label>
+                    </div>
+                    <div class="form-group row">
+                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie Preliminar:</label>
+                                <div class="col-md-5 col-sm-5">
+                                    <input type="text" id="superficie_pre" name="superficie_pre" class="form-control" onchange="ModificaValorProyecto();">
+                                </div>
+                                <label class="col-form-label col-md-2 col-sm-2" for="Destinatario"> m<sup>2</sup></label>
                     </div>
                     <div class="form-group row">
                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Valor del Proyecto:</label>
-                                <div class="col-md-6 col-sm-6">
-                                    <input type="text" id="valor_proyecto" name="valor_proyecto"  class="form-control">
+                                <div class="col-md-5 col-sm-5">
+                                    <input type="text" id="valor_proyecto" name="valor_proyecto"  class="form-control" readonly>
                                 </div>
-                    </div>
-                    <div class="form-group row">
-                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie :</label>
-                                <div class="col-md-6 col-sm-6">
-                                    <input type="text" id="superficie" name="superficie" class="form-control">
-                                </div>
+                                <label class="col-form-label col-md-2 col-sm-2" for="Destinatario" id="monedaTipo" name="monedaTipo"> UF</label>
                     </div>
                 </div>
                 <div class="col-md-6 col-sm-6 ">
@@ -294,9 +308,9 @@
 		        </div>
         </div>
         <div class="form-group row">
-            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie Ppto</label>
+            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie APL</label>
 				<div class="col-md-7 col-sm-7">
-				    <input type="text" id="superficie_ppto" name="superficie_ppto"  class="form-control">
+				    <input type="text" id="superficie_apl" name="superficie_apl"  class="form-control">
 				</div>
         </div>
         <div class="form-group row">
@@ -352,6 +366,53 @@
     </div>
 </div>
 <script>
+    function ModificaTipoCobro ()
+    {
+        var id_tipo           = $( "#id_tipo_cobro" ).val();
+
+        switch(id_tipo)
+        {
+            case "1":
+            case 1:
+            // "$"
+            $( "#monedaTipo" ).html("$");
+            $( "#monedaM2" ).html("$ /m<sup>2</sup>");
+            break;
+            case "2":
+            case 2:
+            // "US$"
+            $( "#monedaTipo" ).html("US$");
+            $( "#monedaM2" ).html("US$ /m<sup>2</sup>");
+            break;
+            case "4":
+            case 4:
+            // "UF"
+            $( "#monedaTipo" ).html("UF");
+            $( "#monedaM2" ).html("UF /m<sup>2</sup>");
+            break;
+            case "10":
+            case 10:
+            // "S/"
+            $( "#monedaTipo" ).html("S");
+            $( "#monedaM2" ).html("S /m<sup>2</sup>");
+            break;
+        }
+
+    }
+    function ModificaValorProyecto()
+    {
+        var valor_x_m2 = $( "#valor_x_m2" ).val();
+        var superficie    = $( "#superficie_pre" ).val();
+
+        console.log(valor_x_m2);
+        console.log(superficie);
+        if((valor_x_m2 !== null && valor_x_m2 !== '' )
+            && (superficie !== null && superficie !== '' ))
+            {
+                var vproyecto = valor_x_m2 * superficie;
+                $( "#valor_proyecto" ).val(vproyecto);
+            }
+    }
 function validarFormulario()
 {
     // DATOS GENERALES 
@@ -380,14 +441,14 @@ function validarFormulario()
     // DATOS FINANCIEROS 
     var valorxmts     = $( "#valor_x_m2" ).val();
     var valorproyecto = $( "#valor_proyecto" ).val();
-    var superficie    = $( "#superficie" ).val();
+    var superficie    = $( "#superficie_pre" ).val();
     var finicio       = $( "#fecha_inicio" ).val();
     var fentrega      = $( "#fecha_entrega" ).val();
     var ftermino      = $( "#fecha_termino" ).val();
 
     if(valorxmts !== null && valorxmts !== '' ) {$("#valor_x_m2").css({'border-color': '#28a745'});} else {$("#valor_x_m2").css({'border-color': '#dc3545'});estadoEnvio = false;}
     if(valorproyecto !== null && valorproyecto !== '' ) {$("#valor_proyecto").css({'border-color': '#28a745'});} else {$("#valor_proyecto").css({'border-color': '#dc3545'});estadoEnvio = false;}
-    if(superficie !== null && superficie !== '' ) {$("#superficie").css({'border-color': '#28a745'});} else {$("#superficie").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(superficie !== null && superficie !== '' ) {$("#superficie_pre").css({'border-color': '#28a745'});} else {$("#superficie_pre").css({'border-color': '#dc3545'});estadoEnvio = false;}
     if(finicio !== null && finicio !== '' ) {$("#fecha_inicio").css({'border-color': '#28a745'});} else {$("#fecha_inicio").css({'border-color': '#dc3545'});estadoEnvio = false;}
     if(fentrega !== null && fentrega !== '' ) {$("#fecha_entrega").css({'border-color': '#28a745'});} else {$("#fecha_entrega").css({'border-color': '#dc3545'});estadoEnvio = false;}
     if(ftermino !== null && ftermino !== '' ) {$("#fecha_termino").css({'border-color': '#28a745'});} else {$("#fecha_termino").css({'border-color': '#dc3545'});estadoEnvio = false;}

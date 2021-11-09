@@ -533,8 +533,6 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
   " GROUP BY t2.idSolicitud ");
 
 
-
-
   const seleccionaList = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t1.fecha, DATE_FORMAT(t1.fecha, '%d-%m-%Y') as fecha"+
   
                                             " FROM  " +
@@ -543,9 +541,8 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
                                                         " sys_usuario AS t3" +
                                                         
                                             " WHERE  " +
-                                                        " t1.idTipoSolicitud = t1.idTipoSolicitud " +
-                                            " AND  " +
-                                                        " t2.idSolicitud = " + id +""+
+                                                        
+                                                        " t2.idUsuario = " + selecciona[0].idUsuario +""+
                                             " AND  " +
                                                         " t1.id = t2.idSolicitud"+
                                             " AND  " +
@@ -554,6 +551,7 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
                                                         " t1.idEstado = 3 "+
                                               
                                             " GROUP BY t2.idSolicitud ");
+
 
   const diasFecha = await pool.query("SELECT  DATE_FORMAT(t1.fecha, '%Y-%m-%d') as fecha, " +
                                      "   if (t1.medioDia = 'Y', ' Medio dia', ' Dia completo') AS mediodia, " +

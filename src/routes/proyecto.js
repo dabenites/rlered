@@ -382,7 +382,7 @@ router.get('/editar/:id', async (req, res) => {
 
   const estado = await pool.query("SELECT * FROM proyecto_estado");
 
-  
+  const monedas = await pool.query("SELECT * FROM moneda_tipo as t1 WHERE t1.factura = 'Y'");
   
   // // 
 
@@ -393,7 +393,9 @@ router.get('/editar/:id', async (req, res) => {
                                      " t1c.id AS idMan , t1c.name nomMan, " +
                                      " t1d.id AS idCli , t1d.name nomCli, " +
                                      " t1e.id AS idArq , t1e.name nomArq, " +
-                                     " t1f.id AS idRev , t1f.name nomRev " +
+                                     " t1f.id AS idRev , t1f.name nomRev, " +
+                                     " t1p.simbolo AS simbolo," +
+                                     " CONCAT(t1p.simbolo,' /', 'm <sup> 2</sup>')  AS sm2" +
                                      " FROM pro_proyectos AS t1 " +
                                      " LEFT JOIN sys_usuario AS t1a ON t1.id_director = t1a.idUsuario " +
                                      " LEFT JOIN sys_usuario AS t1b ON t1.id_jefe = t1b.idUsuario " +
@@ -401,9 +403,10 @@ router.get('/editar/:id', async (req, res) => {
                                      " LEFT JOIN contacto AS t1d ON t1.id_cliente = t1d.id " +
                                      " LEFT JOIN contacto AS t1e ON t1.id_arquitecto = t1e.id " +
                                      " LEFT JOIN contacto AS t1f ON t1.id_revisor = t1f.id " +
+                                     " LEFT JOIN moneda_tipo AS t1p ON t1.id_tipo_moneda = t1p.id_moneda " +
                                      " WHERE t1.id = ?",[id]);
 
-  console.log(proyectos[0]);
+  //console.log(proyectos[0]);
 
   const isEqualHelperHandlerbar = function(a, b, opts) {
           if (a == b) {
@@ -414,7 +417,7 @@ router.get('/editar/:id', async (req, res) => {
       };
 
 
-  res.render('proyecto/uptProyecto', { proyecto:proyectos[0], tipo, complejidad, servicio, estado, req, layout: 'template' , helpers : { if_equal : isEqualHelperHandlerbar}});
+  res.render('proyecto/uptProyecto', {monedas, proyecto:proyectos[0], tipo, complejidad, servicio, estado, req, layout: 'template' , helpers : { if_equal : isEqualHelperHandlerbar}});
 
 
 });
@@ -532,9 +535,9 @@ res.redirect('/proyecto/facturar/'+id_proyecto);
 //router.post()
 router.post('/cargarProyecto', async (req, res) => {
 
-  const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie,id_director,id_jefe,
-    id_mandante,id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_ppto,
-    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado} = req.body;
+  const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
+    id_mandante,id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
+    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado,id_tipo_cobro} = req.body;
 
     //console.log(req.body);
 
@@ -543,6 +546,7 @@ router.post('/cargarProyecto', async (req, res) => {
        nombre: nombre,
        year: year,
        code:code,
+       id_tipo_moneda : id_tipo_cobro,
        id_tipo_proyecto: id_tipo_proyecto,
        id_tipo_servicio: id_servicio,
        id_estado: id_Estado,
@@ -556,8 +560,8 @@ router.post('/cargarProyecto', async (req, res) => {
        altitud : loc_long,
        direccion : direccion,
        id_complejidad : id_Complejidad,
-       superficie : superficie,
-       superficie_ppto : superficie_ppto,
+       superficie_pre : superficie_pre,
+       superficie_apl : superficie_apl,
        valor_proyecto : valor_proyecto,
        valor_metro_cuadrado : valor_x_m2,
        fecha_inicio : fecha_inicio,
@@ -594,8 +598,8 @@ router.post('/cargarProyecto', async (req, res) => {
      altitud : loc_long,
      direccion : direccion,
      id_complejidad : id_Complejidad,
-     superficie : superficie,
-     superficie_ppto : superficie_ppto,
+     superficie_pre : superficie_pre,
+     superficie_apl : superficie_apl,
      valor_proyecto : valor_proyecto,
      valor_metro_cuadrado : valor_x_m2,
      fecha_inicio : fecha_inicio,
@@ -625,10 +629,11 @@ router.post('/cargarProyecto', async (req, res) => {
 
 router.post('/ActualizarProyecto', async (req, res) => {
 
-  const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie,id_director,id_jefe,
-    id_mandante,id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_ppto,
-    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado , id} = req.body;
+  const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
+    id_mandante,id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
+    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado , id,id_tipo_cobro} = req.body;
 
+  //  console.log(req.body);
   
   var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
   //req.user.idUsuario
@@ -638,6 +643,7 @@ router.post('/ActualizarProyecto', async (req, res) => {
      nombre: nombre,
      year: year,
      code:code,
+     id_tipo_moneda : id_tipo_cobro,
      id_tipo_proyecto: id_tipo_proyecto,
      id_tipo_servicio: id_servicio,
      id_estado: id_Estado,
@@ -651,8 +657,8 @@ router.post('/ActualizarProyecto', async (req, res) => {
      altitud : loc_long,
      direccion : direccion,
      id_complejidad : id_Complejidad,
-     superficie : superficie,
-     superficie_ppto : superficie_ppto,
+     superficie_pre : superficie_pre,
+     superficie_apl : superficie_apl,
      valor_proyecto : valor_proyecto,
      valor_metro_cuadrado : valor_x_m2,
      fecha_inicio : fecha_inicio,
@@ -674,6 +680,7 @@ router.post('/ActualizarProyecto', async (req, res) => {
      nombre: nombre,
      year: year,
      code:code,
+     id_tipo_moneda : id_tipo_cobro,
      id_tipo_proyecto: id_tipo_proyecto,
      id_tipo_servicio: id_servicio,
      id_estado: id_Estado,
@@ -687,8 +694,8 @@ router.post('/ActualizarProyecto', async (req, res) => {
      altitud : loc_long,
      direccion : direccion,
      id_complejidad : id_Complejidad,
-     superficie : superficie,
-     superficie_ppto : superficie_ppto,
+     superficie_pre : superficie_pre,
+     superficie_apl : superficie_apl,
      valor_proyecto : valor_proyecto,
      valor_metro_cuadrado : valor_x_m2,
      fecha_inicio : fecha_inicio,

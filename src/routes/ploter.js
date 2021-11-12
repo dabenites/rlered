@@ -221,6 +221,7 @@ router.get('/buscarPro/:find', async (req, res) => {
     const proyectos =  await pool.query("SELECT t1.id AS id, CONCAT(t1.year,'-',t1.code , ' : ' , t1.nombre) AS value " +
                                         " FROM pro_proyectos as t1 WHERE t1.nombre LIKE '%"+nombre+"%' OR CONCAT(t1.year,'-',t1.code) LIKE '%"+nombre+"%'");
     
+                                        
     res.setHeader('Content-Type', 'application/json');
     res.json(proyectos);
   

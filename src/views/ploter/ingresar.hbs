@@ -14,6 +14,44 @@
         }
     </style>
 </head>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+  .<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+
+<script>
+     var nuevoalias = jQuery.noConflict();
+	    nuevoalias(document).ready(function() {
+	      nuevoalias( function() {
+                nuevoalias( "#proyecto" ).autocomplete({
+                source: "buscarPro/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#idProyecto').val(ui.item.id);
+                }
+                });
+                nuevoalias( "#destinatario" ).autocomplete({
+                source: "buscarDesti/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#idDestinatario').val(ui.item.id);
+                }
+                });
+            } );
+
+    nuevoalias(function() { nuevoalias('#fechaHora').datetimepicker({ 
+        showSecond: false,
+        dateFormat: 'dd-mm-yy',
+      timeFormat: 'hh:mm',
+      stepHour: 1,
+      stepMinute: 30
+    });        });
+        
+
+
+	});
+</script>
 
 <div class="col-md-12 col-sm-12  ">
     <div class="x_panel">
@@ -38,37 +76,43 @@
             </ul>
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="ingreso" role="tabpanel" aria-labelledby="ingreso-tab">
-                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
-                        action="/ploter/addSolicitud" method="POST">
+                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="/ploter/addSolicitud" method="POST">
                         <span class="section">1.- Servicio a solicitar </span>
                         <div class="form-group row">
-                            <label class="col-md-1 col-sm-1  control-label">Impresión:
+                            <label class="col-md-1 col-sm-1"> <b>Trabajos</b>:
                             </label>
                             <div class="col-md-11 col-sm-11 ">
                                 <div class="checkbox">
-                                    <label><input name="impresion" type="checkbox" value="ING" checked /> ING</label>
-                                    <label><input name="impresion" type="checkbox" value="ARQ" /> ARQ</label>
-                                    <label><input name="impresion" type="checkbox" value="Portada" /> Portada</label>
-                                    <label><input name="impresion" type="checkbox" value="Listado" /> Listado</label>
-                                    <label><input name="impresion" type="checkbox" value="Doblado" /> Doblado</label>
-                                    <label><input name="impresion" type="checkbox" value="PDF" /> PDF</label>
-                                    <label><input name="impresion" type="checkbox" value="DWG" /> DWG </label>
-                                    <label><input name="impresion" type="checkbox" value="Otro" /> Otro</label>
+                                    <!-- <label><input name="impresion" type="checkbox" value="ING" checked/> ING </label> -->
+                                    <!-- <label><input name="impresion" type="checkbox" value="ARQ" /> ARQ </label> -->
+                                    <!-- <label><input name="impresion" type="checkbox" value="Listado" /> Listado </label> -->
+
+                                    <label><input name="trabajo" type="checkbox" value="Portada" /> Portada </label>
+                                    <label><input name="trabajo" type="checkbox" value="Lista de Planos" /> Listado Planos</label>
+                                    <label><input name="trabajo" type="checkbox" value="Limpiar planos" /> Limpiar planos</label>
+                                    <label><input name="trabajo" type="checkbox" value="Bindear" /> Bindear</label>
+                                    <label><input name="trabajo" type="checkbox" value="Calculo Areas" /> Calculo Areas</label>
+                                    <label><input name="trabajo" type="checkbox" value="Otro" /> Otro </label>
+
+                                    <!-- <label><input name="impresion" type="checkbox" value="Doblado" /> Doblado </label> -->
+                                    <!-- <label><input name="impresion" type="checkbox" value="PDF" /> PDF </label> -->
+                                    <!-- <label><input name="impresion" type="checkbox" value="DWG" /> DWG </label> -->
+                                    
                                 </div>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-md-1 col-sm-1  control-label">Digital:
-                            </label>
+                            <label class="col-md-1 col-sm-1"> <b> Impresión: </b></label>
                             <div class="col-md-11 col-sm-11 ">
                                 <div class="checkbox">
-                                    <label><input name="digital" type="checkbox" value="Lista de Planos" /> Lista de
-                                        Planos</label>
-                                    <label><input name="digital" type="checkbox" value="CD" /> CD</label>
-                                    <label><input name="digital" type="checkbox" value="Mail" /> Mail</label>
-                                    <label><input name="digital" type="checkbox" value="Calculo Areas" /> Calculo Areas</label>
-                                    <label><input name="digital" type="checkbox" value="Bindear" /> Bindear</label>
-                                    <label><input name="digital" type="checkbox" value="Limpiar planos" /> Limpiar planos</label>
+                                    <label><input name="impresion" type="checkbox" value="Papel" /> Papel</label>
+                                    <label><input name="impresion" type="checkbox" value="Doblado" /> Doblado </label>
+                                    <label><input name="impresion" type="checkbox" value="Firma" /> Firma </label>
+                                    <label><input name="impresion" type="checkbox" value="DigitalExportar" /> Digital/Exportar </label>
+                                    <label><input name="impresion" type="checkbox" value="Mail" /> Mail </label>
+                                    <label><input name="impresion" type="checkbox" value="CD" /> CD </label>
+                                    <label><input name="impresion" type="checkbox" value="Pendrive" /> Pendrive </label>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -80,38 +124,48 @@
                                     <label class="col-form-label col-md-3 col-sm-3 label-align"
                                         for="Proyecto">Proyecto:<span class="required">*</span></label>
                                     <div class="col-md-9 col-sm-9 ">
-                                        <select class="form-control" name="idProyecto" id="idProyecto">
+                                        <!-- <select class="form-control" name="idProyecto" id="idProyecto">
                                             {{#each proyectos}}
                                             <option value="{{id}}">{{year}}-{{code}} : {{nombre}}</option>
                                             {{/each}}
+                                            -->
+                                            <input id="proyecto" name="proyecto"  class="form-control">
+                                            <input type="hidden" id="idProyecto" name="idProyecto"  >
                                         </select>
                                     </div>
                                 </div>
                                 <div class="item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="ruta">Ruta
-                                        Archivos:</label>
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="ruta">Ruta Archivos:</label>
                                     <div class="col-md-9 col-sm-9 ">
-                                        <input type="text" id="ruta" class="form-control" value="" name="ruta"
-                                            placeholder="Ruta del proyecto" />
+                                        <input type="text" id="ruta" class="form-control" value="" name="ruta" placeholder="Ruta del proyecto" />
                                     </div>
                                 </div>
                                 <div class="item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="fechaHora">Fecha y
-                                        Hora Entrega:</label>
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="fechaHora">Fecha y Hora Entrega:</label>
                                     <div class="col-md-9 col-sm-9 ">
-                                        <input type="text" id="fecha" class="form-control" value="03-12-2020"
-                                            name="fecha" placeholder="Ruta del proyecto" />
+                                         <div class="input-group date" id="fechaHora" data-target-input="nearest">
+                                                <input type="text" class="form-control datetimepicker-input" data-target="#fechaHora"/>
+                                                <div class="input-group-append" data-target="#fechaHora" data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+                                                </div>
+                                          </div>
                                     </div>
                                 </div>
+
+
                                 <div class="item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3 label-align"
                                         for="Destinatario">Destinatario:</label>
                                     <div class="col-md-9 col-sm-9 ">
-                                        <select class="form-control" name="idDestinatario" id="idDestinatario">
+                                       <!--
+                                            <select class="form-control" name="idDestinatario" id="idDestinatario">
                                             {{#each usuarios}}
-                                            <option value="{{idUsuario}}">{{NombreCompleto}}</option>
+                                            <option value="{{idUsuario}}">{{Nombre}}</option>
                                             {{/each}}
-                                        </select>
+                                            </select>
+                                            -->
+                                        <input id="destinatario" name="destinatario"  class="form-control">
+                                        <input type="hidden" id="idDestinatario" name="idDestinatario"  >    
                                     </div>
                                 </div>
                                 <div class="item form-group">
@@ -144,35 +198,29 @@
                                     </div>
                                 </div>
                                 <div class="item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Otros
-                                        (100,103;100-103):</label>
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Otros (100,103;100-103):</label>
                                     <div class="col-md-9 col-sm-9 ">
-                                        <input type="text" id="otroarch" class="form-control" value="" name="otroarch"
-                                            placeholder="Otros" />
+                                        <input type="text" id="otroarch" class="form-control" value="" name="otroarch" placeholder="Otros" />
                                     </div>
                                 </div>
                                 <div class="item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3 label-align"
                                         for="Destinatario">Detalle Escalas:</label>
                                     <div class="col-md-9 col-sm-9 ">
-                                        <input type="text" id="escalas" class="form-control" value="" name="escalas"
-                                            placeholder="Ingrese detalles de escalas" />
+                                        <input type="text" id="escalas" class="form-control" value="" name="escalas" placeholder="Ingrese detalles de escalas" />
                                     </div>
                                 </div>
                                 <div class="item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3 label-align"
                                         for="Destinatario">Copias Impresion:</label>
                                     <div class="col-md-9 col-sm-9 ">
-                                        <input type="text" id="ncopias" class="form-control" value="" name="ncopias"
-                                            placeholder="numero de copias" />
+                                        <input type="text" id="ncopias" class="form-control" value="" name="ncopias" placeholder="numero de copias" />
                                     </div>
                                 </div>
                                 <div class="item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3 label-align"
-                                        for="Destinatario">Copias CD's:</label>
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Copias CD's:</label>
                                     <div class="col-md-9 col-sm-9 ">
-                                        <input type="text" id="ncopiasCD" class="form-control" value="" name="ncopiasCD"
-                                            placeholder="numero de copias CDs" />
+                                        <input type="text" id="ncopiasCD" class="form-control" value="" name="ncopiasCD" placeholder="numero de copias CDs" />
                                     </div>
                                 </div>
                             </div>
@@ -195,13 +243,12 @@
                                     </div>
                                 </div>
                                 <div class="item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Tipo
-                                        Papel:</label>
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Formato Entrega:</label>
                                     <div class="col-md-9 col-sm-9 ">
-                                        <select class="form-control" name="tipopapel" id="tipopapel">
-                                            <option value="Ninguno">Ninguno</option>
-                                            <option value="Bond">Bond</option>
-                                            <option value="Vegetal">Vegetal</option>
+                                        <select class="form-control" name="formatoEntrega" id="formatoEntrega">
+                                            <option value="PDF">PDF</option>
+                                            <option value="DWG">DWG</option>
+                                            <option value="DWF">DWF</option>
                                         </select>
                                     </div>
                                 </div>

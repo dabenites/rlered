@@ -214,6 +214,29 @@ router.post('/cambiaEstado',express.json({type: '*/*'}), isLoggedIn, async (req,
 
 }); 
 
+router.get('/buscarPro/:find', async (req, res) => {
+  
+    // BUSCAR DIRECTOR  
+    const nombre = req.query.term;
+    const proyectos =  await pool.query("SELECT t1.id AS id, CONCAT(t1.year,'-',t1.code , ' : ' , t1.nombre) AS value " +
+                                        " FROM pro_proyectos as t1 WHERE t1.nombre LIKE '%"+nombre+"%' OR CONCAT(t1.year,'-',t1.code) LIKE '%"+nombre+"%'");
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.json(proyectos);
+  
+  });
+
+  router.get('/buscarDesti/:find', async (req, res) => {
+  
+    // BUSCAR DIRECTOR  
+    const nombre = req.query.term;
+    const destinarios =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 WHERE t1.Nombre LIKE '%"+nombre+"%'");
+    
+ 
+    res.setHeader('Content-Type', 'application/json');
+    res.json(destinarios);
+  
+  });
 
 
 

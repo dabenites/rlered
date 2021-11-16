@@ -9,176 +9,85 @@ const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
 
 router.get('/ploteo', isLoggedIn, async (req, res) => {
+ 
+    const ploteos_pendiente  =  await pool.query("SELECT t.*, t2.nombre AS nomPro,t3.Nombre AS nomIngr, t4.Nombre AS nomDes" +
+                                                "  FROM sol_ploteo as t , pro_proyectos AS t2 , sys_usuario AS t3, sys_usuario AS t4" +
+                                                " where t.id_estado = 1 AND t.id_proyecto = t2.id AND t.id_ingreso = t3.idUsuario AND t.id_destinatario = t4.idUsuario");  
 
-    const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");       
-    const usuarios = await pool.query('SELECT * FROM sys_usuario');      
+    const ploteos_proceso  =  await pool.query("SELECT t.*, t2.nombre AS nomPro,t3.Nombre AS nomIngr, t4.Nombre AS nomDes" +
+                                                "  FROM sol_ploteo as t , pro_proyectos AS t2 , sys_usuario AS t3, sys_usuario AS t4" +
+                                                " where t.id_estado = 2 AND t.id_proyecto = t2.id AND t.id_ingreso = t3.idUsuario AND t.id_destinatario = t4.idUsuario");
     
-    const ploteos =  await pool.query('SELECT * FROM solicitudes ORDER BY id DESC LIMIT 100');      
-    const ploteosPendientes =  await pool.query("SELECT * FROM solicitudes as t WHERE t.estado in ('Pendiente', 'Procesando') ");
+   // console.log(ploteos_pendiente);
 
-    //console.log(ploteos);
-    res.render('ploter/ingresar', { proyectos,usuarios,ploteos, ploteosPendientes , req ,layout: 'template'});
+    res.render('ploter/ingresar', { ploteos_pendiente, ploteos_proceso , req ,layout: 'template'});
 }); 
 
 router.post('/addSolicitud', isLoggedIn, async (req, res) => {
 
                                                 
-    //res.render('ploter/ingresar', { req ,layout: 'template'});
+    // 15/11 Nuevo objeto
+    //req.user.id
+    const {idProyecto,idDestinatario,trabajo,impresion,series,ruta,otroarch,comentarios,escalas,ncopias,ncopiasCD,formapapel,formatoEntrega,fecheHora} = req.body; 
+    var trabajosBD = "";
+    var impresionBD = "";
+    var seriesBD = "";
 
-    //console.log(req.body);
-
-    const { impresion , digital, idProyecto, ruta ,series,fecha,idDestinatario,comentarios,otroarch,escalas,ncopias,ncopiasCD,formapapel,tipopapel} = req.body; 
-
-    var mailImpresion = "";
-    if (typeof impresion == "string")
+    if (typeof trabajo !== 'undefined') 
     {
-       // console.log(impresion);
-       mailImpresion = impresion;
-    }
-    else
-    {
-        mailImpresion= impresion.join(" + ");
-    }
-
-    //______________________________________________
-    var s1,s2,s3,s4,s5,s6,s7,s8,s9 = "";
-    var mailSerie = "";
-    if (typeof series == "string")
-    {
-       // console.log(impresion);
-       mailSerie = series;
-       s1 = series;
-    }
-    else
-    {
-        mailSerie= series.join(" + ");
-        for (var i=0; i<series.length; i++) 
-        { 
-            switch(i)
-            {
-                case 0:
-                    s1 = series[i];
-                break;
-                case 1:
-                    s2 = series[i];
-                break;
-                case 2:
-                    s3 = series[i];
-                break;
-                case 3:
-                    s4 = series[i];
-                break;
-                case 4:
-                    s5 = series[i];
-                break;
-                case 5:
-                    s6 = series[i];
-                break;
-                case 6:
-                    s7 = series[i];
-                break;
-                case 7:
-                    s8 = series[i];
-                break;
-                case 8:
-                    s9 = series[i];
-                break;
-            }
+        if (typeof trabajo === 'string'){ trabajosBD = trabajo;}
+        else
+        {
+            for (var i=0; i<trabajo.length; i++) 
+            { if ( (i + 1) === trabajo.length) {trabajosBD = trabajosBD + trabajo[i];} else {trabajosBD = trabajosBD + trabajo[i]+ " + ";} }
         }
-
     }
-
+    if (typeof impresion !== 'undefined') 
+    {
+        if (typeof impresion === 'string'){ impresionBD = impresion;}
+        else
+        {
+            for (var i=0; i<impresion.length; i++) 
+            { if ( (i + 1) === trabajo.length) {impresionBD = impresionBD + impresion[i];} else {impresionBD = impresionBD + impresion[i]+ " + ";}  }
+        }
+    }
+    if (typeof series !== 'undefined') 
+    {
+        if (typeof series === 'string'){ seriesBD = series;}
+        {
+            for (var i=0; i<series.length; i++) 
+            { if ( (i + 1) === series.length) {seriesBD = seriesBD + series[i];} else {seriesBD = seriesBD + series[i]+ " + ";}  }
+        }
+    }
     //______________________________________________
-
-    const proyecto =  await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id ="+idProyecto+"");     
-    const usuario =  await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.idUsuario ="+idDestinatario+"");
     
    // console.log(req.user.isLoggedIn);
    //dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
-   var fechaActual = dateFormat(new Date(), "dd-mm-yyyy");
-   var horaA = dateFormat(new Date(), "HH:MM");
-    const solicitud = {
-        nomproyec :proyecto[0].id,
-        nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
-        login : req.user.login,
-        formapapel : formapapel,
-        tipopapel : tipopapel,
-        prioridad : fecha, // es cuando se tiene que entregar el trabajo,
-        complemento : mailImpresion,
-        estado : "Pendiente",
-        fecha : fechaActual ,
-        fechat : "",
-        ruta : ruta,
-        destinatario : usuario[0].Email,
-        hora : horaA,
-        horat : '',
-        serie1 : s1,
-        serie2 : s2,
-        serie3 : s3,
-        serie4 : s4,
-        serie5 : s5,
-        serie6 : s6,
-        serie7 : s7,
-        serie8 : s8,
-        serie9 : s9,
-        escalaespecial : escalas,
-        escalaespecial2 : '',
-        observacion : comentarios,
-        ncopiasimp : ncopias,
-        ncopiascd : ncopiasCD,
-        enviomail : usuario[0].Email,
-        fechaprograentre : '',
-        comen : ''
-    };
+   var fechaActual = dateFormat(new Date(), "dd-mm-yyyy HH:MM");
+      
+   const solicitud = {
+        id_proyecto : idProyecto,
+        id_ingreso : req.user.idUsuario,
+        id_destinatario : idDestinatario,
+        id_estado : 1,
+        trabajo : trabajosBD,
+        impresion : impresionBD,
+        ruta : ruta, // es cuando se tiene que entregar el trabajo,
+        fecha_entrega : fecheHora,
+        fecha_solicitud : fechaActual,
+        comentario : comentarios ,
+        serie : seriesBD,
+        serieespecial : otroarch,
+        escala : escalas,
+        nimpresion : ncopias,
+        ncopias : ncopiasCD,
+        formatoPapel : formapapel,
+        formatoEntrega : formatoEntrega };
 
-    console.log('INSERT INTO solicitudes set ?', [solicitud]);
 
-    const result = pool.query('INSERT INTO solicitudes set ?', [solicitud]);
+    const result = await pool.query('INSERT INTO sol_ploteo set ?', [solicitud]);
 
-    var transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false, // upgrade later with STARTTLS
-        auth: {
-          user: "dbenites@renelagos.com",
-          pass: "dbenites."
-        }
-      });
-
-      var mailOptions = {
-          from : "Remitente",
-          to : "dbenites.s@gmail.com",
-          subject : "Enviado desde nodemailer",
-          html: '<b>Detalles</b>' +
-                '<table>'+
-                    '<tr><td>Incluye</td><td>'+impresion+'</td></tr>'+
-                    '<tr><td>Fecha Entrega</td><td>'+fecha+'</td></tr>'+
-                    '<tr><td>Ruta Archivos</td><td>'+ruta+'</td></tr>'+
-                    '<tr><td>Series</td><td>'+series+'</td></tr>'+
-                    '<tr><td>Escalas</td><td>'+escalas+'</td></tr>'+
-                    '<tr><td>Formato Papel</td><td>'+formapapel+'</td></tr>'+ 
-                    '<tr><td>Tipo Papel</td><td>'+tipopapel+'</td></tr>'+ 
-                    '<tr><td>Copias Impresion</td><td>'+ncopias+'</td></tr>'+ 
-                    '<tr><td>Copias CD</td><td>'+ncopiasCD+'</td></tr>'+ 
-                    '<tr><td>Comentarios</td><td>'+comentarios+'</td></tr>'+ 
-                '</table>',
-          alternatives: [
-              {
-                  contentType: 'text/x-web-markdown',
-                  content: '**Hello world!**'
-              }
-          ]
-      }
-  // res.send("Mensaje");
-  
-    const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");       
-    const usuarios = await pool.query('SELECT * FROM sys_usuario');      
-    
-    const ploteos =  await pool.query('SELECT * FROM solicitudes ORDER BY id DESC LIMIT 100');      
-    const ploteosPendientes =  await pool.query("SELECT * FROM solicitudes as t WHERE t.estado in ('Pendiente', 'Procesando') ");
-
-    //console.log(ploteos);
-    res.render('ploter/ingresar', { proyectos,usuarios,ploteos, ploteosPendientes , req ,layout: 'template'});
+    res.redirect('/ploter/ploteo/');
 
 }); 
 
@@ -214,6 +123,7 @@ router.post('/cambiaEstado',express.json({type: '*/*'}), isLoggedIn, async (req,
 
 }); 
 
+
 router.get('/buscarPro/:find', async (req, res) => {
   
     // BUSCAR DIRECTOR  
@@ -238,6 +148,31 @@ router.get('/buscarPro/:find', async (req, res) => {
     res.json(destinarios);
   
   });
+
+  router.get('/ploteo/cambiaEstadoProceso/:id', async (req, res) => {
+
+    const { id } = req.params;
+
+    var fechaActual = dateFormat(new Date(), "dd-mm-yyyy HH:MM");
+    
+    const proyecto = await pool.query('UPDATE sol_ploteo set id_estado = 2 , fecha_e_trabajando = ? WHERE id = ?', [fechaActual, id]);
+
+    res.redirect('/ploter/ploteo/');
+
+  });
+
+  router.get('/ploteo/cambiaEstadoTerminado/:id', async (req, res) => {
+
+    const { id } = req.params;
+    
+    var fechaActual = dateFormat(new Date(), "dd-mm-yyyy HH:MM");
+
+    const proyecto = await pool.query('UPDATE sol_ploteo set id_estado = 3 , fecha_e_terminado = ? WHERE id = ?', [fechaActual,id]);
+
+    res.redirect('/ploter/ploteo/');
+
+  });
+
 
 
 

@@ -312,7 +312,9 @@ router.get('/addPro', async (req, res) => {
 // listado
 router.get('/listado', async (req, res) => {
 
-  const proyectos = await pool.query("SELECT * FROM pro_proyectos AS t1  ORDER BY t1.id");
+  var annio = dateFormat(new Date(), "yyyy");
+
+  const proyectos = await pool.query("SELECT * FROM pro_proyectos AS t1 where t1.year >= "+ (annio - 10) +" ORDER BY t1.id");
 
   res.render('proyecto/listado', { proyectos, req, layout: 'template' });
 

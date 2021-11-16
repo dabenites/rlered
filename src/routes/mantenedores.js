@@ -102,7 +102,7 @@ router.post('/addUsuario', async (req, res) => {
  
    
    const verToask = {
-       titulo : NombreCompleto,
+       titulo : Nombre,
        body   : "Se ha creado correctamente",
        tipo   : "Crear"
    };

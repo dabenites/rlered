@@ -12,6 +12,28 @@
         #grid td {
             white-space: inherit;
         }
+         .headerToolbar {
+            background-color: #fed300;
+
+        }
+        .close {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+        }
+        .close:not(:disabled):not(.disabled) {
+            cursor: pointer;
+        }
+        button.close {
+            padding: 0;
+            background-color: transparent;
+            border: 0;
+            -webkit-appearance: none;
+        }
     </style>
 </head>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
@@ -71,7 +93,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="historial-tab" data-toggle="tab" href="#historial" role="tab"
-                        aria-controls="historial" aria-selected="false">Historial</a>
+                        aria-controls="historial" aria-selected="false">En proceso</a>
                 </li>
             </ul>
             <div class="tab-content" id="myTabContent">
@@ -144,7 +166,7 @@
                                     <label class="col-form-label col-md-3 col-sm-3 label-align" for="fechaHora">Fecha y Hora Entrega:</label>
                                     <div class="col-md-9 col-sm-9 ">
                                          <div class="input-group date" id="fechaHora" data-target-input="nearest">
-                                                <input type="text" class="form-control datetimepicker-input" data-target="#fechaHora"/>
+                                                <input type="text" class="form-control datetimepicker-input" data-target="#fechaHora" name="fecheHora" id="fecheHora" />
                                                 <div class="input-group-append" data-target="#fechaHora" data-toggle="datetimepicker">
                                                     <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
                                                 </div>
@@ -271,46 +293,76 @@
                                 <th>Solícito</th>
                                 <th>Incluye</th>
                                 <th>Entrega</th>
-                                <th>Series</th>
-                                <th>Formato</t>
-                                <th>Papel</th>
-                                <th>Escalas</th>
-                                <th>Comentario</th>
                                 <th>Ruta</th>
-                                <th>Copias Impresas</th>
-                                <th>Copias CD</th>
+                                <th>Series</th>
+                                <th>Comentario</th>
                                 <th>Fecha Solicitud</th>
                                 <th>Destinatario</th>
                                 <th>Opciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {{#each ploteosPendientes}}
+                            {{#each ploteos_pendiente}}
                             <tr>
-                                <td>{{nombre}}</td>
-                                <td>{{login}}</td>
-                                <td>{{complementeo}}</td>
-                                <td>{{prioridad}}</td>
-                                <td>{{serie1}}</td>
-                                <td>{{formapapel}}</td>
-                                <td>{{tipopapel}}</td>
-                                <td>{{scalaespecial}}</td>
-                                <td>{{observacion}}</td>
+                                <td>{{nomPro}}</td>
+                                <td>{{nomIngr}}</td>
+                                <td>{{trabajo}} {{impresion}}</td>
+                                <td>{{fecha_entrega}}</td>
                                 <td>{{ruta}}</td>
-                                <td>{{ncopiasimp}}</td>
-                                <td>{{ncopiascd}}</td>
-                                <td>{{fecha}}</td>
-                                <td>{{destinatario}}</td>
+                                <td>{{serie}} {{serieespecial}}</td>
+                                <td>{{comentario}}</td>
+                                <td>{{fecha_solicitud}}</td>
+                                <td>{{nomDes}}</td>
                                 <td>
-                                    <button type="button" class="btn btn-warning btn-xs"
-                                        onclick="cargaEstado('Procesando',{{id}})">Procesando</button>
-                                    <button type="button" class="btn btn-warning btn-xs"
-                                        onclick="cargaEstado('Terminado',{{id}})">Terminado</button>
+                                    <div class="form-group row">
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#ver{{id}}"> Ver Detalle </button>
+                                        <div class="modal fade" id="ver{{id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle">Detalle Solicitud</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                 <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario">Escala :</label>
+							                            <label class="col-form-label col-md-3 col-sm-3"	for="Destinatario">{{escala}}</label>
+                                                 </div>
+                                                 <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario">Nº Impresiones :</label>
+                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Destinatario">{{nimpresion}}</label>
+                                                 </div>
+                                                 <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario">Nº Copias :</label>
+                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Destinatario">{{ncopias}}</label>
+                                                 </div>
+                                                 <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario">Formato Papel :</label>
+                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Destinatario">{{formatoPapel}}</label>
+                                                 </div>
+                                                 <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario">Formato Entrega :</label>
+                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Destinatario">{{formatoEntrega}}</label>
+                                                 </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <a href="cambiaEstadoProceso/{{id}}"><button type="button" class="btn btn-warning btn-sm" >  En Proceso</button></a>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             {{/each}}
                         </tbody>
-
                     </table>
                 </div>
                 <div class="tab-pane fade" id="historial" role="tabpanel" aria-labelledby="historial-tab">
@@ -321,39 +373,76 @@
                                 <th>Solícito</th>
                                 <th>Incluye</th>
                                 <th>Entrega</th>
-                                <th>Series</th>
-                                <th>Formato</t>
-                                <th>Papel</th>
-                                <th>Escalas</th>
-                                <th>Comentario</th>
                                 <th>Ruta</th>
-                                <th>Copias Impresas</th>
-                                <th>Copias CD</th>
+                                <th>Series</th>
+                                <th>Comentario</th>
                                 <th>Fecha Solicitud</th>
                                 <th>Destinatario</th>
+                                <th>Opciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {{#each ploteos}}
+                            {{#each ploteos_proceso}}
                             <tr>
-                                <td>{{nombre}}</td>
-                                <td>{{login}}</td>
-                                <td>{{complementeo}}</td>
-                                <td>{{prioridad}}</td>
-                                <td>{{serie1}}</td>
-                                <td>{{formapapel}}</td>
-                                <td>{{tipopapel}}</td>
-                                <td>{{scalaespecial}}</td>
-                                <td>{{observacion}}</td>
+                                <td>{{nomPro}}</td>
+                                <td>{{nomIngr}}</td>
+                                <td>{{trabajo}} {{impresion}}</td>
+                                <td>{{fecha_entrega}}</td>
                                 <td>{{ruta}}</td>
-                                <td>{{ncopiasimp}}</td>
-                                <td>{{ncopiascd}}</td>
-                                <td>{{fecha}}</td>
-                                <td>{{destinatario}}</td>
+                                <td>{{serie}} {{serieespecial}}</td>
+                                <td>{{comentario}}</td>
+                                <td>{{fecha_solicitud}}</td>
+                                <td>{{nomDes}}</td>
+                                <td>
+                                    <div class="form-group row">
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#ver{{id}}"> Ver Detalle </button>
+                                        <div class="modal fade" id="ver{{id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle">Detalle Solicitud</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                 <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario">Escala :</label>
+							                            <label class="col-form-label col-md-3 col-sm-3"	for="Destinatario">{{escala}}</label>
+                                                 </div>
+                                                 <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario">Nº Impresiones :</label>
+                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Destinatario">{{nimpresion}}</label>
+                                                 </div>
+                                                 <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario">Nº Copias :</label>
+                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Destinatario">{{ncopias}}</label>
+                                                 </div>
+                                                 <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario">Formato Papel :</label>
+                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Destinatario">{{formatoPapel}}</label>
+                                                 </div>
+                                                 <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario">Formato Entrega :</label>
+                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Destinatario">{{formatoEntrega}}</label>
+                                                 </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <a href="cambiaEstadoTerminado/{{id}}"><button type="button" class="btn btn-warning btn-sm" >Terminado</button></a>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                             {{/each}}
                         </tbody>
-
                     </table>
                 </div>
             </div>

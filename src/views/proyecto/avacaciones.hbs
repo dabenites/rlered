@@ -5,7 +5,7 @@
 <div class="col-md-5 col-sm-5 ">
     <div class="x_panel">
         <div class="x_title">
-            <h2>Listar vacaciones<small> Por aprobar</small></h2>
+            <h2>Solicitud vacaciones<small></small></h2>
 
             <div class="clearfix"></div>
         </div>
@@ -13,8 +13,8 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Usuario</th>
+                        <th>Estado</th>
                         <th>Días</th>
                         <th>Opciones</th>
                     </tr>
@@ -23,8 +23,8 @@
                     {{#if selecciona }}
                     {{#each soliVacaciones}}
                     <tr>
-                        <th scope="row">{{idUsuario}}</th>
                         <td>{{Nombre}}</td>
+                        <td>{{descripcion}}</td>
                         <td>{{Dias}}</td>
                         <td style="padding: .15rem;">
                             <a style="padding: .25rem;" type="button" class="btn btn-warning  btn-xs"
@@ -37,8 +37,8 @@
                     {{else}}
                     {{#each soliVacaciones}}
                     <tr>
-                        <th scope="row">{{idUsuario}}</th>
                         <td>{{Nombre}}</td>
+                        <td>{{descripcion}}</td>
                         <td>{{Dias}}</td>
                         <td style="padding: .15rem;">
                             <a style="padding: .25rem;" type="button" class="btn btn-warning btn-xs"
@@ -79,13 +79,12 @@
 
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="revisar" role="tabpanel" aria-labelledby="home-tab">
-                    <form id="updateVacaciones" name="updateVacaciones" data-parsley-validate
-                        action="/solicitudes/updateVacaciones" method="POST">
+                    <form id="updateVacaciones" name="updateVacaciones" data-parsley-validate action="/solicitudes/updateVacaciones" method="POST">
                         <!-- CAMBIAR-->
 
                         <div class="item form-group">
                             <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name">Usuario <span
-                                    class="required">*</span></label>
+                                    class="required"></span></label>
                             <div class="col-md-6 col-sm-6 ">
                                 <input type="text" id="usuario" class="form-control" value="{{obj.Nombre}}"
                                     name="usuario" readonly />
@@ -94,7 +93,7 @@
 
                         <div class="item form-group">
                             <label class="col-form-label col-md-3 col-sm-3 label-align" for="dia">Nº Días
-                                <span class="required">*</span></label>
+                                <span class="required"></span></label>
                             <div class="col-md-6 col-sm-6 ">
                                 <input type="text" id="dia" class="form-control" value="{{obj.Dias}}" name="dia"
                                     readonly />
@@ -123,32 +122,46 @@
 
                         <div class="item form-group">
                             <label class="col-form-label col-md-3 col-sm-3 label-align"
-                                for="descripcion">Comentario<span class="required">*</span></label>
+                                for="descripcion">Comentario<span class="required"></span></label>
                             <div class="col-md-6 col-sm-6 ">
                                 <textarea class="form-control" rows="3" name="comentario" id="comentario"
                                     readonly>{{obj.comentario}}</textarea>
                             </div>
                         </div>
 
-                        <div class="item form-group">
+                         {{#if anulacion }}
+                         <div class="item form-group">
                             <label class="col-form-label col-md-3 col-sm-3 label-align"
-                                for="descripcion">Observación<span class="required">*</span></label>
+                                for="descripcion">Comentario Anulación<span class="required"></span></label>
                             <div class="col-md-6 col-sm-6 ">
-                                <textarea class="form-control" rows="3" name="Observacion" id="Observacion"></textarea>
+                                <textarea class="form-control" rows="3" name="comentario_anulacion" id="comentario_anulacion" readonly>{{obj.comentario_anulacion}}</textarea>
                             </div>
                         </div>
+
+                         
+                         {{else}}
+                            <div class="item form-group">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"
+                                    for="descripcion">Observación<span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <textarea class="form-control" rows="3" name="Observacion" id="Observacion"></textarea>
+                                </div>
+                            </div>
+                         {{/if}}
+                        
 
 
                         <div class="ln_solid"></div>
                         <div class="item form-group">
                             <div class="col-md-9 col-sm-9 offset-md-4">
                             <input type="hidden" id="estado" class="form-control" value="" name="estado" readonly />
-                            <input type="hidden" id="id_solicitud" class="form-control" value="{{obj.id}}"
-                                name="id_solicitud" readonly />
-                            <button type="button" onclick="revisarAction(1);" class="btn btn-warning"
-                                type="reset">Aceptar</button>
-                            <button type="button" onclick="revisarAction(0);" class="btn btn-danger"
-                                type="button">Rechazar</button>
+                            <input type="hidden" id="id_solicitud" class="form-control" value="{{obj.id}}"  name="id_solicitud" readonly />
+                             {{#if anulacion }}
+                                <button type="button" onclick="revisarAction(2);" class="btn btn-warning" type="reset">Anular </button>
+                             {{else}}
+                                <button type="button" onclick="revisarAction(1);" class="btn btn-warning" type="reset">Aceptar</button>
+                                <button type="button" onclick="revisarAction(0);" class="btn btn-danger"  type="button">Rechazar</button>
+                             {{/if}}
                             </div>
                         </div>
                     </form>
@@ -159,8 +172,9 @@
                             <tr>
 
                                 <th>Días</th>
-                                <th>Fecha Ingreso</th>
-                                <th>Opciones</th>
+                                <th>Fecha Ingreso Solicitud</th>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha Termino</th>
 
                             </tr>
                         </thead>
@@ -170,15 +184,8 @@
 
                                 <td>{{Dias}}</td>
                                 <td>{{fecha}}</td>
-
-                                <!-- Button trigger modal -->
-                                <td style="padding: .15rem;">
-                                    <button style="padding: .25rem;" type="button" class="btn btn-warning btn-xs"
-                                        data-toggle="modal" data-target="#exampleModal">
-                                        Revisar
-                                    </button>
-                                </td>
-
+                                <td>{{minFecha}}</td>
+                                <td>{{maxFecha}}</td>
 
                             </tr>
                             {{/each}}
@@ -189,37 +196,6 @@
     </div>
 </div>
 {{/if}}
-
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Fechas seleccionadas</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-
-                <form action="/facturacion/addFecha" method="POST"></form>
-
-
-                <label for="Fecha">Días seleccionados:</label>
-                <input type="txt" id="fecha" class="form-control" value="{{sol_selec_dias.fecha}}" name="fecha"
-                    Readonly />
-                </form>
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 <!-- Optional JavaScript; choose one of the two! -->
 
@@ -238,6 +214,9 @@
                 break;
             case 1:
                 $("#estado").val(1); // aprobado
+                break;
+            case 2:
+                $("#estado").val(2); // Anulado
                 break;
         }
         document.getElementById("updateVacaciones").submit();

@@ -53,7 +53,7 @@
                                     href="../../categoria/edit/{{id}}">
                                     Editar
                                 </a>
-                                <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" onclick="return confirm('¿ Esta seguro de borrar la categoria : {{categoria}} ?')"
                                     href="../../categoria/delete/{{id}}">
                                     Borrar
                                 </a>
@@ -72,7 +72,7 @@
                                     href="categoria/edit/{{id}}">
                                     Editar
                                 </a>
-                                <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"  onclick="return confirm('¿ Esta seguro de borrar la categoria : {{categoria}} ?')"
                                     href="categoria/delete/{{id}}">
                                     Borrar
                                 </a>
@@ -216,26 +216,37 @@
 
 function validarIngreso ()
 {
-  nameCategoria = $("#demo-form").serialize();
+    var nombre      = $("#name").val();
+    var centroCosto = $("#idCentroCosto").val();
+    var valorHH     = $("#valorhh").val();
 
- $.ajax({
-     method:'POST',
-     url : '/mantenedores/ajax-validarNombreCategoria',
-     data : nameCategoria,
-     success : function(result)
-     {
-         //alert(result);
-         if(!$.trim(result)){
-             // no existe resultado esta en lo correcto
-             document.getElementById("demo-form").submit();
-         }
-         else{
-            toastr.warning('warning', 'No se pueden cargar una categoria con el mismo nombre.', {
-           "progressBar": true
-             });
-         }
-     }
-    });
+    if (nombre !== "" && centroCosto !== "" && valorHH !== "")
+    {
+        nameCategoria = $("#demo-form").serialize();
+
+        $.ajax({
+            method:'POST',
+            url : '/mantenedores/ajax-validarNombreCategoria',
+            data : nameCategoria,
+            success : function(result)
+            {
+                //alert(result);
+                if(!$.trim(result)){
+                    // no existe resultado esta en lo correcto
+                    document.getElementById("demo-form").submit();
+                }
+                else{
+                    toastr.warning('warning', 'No se pueden cargar una categoria con el mismo nombre.', {
+                "progressBar": true
+                    });
+                }
+            }
+            });
+    }
+    else
+    {
+            alert("Ingresar los valores requeridos( Nombre , Centro Costo y Valor HH)")
+    }
 }
 
 </script>

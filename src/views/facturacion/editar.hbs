@@ -5,6 +5,7 @@
             <h2>Proyecto
             </h2>
             <div class="clearfix"></div>
+            <!-- .glyphicon .glyphicon-arrow-left -->
         </div>
         <div class="x_content">
             <div class="form-group row">
@@ -34,7 +35,6 @@
             <h2>Información Facturación
                 <small style="align-content: flex-end;">Estado : <b> {{factura.descripcion}}</b> </small>
             </h2>
-            
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -162,6 +162,9 @@
     <div class="x_panel">
         <div class="x_title">
             <h2>Historial Facturacion</h2>
+            <ul class="nav navbar-right panel_toolbox">
+				<li><a onclick="window.history.go(-1); return false;"><i class="fa fa-arrow-circle-left"></i> Volver</a></li>
+			</ul>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">

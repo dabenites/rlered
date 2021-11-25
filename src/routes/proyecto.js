@@ -11,6 +11,7 @@ const { chdir } = require('process');
 const { Console } = require('console');
 
 var dateFormat = require('dateformat');
+const { isEmptyObject } = require('jquery');
 
 
 
@@ -312,13 +313,51 @@ router.get('/addPro', async (req, res) => {
 // listado
 router.get('/listado', async (req, res) => {
 
-  var annio = dateFormat(new Date(), "yyyy");
+  
+  // Filtrar segun la categoria de la persona. 
+  // JP // Director  // ING A // ING B
+ // ING A 21
+ // ING B 22
+ // JP 24
+ // DIRECTORES 26 // 27 // 40 // 41 // 42 // 46
+ // Todos los demas pueden ver todo. 
+  //console.log(req.user);
+  var sql = ""
+  switch(req.user.idCategoria)
+  {
+    case 21:
+    case 22:
+    case 24:
+    case 26:
+    case 27:
+    case 40:
+    case 41:
+    case 42:
+    case 46:
+      sql = " SELECT t3.Nombre AS nomJefe, t4.Nombre AS nomDir, t2.name AS nomCli, t1.*  FROM pro_proyectos AS t1 " +
+            " LEFT JOIN contacto AS t2 ON t1.id_cliente = t2.id " +
+            " LEFT JOIN sys_usuario AS t3 ON t1.id_jefe = t3.idUsuario " + 
+            " LEFT JOIN sys_usuario AS t4 ON t1.id_director = t4.idUsuario " + 
+            " WHERE t1.id_jefe = "+req.user.idUsuario +" OR t1.id_director = "+req.user.idUsuario +" ORDER BY t1.id";
+    break;
+    default:
+      sql = "SELECT t3.Nombre AS nomJefe, t4.Nombre AS nomDir, t2.name AS nomCli, t1.* FROM pro_proyectos AS t1 "+ 
+            "LEFT JOIN contacto AS t2 ON t1.id_cliente = t2.id " +
+            " LEFT JOIN sys_usuario AS t3 ON t1.id_jefe = t3.idUsuario " + 
+            " LEFT JOIN sys_usuario AS t4 ON t1.id_director = t4.idUsuario" +
+            " ORDER BY t1.id";
+    break;
+  }
 
-  const proyectos = await pool.query("SELECT * FROM pro_proyectos AS t1 where t1.year >= "+ (annio - 10) +" ORDER BY t1.id");
+  // console.log(sql);
+
+
+  const proyectos = await pool.query(sql);
 
   res.render('proyecto/listado', { proyectos, req, layout: 'template' });
 
 });
+//buscarPais
 
 router.get('/facturar/:id', async (req, res) => {
   const { id } = req.params;
@@ -391,6 +430,10 @@ router.get('/editar/:id', async (req, res) => {
   const proyectos = await pool.query("SELECT * , t1.id as idPro, " +
                                     " t1a.idUsuario AS idDir, " +
                                      " t1a.Nombre AS nomDir, " +
+                                     " t1.id_pais AS id_pais, " +
+                                     " t1.zona AS zona, " +
+                                     " t1.suelo AS suelo, " +
+                                     " t1.categoria AS categoria, " +
                                      " t1b.idUsuario AS idJefe, t1b.Nombre AS nomJefe, " +
                                      " t1c.id AS idMan , t1c.name nomMan, " +
                                      " t1d.id AS idCli , t1d.name nomCli, " +
@@ -408,7 +451,9 @@ router.get('/editar/:id', async (req, res) => {
                                      " LEFT JOIN moneda_tipo AS t1p ON t1.id_tipo_moneda = t1p.id_moneda " +
                                      " WHERE t1.id = ?",[id]);
 
-  //console.log(proyectos[0]);
+  const zonas = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+proyectos[0].id_pais+" AND t1.id_parametro = 1 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
+  const suelo = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+proyectos[0].id_pais+" AND t1.id_parametro = 2 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
+  const categoria = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+proyectos[0].id_pais+" AND t1.id_parametro = 3 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
 
   const isEqualHelperHandlerbar = function(a, b, opts) {
           if (a == b) {
@@ -419,7 +464,7 @@ router.get('/editar/:id', async (req, res) => {
       };
 
 
-  res.render('proyecto/uptProyecto', {monedas, proyecto:proyectos[0], tipo, complejidad, servicio, estado, req, layout: 'template' , helpers : { if_equal : isEqualHelperHandlerbar}});
+  res.render('proyecto/uptProyecto', {monedas,zonas, suelo,categoria, proyecto:proyectos[0], tipo, complejidad, servicio, estado, req, layout: 'template' , helpers : { if_equal : isEqualHelperHandlerbar}});
 
 
 });
@@ -539,7 +584,7 @@ router.post('/cargarProyecto', async (req, res) => {
 
   const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
     id_mandante,id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
-    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado,id_tipo_cobro} = req.body;
+    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado,id_tipo_cobro,id_pais} = req.body;
 
     //console.log(req.body);
 
@@ -562,6 +607,7 @@ router.post('/cargarProyecto', async (req, res) => {
        altitud : loc_long,
        direccion : direccion,
        id_complejidad : id_Complejidad,
+       id_pais : id_pais,
        superficie_pre : superficie_pre,
        superficie_apl : superficie_apl,
        valor_proyecto : valor_proyecto,
@@ -600,6 +646,7 @@ router.post('/cargarProyecto', async (req, res) => {
      altitud : loc_long,
      direccion : direccion,
      id_complejidad : id_Complejidad,
+     id_pais : id_pais,
      superficie_pre : superficie_pre,
      superficie_apl : superficie_apl,
      valor_proyecto : valor_proyecto,
@@ -633,7 +680,7 @@ router.post('/ActualizarProyecto', async (req, res) => {
 
   const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
     id_mandante,id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
-    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado , id,id_tipo_cobro} = req.body;
+    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado , id,id_tipo_cobro, id_pais} = req.body;
 
   //  console.log(req.body);
   
@@ -659,6 +706,7 @@ router.post('/ActualizarProyecto', async (req, res) => {
      altitud : loc_long,
      direccion : direccion,
      id_complejidad : id_Complejidad,
+     id_pais:id_pais,
      superficie_pre : superficie_pre,
      superficie_apl : superficie_apl,
      valor_proyecto : valor_proyecto,
@@ -724,12 +772,38 @@ router.post('/ActualizarProyecto', async (req, res) => {
 res.redirect('/proyecto/listado');
 
 });
-//ActualizarProyecto
+router.post('/buscarPais', isLoggedIn, async (req, res) => {
+
+  //console.log(req.body.pais);
+  const sql = " SELECT * " +
+                  " FROM  " +
+                " pais	 AS t1 " +
+                " WHERE  " +
+                " t1.pais LIKE '%"+ req.body.pais +"%' ";
+
+  const pais = await pool.query( sql);
+
+  if (pais.length === 0 )
+  {
+    const respuesta = { estado : 0};
+    res.send(respuesta);
+  }
+  else
+  {
+    // los valores de la zona
+    const zona = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+pais[0].id+" AND t1.id_parametro = 1 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
+    const suelo = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+pais[0].id+" AND t1.id_parametro = 2 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
+    const categoria = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+pais[0].id+" AND t1.id_parametro = 3 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
+    
+    const respuesta = { estado : 1, id_pais : pais[0].id,zona : zona,suelo : suelo,categoria : categoria};
+    //console.log(respuesta);
+    res.send(respuesta);
+  }
 
 
+  
+});
 
-
-//buscarDirector
 
 
 module.exports = router;

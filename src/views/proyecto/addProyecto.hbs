@@ -62,6 +62,45 @@
 
             google.maps.event.addListener(autocomplete, 'place_changed', function () {
 				var near_place = autocomplete.getPlace();
+                
+                    for (var i=0; i<near_place.address_components.length; i++)
+                    {
+                        if (near_place.address_components[i].types[0] === "country")
+                        {
+                            //console.log(near_place.address_components[i]);
+                            //alert(near_place.address_components[i].long_name);
+
+                            // Crear un objeto de busqueda para ver si el pais esta registrado en la base de datos.
+                            var obt = { pais : near_place.address_components[i].long_name} ;
+                             $.ajax({
+                                            method:'POST',
+                                            url : '/proyecto/buscarPais',
+                                            data : obt,
+                                            success : function(result)
+                                            {
+                                               if (result.estado === 0)
+                                               {
+                                                   alert("Pais no registrado");
+                                               }
+                                               else
+                                               {
+                                                   nuevoalias('#id_pais').val(result.id_pais);
+                                                   //nuevoalias('#zona').html('<option value="A">CAREWE</option>');
+                                                  var zona = "";
+                                                  var suelo = "";
+                                                  var categoria = "";
+                                                  result.zona.forEach(element => zona += "<option value="+element.valor+">"+element.valor+"</option>");
+                                                  result.suelo.forEach(element => suelo += "<option value="+element.valor+">"+element.valor+"</option>");
+                                                  result.categoria.forEach(element => categoria += "<option value="+element.valor+">"+element.valor+"</option>");
+                                                  nuevoalias('#zona').html(zona);
+                                                  nuevoalias('#suelo').html(suelo);
+                                                  nuevoalias('#categoria').html(categoria);
+                                               }
+                                            }
+                                     });
+
+                        }
+                    }
                 nuevoalias('#loc_lat').val(near_place.geometry.location.lat());
                 nuevoalias('#loc_long').val(near_place.geometry.location.lng());
 			});
@@ -76,6 +115,9 @@
     <div class="x_panel">
         <div class="x_title">
             <h2>Crear Proyecto<small></small></h2>
+             <ul class="nav navbar-right panel_toolbox">
+				<li><a onclick="window.history.go(-1); return false;"><i class="fa fa-arrow-circle-left"></i> Volver</a></li>
+			</ul>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -177,7 +219,11 @@
                                 <input type="text" id="direccion" name="direccion"  class="form-control">
                                     <input type="hidden" name="loc_lat" id="loc_lat" />
 								    <input type="hidden" name="loc_long" id="loc_long" />
+                                    <input type="hidden" name="id_pais" id="id_pais" />
                             </div>
+                        </div>
+                        <div class="form-group row">
+
                         </div>
   </div>
   <div class="tab-pane" id="profile" role="tabpanel" aria-labelledby="profile-tab">
@@ -201,21 +247,21 @@
                     <div class="form-group row">
                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Valor x m2:</label>
                                 <div class="col-md-5 col-sm-5">
-                                    <input type="text" id="valor_x_m2" name="valor_x_m2"  class="form-control" onchange="ModificaValorProyecto();">
+                                    <input type="text" id="valor_x_m2" name="valor_x_m2"  class="form-control" onchange="ModificaValorProyecto(1);">
                                 </div>
                                 <label class="col-form-label col-md-2 col-sm-2" for="Destinatario" id="monedaM2" name="monedaM2">UF/ m<sup>2</sup></label>
                     </div>
                     <div class="form-group row">
                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie Preliminar:</label>
                                 <div class="col-md-5 col-sm-5">
-                                    <input type="number" id="superficie_pre" name="superficie_pre" class="form-control" onchange="ModificaValorProyecto();">
+                                    <input type="number" id="superficie_pre" name="superficie_pre" class="form-control" onchange="ModificaValorProyecto(2);">
                                 </div>
                                 <label class="col-form-label col-md-2 col-sm-2" for="Destinatario"> m<sup>2</sup></label>
                     </div>
                     <div class="form-group row">
                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Valor del Proyecto:</label>
                                 <div class="col-md-5 col-sm-5">
-                                    <input type="text" id="valor_proyecto" name="valor_proyecto"  class="form-control" readonly>
+                                    <input type="text" id="valor_proyecto" name="valor_proyecto"  class="form-control" onchange="ModificaValorProyecto(3);">
                                 </div>
                                 <label class="col-form-label col-md-2 col-sm-2" for="Destinatario" id="monedaTipo" name="monedaTipo"> UF</label>
                     </div>
@@ -248,14 +294,14 @@
           &nbsp;
       </div>
                           <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Director :</label>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Director Proyecto:</label>
 							<div class="col-md-9 col-sm-9">
 							    <input id="director" name="director"  class="form-control">
                                 <input type="hidden" id="id_director" name="id_director">
 							</div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Jefe:</label>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Jefe Proyecto:</label>
 							<div class="col-md-9 col-sm-9">
 							    <input id="jefe" name="jefe"  class="form-control">
                                 <input type="hidden" id="id_jefe" name="id_jefe">
@@ -328,19 +374,28 @@
         <div class="form-group row">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Zona</label>
 				<div class="col-md-7 col-sm-7">
-				    <input type="text" id="zona" name="zona"  class="form-control">
+				   <!--  <input type="text" id="zona" name="zona"  class="form-control"> -->
+                   <select class="select2_single form-control" tabindex="-1" name="zona" id="zona">
+						<option value="0">Ingrese una dirección</option>							
+					</select>
 				</div>
         </div>
         <div class="form-group row">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Suelo</label>
 				<div class="col-md-7 col-sm-7">
-				    <input type="text" id="suelo" name="suelo"  class="form-control">
+				    <!-- <input type="text" id="suelo" name="suelo"  class="form-control">-->
+                    <select class="select2_single form-control" tabindex="-1" name="suelo" id="suelo">
+						<option value="0">Ingrese una dirección</option>							
+					</select>
 				</div>
         </div>
         <div class="form-group row">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Categoria</label>
 				<div class="col-md-7 col-sm-7">
-				    <input type="text" id="categoria" name="categoria"  class="form-control">
+				    <!--<input type="text" id="categoria" name="categoria"  class="form-control">-->
+                    <select class="select2_single form-control" tabindex="-1" name="categoria" id="categoria">
+						<option value="0">Ingrese una dirección</option>							
+					</select>
 				</div>
         </div>
         <div class="form-group row">
@@ -399,18 +454,38 @@
         }
 
     }
-    function ModificaValorProyecto()
+    function ModificaValorProyecto( dato )
     {
-        var valor_x_m2 = $( "#valor_x_m2" ).val();
+        var valor_x_m2    = $( "#valor_x_m2" ).val();
         var superficie    = $( "#superficie_pre" ).val();
+        var valor_pro    = $( "#valor_proyecto" ).val();
 
-        console.log(valor_x_m2);
-        console.log(superficie);
+       
         if((valor_x_m2 !== null && valor_x_m2 !== '' )
+            && (superficie !== null && superficie !== '' )
+            && (valor_pro !== null && valor_pro !== '' ))
+            {
+                switch(dato)
+                {
+                    case 1:$( "#valor_proyecto" ).val(valor_x_m2 * superficie );break;
+                    case 2:$( "#valor_x_m2" ).val(valor_pro / superficie );break;
+                    case 3:$( "#valor_x_m2" ).val(valor_pro / superficie ); break;
+                }
+            }
+        else if((valor_x_m2 !== null && valor_x_m2 !== '' )
             && (superficie !== null && superficie !== '' ))
             {
+                console.log(valor_x_m2);
+                console.log(superficie);
+                console.log(valor_pro);
                 var vproyecto = valor_x_m2 * superficie;
                 $( "#valor_proyecto" ).val(vproyecto);
+            }
+        else if((valor_pro !== null && valor_pro !== '')
+            && (superficie !== null && superficie !== '' ))
+            {
+                var vxm2 = valor_pro / superficie;
+                $( "#valor_x_m2" ).val(vxm2);
             }
     }
 function validarFormulario()

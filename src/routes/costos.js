@@ -5,6 +5,8 @@ var formidable = require('formidable');
 var fs = require('fs');
 var dateFormat = require('dateformat');
 
+var url = require('url');
+
 //importar una conexión a DB
 const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
@@ -99,9 +101,16 @@ router.post('/fileupload', async (req,res) => {
                         }
                     });
                 });
-                res.redirect("../costos/usuario");
           });
     })
+
+   // res.redirect("../costos/usuario",);
+   res.redirect(   url.format({
+    pathname:"../costos/usuario",
+    query: {
+       "a": 1
+     }
+  }));
 
 });
 
@@ -185,11 +194,10 @@ router.get('/historial/:id', async (req, res) => {
     const { id } = req.params;
     
     const costos =  await pool.query("SELECT * ,DATE_FORMAT(t1.fecha, '%Y-%m-%d') AS fecha FROM sys_usuario_costo_ingreso AS t1, sys_usuario AS t2 WHERE t1.id_user = t2.idUsuario ORDER BY t1.id DESC");
-    const detalle = await pool.query("SELECT * FROM sys_usuario_costo_ingreso_detalle AS t1, sys_usuario AS t2 WHERE t1.id_costo_ingreso = 16 AND  t1.idUsuario = t2.idUsuario");
+    const detalle = await pool.query("SELECT * FROM sys_usuario_costo_ingreso_detalle AS t1, sys_usuario AS t2 WHERE t1.id_costo_ingreso = "+id+" AND  t1.idUsuario = t2.idUsuario");
 
+    // Detalle del historial de la carga.
     
-    // detalles 
-
 
     res.render('costos/historial', { costos,detalle,req ,layout: 'template'});
 
@@ -254,12 +262,12 @@ router.get('/descargarPlanilla', isLoggedIn, async (req, res) => {
 
   
   // save under export.xlsx
-  await workbook.xlsx.writeFile('export.xlsx');
+  await workbook.xlsx.writeFile(''+year+'_'+mes+'.xlsx');
 
   //_____________________________________________________________________________________
   res.set({
     'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'Content-Disposition': `attachment; filename="export.xlsx"`,
+    'Content-Disposition': `attachment; filename="`+year+`_`+mes+`.xlsx"`,
   });
   //_____________________________________________________________________________________
   
@@ -276,6 +284,8 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
     var mes = fecha.getMonth() + 1;
     const annios = [];
 
+    var mensaje = -1;
+
     
     if (req.query.anio !== undefined)
     {
@@ -285,7 +295,14 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
     {
         mes = req.query.mes;
     }
+    if (req.query.a !== undefined)
+    {
+        mensaje = req.query.a;
+    }
     
+    /// revisar si viene el mensaje de aleta 
+    //console.log(req.query);
+
 
     for (let step = 0; step < 10; step++) {
         annios.push(year - step);
@@ -314,30 +331,6 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
         }
     });
 
-    // Buscar la informacion de los usuarios.
-
-   /* const costos  = await pool.query("SELECT * ," +
-                                     "FORMAT(t1.costo,2) AS costoFormat" +
-                                    " FROM    " +
-                                                    " sys_usuario_costo AS t1," + 
-                                                    " sys_usuario  AS t2, " +
-                                                    " sys_categoria AS t3," +
-                                                    " centro_costo AS t4, " +
-                                                    " sys_sucursal AS t5" + 
-                                    " WHERE     " + 
-                                                    " t1.annio = "+ year +" " +
-                                    " AND       " +
-                                                    " t1.mes = "+ mes +"  " +
-                                    " AND       " +
-                                                    " t1.idUsuario = t2.idUsuario" +
-                                    " AND       " + 
-                                                    " t2.idCategoria = t3.id_Categoria"+
-                                    " AND       " +
-                                                    "t3.idCentroCosto = t4.id" +
-                                    " AND       " +
-                                                    "t5.id_Sucursal = t2.idSucursal");
-                                                    */
-
 
         const costos  = await pool.query(" SELECT " +
                                                     " *, " +
@@ -356,15 +349,34 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
                                                 " t4.idCentroCosto = t5.id ");
     // Revisar la Query de los costos.
 
-                                                    
-    res.render('costos/usuario', { annios, messes, costos,year,mes, req ,layout: 'template'});
+    
+    if (mensaje !== -1)
+    { 
+        const verToask = {
+        titulo : "Mensaje",
+        body   : "Planilla cargada correctamente.",
+        tipo   : "Crear"
+            };
+    
+       res.render('costos/usuario', { annios, messes,verToask, costos,year,mes, req ,layout: 'template'});
+    }
+    else
+    {
+        res.render('costos/usuario', { annios, messes, costos,year,mes, req ,layout: 'template'});
+    }
+    
+    
+
+
+
+
 }); 
 
 router.get('/eproyectos', isLoggedIn, async (req, res) => {
 
     const proveedores =  await pool.query("SELECT * FROM prov_externo ORDER BY nombre ASC");
     const centros =  await pool.query("SELECT * FROM centro_costo ORDER BY centroCosto ASC");
-    const monedas =  await pool.query("SELECT * FROM moneda_tipo as t1 WHERE  t1.id_moneda in (1,2,4)");
+    const monedas =  await pool.query("SELECT * FROM moneda_tipo as t1 WHERE  t1.factura = 'Y'");
     const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");
 
 
@@ -393,7 +405,8 @@ router.get('/aproyectos', isLoggedIn, async (req, res) => {
 
     // Seleccicionar los costos que el ha ingresado
     const costosExternos = await pool.query("SELECT " + 
-                                            "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso , t5.nombre as proveedor,  t2.nombre as nomProyecto" +
+                                            "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso ,"+
+                                            " t5.nombre as proveedor,  t2.nombre as nomProyecto, t4.nombre AS nomSol" +
                                             " FROM pro_costo_externo as t1, "+
                                             " pro_proyectos as t2, " +
                                             " pro_costo_externo_estado as t3, " +
@@ -405,6 +418,9 @@ router.get('/aproyectos', isLoggedIn, async (req, res) => {
                                             " AND t1.id_ingreso = t4.idUsuario" + 
                                             " AND t5.id = t1.id_prov_externo" );
 
+
+    console.log(costosExternos);
+
     res.render('proyecto/acostoexterno', {costosExternos, req ,layout: 'template'});
 
 });
@@ -413,7 +429,7 @@ router.get('/costoexterno/revisar/:id', async (req, res) => {
     const { id } = req.params;
     
     const costosExternos = await pool.query("SELECT " + 
-    "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso , t5.nombre as proveedor, t2.nombre as nomProyecto" +
+    "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso , t5.nombre as proveedor, t2.nombre as nomProyecto, t4.nombre AS nomSol" +
     " FROM pro_costo_externo as t1, "+
     " pro_proyectos as t2, " +
     " pro_costo_externo_estado as t3, " +
@@ -426,7 +442,7 @@ router.get('/costoexterno/revisar/:id', async (req, res) => {
     " AND t5.id = t1.id_prov_externo" );
 
     const costoExterno = await pool.query("SELECT " + 
-    "* , t1.id as idCostoExterno,t1.descripcion as desTra,  t5.nombre as nomProveedor,t2.nombre As nomPro, t2.id As idPro FROM pro_costo_externo as t1, "+
+    "* , t1.id as idCostoExterno,t1.descripcion as desTra,  t5.nombre as nomProveedor,t2.nombre As nomPro, t2.id As idPro, t4.nombre AS nomSol FROM pro_costo_externo as t1, "+
     " pro_proyectos as t2, " +
     " pro_costo_externo_estado as t3, " +
     " sys_usuario as t4, " + 
@@ -440,7 +456,7 @@ router.get('/costoexterno/revisar/:id', async (req, res) => {
     " AND t1.id_ingreso = t4.idUsuario");
 
     const costosAnteriores = await pool.query("SELECT " + 
-    "* , t1.id as idCostoExterno,t1.descripcion as desTra, t5.nombre as nomProveedor,t2.nombre As nomPro,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso FROM pro_costo_externo as t1, "+
+    "* , t1.id as idCostoExterno,t1.descripcion as desTra, t5.nombre as nomProveedor,t2.nombre As nomPro,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso, t4.nombre AS nomSol FROM pro_costo_externo as t1, "+
     " pro_proyectos as t2, " +
     " pro_costo_externo_estado as t3, " +
     " sys_usuario as t4, " + 

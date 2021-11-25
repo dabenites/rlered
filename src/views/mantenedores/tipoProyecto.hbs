@@ -60,7 +60,7 @@
                                                 href="tipoProyecto/edit/{{id}}">
                                                 Editar
                                             </a>
-                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"  onclick="return confirm('¿ Esta seguro de borrar el tipo proyecto : {{descripcion}} ?')"
                                                 href="tipoProyecto/delete/{{id}}">
                                                 Borrar
                                             </a>
@@ -159,26 +159,36 @@
 
 function validarIngreso ()
 {
-  nameTipoProyecto = $("#demo-form").serialize();
 
- $.ajax({
-     method:'POST',
-     url : '/mantenedores/ajax-validarNombreTipoProyecto',
-     data : nameTipoProyecto,
-     success : function(result)
-     {
-         //alert(result);
-         if(!$.trim(result)){
-             // no existe resultado esta en lo correcto
-             document.getElementById("demo-form").submit();
-         }
-         else{
-            toastr.warning('warning', 'No se pueden cargar un tipo proyecto con el mismo nombre.', {
-           "progressBar": true
-             });
-         }
-     }
-    })
+  var tipoProyecto = $("#descripcion").val();
+    
+  if (tipoProyecto === "")
+    {
+        alert("El campo Tipo Proyecto no puede estar sin rellenar.");
+    }
+    else
+    {
+    nameTipoProyecto = $("#demo-form").serialize();
+
+    $.ajax({
+        method:'POST',
+        url : '/mantenedores/ajax-validarNombreTipoProyecto',
+        data : nameTipoProyecto,
+        success : function(result)
+        {
+            //alert(result);
+            if(!$.trim(result)){
+                // no existe resultado esta en lo correcto
+                document.getElementById("demo-form").submit();
+            }
+            else{
+                toastr.warning('warning', 'No se pueden cargar un tipo proyecto con el mismo nombre.', {
+            "progressBar": true
+                });
+            }
+        }
+        });
+    }
 }
 
 </script>

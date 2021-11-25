@@ -19,7 +19,8 @@
                     <tr>
                         <th>Proyecto</th>
                         <th>Cliente</th>
-                        <th>Director / Jefe</th>
+                        <th>Director</th>
+                        <th>Jefe</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
@@ -27,8 +28,9 @@
                     {{#each proyectos}}
                     <tr>
                         <td>{{year}}-{{code}} : {{nombre}}</td>
-                        <td></td>
-                        <td></td>
+                        <td>{{nomCli}}</td>
+                        <td>{{nomDir}}</td>
+                        <td>{{nomJefe}}</td>
                         <td style="padding: .15rem;">
                             <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
                                 href="editar/{{id}}">

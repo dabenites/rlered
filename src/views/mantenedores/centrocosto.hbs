@@ -60,7 +60,7 @@
                                                 href="centrocosto/edit/{{id}}">
                                                 Editar
                                             </a>
-                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" onclick="return confirm('¿ Esta seguro de borrar el centro de costo : {{centroCosto}} ?')"
                                                 href="centrocosto/delete/{{id}}">
                                                 Borrar
                                             </a>
@@ -156,26 +156,36 @@
 
 function validarIngreso ()
 {
-  nameCentroCosto = $("#demo-form").serialize();
 
- $.ajax({
-     method:'POST',
-     url : '/mantenedores/ajax-validarNombreCentroCosto',
-     data : nameCentroCosto,
-     success : function(result)
-     {
-         //alert(result);
-         if(!$.trim(result)){
-             // no existe resultado esta en lo correcto
-             document.getElementById("demo-form").submit();
-         }
-         else{
-            toastr.warning('warning', 'No se pueden cargar centros de costos con el mismo nombre.', {
-           "progressBar": true
-             });
-         }
-     }
-    })
+    var nomCentroCosto = $("#name").val();
+    
+    if (nomCentroCosto === "")
+    {
+        alert("El campo centro de costo no puede estar sin rellenar");
+    }
+    else
+    {
+        nameCentroCosto = $("#demo-form").serialize();
+
+        $.ajax({
+            method:'POST',
+            url : '/mantenedores/ajax-validarNombreCentroCosto',
+            data : nameCentroCosto,
+            success : function(result)
+            {
+                //alert(result);
+                if(!$.trim(result)){
+                    // no existe resultado esta en lo correcto
+                    document.getElementById("demo-form").submit();
+                }
+                else{
+                    toastr.warning('warning', 'No se pueden cargar centros de costos con el mismo nombre.', {
+                "progressBar": true
+                    });
+                }
+            }
+            });
+    }
 }
 
 </script>

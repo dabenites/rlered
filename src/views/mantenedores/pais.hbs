@@ -77,7 +77,7 @@
                                                 href="pais/edit/{{id}}">
                                                 Editar
                                             </a>
-                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
+                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" onclick="return confirm('¿ Esta seguro de borrar el pais : {{pais}} ?')"
                                                 href="pais/delete/{{id}}">
                                                 Borrar
                                             </a>
@@ -180,26 +180,37 @@
 
 function validarIngreso ()
 {
-  namePais = $("#demo-form").serialize();
 
- $.ajax({
-     method:'POST',
-     url : '/mantenedores/ajax-validarNombrePais',
-     data : namePais,
-     success : function(result)
-     {
-         //alert(result);
-         if(!$.trim(result)){
-             // no existe resultado esta en lo correcto
-             document.getElementById("demo-form").submit();
-         }
-         else{
-            toastr.warning('warning', 'No se pueden cargar Pais con el mismo nombre.', {
-           "progressBar": true
-             });
-         }
-     }
-    })
+     var pais = $("#name").val();
+    
+    if (pais === "")
+    {
+        alert("El campo pais no puede estar sin rellenar.");
+    }
+    else
+    {
+        namePais = $("#demo-form").serialize();
+
+        $.ajax({
+            method:'POST',
+            url : '/mantenedores/ajax-validarNombrePais',
+            data : namePais,
+            success : function(result)
+            {
+                //alert(result);
+                if(!$.trim(result)){
+                    // no existe resultado esta en lo correcto
+                    document.getElementById("demo-form").submit();
+                }
+                else{
+                    toastr.warning('warning', 'No se pueden cargar Pais con el mismo nombre.', {
+                "progressBar": true
+                    });
+                }
+            }
+            });
+    }
+  
 }
 
 </script>

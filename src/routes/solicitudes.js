@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../database');
 var dateFormat = require('dateformat');
+var url = require('url');
 
 const { isLoggedIn } = require('../lib/auth');
 
@@ -356,7 +357,7 @@ router.post('/AddIngreso', async (req,res) => {
     idTipoSolicitud : 1,
     fecha : fecha,
     comentario:comentario,
-    idEstado: '1'
+    idEstado: '2'
   }
   
     //Guardar datos en la BD      
@@ -387,10 +388,13 @@ router.get('/apermisos', async (req,res) => {
                                     "DATE_FORMAT(t3.fecha_inicio,'%Y-%m-%d' ) AS fecha_per," +
                                     "DATE_FORMAT(t3.fecha_inicio,'%H:%i' ) AS fecha_inicio," +
                                     "DATE_FORMAT(t3.fecha_termino,'%H:%i' ) AS fecha_termino, "+
-                                    't1.id' +
-                                    ' FROM sol_solicitud AS t1, sys_usuario AS t2, sol_permiso AS t3 '+
+                                    't1.id,' +
+                                    't4.descripcion' +
+                                    ' FROM sol_solicitud AS t1, sys_usuario AS t2, sol_permiso AS t3, sol_estado AS t4 '+
                                      ' WHERE' +
-                                     ' t1.idTipoSolicitud = 2 AND t1.idEstado = 2 AND t1.idUsuario = t2.idUsuario AND t3.idSolicitud = t1.id ' +
+                                     ' t1.idTipoSolicitud = 2 AND t1.idEstado IN(2,4) AND t1.idUsuario = t2.idUsuario AND t3.idSolicitud = t1.id ' +
+                                     ' AND ' + 
+                                          ' t4.id = t1.idEstado ' +
                                      ' AND ' + 
                                      " t1.idAprobador = "+ req.user.idUsuario +"");
 
@@ -402,15 +406,19 @@ router.get('/solicitudes/revisar/:id', async (req, res) => {
 
   const { id } = req.params;
 
+  
   const permisos  = await pool.query(' SELECT t2.Nombre, '+
                                     "DATE_FORMAT(t1.fecha,'%Y-%m-%d') AS fecha, " +
                                     "DATE_FORMAT(t3.fecha_inicio,'%Y-%m-%d' ) AS fecha_per," +
                                     "DATE_FORMAT(t3.fecha_inicio,'%H:%i' ) AS fecha_inicio," +
                                     "DATE_FORMAT(t3.fecha_termino,'%H:%i' ) AS fecha_termino, "+
-                                    't1.id' +
-                                    ' FROM sol_solicitud AS t1, sys_usuario AS t2, sol_permiso AS t3 '+
+                                    't1.id,' +
+                                    't4.descripcion' +
+                                    ' FROM sol_solicitud AS t1, sys_usuario AS t2, sol_permiso AS t3 , sol_estado AS t4'+
                                      ' WHERE' +
-                                     ' t1.idTipoSolicitud = 2 AND t1.idEstado = 2 AND t1.idUsuario = t2.idUsuario AND t3.idSolicitud = t1.id ' +
+                                     ' t1.idTipoSolicitud = 2 AND t1.idEstado IN (2,4) AND t1.idUsuario = t2.idUsuario AND t3.idSolicitud = t1.id ' +
+                                     ' AND ' + 
+                                     ' t4.id = t1.idEstado ' +
                                      ' AND ' + 
                                      " t1.idAprobador = "+ req.user.idUsuario +"");
 
@@ -423,7 +431,7 @@ router.get('/solicitudes/revisar/:id', async (req, res) => {
                                     ' t1.id' +
                                     ' FROM sol_solicitud AS t1, sys_usuario AS t2, sol_permiso AS t3 '+
                                     ' WHERE' +
-                                    ' t1.idTipoSolicitud = 2 AND t1.idEstado = 2 AND t1.idUsuario = t2.idUsuario AND t3.idSolicitud = t1.id ' +
+                                    ' t1.idTipoSolicitud = 2 AND t1.idUsuario = t2.idUsuario AND t3.idSolicitud = t1.id ' +
                                     ' AND ' + 
                                     " t1.id = "+ id+"");
 
@@ -439,8 +447,22 @@ router.get('/solicitudes/revisar/:id', async (req, res) => {
                                     ' t1.idTipoSolicitud = 2 AND t1.idEstado = 3 AND t1.idAprobador = t2.idUsuario AND t3.idSolicitud = t1.id ' +
                                     ' AND ' + 
                                     " t1.idUsuario = "+ permiso[0]["idUsuario"]+"");
+  
+  //___
+  switch(permiso[0].idEstado)
+  {
+    case 2:
+    case "2":
+      res.render('solicitudes/aprobarPermiso', { req,permisoAnteriores ,permisos ,permiso:permiso[0], layout: 'template'})
+    break;
+    case 4:
+    case "4":
+      const anulacion = "";
+      res.render('solicitudes/aprobarPermiso', { req,permisoAnteriores ,anulacion:permiso[0], permisos ,permiso:permiso[0], layout: 'template'})
+    break;
+  }
 
-  res.render('solicitudes/aprobarPermiso', { req,permisoAnteriores ,permisos ,permiso:permiso[0], layout: 'template'})
+  
 
 }); 
 
@@ -450,8 +472,11 @@ router.post('/updatePermisos', async (req,res) => {
 
   switch(req.body.estado)
   {
+    case "2":
+      const resultPer2 = await pool.query("UPDATE sol_permiso set idEstado = 5 WHERE  idSolicitud = "+req.body.id_solicitud+" "); // Aprobado
+      const result2 = await pool.query("UPDATE sol_solicitud set idEstado = 5 WHERE  id = "+req.body.id_solicitud+" ");
+    break;
     case "1":
-      console.log("Aprobado");
       const resultPer1 = await pool.query("UPDATE sol_permiso set idEstado = 3 WHERE  idSolicitud = "+req.body.id_solicitud+" "); // Aprobado
       const result1 = await pool.query("UPDATE sol_solicitud set idEstado = 3 WHERE  id = "+req.body.id_solicitud+" ");
     break;
@@ -471,10 +496,11 @@ router.get('/avacaciones', isLoggedIn, async (req, res) => {
 
 
   // Seleccicionar los días que el ha ingresado
-  const soliVacaciones  = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id"+
+  const soliVacaciones  = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t4.descripcion"+
                                   " FROM  " +
                                               " sol_solicitud AS t1 ,  " +
                                               " sol_selec_dias AS t2 ,  " +
+                                              " sol_estado AS t4,  " +
                                               " sys_usuario AS t3" +
                                   " WHERE  " +
                                                " t1.idTipoSolicitud = t1.idTipoSolicitud " +
@@ -483,9 +509,11 @@ router.get('/avacaciones', isLoggedIn, async (req, res) => {
                                   " AND  " +
                                               " t1.idEstado = t1.idEstado "+
                                   " AND  " +
+                                              " t1.idEstado = t4.id"+
+                                  " AND  " +
                                               " t1.id = t2.idSolicitud"+
                                   " AND  " +
-                                              " t1.idEstado in (1,2)"+
+                                              " t1.idEstado in (2,4)"+
                                   " AND  " +
                                               " t1.idUsuario = t3.idUsuario "+ 
                                   "   GROUP BY t2.idSolicitud ");
@@ -499,28 +527,31 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
   //console.log(req.body);
   const { id } = req.params;
    // Seleccicionar los días que el ha ingresado
-   const soliVacaciones  = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id"+
+   const soliVacaciones  = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t4.descripcion"+
    " FROM  " +
                " sol_solicitud AS t1 ,  " +
                " sol_selec_dias AS t2 ,  " +
+               " sol_estado AS t4,  " +
                " sys_usuario AS t3" +
    " WHERE  " +
                 " t1.idTipoSolicitud = t1.idTipoSolicitud " +
    " AND  " +
                " t1.idAprobador = " +  req.user.idUsuario +  "" +
    " AND  " +
-               " t1.idEstado in (1,2) "+
-
+               " t1.idEstado in (2,4) "+
+   " AND  " +
+               " t1.idEstado = t4.id"+
    " AND  " +
                " t1.id = t2.idSolicitud"+
    " AND  " +
                " t1.idUsuario = t3.idUsuario "+
    " GROUP BY t2.idSolicitud ");
 
-  const selecciona = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t1.fecha , t1.comentario, t1.fecha, DATE_FORMAT(t1.fecha, '%Y-%m-%d') as fecha "+
+  const selecciona = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t1.fecha , t1.comentario,t1.comentario_anulacion, t1.fecha, DATE_FORMAT(t1.fecha, '%Y-%m-%d') as fecha, t4.descripcion, t4.id as idEstado "+
   " FROM  " +
               " sol_solicitud AS t1 ,  " +
               " sol_selec_dias AS t2 ,  " +
+              " sol_estado AS t4,  " +
               " sys_usuario AS t3" +
   " WHERE  " +
                " t1.idTipoSolicitud =  t1.idTipoSolicitud " +
@@ -529,11 +560,15 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
   " AND  " +
               " t1.id = t2.idSolicitud"+
   " AND  " +
+              " t1.idEstado = t4.id"+
+  " AND  " +
               " t1.idUsuario = t3.idUsuario "+
   " GROUP BY t2.idSolicitud ");
 
 
-  const seleccionaList = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t1.fecha, DATE_FORMAT(t1.fecha, '%d-%m-%Y') as fecha"+
+  const seleccionaList = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t1.fecha, DATE_FORMAT(t1.fecha, '%d-%m-%Y') as fecha,"+
+                                          " DATE_FORMAT(MAX(t2.fecha), '%d-%m-%Y') AS maxFecha, " +
+                                          " DATE_FORMAT(MIN(t2.fecha), '%d-%m-%Y') AS minFecha" +
   
                                             " FROM  " +
                                                         " sol_solicitud AS t1 ,  " +
@@ -551,8 +586,6 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
                                                         " t1.idEstado = 3 "+
                                               
                                             " GROUP BY t2.idSolicitud ");
-
-
   const diasFecha = await pool.query("SELECT  DATE_FORMAT(t1.fecha, '%Y-%m-%d') as fecha, " +
                                      "   if (t1.medioDia = 'Y', ' Medio dia', ' Dia completo') AS mediodia, " +
                                      " if (t1.medioDia = 'Y', if(t1.hora = 'AM', ' Mañana',' Tarde'), '') AS hora " +
@@ -561,7 +594,24 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
                                      " WHERE  " +
                                               " t1.idSolicitud = " + id +"");
 
-res.render('proyecto/avacaciones', { soliVacaciones , selecciona , obj :selecciona[0] ,seleccionaList,diasFecha, req , layout: 'template'});
+// Preguntar el estado 
+
+//console.log(selecciona[0]);
+switch(selecciona[0].idEstado)
+{
+  case 2:
+  case "2":
+    res.render('proyecto/avacaciones', { soliVacaciones , selecciona , obj :selecciona[0] ,seleccionaList,diasFecha, req , layout: 'template'});
+  break;
+
+  case 4:
+  case "4":
+    const anulacion = "";
+    res.render('proyecto/avacaciones', { anulacion:selecciona[0], soliVacaciones , selecciona , obj :selecciona[0] ,seleccionaList,diasFecha, req , layout: 'template'});
+  break;
+
+}
+
 });
 
 
@@ -571,6 +621,11 @@ router.post('/updateVacaciones', async (req,res) => {
 
   switch(req.body.estado)
   {
+    case "2":
+      //console.log("UPDATE sol_selec_dias set idEstado = 3 WHERE  idSolicitud = "+req.body.id_solicitud+" ");
+      const resultPer2 = await pool.query("UPDATE sol_selec_dias set idEstado = 5 WHERE  idSolicitud = "+req.body.id_solicitud+" "); // Anulada
+      const result2 = await pool.query("UPDATE sol_solicitud set idEstado = 5 WHERE  id = "+req.body.id_solicitud+" ");
+    break;
     case "1":
       //console.log("UPDATE sol_selec_dias set idEstado = 3 WHERE  idSolicitud = "+req.body.id_solicitud+" ");
       const resultPer1 = await pool.query("UPDATE sol_selec_dias set idEstado = 3 WHERE  idSolicitud = "+req.body.id_solicitud+" "); // Aprobado
@@ -600,6 +655,288 @@ const result2 = await pool.query('DELETE FROM sol_solicitud WHERE id = ? ', [id]
 res.send("OK");
 
 });
+
+// Permisos 
+router.get('/missolicitudes', isLoggedIn, async (req, res) => {
+
+ // console.log(req.user);
+
+  const solicitudes = await pool.query("SELECT " +
+                                              " t1.id, " +
+                                              " t2.descripcion, " +
+                                              " t1.idAprobador, " +
+                                              " t3.Nombre, "+
+                                              " t4.descripcion AS estado, " +
+                                              " t1.idEstado, " +
+                                              " DATE_FORMAT(t1.fecha , '%Y-%m-%d')  AS fecha " +
+                                        " FROM sol_solicitud AS t1, " +
+                                              " sol_tipo_solicitud AS t2, " +
+                                              " sys_usuario AS t3, " +
+                                              " sol_estado AS t4 " +
+                                        " WHERE " +
+                                              " t1.idUsuario = "+req.user.idUsuario+" " +
+                                          " AND  " +
+                                              " t1.idTipoSolicitud = t2.id " +
+                                          " AND  " +
+                                              " t1.idAprobador = t3.idUsuario " +
+                                          " AND " +
+                                              " t4.id = t1.idEstado");
+  
+  var mensaje = -1;
+   if (req.query.a !== undefined)
+        {
+           mensaje = req.query.a;
+        }
+
+        if (mensaje !== -1)
+        { 
+            const verToask = {
+            titulo : "",
+            body   : "Solicitud fue enviada a proceso de anulación",
+            tipo   : "Editar"
+                };
+        
+                res.render('solicitudes/missolicitudes', {  verToask, solicitudes, req ,layout: 'template'});
+        }
+        else
+        {
+          res.render('solicitudes/missolicitudes', {  solicitudes, req ,layout: 'template'});
+        }
+
+  
+}); 
+
+router.get('/missolicitudes/:id', isLoggedIn, async (req, res) => {
+
+  const { id } = req.params;
+
+  const solicitudes = await pool.query("SELECT " +
+                                                " t1.id, " +
+                                                " t2.descripcion, " +
+                                                " t1.idAprobador, " +
+                                                " t3.Nombre, "+
+                                                " t4.descripcion AS estado, " +
+                                                " t1.idEstado, " +
+                                                " DATE_FORMAT(t1.fecha , '%Y-%m-%d')  AS fecha " +
+                                    " FROM sol_solicitud AS t1, " +
+                                                " sol_tipo_solicitud AS t2, " +
+                                                " sys_usuario AS t3, " +
+                                                " sol_estado AS t4 " +
+                                    " WHERE " +
+                                                " t1.idUsuario = "+req.user.idUsuario+" " +
+                                    " AND  " +
+                                                " t1.idTipoSolicitud = t2.id " +
+                                    " AND  " +
+                                                " t1.idAprobador = t3.idUsuario " +
+                                    " AND " +
+                                                " t4.id = t1.idEstado");
+
+  const solicitud = await pool.query("SELECT " +
+                                          " t1.id, " +
+                                          " t2.id as tipo, " +
+                                          " t2.descripcion, " +
+                                          " t1.idAprobador, " +
+                                          " t3.Nombre, "+
+                                          " t4.descripcion AS estado, " +
+                                          " t4.id AS idEstado, " +
+                                          " t1.idEstado, " +
+                                          " DATE_FORMAT(t1.fecha , '%Y-%m-%d')  AS fecha, " +
+                                          " t1.comentario, " +
+                                          " t1.comentario_anulacion " +
+                                        " FROM sol_solicitud AS t1, " +
+                                          " sol_tipo_solicitud AS t2, " +
+                                          " sys_usuario AS t3, " +
+                                          " sol_estado AS t4 " +
+                                        " WHERE " +
+                                          " t1.idUsuario = "+req.user.idUsuario+" " +
+                                        " AND  " +
+                                          " t1.idTipoSolicitud = t2.id " +
+                                        " AND  " +
+                                          " t1.idAprobador = t3.idUsuario " +
+                                        " AND  " +
+                                          " t1.id = "+id+" " +
+                                        " AND " +
+                                          " t4.id = t1.idEstado");
+
+  //console.log(solicitud);
+  switch(solicitud[0].tipo)
+  {
+    case 1:
+    case "1":
+      var sql  = "SELECT " +
+              " DATE_FORMAT(t1.fecha , '%Y-%m-%d') as fecha , " +
+              " if (t1.medioDia = 'Y', if(t1.hora = 'AM','Mañana','Tarde'),'') AS horario " +
+              " FROM  " +
+              " sol_selec_dias AS t1 " +
+              " WHERE " +
+              " t1.idSolicitud = "+solicitud[0].id+"";
+     
+     const vacaciones = await pool.query(sql);
+     switch(solicitud[0].idEstado)
+     {
+        case 1:
+        case 2:
+        case 3:
+          res.render('solicitudes/missolicitudes', {valido:solicitud[0],  vacaciones, solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
+        break;
+        case 4:
+        case 5:
+          res.render('solicitudes/missolicitudes', { vacaciones, solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
+        break;
+
+     }
+     
+
+    break;
+
+
+    case 2:
+    case "2":
+      var sql  = " SELECT " +
+ 		                  " DATE_FORMAT(t1.fecha_inicio, '%Y-%m-%d') AS fecha, " +
+		                  " DATE_FORMAT(t1.fecha_inicio, '%H:%i') AS inicio, " +
+		                  " DATE_FORMAT(t1.fecha_termino, '%H:%i') AS termino " +
+                " FROM  " +
+		                  " sol_permiso AS t1 " +
+                " WHERE  " +
+		                  "  t1.idSolicitud = "+solicitud[0].id+" "; 
+      
+      const permisos = await pool.query(sql);
+
+     // console.log(solicitud[0]);
+
+     // res.render('solicitudes/missolicitudes', {  permiso:permisos[0],solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
+     switch(solicitud[0].idEstado)
+     {
+        case 1:
+        case 2:
+        case 3:
+          res.render('solicitudes/missolicitudes', { valido:solicitud[0], permiso:permisos[0],solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
+        break;
+        case 4:
+        case 5:
+          res.render('solicitudes/missolicitudes', {  permiso:permisos[0],solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
+        break;
+
+     }
+    break;
+
+  }
+
+
+  
+
+ });
+//
+
+router.post('/anular', async (req,res) => {
+
+const {comentario,id,idEstado} = req.body
+  
+ // console.log(comentario);
+
+  switch(idEstado)
+  {
+    case 1:
+    case "1":
+    case 2:
+    case "2":
+    case 4:
+    case "4":  
+      const result = await pool.query('UPDATE sol_solicitud set  idEstado = 5 , comentario_anulacion = ? WHERE id = ? ', [comentario,id]);
+    break;
+    case 3:
+    case "3":
+      const result2 = await pool.query('UPDATE sol_solicitud set  idEstado = 4 , comentario_anulacion = ? WHERE id = ? ', [comentario,id]);
+    break;
+  }
+ 
+  res.redirect(   url.format({
+    pathname:"../solicitudes/missolicitudes",
+    query: {
+       "a": 1
+     }
+  }));
+
+});
+
+
+//horaextras
+router.get('/horaextras', isLoggedIn, async (req, res) => {
+
+  const horasExtras  =  await pool.query("SELECT " +
+	                                                " t1.numhh,t1.comentario,t1.id, t2.Nombre AS nomSol,t3.nombre AS nomPro, t4.descripcion   " +
+                                          "  FROM sol_horaextra AS t1  "+
+                                          "  LEFT JOIN sys_usuario AS t2 ON t1.idSolicitante = t2.idUsuario  "+
+                                          "  LEFT JOIN pro_proyectos AS t3 ON t1.idProyecto = t3.id"+
+                                          "  LEFT JOIN sol_estado AS t4 ON t1.idEstado = t4.id");
+
+  res.render('solicitudes/horasextras', {  horasExtras,req ,layout: 'template'});
+ });
+ 
+
+ router.get('/buscarPro/:find', async (req, res) => {
+  
+  // BUSCAR DIRECTOR  
+  const nombre = req.query.term;
+  const proyectos =  await pool.query("SELECT t1.id AS id, CONCAT(t1.year,'-',t1.code , ' : ' , t1.nombre) AS value " +
+                                      " FROM pro_proyectos as t1 WHERE t1.nombre LIKE '%"+nombre+"%' OR CONCAT(t1.year,'-',t1.code) LIKE '%"+nombre+"%'");
+  
+                                      
+  res.setHeader('Content-Type', 'application/json');
+  res.json(proyectos);
+
+});
+
+router.get('/buscarSol/:find', async (req, res) => {
+
+  // BUSCAR DIRECTOR  
+  const nombre = req.query.term;
+  const destinarios =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 WHERE t1.Nombre LIKE '%"+nombre+"%'");
+  
+
+  res.setHeader('Content-Type', 'application/json');
+  res.json(destinarios);
+
+});
+
+//addHorasExtras
+router.post('/addHorasExtras', async (req,res) => {
+
+  const {comentario,num_hh,idSolicitante,idProyecto} = req.body;
+  //proyecto: '1998-11 : IGLESIA CORPORACION PENTECOSTAL SAN BERNARDO',
+  //idProyecto: '185',
+  //solicitante: 'David Benites',
+  //idSolicitante: '124',
+  //num_hh: '23',
+  //comentario: 'comentario'
+
+   // Permiso
+ const horaExtra  ={ //Se gurdaran en un nuevo objeto
+  idSolicitante :idSolicitante ,
+  idIngreso:   req.user.idUsuario,
+  idProyecto : idProyecto,
+  idEstado : 2,
+  fecha_solicitante : new Date(),
+  numhh:num_hh,
+  comentario: comentario
+}
+const he = await pool.query('INSERT INTO sol_horaextra  set ? ', [horaExtra]);
+   
+    res.redirect(   url.format({
+      pathname:"../solicitudes/horaextras",
+      query: {
+         "a": 1
+       }
+    }));
+  
+  });
+
+
+// ahorasExtras
+
+
+
 
 
 module.exports = router;

@@ -63,7 +63,7 @@ button.close {
 				
 									{{else}}	
 										<td>
-											<a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" href="contacto/delete/{{id}}" > Eliminar</a>
+											<a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" onclick="return confirm('¿ Esta seguro de borrar contacto : {{name}} ?')" href="contacto/delete/{{id}}" > Eliminar</a>
 										</td>
 									{{/if}}
                                 </tr>

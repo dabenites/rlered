@@ -11,6 +11,7 @@
                 <thead>
                     <tr>
                         <th>Solicitante</th>
+                        <th>Estado</th>
                         <th>Fecha Ingreso</th>
                         <th>Periordo</th>
                         <th>Opciones</th>
@@ -21,6 +22,7 @@
                             {{#each permisos}}
                                 <tr > 
                                     <td>{{Nombre}}</td>
+                                    <td>{{descripcion}}</td>
                                     <td>{{fecha}}</td>
                                     <td>{{fecha_per}} : {{fecha_inicio}} hasta {{fecha_termino}}</td>
                                     <td>
@@ -34,6 +36,7 @@
                             {{#each permisos}}
                                 <tr > 
                                     <td>{{Nombre}}</td>
+                                    <td>{{descripcion}}</td>
                                     <td>{{fecha}}</td>
                                     <td>{{fecha_per}} : {{fecha_inicio}} hasta {{fecha_termino}}</td>
                                     <td>
@@ -114,8 +117,12 @@
                                 <label class="col-form-label col-md-4 col-sm-4 label-align" for="descripcion"></label>
                                 <input type="hidden" id="estado" class="form-control" value="" name="estado" readonly />
                                 <input type="hidden" id="id_solicitud" class="form-control" value="{{permiso.id}}" name="id_solicitud" readonly />
-                                <button type="button" onclick="revisarAction(1);"class="btn btn-warning" type="reset">Aceptar</button>
-                                <button type="button" onclick="revisarAction(0);" class="btn btn-danger" type="button">Rechazar</button>
+                                 {{#if anulacion }}
+                                    <button type="button" onclick="revisarAction(2);" class="btn btn-warning" type="reset">Anular </button>
+                                {{else}}
+                                    <button type="button" onclick="revisarAction(1);" class="btn btn-warning" type="reset">Aceptar</button>
+                                    <button type="button" onclick="revisarAction(0);" class="btn btn-danger"  type="button">Rechazar</button>
+                                {{/if}}
                             </div>
                         </form>
                       </div>
@@ -157,6 +164,9 @@
                 break;
                 case 1:
                 $("#estado").val(1); // aprobado
+                break;
+                 case 2:
+                $("#estado").val(2); // Anulado
                 break;
             }
             document.getElementById("updatePermiso").submit();

@@ -11,12 +11,16 @@ const { isLoggedIn } = require('../lib/auth');
 router.get('/ploteo', isLoggedIn, async (req, res) => {
  
     const ploteos_pendiente  =  await pool.query("SELECT t.*, t2.nombre AS nomPro,t3.Nombre AS nomIngr, t4.Nombre AS nomDes" +
-                                                "  FROM sol_ploteo as t , pro_proyectos AS t2 , sys_usuario AS t3, sys_usuario AS t4" +
-                                                " where t.id_estado = 1 AND t.id_proyecto = t2.id AND t.id_ingreso = t3.idUsuario AND t.id_destinatario = t4.idUsuario");  
+                                                "  FROM sol_ploteo as t  "+
+                                                " LEFT JOIN sys_usuario AS t4 ON t.id_destinatario = t4.idUsuario, "+
+                                                " pro_proyectos AS t2 , sys_usuario AS t3" +
+                                                " where t.id_estado = 1 AND t.id_proyecto = t2.id AND t.id_ingreso = t3.idUsuario");  
 
     const ploteos_proceso  =  await pool.query("SELECT t.*, t2.nombre AS nomPro,t3.Nombre AS nomIngr, t4.Nombre AS nomDes" +
-                                                "  FROM sol_ploteo as t , pro_proyectos AS t2 , sys_usuario AS t3, sys_usuario AS t4" +
-                                                " where t.id_estado = 2 AND t.id_proyecto = t2.id AND t.id_ingreso = t3.idUsuario AND t.id_destinatario = t4.idUsuario");
+                                                "  FROM sol_ploteo as t "+
+                                                " LEFT JOIN sys_usuario AS t4 ON t.id_destinatario = t4.idUsuario," +
+                                                " pro_proyectos AS t2 , sys_usuario AS t3" +
+                                                " where t.id_estado = 2 AND t.id_proyecto = t2.id AND t.id_ingreso = t3.idUsuario ");
     
    // console.log(ploteos_pendiente);
 

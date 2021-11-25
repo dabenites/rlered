@@ -1,10 +1,12 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
 <div class="x_panel">
     <div class="x_title">
         <h2>Información moneda UF <!--<small>Tener los valores actualizados para un correcto funcionamiento de los
                 Dashboard</small>--></h2>
         <ul class="nav navbar-right panel_toolbox">
             <button type="button" class="btn btn-success btn-xs"><a class="close-link"
-                    href="/mantenedores/valorufmanual"> Actualizar Manual</a></button>
+                    href="/mantenedores/valorufmanual"> <label style="color: #e8f1fb;"> Actualizar Manual</label></a></button>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i
                         class="fa fa-clock-o"></i></a>
@@ -64,6 +66,9 @@
 <script src="../../../template/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script> 
 <script src="../../../template/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 <script>
       $('#tablavalorMoneda').DataTable({
         language: {
@@ -89,3 +94,31 @@
       });
 
 </script>
+{{#if verToask }}
+<!--INFORMACIÓN-->
+<script>
+    if ("{{verToask.tipo}}" == "Editar") {
+        toastr.warning('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Crear") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Eliminar") {
+        toastr.error('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Permisos") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+
+
+
+</script>
+{{/if}}

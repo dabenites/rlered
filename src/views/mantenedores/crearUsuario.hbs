@@ -3,23 +3,19 @@
 <div class="col-md-12 col-sm-12 ">
 	<div class="x_panel">
 		<div class="x_title">
-			<h2>Formulario <small>Creación de nuevos usuarios</small></h2>
+			<h2>Nuevo Usuario <small></small></h2>
 
-			<ul class="nav navbar-right panel_toolbox">
-				<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-				<li><a class="close-link"><i class="fa fa-close"></i></a></li>
-			</ul>
 			<div class="clearfix">
 			</div>
 			</div>
 			<div class="x_content">
 			<br/>
-			<form name="ignresoUsuario" id="ignresoUsuario" data-parsley-validate class="form-horizontal form-label-left"  action="/mantenedores/addUsuario" method="POST">
+			<form name="ignresoUsuario" id="ignresoUsuario" data-parsley-validate class="form-horizontal form-label-left" action="/mantenedores/addUsuario" method="POST">
 				<div class="item form-group">
-					<label class="col-form-label col-md-3 col-sm-3 label-align" for="Nombre">Nombre<span class="required">*</span>
+					<label class="col-form-label col-md-3 col-sm-3 label-align" for="Nombre" >Nombre<span class="required">*</span>
 					</label>
 					<div class="col-md-6 col-sm-6 ">
-						<input type="text" id="Nombre" name="Nombre" required="required" class="form-control">
+						<input type="text" id="Nombre" name="Nombre" required="required" class="form-control" >
 					</div>
 				</div>
 				<div class="item form-group">
@@ -30,10 +26,10 @@
 					</div>
 				</div>
 				<div class="item form-group">
-					<label class="col-form-label col-md-3 col-sm-3 label-align" for="Telefono">Teléfono<span class="required">*</span>
+					<label class="col-form-label col-md-3 col-sm-3 label-align" for="Telefono">Teléfono<span class="required"></span>
 					</label>
 					<div class="col-md-6 col-sm-6 ">
-						<input type="text" id="Telefono" name="Telefono" required="required" class="form-control">
+						<input type="text" id="Telefono" name="Telefono" class="form-control">
 					</div>
 				</div>
 				<div class="item form-group">
@@ -64,17 +60,25 @@
 					</div>
 				</div>
 				<div class="item form-group">
-					<label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Título<span class="required">*</span>
+					<label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Título<span class="required"></span>
 					</label>
 					<div class="col-md-6 col-sm-6 ">
-						<input type="text" id="titulo" name="titulo"  required="required" class="form-control">
+						<input type="text" id="titulo" name="titulo"  class="form-control">
+					</div>
+				</div>
+				<div class="item form-group">
+					<label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo"><span class="required"></span>
+					</label>
+					<div class="col-md-6 col-sm-6 ">
+						(*) Campo Obligatorio
 					</div>
 				</div>
 				<div class="ln_solid"></div>
 				<div class="form-group">
 					<div class="col-md-9 col-sm-9  offset-md-3">
 						<!--<button type="button" class="btn btn-primary">Cancelar</button>-->
-						<button type="button"  onclick="ValidarIngreso();" class="btn btn-success">Guardar</button>
+						<!-- <button type="button"  onclick="ValidarIngreso();" class="btn btn-success">Guardar</button> -->
+						<button type="submit" class="btn btn-success" >Guardar</button>
 					</div>
 				</div>
 			</form>
@@ -87,33 +91,52 @@
 
 
 <script>
+var retVal = null; 
+
+$("#ignresoUsuario").submit(function(e){
+	
+	
+	if (ValidarIngreso() == false)
+	{
+		e.preventDefault(); 
+	}
+	
+	//e.preventDefault(); 
+ });
+
+function ajaxCallBack(estado){
+    this.retVal = estado;
+}
+
+// planner.renelagos.com
 
 function ValidarIngreso ( )
 	{
 		//_________________________________________
 		var dataIngreso = $("#ignresoUsuario").serialize();
 		//_________________________________________
-		//alert("ASDF");	
+		var estado = true;
+			$.ajax({
+							async: false,
+							method:'POST',
+							url : '/mantenedores/ajax-validarNombreLogin',
+							data : dataIngreso,
+							success : function(result)
+							{
+								if(!$.trim(result)){
+									estado = true;
+								}
+								else{
+									toastr.warning('warning', result, {
+										"progressBar": true
+									});
+									estado = false;
+								}
+							}
+					});
+		
+		return estado;
 
-		$.ajax({
-				method:'POST',
-				url : '/mantenedores/ajax-validarNombreLogin',
-				data : dataIngreso,
-				success : function(result)
-				{
-					//alert(result);
-					if(!$.trim(result)){
-						// no existe resultado esta en lo correcto
-						document.getElementById("ignresoUsuario").submit();
-					}
-					else{
-						toastr.warning('warning', 'No se pueden crear un usuario con un login existente', {
-							"progressBar": true
-						});
-					}
-				}
-				});
-
-	}
+	};
 
 </script>

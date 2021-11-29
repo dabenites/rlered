@@ -300,11 +300,11 @@ router.get('/buscador/delete/:id', async (req, res) => {
 router.get('/addPro', async (req, res) => {
 
   const tipo = await pool.query("SELECT * FROM proyecto_tipo");
-  const estado = await pool.query("SELECT * FROM pro_costo_externo_estado");
-  
+  const estado = await pool.query("SELECT * FROM proyecto_estado");
+  const servicio = await pool.query("SELECT * FROM proyecto_servicio");  
   // // 
 
-  res.render('proyecto/addProyecto', { tipo,estado, req, layout: 'template' });
+  res.render('proyecto/addProyecto', {servicio, tipo,estado, req, layout: 'template' });
   
 });
 

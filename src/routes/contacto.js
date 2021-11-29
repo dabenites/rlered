@@ -231,4 +231,28 @@ router.get('/contacto/delete/:id', async (req, res) => {
     
 });
 
+router.get('/contacto/editar/:id', async (req, res) => {
+
+    
+    const { id } = req.params;
+
+    /// contacto
+    const keys_words  = await pool.query("SELECT * FROM contacto_key");
+
+    const contacto  = await pool.query("SELECT * FROM contacto as t WHERE t.id = "+id+"");
+
+    console.log(contacto);
+
+    res.render('contacto/editar', { contacto:contacto[0],req ,layout: 'template'});
+
+
+
+
+});
+
+
+
+
+
+
 module.exports = router;

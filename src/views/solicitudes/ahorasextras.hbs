@@ -1,0 +1,108 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+<div class="col-md-6 col-sm-6  ">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Aprobación de Horas Extras <!--<small> Listado de permisos por aprobar</small>--></h2>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Solicitante</th>
+                        <th>Proyecto</th>
+                        <th>Nº Horas</th>
+                        <th>Fecha</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                    <tbody>
+                        {{#each horasextras}}
+                                <tr> 
+                                    <td>{{Nombre}}</td>
+                                    <td>{{nomPro}}</td>
+                                    <td>{{numhh}}</td>
+                                    <td>{{fecha}}</td>
+                                    <td>
+                                        <a style="padding: .25rem;" type="button" class="btn btn-warning btn-xs" href="../../solicitudes/horaextra/{{id}}">
+                                            Revisar 
+                                        </a>
+                                    </td>
+                                </tr>
+                        {{/each}}
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+ {{#if horasextra }}
+    <div class="col-md-6 ">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Revisar Hora Extra<small></small></h2> 
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                 <form id="uHorasExtra" name="uHorasExtra" data-parsley-validate action="/solicitudes/uhorasextras" method="POST">
+                <div class="form-group row">
+                        <label for="Proyecto" class="col-sm-3 col-form-label label-align"> <b>Proyecto</b></label>
+                        <label for="nomPro" class="col-sm-8 col-form-label">{{horasextra.nomPro}}</label>
+                </div>
+                <div class="form-group row">
+                        <label for="Proyecto" class="col-sm-3 col-form-label label-align"> <b>Solicitante</b></label>
+                        <label for="nomPro" class="col-sm-8 col-form-label">{{horasextra.Nombre}}</label>
+                </div>
+                <div class="form-group row">
+                        <label for="Proyecto" class="col-sm-3 col-form-label label-align"> <b>Colaborador</b></label>
+                        <label for="nomPro" class="col-sm-8 col-form-label">{{horasextra.colaborador}}</label>
+                </div>
+                <div class="form-group row">
+                        <label for="Proyecto" class="col-sm-3 col-form-label label-align"> <b>Fecha Solicitud</b></label>
+                        <label for="nomPro" class="col-sm-8 col-form-label">{{horasextra.fecha}}</label>
+                </div>
+                <div class="form-group row">
+                        <label for="Proyecto" class="col-sm-3 col-form-label label-align"> <b>Nº Horas</b></label>
+                        <label for="nomPro" class="col-sm-8 col-form-label">{{horasextra.numhh}}</label>
+                </div>
+                <div class="form-group row">
+                        <label for="Proyecto" class="col-sm-3 col-form-label label-align"> <b>Comentario</b></label>
+                        <label for="nomPro" class="col-sm-8 col-form-label">{{horasextra.comentario}}</label>
+                </div>
+                <div class="form-group row">
+                        <label for="staticEmail" class="col-sm-3 col-form-label label-align"> <b>Comentario Solicitud</b></label>
+                        <div class="col-sm-9">
+                            <input type="hidden" name="id" id="id" value="{{horasextra.id}}">
+                            <input type="hidden" id="estado" class="form-control" value="" name="estado" readonly />
+                            <textarea class="form-control" placeholder="Ingresar Comentario" id="comentario" name="comentario"></textarea>
+                        </div>
+                </div>
+                 <div class="form-group row">
+                        <div class="col-sm-3">
+                        </div>
+                        <div class="col-sm-6">
+                            <button type="button" onclick="cargaTrackingHoraExtra(1);" class="btn btn-success">Aprobar</button>
+                            <button type="button" onclick="cargaTrackingHoraExtra(2);" class="btn btn-danger">Rechazar</button>
+                        </div>
+                </div>
+                </form>
+            </div>  
+        </div>
+    </div>
+ {{/if}}
+
+<script>
+    function cargaTrackingHoraExtra(estado)
+        {
+            switch(estado)
+            {
+                case 1:
+                $("#estado").val(1); // aprobado
+                break;
+                 case 2:
+                $("#estado").val(2); // Rechazado
+                break;
+            }
+            document.getElementById("uHorasExtra").submit();
+        }
+</script>

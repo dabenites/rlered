@@ -193,12 +193,18 @@
                          <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo Servicio:</label>
 									<div class="col-md-7 col-sm-7">
 										<select class="select2_single form-control" tabindex="-1" name="id_servicio" id="id_servicio">
-                                                <option value="0">Ninguno</option>
+                                             <option value="0">Ninguno</option>
+                                            {{#each servicio}}
+                                                <option value="{{id}}">{{descripcion}}</option>
+                                            {{/each}}
+                                                <!--
+                                                    <option value="0">Ninguno</option>
                                                 <option value="1">Proyecto Internacional</option>
                                                 <option value="2">Revision</option>
                                                 <option value="3">Proyecto TI</option>
                                                 <option value="4">Proyecto Nacional</option>
                                                 <option value="5">Proyecto Perú</option>
+                                                -->
                                         </select>
 									</div>
                      </div>
@@ -222,9 +228,14 @@
                                     <input type="hidden" name="id_pais" id="id_pais" />
                             </div>
                         </div>
-                        <div class="form-group row">
-
+                    <div class="form-group row">
+                        <div class="col-md-9 col-sm-9">
+                        
                         </div>
+                    <div class="col-md-1 col-sm-1">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="cargaTab(2);">next</button>
+                    </div>
+                    </div>
   </div>
   <div class="tab-pane" id="profile" role="tabpanel" aria-labelledby="profile-tab">
         <div class="form-group row">
@@ -270,7 +281,7 @@
                         <div class="form-group row">
                              <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Inicio:</label>
                                 <div class="col-md-6 col-sm-6">
-                                    <input type="date" id="fecha_inicio" name="fecha_inicio"  class="form-control">
+                                    <input type="date" id="fecha_inicio" name="fecha_inicio"  class="form-control" onchange="fechaInicio();">
                                 </div>
                         </div>
                         <div class="form-group row">
@@ -282,11 +293,22 @@
                         <div class="form-group row">
                              <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Termino:</label>
                                 <div class="col-md-6 col-sm-6">
-                                    <input type="date" id="fecha_termino" name="fecha_termino"  class="form-control">
+                                    <input type="date" id="fecha_termino" name="fecha_termino"  class="form-control" onchange="fechaTermino();">
                                 </div>
                         </div>
                 </div>
             </div>
+        </div>
+         <div class="form-group row">
+             <div class="col-md-1 col-sm-1">
+                 <button type="button" class="btn btn-secondary btn-sm" onclick="cargaTab(1);">Prev</button>
+             </div>
+                        <div class="col-md-9 col-sm-9">
+                        
+                        </div>
+                    <div class="col-md-1 col-sm-1">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="cargaTab(3);">Next</button>
+                    </div>
         </div>
   </div>
   <div class="tab-pane" id="messages" role="tabpanel" aria-labelledby="messages-tab">
@@ -334,6 +356,19 @@
 							    <input id="revisor" name="revisor"  class="form-control">
                                 <input type="hidden" id="id_revisor" name="id_revisor" class="form-control">
 							</div>
+                    </div>
+                     <div class="form-group row">
+                    <div class="col-md-3 col-sm-3">
+                    </div>
+                    <div class="col-md-1 col-sm-1">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="cargaTab(2);">Prev</button>
+                    </div>
+                        <div class="col-md-7 col-sm-7">
+                        
+                        </div>
+                    <div class="col-md-1 col-sm-1">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="cargaTab(4);">Next</button>
+                    </div>
                     </div>
   </div>
   <div class="tab-pane" id="settings" role="tabpanel" aria-labelledby="settings-tab">
@@ -404,10 +439,24 @@
 				    <input type="number" id="num_planos_estimado" name="num_planos_estimado"  class="form-control">
 				</div>
         </div>
+         <div class="form-group row">
+                    <div class="col-md-3 col-sm-3">
+                    </div>
+                    <div class="col-md-1 col-sm-1">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="cargaTab(3);">Prev</button>
+                    </div>
+                        <div class="col-md-4 col-sm-4">
+                        
+                        </div>
+                    <div class="col-md-1 col-sm-1">
+                        <button type="button" class="btn btn-success btn-sm" onclick="validarFormulario();">Ingresar</button>
+                    </div>
+                    </div>
+
 
 </div>
             
-            
+                <!--
                 <div class="form-group row">
                     <div class="col-md-5 col-sm-5">
                         
@@ -416,6 +465,7 @@
                         <button type="button" class="btn btn-success btn-sm" onclick="validarFormulario();">Ingresar</button>
                     </div>
                 </div>
+                -->
             </form>
         </div>
     </div>
@@ -551,6 +601,107 @@ function validarFormulario()
         $( "#cargaProyecto" ).submit();
     }
 }
+
+function fechaInicio ()
+{
+    // preguntar información.
+    var valorFechaTermino   =  $( "#fecha_termino" ).val();
+    var valorFechaInicio    =  $( "#fecha_inicio" ).val();
+
+    if (valorFechaTermino != "")
+    {
+        const termino = new Date(valorFechaTermino);
+        const inicio = new Date(valorFechaInicio);
+        const diffTime = termino - inicio;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        if (diffDays < 0)
+        {
+            alert("La fecha de inicio no puede ser mayor a la fecha de termino");
+            $( "#fecha_inicio" ).val("");
+        }
+    }
+}
+
+function cargaTab(tab)
+{
+    switch(tab)
+    {
+        case 1:
+        $( "#home" ).addClass('tab-pane active');
+        $( "#home-tab" ).addClass('nav-link active');
+
+        $( "#profile-tab" ).removeClass('nav-link active');
+        $( "#profile-tab" ).addClass('nav-link');
+        $( "#profile" ).removeClass('tab-pane active');
+        $( "#profile" ).addClass('tab-pane');
+        break;
+
+        case 2:
+        $( "#profile" ).addClass('tab-pane active');
+        $( "#profile-tab" ).addClass('nav-link active');
+
+        $( "#home-tab" ).removeClass('nav-link active');
+        $( "#home-tab" ).addClass('nav-link');
+        $( "#home" ).removeClass('tab-pane active');
+        $( "#home" ).addClass('tab-pane');
+
+        $( "#messages-tab" ).removeClass('nav-link active');
+        $( "#messages-tab" ).addClass('nav-link');
+        $( "#messages" ).removeClass('tab-pane active');
+        $( "#messages" ).addClass('tab-pane');
+        
+        break;
+
+        case 3:
+        $( "#messages" ).addClass('tab-pane active');
+        $( "#messages-tab" ).addClass('nav-link active');
+
+        $( "#profile-tab" ).removeClass('nav-link active');
+        $( "#profile-tab" ).addClass('nav-link');
+        $( "#profile" ).removeClass('tab-pane active');
+        $( "#profile" ).addClass('tab-pane');
+        
+        $( "#settings-tab" ).removeClass('nav-link active');
+        $( "#settings-tab" ).addClass('nav-link');
+        $( "#settings" ).removeClass('tab-pane active');
+        $( "#settings" ).addClass('tab-pane');
+        break;
+
+        case 4:
+        $( "#settings" ).addClass('tab-pane active');
+        $( "#settings-tab" ).addClass('nav-link active');
+
+        $( "#messages-tab" ).removeClass('nav-link active');
+        $( "#messages-tab" ).addClass('nav-link');
+        $( "#messages" ).removeClass('tab-pane active');
+        $( "#messages" ).addClass('tab-pane');
+        break;
+
+
+    }
+}
+
+function fechaTermino ()
+{
+    // preguntar información.
+    var valorFechaTermino   =  $( "#fecha_termino" ).val();
+    var valorFechaInicio    =  $( "#fecha_inicio" ).val();
+
+    if (valorFechaInicio != "")
+    {
+        const termino = new Date(valorFechaTermino);
+        const inicio = new Date(valorFechaInicio);
+        const diffTime = termino - inicio;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        if (diffDays < 0)
+        {
+            alert("La fecha de termino no puede ser menor a la fecha de inicio");
+            $( "#fecha_termino" ).val("");
+        }
+    }
+}
+
+
 
 </script>
 

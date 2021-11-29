@@ -935,8 +935,95 @@ const he = await pool.query('INSERT INTO sol_horaextra  set ? ', [horaExtra]);
 
 // ahorasExtras
 
+//Cannot GET /solicitudes/ahorasExtras
+router.get('/ahorasExtras', async (req, res) => {
+  //________________________________________________
+  // sol_horaextra
+
+  const horasextras =  await pool.query("SELECT t2.Nombre , t1.numhh , DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha, t3.nombre AS nomPro, "+
+                                        "t1.id from sol_horaextra AS t1, sys_usuario AS t2, pro_proyectos AS t3 WHERE " +
+                                        " t1.idIngreso = t2.idUsuario AND t1.idProyecto = t3.id AND t1.idEstado in (2)");
 
 
+  res.render('solicitudes/ahorasextras', { horasextras, req ,layout: 'template'});
+
+});
+//Cannot GET /solicitudes/ahorasExtras
+router.get('/horaextra/:id', async (req, res) => {
+  //________________________________________________
+  // sol_horaextra
+  const { id } = req.params;
+
+
+  const horasextra =  await pool.query("SELECT "+
+                                                " t2.Nombre , t1.numhh ," +
+                                                " t2a.Nombre As colaborador," +
+                                                " DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha," +
+                                                " t3.nombre AS nomPro, t1.id, " +
+                                                " t1.comentario " +
+                                       " from  sol_horaextra AS t1," +
+                                              " sys_usuario AS t2, " +
+                                              " sys_usuario AS t2a, " +
+                                              " pro_proyectos AS t3 " +
+                                       " WHERE t1.idIngreso = t2.idUsuario " +
+                                       " AND t2a.idUsuario = t1.idSolicitante " +
+                                       " AND t1.idProyecto = t3.id " +
+                                       " AND t1.id = "+id+"");
+  const horasextras =  await pool.query("SELECT t2.Nombre , t1.numhh , DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha, t3.nombre AS nomPro, t1.id from sol_horaextra AS t1, sys_usuario AS t2, pro_proyectos AS t3 WHERE t1.idIngreso = t2.idUsuario AND t1.idProyecto = t3.id AND t1.idEstado in (2)");
+
+  //console.log(horasextra);
+
+  res.render('solicitudes/ahorasextras', { horasextra:horasextra[0],horasextras, req ,layout: 'template'});
+
+});
+
+
+//___________________
+//addHorasExtras
+router.post('/uhorasextras', async (req,res) => {
+
+  const {id,estado,comentario} = req.body;
+
+  switch(estado)
+  {
+    case 1:
+    case "1":
+      const tracking = {idHoraExtra : id,
+                        fecha   : new Date(),
+                        estado_inicial : "2",
+                        estado_final : "3",
+                        idUsuario : req.user.idUsuario,
+                        comentario   : comentario};
+    
+     const result0 = await pool.query('INSERT INTO sol_horaextra_tracking set ? ', [tracking]);
+
+     const result = pool.query("UPDATE sol_horaextra set idEstado = 3 WHERE  id = "+id+" ");
+
+
+      break;
+    case 2:
+    case "2":
+      const tracking2 = {idHoraExtra : id,
+        fecha   : new Date(),
+        estado_inicial : "2",
+        estado_final : "6",
+        idUsuario : req.user.idUsuario,
+        comentario   : comentario};
+
+      const result01 = await pool.query('INSERT INTO sol_horaextra_tracking set ? ', [tracking2]);
+
+      const result1 = pool.query("UPDATE sol_horaextra set idEstado = 6 WHERE  id = "+id+" ");
+      break;
+  }
+  
+  res.redirect(   url.format({
+    pathname:"../solicitudes/ahorasExtras",
+    query: {
+       "a": 1
+     }
+  }));
+
+});
 
 
 module.exports = router;

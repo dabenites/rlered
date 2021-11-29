@@ -1,3 +1,11 @@
+<style>
+   .dataTables_filter{
+	    position: relative;
+  		float: right;
+   }
+</style>
+
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <!--FORMULARIO-->
 <div class="col-md-12 col-sm-12 ">
@@ -43,6 +51,7 @@
 					<label class="col-form-label col-md-3 col-sm-3 label-align">Categoría</label>
 					<div class="col-md-6 col-sm-6 ">
 						<select class="select2_single form-control" tabindex="-1" name="idCategoria">
+							<option value="0">Seleccione</option>
 							{{#each categoria}}
 								<option value="{{id_Categoria}}">{{categoria}}</option>
 							{{/each}}
@@ -110,12 +119,26 @@ function ajaxCallBack(estado){
 
 // planner.renelagos.com
 
+function validar_email( email ) 
+{
+    var regex = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    return regex.test(email) ? true : false;
+}
+
+
 function ValidarIngreso ( )
 	{
-		//_________________________________________
-		var dataIngreso = $("#ignresoUsuario").serialize();
-		//_________________________________________
+		// 
+		var email = $("#Email").val();
+
 		var estado = true;
+		
+		if (validar_email(email))
+		{
+			//_________________________________________
+			var dataIngreso = $("#ignresoUsuario").serialize();
+			//_________________________________________
+		
 			$.ajax({
 							async: false,
 							method:'POST',
@@ -134,7 +157,14 @@ function ValidarIngreso ( )
 								}
 							}
 					});
-		
+		}
+		else
+		{
+			toastr.warning('warning', "Email no valido", {
+										"progressBar": true
+									});
+			estado = false;
+		}		
 		return estado;
 
 	};

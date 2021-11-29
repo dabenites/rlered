@@ -4,6 +4,8 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 var util = require("util");
 var url = require('url');
+const helpers = require('../lib/helpers');
+const bcrypt = require('bcryptjs');
 
 
 //importar una conexión a DB
@@ -50,6 +52,9 @@ router.get('/usuario/crear/', isLoggedIn, async (req, res) => {
     const categoria = await pool.query('SELECT * FROM sys_categoria');
     const sucursal = await pool.query('SELECT * FROM sys_sucursal');
     
+    //const hash = bcrypt.hashSync("dav", 10);
+
+
     res.render('mantenedores/crearUsuario', { req ,usuarios,categoria,sucursal, layout: 'template'});
 });
 
@@ -100,10 +105,20 @@ router.post('/addUsuario', async (req, res) => {
 
    // console.log(req.body);
    const result = await pool.query('INSERT INTO sys_usuario set ? ', [newUsario]);
-  
+   
+   
+   const newPassword  ={
+    idUsuario : result.insertId,
+    password : bcrypt.hashSync("RL$"+login,10)
+   };
+
+   const result2 = await pool.query('INSERT INTO sys_password set ? ', [newPassword]);
+
    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
    //console.log(usuarios);
- 
+    
+
+
    
    const verToask = {
        titulo : Nombre,
@@ -151,7 +166,7 @@ router.get('/usuario/permisos/:id', async (req, res) => {
 
     var query = "SELECT t1.*, t2.Nombre AS nomGrupo, if (t3.idPermiso > 0,1,0) AS estado " +
                 " FROM sys_grupo_modulo AS t2 , sys_modulo AS t1 " +
-                " LEFT JOIN sys_permiso AS t3 ON t3.idUsuario = "+ id +" AND t3.idModulo = t1.idModulo   WHERE t1.idGrupo = t2.idGrupo ORDER BY nomGrupo ASC,t1.Nombre ASC ";
+                " LEFT JOIN sys_permiso AS t3 ON t3.idUsuario = "+ id +" AND t3.idModulo = t1.idModulo   WHERE t1.idGrupo = t2.idGrupo AND t1.operativo = 'Y' ORDER BY nomGrupo ASC,t1.Nombre ASC ";
     
     const permisos = await pool.query(query);
 

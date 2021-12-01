@@ -52,6 +52,37 @@
         </div>
     </div>
 </div>
+{{#if historiaPermisos }}
+  <div class="col-md-6 ">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Historial Permisos<small></small></h2> 
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+               <table class="table table-hover" name="historialHorasExtras" id="historialHorasExtras">
+                    <thead>
+                        <tr>
+                            <th>Solicitante</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each historiaPermisos}}
+                                <tr> 
+                                    <td>{{Nombre}}</td>
+                                    <td>{{descripcion}}</td>
+                                    <td>{{fecha_per}} : {{fecha_inicio}} hasta {{fecha_termino}}</td>
+                                </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div> 
+ {{/if}}
+
  {{#if permiso }}
 <div class="col-md-7 ">
     <div class="x_panel">
@@ -120,8 +151,8 @@
                                  {{#if anulacion }}
                                     <button type="button" onclick="revisarAction(2);" class="btn btn-warning" type="reset">Anular </button>
                                 {{else}}
-                                    <button type="button" onclick="revisarAction(1);" class="btn btn-warning" type="reset">Aceptar</button>
                                     <button type="button" onclick="revisarAction(0);" class="btn btn-danger"  type="button">Rechazar</button>
+                                    <button type="button" onclick="revisarAction(1);" class="btn btn-warning" type="reset">Aceptar</button>
                                 {{/if}}
                             </div>
                         </form>

@@ -18,6 +18,7 @@ button.close {
     -webkit-appearance: none;
 }
 </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <div class="x_panel">
 	<div class="x_title">
 	    <h2>Lista de contactos<small></small></h2>
@@ -126,6 +127,9 @@ button.close {
 <script src="../../../template/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="../../../template/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script> 
 <script src="../../../template/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 
 <script>
 function verFormulario()
@@ -393,3 +397,25 @@ function creaObjetoContacto ()
     }});
 	
 </script>
+{{#if verToask }}
+<!--INFORMACIÓN-->
+<script>
+    
+    if ("{{verToask.tipo}}" == "Editar") {
+        toastr.warning('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Crear") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Eliminar") {
+        toastr.error('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+
+</script>
+{{/if}}

@@ -10,14 +10,14 @@
         <div class="x_content">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="vacper-tab" data-toggle="tab" href="#vacper" role="tab" aria-controls="vacper" aria-selected="true">Vacaciones / Permiso</a>
+                    <a class="nav-link" id="vacper-tab" data-toggle="tab" href="#vacper" role="tab" aria-controls="vacper" aria-selected="true">Vacaciones / Permiso</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="hextra-tab" data-toggle="tab" href="#hextra" role="tab" aria-controls="hextra" aria-selected="false">Horas Extras</a>
+                    <a class="nav-link active" id="hextra-tab" data-toggle="tab" href="#hextra" role="tab" aria-controls="hextra" aria-selected="false">Horas Extras</a>
                 </li>
            </ul>
            <div class="tab-content">
-               <div class="tab-pane active" id="vacper" role="tabpanel" aria-labelledby="vacper-tab">
+               <div class="tab-pane" id="vacper" role="tabpanel" aria-labelledby="vacper-tab">
                     <div class="form-group row">&nbsp;</div>
 
                     <table class="table table-hover">
@@ -48,7 +48,7 @@
                         </tbody>
                     </table>
                </div>
-               <div class="tab-pane" id="hextra" role="tabpanel" aria-labelledby="hextra-tab">
+               <div class="tab-pane active" id="hextra" role="tabpanel" aria-labelledby="hextra-tab">
                     <div class="form-group row">&nbsp;</div>
                         <table class="table table-hover">
                             <thead>
@@ -81,73 +81,43 @@
     </div>
 </div>
 <div class="col-md-6 ">
-    {{#if solicitud }}
     <div class="x_panel">
-        <div class="x_title">
-                <h2>Revisión de solicitud</h2>
-            <div class="clearfix"></div>
-        </div>
-        <div class="x_content">
-            <form id="demo-form" data-parsley-validate action="/solicitudes/anular" method="POST">
-            
-            <div class="item form-group">
+            <div class="x_title">
+                    <h2>Revisión de solicitud</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="item form-group">
 					<label class="col-form-label col-md-2 col-sm-2 label-align" for="Tipo"> <b> Tipo </b></label>
-					<label class="col-form-label col-md-3 col-sm-3" for="Tipo">{{solicitud.descripcion}} </label>
+					<label class="col-form-label col-md-2 col-sm-2" for="Tipo">Hora Extra </label>
 
                     <label class="col-form-label col-md-2 col-sm-2 label-align" for="Estado"> <b> Estado </b></label>
-                    <label class="col-form-label col-md-3 col-sm-3" for="Tipo">{{solicitud.estado}} </label>
-			</div>
-            <div class="item form-group">
-					<label class="col-form-label col-md-2 col-sm-2 label-align" for="Aprobador"> <b> Aprobador </b></label>
-					<label class="col-form-label col-md-3 col-sm-3" for="Tipo">{{solicitud.Nombre}} </label>
+                    <label class="col-form-label col-md-3 col-sm-3" for="Tipo">{{solicitud.descripcion}} </label>
+			    </div>
+                 <div class="item form-group">
+                     <label class="col-form-label col-md-2 col-sm-2 label-align" for="Tipo"> <b> Proyecto </b></label>
+                      <label class="col-form-label col-md-6 col-sm-6" for="Tipo">{{solicitud.nomPro}} </label>
+                 </div>
+                  <div class="item form-group">
+                        <label class="col-form-label col-md-2 col-sm-2 label-align" for="Tipo"> <b> Asignado A: </b></label>
+					    <label class="col-form-label col-md-2 col-sm-2" for="Tipo">{{solicitud.colaborador}} </label>
 
-                    <label class="col-form-label col-md-2 col-sm-2 label-align" for="Fecha"> <b> Fecha solicitud </b></label>
-                    <label class="col-form-label col-md-3 col-sm-3" for="Tipo">{{solicitud.fecha}} </label>
-			</div>
-            <div class="item form-group">
-					<label class="col-form-label col-md-2 col-sm-2 label-align" for="Comentario"> <b> Comentario Ingreso</b></label>
-					<label class="col-form-label col-md-8 col-sm-8" for="Tipo">{{solicitud.comentario}} </label>
-			</div>
-            <div class="item form-group">
-					<label class="col-form-label col-md-2 col-sm-2 label-align" for="Comentario"> <b> Periodo </b></label>
-					    
-                             {{#if vacaciones }}
-                                <div class="col-md-8 col-sm-8">
-                                    <ul class="list-group">
-                                        {{#each vacaciones}}
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            {{fecha}} {{horario}}
-                                        </li>
-                                        {{/each}}
-                                    </ul>
-                                </div>
-                              {{/if}}
-                               {{#if permiso }}
-                                    <label class="col-form-label col-md-8 col-sm-8" for="Tipo">
-                                    Día : {{permiso.fecha}} , {{permiso.inicio}}  - {{permiso.termino}}
-                                    </label>
-                               {{/if}}
-			</div>
+                        <label class="col-form-label col-md-2 col-sm-2 label-align" for="Tipo"> <b> Nº HH </b></label>
+					    <label class="col-form-label col-md-2 col-sm-2" for="Tipo">{{solicitud.numhh}} </label>
 
-            <div class="item form-group">
-					<label class="col-form-label col-md-2 col-sm-2 label-align" for="Comentario"> <b> Comentario  Respuesta:</b></label>
-					<div class="col-md-8 col-sm-8 ">
-						<label class="col-form-label col-md-8 col-sm-8" for="Tipo"> {{solicitud.comentario_anulacion}}</label>
-					</div>
-			</div>
-             <div class="item form-group">
-                 <label class="col-form-label col-md-4 col-sm-4 label-align" for="Comentario"></label>
-                 <input type="hidden" id="id" class="form-control" value="{{solicitud.id}}" name="id"/>
-                 <input type="hidden" id="idEstado" class="form-control" value="{{solicitud.idEstado}}" name="idEstado"/>
-                 {{#if valido }}
-                    <button type="submit" class="btn btn-warning btn-block"> Anular</button>
-                 {{/if}}
-                 
-             </div>
-             </form>
-        </div>
+                        <label class="col-form-label col-md-2 col-sm-2 label-align" for="Estado"> <b> Fecha Solicitud </b></label>
+                        <label class="col-form-label col-md-3 col-sm-3" for="Tipo">{{solicitud.fecha}} </label>
+                  </div>
+                 <div class="item form-group">
+                     <label class="col-form-label col-md-2 col-sm-2 label-align" for="Tipo"> <b> Comentario Ingreso </b></label>
+                      <label class="col-form-label col-md-10 col-sm-10" for="Tipo">{{solicitud.comentario}} </label>
+                 </div>
+                 <div class="item form-group">
+                      <label class="col-form-label col-md-2 col-sm-2 label-align" for="Tipo"> <b> Comentario Solicitud </b></label>
+                      <label class="col-form-label col-md-10 col-sm-10" for="Tipo">{{solicitud.comentarioSolicitud}} </label>
+                 </div>
+            </div>
     </div>
-    {{/if}}
 </div>
 
 <!-- Optional JavaScript; choose one of the two! -->

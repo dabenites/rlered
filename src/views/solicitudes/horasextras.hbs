@@ -79,22 +79,22 @@
 <div class="col-md-6 col-sm-6  ">
     <div class="x_panel">
         <div class="x_title">
-            <h2>Solicitud Hora Extra
+            <h2>Solicitud Horas Extras
                 <!--<small>Los centros de costos es una agrupacion para las categorias</small>-->
             </h2>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            <form id="demo-form" data-parsley-validate action="/solicitudes/addHorasExtras" method="POST">
+            <form id="cargaHoraExtra" name="cargaHoraExtra" data-parsley-validate action="/solicitudes/addHorasExtras" method="POST">
                     <div class="form-group row">
                         <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Proyecto:</label>
                             <div class="col-md-8 col-sm-8">
                                 <input id="proyecto" name="proyecto"  class="form-control">
-                                <input type="hidden" id="idProyecto" name="idProyecto"  >
+                                <input type="hidden" id="idProyecto" name="idProyecto" required >
                             </div>
                     </div>
                      <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Solicitante:</label>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Asignadas a:</label>
                             <div class="col-md-6 col-sm-6">
                                 <input id="solicitante" name="solicitante"  class="form-control">
                                 <input type="hidden" id="idSolicitante" name="idSolicitante" value="0">  
@@ -113,7 +113,7 @@
                             </div>
                     </div>
                      <div class="form-group row">
-                            <button type="submit" class="btn btn-success btn-block">
+                            <button type="button" class="btn btn-success btn-block" onclick="validarFormulario();">
                                 Ingresar
                             </button>
                      </div>
@@ -134,14 +134,14 @@
                     <tr>
                         <th>Proyecto</th>
                         <th>Nº Horas</th>
-                        <th>Solicitante</th>
+                        <th>Asiganadas a</th>
                         <th>Estado</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{#each horasExtras}}
                         <tr>
-                            <td>{{nomPro}}</td>
+                            <td>{{year}}-{{code}} {{nomPro}}</td>
                             <td>{{numhh}}</td>
                             <td>{{nomSol}}</td>
                             <td>{{descripcion}}</td>
@@ -166,6 +166,34 @@
 
 
 <script>
+
+         function validarFormulario()
+     {
+         //idProyecto
+         //idSolicitante
+         //num_hh
+         var proyecto       = $("#idProyecto").val(); 
+         var solicitante    = $("#idSolicitante").val(); 
+         var num_hh         = $("#num_hh").val(); 
+        
+        var estado = true;
+
+        if (proyecto === "" ||  proyecto === "0" ){
+            $("#proyecto").css({'border-color': '#dc3545'});estado = false;} else {$("#proyecto").css({'border-color': '#28a745'});
+            
+        }
+        if (solicitante === ""  || solicitante === "0"){
+            $("#solicitante").css({'border-color': '#dc3545'});estado = false;} else {$("#solicitante").css({'border-color': '#28a745'});
+        }
+        if (num_hh === ""  ){
+            $("#num_hh").css({'border-color': '#dc3545'});estado = false;} else {$("#num_hh").css({'border-color': '#28a745'});
+        }
+        if (estado === true)
+        {
+             document.getElementById("cargaHoraExtra").submit();
+        }
+     } 
+
  $('#tablaHistorial').DataTable({
         language: {
           "decimal": "",

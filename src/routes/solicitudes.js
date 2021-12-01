@@ -14,7 +14,30 @@ router.get('/permisos', isLoggedIn, async (req, res) => {
   const usuarios = await pool.query('SELECT * FROM sys_usuario');
 
 
-  res.render('solicitudes/permisos', { req ,usuarios,res,layout: 'template'});
+  //res.render('solicitudes/permisos', { req ,usuarios,res,layout: 'template'});
+
+  var mensaje = -1;
+    //console.log(req.query);
+    if (req.query.a !== undefined)
+    {
+        mensaje = req.query.a;
+    }
+
+    if (mensaje !== -1)
+    { 
+        const verToask = {
+        titulo : "Mensaje",
+        body   : "Solicitud de permiso fuera de horario",
+        tipo   : "Eliminar"
+            };
+    
+            res.render('solicitudes/permisos', { verToask, req ,usuarios,res,layout: 'template'});
+    }
+    else
+    {
+      res.render('solicitudes/permisos', { req ,usuarios,res,layout: 'template'});
+    }
+
 
   
 
@@ -38,38 +61,76 @@ router.post('/IngresoPermiso', isLoggedIn, async (req, res) => {
  var dateTimeInicio = divFechaI[2] + "-" +  divFechaI[1] + "-"+ divFechaI[0]+ " " + horai;
  var dateTimeTermino = divFechaF[2] + "-" +  divFechaF[1] + "-"+ divFechaF[0]+ " " + horaf;
 
+
+ // Preguntar que dia de la semana es el permiso. 
+ const numeroDia = new Date(dateTimeInicio).getDay();
+ var  estado = true;
+
+ switch(numeroDia)
+ {
+   case 1:
+   case 2:
+   case 3:
+   case 4:
+     if (horai < "13:00")
+     {
+       if (horaf > "13:00") { estado = false;}
+     }
+     else if(horai >= "14:00")
+     {
+      if (horaf > "18:15") { estado = false;}
+     }
+   break;
+   case 5:
+    if (horaf > "13:30") { estado = false;}
+   break;
+ }
+  
+ if (estado === true)
+ {
  // Permiso
- const permiso  ={ //Se gurdaran en un nuevo objeto
+    const permiso  ={ //Se gurdaran en un nuevo objeto
 
-  idUsuario :  req.user.idUsuario,
-  idAprobador: idAprobador,
-  idInformar : 0,
-  idTipoSolicitud : 2,
-  fecha : new Date(),
-  comentario:comentario,
-  idEstado: '2'
-}
-  //Guardar datos en la BD      
+      idUsuario :  req.user.idUsuario,
+      idAprobador: idAprobador,
+      idInformar : 0,
+      idTipoSolicitud : 2,
+      fecha : new Date(),
+      comentario:comentario,
+      idEstado: '2'
+    }
+      //Guardar datos en la BD      
 
- const infoPermiso = await pool.query('INSERT INTO sol_solicitud  set ? ', [permiso]);
- const det_permiso  ={ //Se gurdaran en un nuevo objeto
+    const infoPermiso = await pool.query('INSERT INTO sol_solicitud  set ? ', [permiso]);
+    const det_permiso  ={ //Se gurdaran en un nuevo objeto
 
-  idUsuario :  req.user.idUsuario,
-  idEstado : 2,
-  idActividad : idActividad,
- // fecha_inicio : dateFormat(dateTimeInicio, 'yyyy-dd-mm HH:MM:ss') ,
- fecha_inicio : dateTimeInicio,
-  //fecha_termino : dateFormat(dateTimeTermino,'yyyy-dd-mm HH:MM:ss'),
-  fecha_termino : dateTimeTermino,
-  idSolicitud : infoPermiso.insertId
-}
+      idUsuario :  req.user.idUsuario,
+      idEstado : 2,
+      idActividad : idActividad,
+    // fecha_inicio : dateFormat(dateTimeInicio, 'yyyy-dd-mm HH:MM:ss') ,
+    fecha_inicio : dateTimeInicio,
+      //fecha_termino : dateFormat(dateTimeTermino,'yyyy-dd-mm HH:MM:ss'),
+      fecha_termino : dateTimeTermino,
+      idSolicitud : infoPermiso.insertId
+    }
 
 
-const infoSolicitud = await pool.query('INSERT INTO sol_permiso  set ? ', [det_permiso]);
+    const infoSolicitud = await pool.query('INSERT INTO sol_permiso  set ? ', [det_permiso]);
 
-// cargada el detalle de la solicitud 
+    // cargada el detalle de la solicitud 
 
-res.redirect("../solicitudes/permisos");
+    res.redirect("../solicitudes/permisos");
+ }
+ else
+ {
+  res.redirect(   url.format({
+    pathname:'/solicitudes/permisos',
+    query: {
+       "a": 1
+     }
+  }));
+
+ }
 
 }); 
 
@@ -158,6 +219,7 @@ router.get('/getPermisos', async (req,res) => {
 
   const permisos = [];
   permisosIngresados.forEach(element => {
+   // console.log(element.idEstado);
     switch(element.idEstado)
     {
         case 2:
@@ -176,11 +238,23 @@ router.get('/getPermisos', async (req,res) => {
             start : element.fecha_inicio,
             end: element.fecha_termino,
             overlap: false,
-            color: ':#33FF58'
+            color: '#23b23d'
         }
-        console.log("asd");
+        //console.log("asd");
               permisos.push(permisoApro);
         break;
+        case 6:
+          const permisoRecha = {
+            title : element.comentario,
+            start : element.fecha_inicio,
+            end: element.fecha_termino,
+            overlap: false,
+            color: '#B63210'
+        }
+        //console.log("asd");
+              permisos.push(permisoRecha);
+        break;
+        
     }
     
   });
@@ -398,7 +472,25 @@ router.get('/apermisos', async (req,res) => {
                                      ' AND ' + 
                                      " t1.idAprobador = "+ req.user.idUsuario +"");
 
-  res.render('solicitudes/aprobarPermiso', { req ,permisos , layout: 'template'})
+  // Historial de permisos. 
+  const historiaPermisos  = await pool.query(' SELECT t2.Nombre, '+
+                                          "DATE_FORMAT(t1.fecha,'%Y-%m-%d') AS fecha, " +
+                                          "DATE_FORMAT(t3.fecha_inicio,'%Y-%m-%d' ) AS fecha_per," +
+                                          "DATE_FORMAT(t3.fecha_inicio,'%H:%i' ) AS fecha_inicio," +
+                                          "DATE_FORMAT(t3.fecha_termino,'%H:%i' ) AS fecha_termino, "+
+                                          't1.id,' +
+                                          't4.descripcion' +
+                                          ' FROM sol_solicitud AS t1, sys_usuario AS t2, sol_permiso AS t3, sol_estado AS t4 '+
+                                          ' WHERE' +
+                                          ' t1.idTipoSolicitud = 2 AND t1.idEstado NOT IN(2,4) AND t1.idUsuario = t2.idUsuario AND t3.idSolicitud = t1.id ' +
+                                          ' AND ' + 
+                                                ' t4.id = t1.idEstado ' +
+                                          ' AND ' + 
+                                          " t1.idAprobador = "+ req.user.idUsuario +"");
+
+  // El historial de pemriso los muestro todos o solo los del aprobador ?
+
+  res.render('solicitudes/aprobarPermiso', { req ,permisos ,historiaPermisos, layout: 'template'})
 
 }); 
 
@@ -481,8 +573,8 @@ router.post('/updatePermisos', async (req,res) => {
       const result1 = await pool.query("UPDATE sol_solicitud set idEstado = 3 WHERE  id = "+req.body.id_solicitud+" ");
     break;
     case "0":
-      const resultPer = await pool.query("UPDATE sol_permiso set idEstado = 4 WHERE idSolicitud = "+req.body.id_solicitud+" "); // Rechazado
-      const result = await pool.query("UPDATE sol_solicitud set idEstado = 4 WHERE  id = "+req.body.id_solicitud+" ");
+      const resultPer = await pool.query("UPDATE sol_permiso set idEstado = 6 WHERE idSolicitud = "+req.body.id_solicitud+" "); // Rechazado
+      const result = await pool.query("UPDATE sol_solicitud set idEstado = 6 WHERE  id = "+req.body.id_solicitud+" ");
     break;
   }
   
@@ -680,7 +772,20 @@ router.get('/missolicitudes', isLoggedIn, async (req, res) => {
                                           " AND  " +
                                               " t1.idAprobador = t3.idUsuario " +
                                           " AND " +
-                                              " t4.id = t1.idEstado");
+                                              " t4.id = t1.idEstado"+
+                                          " AND 	t1.fecha > DATE_SUB(NOW(),INTERVAL 1 YEAR)" );
+
+
+   const horasextrasHistorial =  await pool.query("SELECT t2.Nombre , t1.numhh , DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha,"+
+                                              " t3.nombre AS nomPro,t1.comentario,t4.descripcion, "+
+                                              " t1.id " +
+                                              " FROM sol_horaextra AS t1, sys_usuario AS t2, pro_proyectos AS t3, sol_estado AS t4 " +
+                                              " WHERE " +
+                                              " t1.idSolicitante = t2.idUsuario AND t1.idProyecto = t3.id "+
+                                              " AND t4.id = t1.idEstado"+
+                                              " AND 	t1.fecha_solicitante > DATE_SUB(NOW(),INTERVAL 1 YEAR)");
+
+
   
   var mensaje = -1;
    if (req.query.a !== undefined)
@@ -696,15 +801,79 @@ router.get('/missolicitudes', isLoggedIn, async (req, res) => {
             tipo   : "Editar"
                 };
         
-                res.render('solicitudes/missolicitudes', {  verToask, solicitudes, req ,layout: 'template'});
+                res.render('solicitudes/missolicitudes', {  verToask, solicitudes,horasextrasHistorial, req ,layout: 'template'});
         }
         else
         {
-          res.render('solicitudes/missolicitudes', {  solicitudes, req ,layout: 'template'});
+          res.render('solicitudes/missolicitudes', {  solicitudes,horasextrasHistorial, req ,layout: 'template'});
         }
 
   
 }); 
+
+router.get('/missolicitudesE/:id', isLoggedIn, async (req, res) => {
+
+  const { id } = req.params;
+
+  const solicitudes = await pool.query("SELECT " +
+                                                " t1.id, " +
+                                                " t2.descripcion, " +
+                                                " t1.idAprobador, " +
+                                                " t3.Nombre, "+
+                                                " t4.descripcion AS estado, " +
+                                                " t1.idEstado, " +
+                                                " DATE_FORMAT(t1.fecha , '%Y-%m-%d')  AS fecha " +
+                                    " FROM sol_solicitud AS t1, " +
+                                                " sol_tipo_solicitud AS t2, " +
+                                                " sys_usuario AS t3, " +
+                                                " sol_estado AS t4 " +
+                                    " WHERE " +
+                                                " t1.idUsuario = "+req.user.idUsuario+" " +
+                                    " AND  " +
+                                                " t1.idTipoSolicitud = t2.id " +
+                                    " AND  " +
+                                                " t1.idAprobador = t3.idUsuario " +
+                                    " AND " +
+                                                " t4.id = t1.idEstado"+
+                                    " AND 	t1.fecha > DATE_SUB(NOW(),INTERVAL 1 YEAR)");
+
+
+    const horasextrasHistorial =  await pool.query("SELECT t2.Nombre , t1.numhh , DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha,"+
+                                          " t3.nombre AS nomPro,t1.comentario,t4.descripcion, "+
+                                          " t1.id " +
+                                          " FROM sol_horaextra AS t1, sys_usuario AS t2, pro_proyectos AS t3, sol_estado AS t4 " +
+                                          " WHERE " +
+                                          " t1.idSolicitante = t2.idUsuario AND t1.idProyecto = t3.id "+
+                                          " AND t4.id = t1.idEstado"+
+                                          " AND 	t1.fecha_solicitante > DATE_SUB(NOW(),INTERVAL 1 YEAR)");
+
+     const horasextra =  await pool.query("SELECT "+
+                                                                                        " t2.Nombre , t1.numhh ," +
+                                                                                        " t2a.Nombre As colaborador," +
+                                                                                        " DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha," +
+                                                                                        " t3.nombre AS nomPro, t1.id, " +
+                                                                                        " t4.descripcion, " +
+                                                                                        " t1.comentario, " +
+                                                                                        " t1a.comentario AS comentarioSolicitud " +
+                                                                               " from  sol_horaextra AS t1" +
+                                                                                      " LEFT JOIN sol_horaextra_tracking AS t1a ON t1.id = t1a.idHoraExtra , " +
+                                                                                      " sys_usuario AS t2, " +
+                                                                                      " sys_usuario AS t2a, " +
+                                                                                      " sol_estado AS t4, " +
+                                                                                      " pro_proyectos AS t3 " +
+                                                                               " WHERE t1.idIngreso = t2.idUsuario " +
+                                                                               " AND t2a.idUsuario = t1.idSolicitante " +
+                                                                               " AND t1.idProyecto = t3.id " +
+                                                                               " AND t4.id = t1.idEstado " +
+                                                                               " AND t1.id = "+id+"");
+
+
+    res.render('solicitudes/missolicitudesE', {  solicitud:horasextra[0], horasextrasHistorial, solicitudes, req ,layout: 'template'});
+
+  
+
+ });
+
 
 router.get('/missolicitudes/:id', isLoggedIn, async (req, res) => {
 
@@ -756,9 +925,21 @@ router.get('/missolicitudes/:id', isLoggedIn, async (req, res) => {
                                         " AND  " +
                                           " t1.id = "+id+" " +
                                         " AND " +
-                                          " t4.id = t1.idEstado");
+                                          " t4.id = t1.idEstado"+
+                                        " AND 	t1.fecha > DATE_SUB(NOW(),INTERVAL 1 YEAR)");
 
-  //console.log(solicitud);
+    const horasextrasHistorial =  await pool.query("SELECT t2.Nombre , t1.numhh , DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha,"+
+                                          " t3.nombre AS nomPro,t1.comentario,t4.descripcion, "+
+                                          " t1.id " +
+                                          " FROM sol_horaextra AS t1, sys_usuario AS t2, pro_proyectos AS t3, sol_estado AS t4 " +
+                                          " WHERE " +
+                                          " t1.idSolicitante = t2.idUsuario AND t1.idProyecto = t3.id "+
+                                          " AND t4.id = t1.idEstado"+
+                                          " AND 	t1.fecha_solicitante > DATE_SUB(NOW(),INTERVAL 1 YEAR)");
+
+
+  //console.log(horasextrasHistorial);
+
   switch(solicitud[0].tipo)
   {
     case 1:
@@ -777,11 +958,11 @@ router.get('/missolicitudes/:id', isLoggedIn, async (req, res) => {
         case 1:
         case 2:
         case 3:
-          res.render('solicitudes/missolicitudes', {valido:solicitud[0],  vacaciones, solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
+          res.render('solicitudes/missolicitudes', {valido:solicitud[0],horasextrasHistorial,  vacaciones, solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
         break;
         case 4:
         case 5:
-          res.render('solicitudes/missolicitudes', { vacaciones, solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
+          res.render('solicitudes/missolicitudes', { vacaciones,horasextrasHistorial, solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
         break;
 
      }
@@ -811,11 +992,11 @@ router.get('/missolicitudes/:id', isLoggedIn, async (req, res) => {
         case 1:
         case 2:
         case 3:
-          res.render('solicitudes/missolicitudes', { valido:solicitud[0], permiso:permisos[0],solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
+          res.render('solicitudes/missolicitudes', { valido:solicitud[0], permiso:permisos[0],solicitud:solicitud[0],horasextrasHistorial, solicitudes, req ,layout: 'template'});
         break;
         case 4:
         case 5:
-          res.render('solicitudes/missolicitudes', {  permiso:permisos[0],solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
+          res.render('solicitudes/missolicitudes', {  permiso:permisos[0],solicitud:solicitud[0],horasextrasHistorial, solicitudes, req ,layout: 'template'});
         break;
 
      }
@@ -865,11 +1046,14 @@ const {comentario,id,idEstado} = req.body
 router.get('/horaextras', isLoggedIn, async (req, res) => {
 
   const horasExtras  =  await pool.query("SELECT " +
-	                                                " t1.numhh,t1.comentario,t1.id, t2.Nombre AS nomSol,t3.nombre AS nomPro, t4.descripcion   " +
+	                                                " t1.numhh,t1.comentario,t1.id, t2.Nombre AS nomSol,t3.nombre AS nomPro,t3.year,t3.code, t4.descripcion   " +
                                           "  FROM sol_horaextra AS t1  "+
                                           "  LEFT JOIN sys_usuario AS t2 ON t1.idSolicitante = t2.idUsuario  "+
                                           "  LEFT JOIN pro_proyectos AS t3 ON t1.idProyecto = t3.id"+
-                                          "  LEFT JOIN sol_estado AS t4 ON t1.idEstado = t4.id");
+                                          "  LEFT JOIN sol_estado AS t4 ON t1.idEstado = t4.id"+
+                                          " WHERE "+
+                                                  " t1.idIngreso = "+req.user.idUsuario+"" +
+                                          " ORDER BY t1.id DESC"); 
 
   res.render('solicitudes/horasextras', {  horasExtras,req ,layout: 'template'});
  });
@@ -944,8 +1128,20 @@ router.get('/ahorasExtras', async (req, res) => {
                                         "t1.id from sol_horaextra AS t1, sys_usuario AS t2, pro_proyectos AS t3 WHERE " +
                                         " t1.idIngreso = t2.idUsuario AND t1.idProyecto = t3.id AND t1.idEstado in (2)");
 
+  // comentario : Las horas extras no seran aprobadas por una persona especifica 
+  //              saran aprobadas por la persona que tenga permiso al modulo 
 
-  res.render('solicitudes/ahorasextras', { horasextras, req ,layout: 'template'});
+  const horasextrasHistorial =  await pool.query("SELECT t2.Nombre , t1.numhh , DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha,"+
+                                                " t3.nombre AS nomPro,t1.comentario,t4.descripcion, "+
+                                                " t1.id " +
+                                                " FROM sol_horaextra AS t1, sys_usuario AS t2, pro_proyectos AS t3, sol_estado AS t4 " +
+                                                " WHERE " +
+                                                " t1.idSolicitante = t2.idUsuario AND t1.idProyecto = t3.id AND t1.idEstado not in (2)"+
+                                                " AND t4.id = t1.idEstado");
+
+  //console.log(horasextrasHisotial);
+
+  res.render('solicitudes/ahorasextras', { horasextras,horasextrasHistorial, req ,layout: 'template'});
 
 });
 //Cannot GET /solicitudes/ahorasExtras

@@ -8,6 +8,9 @@ var dateFormat = require('dateformat');
 const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
 
+var url = require('url');
+
+
 router.get('/ploteo', isLoggedIn, async (req, res) => {
  
     const ploteos_pendiente  =  await pool.query("SELECT t.*, t2.nombre AS nomPro,t3.Nombre AS nomIngr, t4.Nombre AS nomDes" +
@@ -22,9 +25,39 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
                                                 " pro_proyectos AS t2 , sys_usuario AS t3" +
                                                 " where t.id_estado = 2 AND t.id_proyecto = t2.id AND t.id_ingreso = t3.idUsuario ");
     
-   // console.log(ploteos_pendiente);
+    
+    const ploteos_terminados  =  await pool.query("SELECT t.*, t2.nombre AS nomPro,t3.Nombre AS nomIngr, t4.Nombre AS nomDes" +
+                                                "  FROM sol_ploteo as t "+
+                                                " LEFT JOIN sys_usuario AS t4 ON t.id_destinatario = t4.idUsuario," +
+                                                " pro_proyectos AS t2 , sys_usuario AS t3" +
+                                                " where t.id_estado = 3 AND t.id_proyecto = t2.id AND t.id_ingreso = t3.idUsuario ");
+                                                                                            
 
-    res.render('ploter/ingresar', { ploteos_pendiente, ploteos_proceso , req ,layout: 'template'});
+//    res.render('ploter/ingresar', { ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+    var mensaje = -1;
+    //console.log(req.query);
+    if (req.query.a !== undefined)
+    {
+        mensaje = req.query.a;
+    }
+
+    if (mensaje !== -1)
+    { 
+        const verToask = {
+        titulo : "Mensaje",
+        body   : "Solicitud ingresada correctamente.",
+        tipo   : "Crear"
+            };
+    
+        res.render('ploter/ingresar', {verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+    }
+    else
+    {
+        res.render('ploter/ingresar', { ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+    }
+
+
+    
 }); 
 
 router.post('/addSolicitud', isLoggedIn, async (req, res) => {
@@ -91,7 +124,14 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
 
     const result = await pool.query('INSERT INTO sol_ploteo set ?', [solicitud]);
 
-    res.redirect('/ploter/ploteo/');
+    //res.redirect('/ploter/ploteo/');
+    res.redirect(   url.format({
+        pathname:'/ploter/ploteo/',
+        query: {
+           "a": 1
+         }
+      }));
+
 
 }); 
 
@@ -133,7 +173,7 @@ router.get('/buscarPro/:find', async (req, res) => {
     // BUSCAR DIRECTOR  
     const nombre = req.query.term;
     const proyectos =  await pool.query("SELECT t1.id AS id, CONCAT(t1.year,'-',t1.code , ' : ' , t1.nombre) AS value " +
-                                        " FROM pro_proyectos as t1 WHERE t1.nombre LIKE '%"+nombre+"%' OR CONCAT(t1.year,'-',t1.code) LIKE '%"+nombre+"%'");
+                                        " FROM pro_proyectos as t1 WHERE t1.nombre LIKE '%"+nombre+"%' OR CONCAT(t1.year,'-',t1.code) LIKE '%"+nombre+"%' LIMIT 100");
     
                                         
     res.setHeader('Content-Type', 'application/json');

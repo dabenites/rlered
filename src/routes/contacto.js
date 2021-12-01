@@ -6,6 +6,9 @@ const router = express.Router();
 const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
 
+var url = require('url');
+
+
 router.get('/listado', isLoggedIn, async (req, res) => {
 
     const keys_words  = await pool.query("SELECT * FROM contacto_key");
@@ -42,7 +45,31 @@ router.get('/listado', isLoggedIn, async (req, res) => {
         contactos[i]["keys_words"] = categoria;
     });
 
-    res.render('contacto/listado', { contactos , req ,layout: 'template'});
+
+    var mensaje = -1;
+    //console.log(req.query);
+    if (req.query.a !== undefined)
+    {
+        mensaje = req.query.a;
+    }
+
+    if (mensaje !== -1)
+    { 
+        const verToask = {
+        titulo : "Mensaje",
+        body   : "Contacto actualizado",
+        tipo   : "Crear"
+            };
+    
+            res.render('contacto/listado', { verToask, contactos , req ,layout: 'template'});
+    }
+    else
+    {
+        res.render('contacto/listado', { contactos , req ,layout: 'template'});
+    }
+
+
+    
 }); 
 
 router.get('/listadov', isLoggedIn, async (req, res) => {
@@ -134,6 +161,49 @@ router.post('/bFormIngreso', async (req,res) => {
     
 });
 
+//uptContacto
+router.post('/uptContacto', async (req,res) => {
+
+  //  console.log(req.body);
+
+
+    // console.log(req.body);
+   const nombre = req.body['iNombreContacto'];
+   const direccion = req.body['iDireccionContacto:'];
+   const telefono = req.body['iTelefonoContacto'];
+   const tipo_conctacto = req.body['iTipoContacto'];
+   const movil = req.body['iMovilContacto'];
+   const durl = req.body['iUrlContacto'];
+   const e_mail = req.body['iMailContacto'];
+   const comentario = req.body['iComentarioContacto'];
+   const concepto = req.body['categorias'];
+   const id= req.body['id'];
+
+   const unContacto ={ 
+    name :  nombre,
+    address1   : direccion,
+    phone :  telefono ,
+    url : durl,
+    email : e_mail,
+    comments : comentario,
+    movil : movil,
+    grupo : tipo_conctacto,
+    keys_words : concepto
+   }; 
+
+   await pool.query('UPDATE contacto set ? WHERE id = ?', [unContacto, id]);
+
+
+    res.redirect(   url.format({
+        pathname:'/contacto/listado',
+        query: {
+           "a": 1
+         }
+      }));
+
+
+
+});
 
 router.post('/addContacto', async (req,res) => {
     
@@ -168,6 +238,7 @@ router.post('/addContacto', async (req,res) => {
    //res.send("Cargar nuevamente la informacion con el toask incluido");
    //res.redirect("../ploter/ploteo");
 
+   
     res.send("mensaje");
 
 });
@@ -239,14 +310,30 @@ router.get('/contacto/editar/:id', async (req, res) => {
     /// contacto
     const keys_words  = await pool.query("SELECT * FROM contacto_key");
 
-    const contacto  = await pool.query("SELECT * FROM contacto as t WHERE t.id = "+id+"");
+    const tipo_contacto  = await pool.query("SELECT * FROM contacto_tipo");
 
-    console.log(contacto);
+    const contacto  = await pool.query("SELECT *," +
+                                       " if(t.keys_words LIKE '%1%','checked','') AS arquitecto," +
+                                       " if(t.keys_words LIKE '%2%','checked','') AS constructora," +
+                                       " if(t.keys_words LIKE '%3%','checked','') AS ito," +
+                                       " if(t.keys_words LIKE '%4%','checked','') AS inmobiliaria," +
+                                       " if(t.keys_words LIKE '%5%','checked','') AS mecsuelo," +
+                                       " if(t.keys_words LIKE '%6%','checked','') AS postensado," +
+                                       " if(t.keys_words LIKE '%7%','checked','') AS murocortina " +
+                                       " FROM contacto as t WHERE t.id = "+id+"");
 
-    res.render('contacto/editar', { contacto:contacto[0],req ,layout: 'template'});
+    const isEqualHelperHandlerbar = function(a, b, opts) {
+        // console.log(a + "----" + b);
+         if (a == b) {
+             return true
+         } else { 
+             return false
+         } 
+     };
 
-
-
+    res.render('contacto/editar', { tipo_contacto, contacto:contacto[0],req ,layout: 'template', helpers : {
+        if_equal : isEqualHelperHandlerbar
+    }});
 
 });
 

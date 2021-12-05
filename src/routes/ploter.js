@@ -185,7 +185,7 @@ router.get('/buscarPro/:find', async (req, res) => {
   
     // BUSCAR DIRECTOR  
     const nombre = req.query.term;
-    const destinarios =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 WHERE t1.Nombre LIKE '%"+nombre+"%'");
+    const destinarios =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 WHERE t1.Nombre LIKE '%"+nombre+"%' AND t1.id_estado = 1");
     
  
     res.setHeader('Content-Type', 'application/json');

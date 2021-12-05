@@ -61,7 +61,7 @@ router.get('/listado', isLoggedIn, async (req, res) => {
         tipo   : "Crear"
             };
     
-            res.render('contacto/listado', { verToask, contactos , req ,layout: 'template'});
+        res.render('contacto/listado', { verToask, contactos , req ,layout: 'template'});
     }
     else
     {

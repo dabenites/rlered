@@ -13,7 +13,7 @@ const { Console } = require('console');
 var dateFormat = require('dateformat');
 const { isEmptyObject } = require('jquery');
 
-
+var url = require('url');
 
 //AGREGAR UN PROYECTO
 
@@ -473,7 +473,10 @@ router.get('/buscarDirector/:find', async (req, res) => {
   
   // BUSCAR DIRECTOR  
   const nombre = req.query.term;
-  const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 WHERE t1.Nombre LIKE '%"+nombre+"%'");
+  const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
+                                       " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
+                                       " AND t1.id_estado = 1" + 
+                                       " AND (t1.idCategoria IN (25,26,28,1) OR t1.idUsuario IN (39) )");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
@@ -484,8 +487,11 @@ router.get('/buscarJefe/:find', async (req, res) => {
   
   // BUSCAR DIRECTOR  
   const nombre = req.query.term;
-  const jefes =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 WHERE t1.Nombre LIKE '%"+nombre+"%'");
-  
+  const jefes =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 " +
+                                  " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
+                                  " AND t1.id_estado = 1"+
+                                  " AND t1.idCategoria IN (25,26,28,1,24,22)");
+
   res.setHeader('Content-Type', 'application/json');
   res.json(jefes);
 
@@ -802,6 +808,95 @@ router.post('/buscarPais', isLoggedIn, async (req, res) => {
 
 
   
+});
+
+router.get('/equipo/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const proyectos = await pool.query("SELECT *, t1.id as idProyecto FROM pro_proyectos AS t1  WHERE t1.id = "+id+""); 
+  const equipo_proyecto =  await pool.query("SELECT t1.id , t2.Nombre FROM pro_equipo AS t1, sys_usuario AS t2 WHERE t1.id_proyecto = "+id+" AND t1.id_usuario = t2.idUsuario");
+ 
+  const colaboradores =  await pool.query("SELECT * FROM sys_usuario AS t1a WHERE t1a.idUsuario"+
+                                          " NOT IN ( SELECT t1.id_usuario FROM pro_equipo AS t1, sys_usuario AS t2 " +
+                                          " WHERE t1.id_proyecto = "+id+" AND t1.id_usuario = t2.idUsuario)");
+
+ // res.render('proyecto/equipo', { equipo_proyecto, proyecto:proyectos[0], req, layout: 'template' });
+ if (req.query.a === undefined)
+            {
+              res.render('proyecto/equipo', { colaboradores, equipo_proyecto, proyecto:proyectos[0], req, layout: 'template' });
+            }
+    else
+            {
+                var verToask = {};
+                switch(req.query.a)
+                {
+                    case 1: // borrar
+                    case "1":
+                        verToask= {
+                        titulo : "Mensaje",
+                        body   : "Relacion Eliminada",
+                        tipo   : "Eliminar"
+                            };
+    
+                    res.render('proyecto/equipo', {colaboradores,verToask, equipo_proyecto, proyecto:proyectos[0], req, layout: 'template' });
+                    break;
+                    case 2: // Asignado
+                    case "2":
+                        verToask = {
+                        titulo : "Mensaje",
+                        body   : "Colaborador agregado con exito",
+                        tipo   : "Crear"
+                            };
+    
+                            res.render('proyecto/equipo', {colaboradores,verToask, equipo_proyecto, proyecto:proyectos[0], req, layout: 'template' });
+                    break;
+                }
+            }
+
+});
+
+router.get('/equipo/delete/:id', async (req, res) => {
+  const { id } = req.params;
+
+  console.log(req.params);
+  console.log(req.body);
+
+  const informacion = await pool.query("SELECT * FROM pro_equipo AS t1 WHERE t1.id = "+id+"");
+  
+  await pool.query('DELETE FROM pro_equipo WHERE id = ?', [id]);
+
+  res.redirect(   url.format({
+    pathname:'/proyecto/equipo/'+informacion[0].id_proyecto,
+    query: {
+       "a": 1
+     }
+  }));
+
+  
+
+
+});
+router.get('/equipo/add/:idUsuario/:id', async (req, res) => {
+  const { id,idUsuario } = req.params;
+
+  
+  const newEquipoProyecto = { //Se gurdaran en un nuevo objeto
+          id_usuario: idUsuario,
+          id_proyecto: id
+          };
+
+   const resultTracking = await pool.query('INSERT INTO pro_equipo set ?', [newEquipoProyecto]);
+
+
+   res.redirect(   url.format({
+    pathname:'/proyecto/equipo/'+id,
+    query: {
+       "a": 2
+     }
+  }));
+  
+
+
 });
 
 

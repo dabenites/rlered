@@ -340,15 +340,20 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
                                         " LEFT JOIN sys_usuario_costo AS t2 ON ( t1.idUsuario = t2.idUsuario AND t2.annio =  "+ year +" AND t2.mes = "+ mes +"), "+
                                         " sys_sucursal AS t3, " +
                                         " sys_categoria AS t4, " +
-                                        " centro_costo AS t5 " +
+                                        " centro_costo AS t5, " +
+                                        " sys_usuario_estado as t6 "+
                                         " WHERE  " +
                                                 " t1.idSucursal = t3.id_Sucursal " +
                                         " AND  " +
                                                 " t1.idCategoria = t4.id_Categoria " +
                                         " AND  " +
-                                                " t4.idCentroCosto = t5.id ");
+                                                " t4.idCentroCosto = t5.id "+
+                                        " AND " +
+                                                "t6.id = t1.id_estado"+
+                                        " AND " +
+                                                "t1.id_estado = 1");
     // Revisar la Query de los costos.
-
+    
     
     if (mensaje !== -1)
     { 

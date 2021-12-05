@@ -144,7 +144,7 @@
       <div class="form-group row">
           &nbsp;
       </div>
-            <div class="form-group row">
+                    <div class="form-group row">
                         <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Año:</label>
 							<div class="col-md-7 col-sm-7">
 							    <select class="form-control" name="year" id="year">
@@ -158,6 +158,27 @@
 								</select>
 							</div>
                     </div>
+                    <div class="form-group row">
+                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Direccion">Dirección:</label>
+                            <div class="col-md-7 col-sm-7">
+                                <input type="text" id="direccion" name="direccion"  class="form-control">
+                                    <input type="hidden" name="loc_lat" id="loc_lat" />
+								    <input type="hidden" name="loc_long" id="loc_long" />
+                                    <input type="hidden" name="id_pais" id="id_pais" />
+                            </div>
+                    </div>
+                    <div class="form-group row">
+                         <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo Proyecto:</label>
+									<div class="col-md-7 col-sm-7">
+										<select class="select2_single form-control" tabindex="-1" name="id_tipo_proyecto" id="id_tipo_proyecto">
+											<option value="0">Seleccione una opción</option>
+											{{#each tipo}}
+											<option value="{{id}}">{{descripcion}}</option>
+											{{/each}}
+										</select>
+									</div>
+                     </div>
+
                     <div class="form-group row">
                         <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Codigo:</label>
 							<div class="col-md-7 col-sm-7">
@@ -178,17 +199,6 @@
 							    <input type="text" id="nombre" name="nombre"  class="form-control">
 							</div>
                     </div>
-                    <div class="form-group row">
-                         <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo Proyecto:</label>
-									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="id_tipo_proyecto" id="id_tipo_proyecto">
-											<option value="0">Seleccione una opción</option>
-											{{#each tipo}}
-											<option value="{{id}}">{{descripcion}}</option>
-											{{/each}}
-										</select>
-									</div>
-                     </div>
                      <div class="form-group row">
                          <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo Servicio:</label>
 									<div class="col-md-7 col-sm-7">
@@ -197,14 +207,6 @@
                                             {{#each servicio}}
                                                 <option value="{{id}}">{{descripcion}}</option>
                                             {{/each}}
-                                                <!--
-                                                    <option value="0">Ninguno</option>
-                                                <option value="1">Proyecto Internacional</option>
-                                                <option value="2">Revision</option>
-                                                <option value="3">Proyecto TI</option>
-                                                <option value="4">Proyecto Nacional</option>
-                                                <option value="5">Proyecto Perú</option>
-                                                -->
                                         </select>
 									</div>
                      </div>
@@ -218,16 +220,39 @@
 											{{/each}}
 										</select>
 									</div>
-					</div>
-                        <div class="form-group row">
-                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Direccion">Dirección:</label>
-                            <div class="col-md-7 col-sm-7">
-                                <input type="text" id="direccion" name="direccion"  class="form-control">
-                                    <input type="hidden" name="loc_lat" id="loc_lat" />
-								    <input type="hidden" name="loc_long" id="loc_long" />
-                                    <input type="hidden" name="id_pais" id="id_pais" />
-                            </div>
+					    </div>
+                    <div class="form-group row">
+                            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie Preliminar:</label>
+                                <div class="col-md-1 col-sm-1">
+                                    <input type="number" id="superficie_pre" name="superficie_pre" class="form-control" onchange="ModificaValorProyecto(2);">
+                                </div>
+                                <label class="col-form-label col-md-2 col-sm-2" for="Destinatario"> m<sup>2</sup></label>
+                    </div>
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align">Complejidad:</label>
+                                <div class="col-md-7 col-sm-7">
+                                                        <select class="select2_single form-control" tabindex="-1" name="id_Complejidad" id="id_Complejidad">
+                                                            <option value="0">Seleccione una opción</option>
+                                                            
+                                                            <option value="1">Baja</option>
+                                                            <option value="2">Media</option>
+                                                            <option value="3">Alta</option>
+                                                            
+                                                        </select>
+                                </div>
                         </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Nº Pisos</label>
+                            <div class="col-md-7 col-sm-7">
+                                <input type="number" id="num_pisos" name="num_pisos"  class="form-control">
+                            </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Nº Subterraneos</label>
+                            <div class="col-md-7 col-sm-7">
+                                <input type="number" id="num_subte" name="num_subte"  class="form-control">
+                            </div>
+                    </div>
                     <div class="form-group row">
                         <div class="col-md-9 col-sm-9">
                         
@@ -265,7 +290,7 @@
                     <div class="form-group row">
                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie Preliminar:</label>
                                 <div class="col-md-5 col-sm-5">
-                                    <input type="number" id="superficie_pre" name="superficie_pre" class="form-control" onchange="ModificaValorProyecto(2);">
+                                    <input type="number" id="superficie_pre_r" name="superficie_pre_r" class="form-control" readonly>
                                 </div>
                                 <label class="col-form-label col-md-2 col-sm-2" for="Destinatario"> m<sup>2</sup></label>
                     </div>
@@ -288,12 +313,6 @@
                              <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Entrega:</label>
                                 <div class="col-md-6 col-sm-6">
                                     <input type="date" id="fecha_entrega" name="fecha_entrega"  class="form-control">
-                                </div>
-                        </div>
-                        <div class="form-group row">
-                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Termino:</label>
-                                <div class="col-md-6 col-sm-6">
-                                    <input type="date" id="fecha_termino" name="fecha_termino"  class="form-control" onchange="fechaTermino();">
                                 </div>
                         </div>
                 </div>
@@ -350,13 +369,6 @@
                                 <input type="hidden" id="id_arquitecto" name="id_arquitecto"  class="form-control">
 							</div>
                     </div>
-                    <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Revisor:</label>
-							<div class="col-md-9 col-sm-9">
-							    <input id="revisor" name="revisor"  class="form-control">
-                                <input type="hidden" id="id_revisor" name="id_revisor" class="form-control">
-							</div>
-                    </div>
                      <div class="form-group row">
                     <div class="col-md-3 col-sm-3">
                     </div>
@@ -376,34 +388,24 @@
           &nbsp;
       </div>
         <div class="form-group row">
-				<label class="col-form-label col-md-3 col-sm-3 label-align">Complejidad:</label>
-				<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="id_Complejidad" id="id_Complejidad">
-											<option value="0">Seleccione una opción</option>
-											
-											<option value="1">Baja</option>
-                                            <option value="2">Media</option>
-                                            <option value="3">Alta</option>
-											
-										</select>
-		        </div>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Revisor:</label>
+							<div class="col-md-7 col-sm-7">
+							    <input id="revisor" name="revisor"  class="form-control">
+                                <input type="hidden" id="id_revisor" name="id_revisor" class="form-control">
+							</div>
         </div>
+
+        <div class="form-group row">
+                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Termino:</label>
+                                <div class="col-md-2 col-sm-2">
+                                    <input type="date" id="fecha_termino" name="fecha_termino"  class="form-control" onchange="fechaTermino();">
+                                </div>
+        </div>
+
         <div class="form-group row">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie APL</label>
 				<div class="col-md-7 col-sm-7">
 				    <input type="number" id="superficie_apl" name="superficie_apl"  class="form-control">
-				</div>
-        </div>
-        <div class="form-group row">
-            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Nº Pisos</label>
-				<div class="col-md-7 col-sm-7">
-				    <input type="number" id="num_pisos" name="num_pisos"  class="form-control">
-				</div>
-        </div>
-        <div class="form-group row">
-            <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Nº Subterraneos</label>
-				<div class="col-md-7 col-sm-7">
-				    <input type="number" id="num_subte" name="num_subte"  class="form-control">
 				</div>
         </div>
         <div class="form-group row">
@@ -510,6 +512,7 @@
         var superficie    = $( "#superficie_pre" ).val();
         var valor_pro    = $( "#valor_proyecto" ).val();
 
+    $( "#superficie_pre_r" ).val($("#superficie_pre" ).val());
        
         if((valor_x_m2 !== null && valor_x_m2 !== '' )
             && (superficie !== null && superficie !== '' )
@@ -548,6 +551,11 @@ function validarFormulario()
     var tipoServicio    = $( "#id_servicio" ).val();
     var estado          = $( "#id_Estado" ).val();
     var direccion       = $( "#direccion" ).val();
+    var id_Complejidad  = $( "#id_Complejidad" ).val();
+    var num_pisos       = $( "#num_pisos" ).val();
+    var num_subte       = $( "#num_subte" ).val();
+    
+    
 
 
     var estadoEnvio = true;
@@ -562,6 +570,10 @@ function validarFormulario()
     if(tipoServicio !== null && tipoServicio !== '' && tipoServicio !== '0') {$("#id_servicio").css({'border-color': '#28a745'});} else {$("#id_servicio").css({'border-color': '#dc3545'});estadoEnvio = false;}
     if(estado !== null && estado !== '' && estado !== '0') {$("#id_Estado").css({'border-color': '#28a745'});} else {$("#id_Estado").css({'border-color': '#dc3545'});estadoEnvio = false;}
     if(direccion !== null && direccion !== '' ) {$("#direccion").css({'border-color': '#28a745'});} else {$("#direccion").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(id_Complejidad !== null && id_Complejidad !== '' && id_Complejidad !== '0') {$("#id_Complejidad").css({'border-color': '#28a745'});} else {$("#id_Complejidad").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(num_pisos !== null && num_pisos !== '') {$("#num_pisos").css({'border-color': '#28a745'});} else {$("#num_pisos").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    if(num_subte !== null && num_subte !== '') {$("#num_subte").css({'border-color': '#28a745'});} else {$("#num_subte").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    
 
     // DATOS FINANCIEROS 
     var valorxmts     = $( "#valor_x_m2" ).val();
@@ -576,7 +588,7 @@ function validarFormulario()
     if(superficie !== null && superficie !== '' ) {$("#superficie_pre").css({'border-color': '#28a745'});} else {$("#superficie_pre").css({'border-color': '#dc3545'});estadoEnvio = false;}
     if(finicio !== null && finicio !== '' ) {$("#fecha_inicio").css({'border-color': '#28a745'});} else {$("#fecha_inicio").css({'border-color': '#dc3545'});estadoEnvio = false;}
     if(fentrega !== null && fentrega !== '' ) {$("#fecha_entrega").css({'border-color': '#28a745'});} else {$("#fecha_entrega").css({'border-color': '#dc3545'});estadoEnvio = false;}
-    if(ftermino !== null && ftermino !== '' ) {$("#fecha_termino").css({'border-color': '#28a745'});} else {$("#fecha_termino").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    //if(ftermino !== null && ftermino !== '' ) {$("#fecha_termino").css({'border-color': '#28a745'});} else {$("#fecha_termino").css({'border-color': '#dc3545'});estadoEnvio = false;}
 
     // EQUIPO PROYECTO 
      var director       = $( "#id_director" ).val();
@@ -591,7 +603,7 @@ function validarFormulario()
     if(mandante !== null && mandante !== '' ) {$("#mandante").css({'border-color': '#28a745'});} else {$("#mandante").css({'border-color': '#dc3545'});estadoEnvio = false;}
     if(cliente !== null && cliente !== '' ) {$("#cliente").css({'border-color': '#28a745'});} else {$("#cliente").css({'border-color': '#dc3545'});estadoEnvio = false;}
     if(arquitecto !== null && arquitecto !== '' ) {$("#arquitecto").css({'border-color': '#28a745'});} else {$("#arquitecto").css({'border-color': '#dc3545'});estadoEnvio = false;}
-    if(revisor !== null && revisor !== '' ) {$("#revisor").css({'border-color': '#28a745'});} else {$("#revisor").css({'border-color': '#dc3545'});estadoEnvio = false;}
+    //if(revisor !== null && revisor !== '' ) {$("#revisor").css({'border-color': '#28a745'});} else {$("#revisor").css({'border-color': '#dc3545'});estadoEnvio = false;}
 
     // 
 

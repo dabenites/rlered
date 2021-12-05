@@ -27,7 +27,8 @@
                     <tr>
                         <th>Nombre</th>
                         <th>Login</th>
-                        <th>E-mail</th>
+                        <th>Estado</th>
+                        <th>Correo</th>
                         <th>Teléfono</th>
                         <th>Categoría</th>
                         <th>Sucursal</t>
@@ -39,6 +40,7 @@
                     <tr>
                         <td>{{Nombre}}</td>
                         <td>{{login}}</td>
+                        <td>{{estado}}</td>
                         <td>{{Email}}</td>
                         <td>{{Telefono}}</td>
                         <td>{{categoria}}</td>
@@ -52,10 +54,11 @@
                                 href="usuario/permisos/{{idUsuario}}">
                                 Permisos
                             </a>
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" onclick="return confirm('¿ Esta seguro de borra el usuario : {{Nombre}} ?')"
+                           <!--
+                               <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" onclick="return confirm('¿ Esta seguro de borra el usuario : {{Nombre}} ?')"
                                 href="usuario/delete/{{idUsuario}}">
                                 Borrar
-                            </a>
+                            </a>-->
                         </td>
                     </tr>
                     {{/each}}
@@ -111,7 +114,9 @@
 
 <script>
 
+/*
         $('#tablaUsuario thead tr').clone(true).appendTo('#tablaUsuario thead');
+        
         $('#tablaUsuario thead tr:eq(1) th').each(function (i) {
             var title = $(this).text();
             $(this).html('<input type="text" placeholder="Search ' + title + '" />');
@@ -125,6 +130,7 @@
                 }
             });
         });
+        */
 
         var table = $('#tablaUsuario').DataTable({
             orderCellsTop: true,

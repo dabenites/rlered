@@ -33,6 +33,22 @@
 					</div>
 				</div>
 				<div class="item form-group">
+					<label class="col-form-label col-md-3 col-sm-3 label-align" for="Nombre">Estado<span
+							class="required">*</span>
+					</label>
+					<div class="col-md-6 col-sm-6 ">
+						<select class="select2_single form-control" tabindex="-1" name="idEstado" id="idEstado">
+							{{#each estados}}
+								{{#if (if_equal id ../usuario.id_estado) }}
+								<option value="{{id}}" selected>{{descripcion}}</option>
+								{{else}}
+								<option value="{{id}}">{{descripcion}}</option>
+								{{/if}}
+							{{/each}}
+						</select>
+					</div>
+				</div>
+				<div class="item form-group">
 					<label class="col-form-label col-md-3 col-sm-3 label-align" for="Email">E-mail<span
 							class="required">*</span>
 					</label>

@@ -21,7 +21,10 @@ router.get('/sucursal', isLoggedIn, async (req, res) => {
 }); 
 
 router.get('/usuario', isLoggedIn, async (req, res) => {
-    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
+    
+    const usuarios = await pool.query("SELECT * , t4.descripcion as estado FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3,  sys_usuario_estado as t4 "+
+                                       "WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal "+
+                                       " AND t1.id_estado = t4.id");
     res.render('mantenedores/usuarios', { usuarios, req ,layout: 'template'});
 }); 
 
@@ -33,6 +36,7 @@ router.get('/usuario/editar/:id', isLoggedIn, async (req, res) => {
     const usuario = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [id]);
     const categoria = await pool.query('SELECT * FROM sys_categoria');
     const sucursal = await pool.query('SELECT * FROM sys_sucursal');
+    const estados = await pool.query('SELECT * FROM sys_usuario_estado');
 
     const isEqualHelperHandlerbar = function(a, b, opts) {
          if (a == b) {
@@ -42,7 +46,7 @@ router.get('/usuario/editar/:id', isLoggedIn, async (req, res) => {
          } 
      };
     // console.log(usuario);
-    res.render('mantenedores/editarUsuario', { req , usuarios,categoria,sucursal, usuario: usuario[0], layout: 'template', helpers : {
+    res.render('mantenedores/editarUsuario', {estados, req , usuarios,categoria,sucursal, usuario: usuario[0], layout: 'template', helpers : {
         if_equal : isEqualHelperHandlerbar
     }});
 }); 
@@ -59,7 +63,7 @@ router.get('/usuario/crear/', isLoggedIn, async (req, res) => {
 });
 
 router.post('/editarUsuarios', async (req, res) => {
-    const { idUsuario,Nombre,Email,Telefono,login,idCategoria,idSucursal,titulo } = req.body;
+    const { idUsuario,Nombre,Email,Telefono,login,idCategoria,idSucursal,titulo,idEstado } = req.body;
 
    const newUsario  ={ //Se gurdaran en un nuevo objeto
     Nombre:Nombre,
@@ -68,13 +72,16 @@ router.post('/editarUsuarios', async (req, res) => {
     login:login,
     idCategoria:idCategoria,
     idSucursal:idSucursal ,
+    id_estado : idEstado,
     titulo:titulo
 };
 
    const result = await pool.query('UPDATE sys_usuario set ? WHERE idUsuario = ?', [newUsario, idUsuario]);
 
   // const usuarios = await pool.query('SELECT * FROM sys_usuario');
-  const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
+  const usuarios = await pool.query("SELECT *, t4.descripcion as estado FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3, sys_usuario_estado as t4  " +
+                                    " WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal"+
+                                    " AND t4.id = t1.id_estado AND t4.id = 1");
    //console.log(usuarios);
 
    
@@ -166,7 +173,7 @@ router.get('/usuario/permisos/:id', async (req, res) => {
 
     var query = "SELECT t1.*, t2.Nombre AS nomGrupo, if (t3.idPermiso > 0,1,0) AS estado " +
                 " FROM sys_grupo_modulo AS t2 , sys_modulo AS t1 " +
-                " LEFT JOIN sys_permiso AS t3 ON t3.idUsuario = "+ id +" AND t3.idModulo = t1.idModulo   WHERE t1.idGrupo = t2.idGrupo AND t1.operativo = 'Y' ORDER BY nomGrupo ASC,t1.Nombre ASC ";
+                " LEFT JOIN sys_permiso AS t3 ON t3.idUsuario = "+ id +" AND t3.idModulo = t1.idModulo   WHERE t1.idGrupo = t2.idGrupo AND t1.id_estado = 1 ORDER BY nomGrupo ASC,t1.Nombre ASC ";
     
     const permisos = await pool.query(query);
 
@@ -1281,7 +1288,6 @@ router.post('/editMoneda', async (req,res) => {
     //Guardar datos en la BD     
     await pool.query('UPDATE moneda_tipo set ? WHERE id_moneda = ?', [newMoneda, id]);
   
-console.log(req.body);
    const monedas = await pool.query("SELECT * FROM moneda_tipo as t1 WHERE t1.factura= 'Y' ORDER BY t1.descripcion");
 
    
@@ -1296,7 +1302,108 @@ console.log(req.body);
 });
 
 
+// __
 
+router.get('/equipoTrabajo', async (req, res) => {
+
+    const equipos_proyecto = await pool.query(" SELECT t1.id , t1a.Nombre AS nomLider, t1b.Nombre AS nomCol FROM sys_usuario_equipo as t1 " +
+                                                        " LEFT JOIN sys_usuario AS t1a ON t1a.idUsuario = t1.id_lider_equipo" +
+                                                        " LEFT JOIN sys_usuario AS t1b ON t1b.idUsuario = t1.id_colaborador ");
+
+    const colaborador_pendiente =  await pool.query(" SELECT * FROM sys_usuario AS t1a WHERE t1a.idUsuario NOT IN " +
+                                                    " (SELECT t1.id_colaborador FROM sys_usuario_equipo AS t1 GROUP BY t1.id_colaborador) AND t1a.id_estado = 1");
+
+
+    if (req.query.a === undefined)
+            {
+                res.render('mantenedores/equipoTrabajo', { equipos_proyecto,colaborador_pendiente, req ,layout: 'template'});
+            }
+    else
+            {
+                var verToask = {};
+                switch(req.query.a)
+                {
+                    case 1: // borrar
+                    case "1":
+                        verToask= {
+                        titulo : "Mensaje",
+                        body   : "Relacion Eliminada",
+                        tipo   : "Eliminar"
+                            };
+    
+                    res.render('mantenedores/equipoTrabajo', {verToask, equipos_proyecto,colaborador_pendiente, req ,layout: 'template'});
+                    break;
+                    case 2: // Asignado
+                    case "2":
+                        verToask = {
+                        titulo : "Mensaje",
+                        body   : "Asignacion terminada con exito",
+                        tipo   : "Crear"
+                            };
+    
+                    res.render('mantenedores/equipoTrabajo', {verToask, equipos_proyecto,colaborador_pendiente, req ,layout: 'template'});
+                    break;
+                }
+            }
+
+    
+
+});
+
+// /mantenedores/equipoTrabajo/delete/42
+router.get('/equipoTrabajo/delete/:id', async (req, res) => {
+
+    const { id } = req.params;
+
+    await pool.query('DELETE FROM sys_usuario_equipo WHERE id = ?', [id]);
+
+    res.redirect(   url.format({
+        pathname:'/mantenedores/equipoTrabajo',
+        query: {
+        "a": 1
+        }
+    }));
+
+
+});
+
+router.get('/buscarDesti/:find', async (req, res) => {
+  
+    // BUSCAR DIRECTOR  
+    const nombre = req.query.term;
+    const destinarios =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 WHERE t1.Nombre LIKE '%"+nombre+"%' AND t1.id_estado = 1");
+    
+ 
+    res.setHeader('Content-Type', 'application/json');
+    res.json(destinarios);
+  
+  });
+
+
+  // /mantenedores/equipoTrabajo/asociar
+  router.post('/equipoTrabajo/asociar/', async (req,res) => {
+
+    console.log(req.body);
+
+    const {idColaborador} = req.body;
+    var valor = "idLider"+idColaborador;
+    var idLider = req.body[valor];
+    
+    const newIdEquipo  ={ //Se gurdaran en un nuevo objeto
+        id_lider_equipo:idLider,
+        id_colaborador:idColaborador
+    };
+    
+       // console.log(req.body);
+       const result = await pool.query('INSERT INTO sys_usuario_equipo set ? ', [newIdEquipo]);
+
+       res.redirect(   url.format({
+        pathname:'/mantenedores/equipoTrabajo',
+        query: {
+        "a": 2
+        }
+    }));
+  });
 
 
 

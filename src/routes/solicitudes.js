@@ -11,7 +11,7 @@ router.get('/permisos', isLoggedIn, async (req, res) => {
   // buscar los datos del usuario en las variables req
  
   //console.log("permisos de usuario");
-  const usuarios = await pool.query('SELECT * FROM sys_usuario');
+  const usuarios = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1");
 
 
   //res.render('solicitudes/permisos', { req ,usuarios,res,layout: 'template'});
@@ -142,7 +142,7 @@ router.post('/IngresoPermiso', isLoggedIn, async (req, res) => {
 router.get('/vacaciones', isLoggedIn, async (req, res) => {
     // buscar los datos del usuario en las variables req
     const vacacione = await pool.query('SELECT * FROM sol_selec_dias');
-    const usuarios = await pool.query('SELECT * FROM sys_usuario');
+    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1");
     const solicitud = await pool.query('SELECT * FROM sol_solicitud');
     res.render('solicitudes/vacaciones', { req ,vacacione,usuarios,solicitud,layout: 'template'});
 }); 
@@ -1076,7 +1076,7 @@ router.get('/buscarSol/:find', async (req, res) => {
 
   // BUSCAR DIRECTOR  
   const nombre = req.query.term;
-  const destinarios =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 WHERE t1.Nombre LIKE '%"+nombre+"%'");
+  const destinarios =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 WHERE t1.Nombre LIKE '%"+nombre+"%' AND t1.id_estado = 1");
   
 
   res.setHeader('Content-Type', 'application/json');

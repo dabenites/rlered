@@ -1,12 +1,23 @@
+<style>
+   .dataTables_filter{
+	    position: relative;
+  		float: left;
+   }
+   .dataTables_length{
+	    position: relative;
+  		float: right;
+   }
+</style>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 <div class="x_panel">
     <div class="x_title">
-        <h2>Información moneda UF <!--<small>Tener los valores actualizados para un correcto funcionamiento de los
+        <h2>Información Valor UF <!--<small>Tener los valores actualizados para un correcto funcionamiento de los
                 Dashboard</small>--></h2>
         <ul class="nav navbar-right panel_toolbox">
             <button type="button" class="btn btn-success btn-xs"><a class="close-link"
-                    href="/mantenedores/valorufmanual"> <label style="color: #e8f1fb;"> Actualizar Manual</label></a></button>
+                    href="/mantenedores/valorufmanual"> <label style="color: #e8f1fb;">Fecha a Revisar</label></a></button>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i
                         class="fa fa-clock-o"></i></a>
@@ -40,18 +51,18 @@
         <thead>
             <tr>
                 <th style="text-align: center;">Fecha</th>
-                <th style="text-align: center;">Moneda</th>
-                <th style="text-align: center;">Indicador</th>
-                <th style="text-align: center;">Actual</th>
+                <!-- <th style="text-align: center;">Moneda</th> -->
+                <th style="text-align: center;">Valor Indicador</th>
+                <th style="text-align: center;">Valor</th>
             </tr>
         </thead>
         <tbody>
             {{#each indicacoresCL}}
             <tr>
                 <th style="text-align: center;">{{@key}}</th>
-                <td style="text-align: center;">{{nombre}}</td>
-                <td style="text-align: center;">{{valor}}</td>
-                <td style="text-align: center;">{{valor_UF}}</td>
+                <!-- <td style="text-align: center;">{{nombre}}</td> -->
+                <td style="text-align: center;">$ {{valor}}</td>
+                <td style="text-align: center;">$ {{valor_UF}}</td>
             </tr>
             {{/each}}
         </tbody>
@@ -71,6 +82,9 @@
 
 <script>
       $('#tablavalorMoneda').DataTable({
+        "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         language: {
           "decimal": "",
           "emptyTable": "No hay información",

@@ -43,6 +43,7 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
 
     if (mensaje !== -1)
     { 
+       /*
         const verToask = {
         titulo : "Mensaje",
         body   : "Solicitud ingresada correctamente.",
@@ -50,6 +51,32 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
             };
     
         res.render('ploter/ingresar', {verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+        */
+        var verToask = {};
+                switch(req.query.a)
+                {
+                    case 1: // CREAR
+                    case "1":
+                        verToask= {
+                        titulo : "Mensaje",
+                        body   : "Solicitud ingresada correctamente.",
+                        tipo   : "Crear"
+                            };
+    
+                    res.render('ploter/ingresar', {verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+                    break;
+                    case 2: // Asignado
+                    case "2":
+                        verToask = {
+                        titulo : "Mensaje",
+                        body   : "Solicitud cambio de estado correctamente",
+                        tipo   : "Editar"
+                            };
+    
+                    res.render('ploter/ingresar', {verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+                    break;
+                }
+
     }
     else
     {
@@ -126,7 +153,7 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
 
     //res.redirect('/ploter/ploteo/');
     res.redirect(   url.format({
-        pathname:'/ploter/ploteo/',
+        pathname:'/ploter/ploteo',
         query: {
            "a": 1
          }
@@ -147,18 +174,12 @@ router.post('/cambiaEstado',express.json({type: '*/*'}), isLoggedIn, async (req,
         case 'Procesando':
             const pro = await pool.query('UPDATE solicitudes set estado = ? WHERE id = ?', [req.body[0].estado,req.body[0].id]);
             res.send("mensaje");
-            //location.reload();
-            //req.reload();
-            //res.redirect('..');
         break;
         case 'Terminado':
             var hora = dateFormat(new Date(), "HH:MM");
             var fecha = dateFormat(new Date(), "dd-mm-yyyy");
             const ter = await pool.query('UPDATE solicitudes set estado = ? , horat = ? ,fechat = ? WHERE id = ?', [req.body[0].estado,hora,fecha,req.body[0].id]);
             res.send("mensaje");
-            //location.reload();
-            //req.reload();
-            //res.redirect('..');
         break;
     }
 
@@ -201,7 +222,14 @@ router.get('/buscarPro/:find', async (req, res) => {
     
     const proyecto = await pool.query('UPDATE sol_ploteo set id_estado = 2 , fecha_e_trabajando = ? WHERE id = ?', [fechaActual, id]);
 
-    res.redirect('/ploter/ploteo/');
+    //res.redirect('/ploter/ploteo/');
+    res.redirect(   url.format({
+        pathname:'/ploter/ploteo',
+        query: {
+           "a": 2
+         }
+      }));
+
 
   });
 
@@ -213,7 +241,12 @@ router.get('/buscarPro/:find', async (req, res) => {
 
     const proyecto = await pool.query('UPDATE sol_ploteo set id_estado = 3 , fecha_e_terminado = ? WHERE id = ?', [fechaActual,id]);
 
-    res.redirect('/ploter/ploteo/');
+    res.redirect(   url.format({
+        pathname:'/ploter/ploteo',
+        query: {
+           "a": 2
+         }
+      }));
 
   });
 

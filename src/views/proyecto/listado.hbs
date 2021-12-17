@@ -1,11 +1,21 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<style>
+   .dataTables_filter{
+	    position: relative;
+  		float: left;
+   }
+   .dataTables_length{
+	    position: relative;
+  		float: right;
+   }
+</style>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 <!--LISTAR-->
 <div class="col-md-12 col-sm-12 ">
     <div class="x_panel">
         <div class="x_title">
-            <h2>Listar Usuarios<small></small></h2>
+            <h2>Proyecto<small></small></h2>
             <ul class="nav navbar-right panel_toolbox">
                 <td style="text-align: right;width:220px">
                    <a style="padding: .50rem;" type="button" class="btn btn-info" href="/proyecto/addPro">Crear Proyectos</a> 
@@ -31,19 +41,14 @@
                         <td>{{nomCli}}</td>
                         <td>{{nomDir}}</td>
                         <td>{{nomJefe}}</td>
-                        <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                href="editar/{{id}}">
-                                Editar
-                            </a>
-                            <a style="padding: .25rem;" type="button" class="btn btn-warning btn-xs"
-                                href="facturar/{{id}}">
-                                Facturar
-                            </a>
-                             <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                href="equipo/{{id}}">
-                                Equipo
-                            </a>
+                        <td>
+
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <button type="button" class="btn btn-secondary btn-sm"><a href="editar/{{id}}" style="color: #fff;">Editar</a></button>
+                                <button type="button" class="btn btn-secondary btn-sm"><a href="facturar/{{id}}" style="color: #fff;">Facturar</a></button>
+                                <button type="button" class="btn btn-secondary btn-sm"><a href="equipo/{{id}}" style="color: #fff;">Equipo</a></button>
+                            </div>
+
                         </td>
                     </tr>
                     {{/each}}
@@ -115,6 +120,9 @@
         });
 
         var table = $('#tablaProyectos').DataTable({
+            "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
             orderCellsTop: true,
             fixedHeader: true,
             "scrollX": true,

@@ -138,15 +138,25 @@
                                         <textarea class="form-control" rows="3" name="descripcion" id="descripcion" readonly>{{permiso.comentario}}</textarea>         
                                 </div>
                             </div>
-                            <div class="item form-group">
-                                <label class="col-form-label col-md-3 col-sm-3 label-align" for="descripcion">Observacion<span class="required">*</span></label>
-                                <div class="col-md-6 col-sm-6 ">
-                                        <textarea class="form-control" rows="3" name="Observacion" id="Observacion" ></textarea>         
+                            {{#if anulacion }}
+                                <div class="item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="descripcion">Comentario Aprobador<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 ">
+                                            <textarea class="form-control" rows="3" name="Observacion" id="Observacion" readonly>{{permiso.comentarioSolicitud}}</textarea>         
+                                    </div>
                                 </div>
-                            </div>
+                            {{else}}
+                             <div class="item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="descripcion">Observacion<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6 ">
+                                            <textarea class="form-control" rows="3" name="Observacion" id="Observacion" readonly></textarea>         
+                                    </div>
+                                </div>
+                            {{/if}}
                             <div class="item form-group">
                                 <label class="col-form-label col-md-4 col-sm-4 label-align" for="descripcion"></label>
                                 <input type="hidden" id="estado" class="form-control" value="" name="estado" readonly />
+                                <input type="hidden" id="estado_actual" class="form-control" value="{{permiso.estadoActual}}" name="estado_actual" readonly />
                                 <input type="hidden" id="id_solicitud" class="form-control" value="{{permiso.id}}" name="id_solicitud" readonly />
                                  {{#if anulacion }}
                                     <button type="button" onclick="revisarAction(2);" class="btn btn-warning" type="reset">Anular </button>

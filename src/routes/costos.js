@@ -83,11 +83,9 @@ router.post('/fileupload', async (req,res) => {
                                 existeCosto.forEach(function(elemento, indice, array) {
                                     tieneResitros = true;
                                 });
+                                
                                 if(tieneResitros)
                                 {
-                                    //const result = await pool.query('UPDATE sys_usuario_costo set costo = ? WHERE annio = ? , mes = ? , idUsuario = ? ', [row.values[7],lectura["ano"],lectura["mes"],row.values[2]]);
-                                    // lectura["ano"],lectura["mes"],row.values[2]]
-                                    //console.log("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
                                     const result = await pool.query("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
                                     const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
                                 }
@@ -389,8 +387,10 @@ router.get('/eproyectos', isLoggedIn, async (req, res) => {
     const costosExternos = await pool.query("SELECT " + 
                                             "* " +
                                             " , DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso " +
-                                            " , t4.nombre as proveedor, t2.nombre as nomProyecto" +
-                                            " FROM pro_costo_externo as t1,"+
+                                            " , t4.nombre as proveedor, t2.nombre as nomProyecto, t1.id as idCosto, t1.descripcion as comentarioIngreso ," +
+                                            " t1a.descripcion as comentarioAProbador"+
+                                            " FROM pro_costo_externo as t1 "+
+                                            " LEFT JOIN pro_costo_externo_tracking as t1a ON t1.id = t1a.id_pro_costo_externo ," +
                                             " pro_proyectos as t2, " +
                                             " prov_externo as t4, " +
                                             " pro_costo_externo_estado as t3 " +
@@ -404,10 +404,7 @@ router.get('/eproyectos', isLoggedIn, async (req, res) => {
 });
 
 router.get('/aproyectos', isLoggedIn, async (req, res) => {
-
-    
-
-
+ 
     // Seleccicionar los costos que el ha ingresado
     const costosExternos = await pool.query("SELECT " + 
                                             "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso ,"+
@@ -423,8 +420,6 @@ router.get('/aproyectos', isLoggedIn, async (req, res) => {
                                             " AND t1.id_ingreso = t4.idUsuario" + 
                                             " AND t5.id = t1.id_prov_externo" );
 
-
-    console.log(costosExternos);
 
     res.render('proyecto/acostoexterno', {costosExternos, req ,layout: 'template'});
 

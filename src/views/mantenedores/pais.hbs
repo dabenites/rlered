@@ -20,7 +20,7 @@
     <div class="col-md-6 col-sm-6  ">
         <div class="x_panel">
             <div class="x_title">
-                <h2>Paises
+                <h2>Países
                     <!--<small>Pais donde estara ubicado el proyecto en desarrollo</small>-->
                 </h2>
                 <div class="clearfix"></div>
@@ -35,36 +35,29 @@
                     </thead>
                     <tbody>
                         {{#if pais }}
-                        {{#each paises}}
-                        <tr>
-                            <td>{{pais}}</td>
-                            <td style="padding: .15rem;">
-                                <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                    href="../../pais/edit/{{id}}">
-                                    Editar
-                                </a>
-                                <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                    href="../../pais/delete/{{id}}">
-                                    Borrar
-                                </a>
-                            </td>
-                        </tr>
-                        {{/each}}
+                            {{#each paises}}
+                                <tr>
+                                    <td>{{pais}}</td>
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                            <button type="button" class="btn btn-secondary btn-sm"><a type="button"href="../../pais/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                            <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../pais/delete/{{id}}" style="color: white;"
+                                            onclick="return confirm('¿Esta seguro de borrar el Pais {{pais}} ?')">Borrar</a></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {{/each}}
                         {{else}}
                             {{#if verToask }}
-                            {{#each paises}}
+                                {{#each paises}}
                                     <tr>
                                         <td>{{pais}}</td>
-                                        <td style="padding: .15rem;">
-                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                                href="../../pais/edit/{{id}}">
-                                                Editar
-                                            </a>
-                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                                href="../../pais/delete/{{id}}">
-                                                Borrar
-                                            </a>
-
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <button type="button" class="btn btn-secondary btn-sm"><a type="button"href="../../mantenedores/pais/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../mantenedores/pais/delete/{{id}}" style="color: white;"
+                                                onclick="return confirm('¿Esta seguro de borrar el Pais proveedor {{pais}} ?')">Borrar</a></button>
+                                            </div>
                                         </td>
                                     </tr>
                                 {{/each}}
@@ -72,16 +65,12 @@
                                 {{#each paises}}
                                     <tr>
                                         <td>{{pais}}</td>
-                                        <td style="padding: .15rem;">
-                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                                href="pais/edit/{{id}}">
-                                                Editar
-                                            </a>
-                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" onclick="return confirm('¿ Esta seguro de borrar el pais : {{pais}} ?')"
-                                                href="pais/delete/{{id}}">
-                                                Borrar
-                                            </a>
-
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <button type="button" class="btn btn-secondary btn-sm"><a type="button"href="pais/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="pais/delete/{{id}}" style="color: white;"
+                                                onclick="return confirm('¿Esta seguro de borrar el Pais proveedor {{pais}} ?')">Borrar</a></button>
+                                            </div>
                                         </td>
                                     </tr>
                                 {{/each}}
@@ -96,9 +85,9 @@
         <div class="x_panel">
             <div class="x_title">
                 {{#if pais }}
-                <h2>Actualizar Pais <small>{{pais.pais}}</small></h2>
+                <h2>Actualizar País <small>{{pais.pais}}</small></h2>
                 {{else}}
-                <h2>Registrar Pais
+                <h2>Registrar País
                     <!--<small>Se podra seleccionar el pais en el ingreso de un proyecto</small>-->
                 </h2>
                 {{/if}}

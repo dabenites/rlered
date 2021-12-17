@@ -38,15 +38,11 @@
                             {{#each tipos_servicio}}
                             <tr>
                                 <td>{{descripcion}}</td>
-                                <td style="padding: .15rem;">
-                                    <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                        href="../../tipoServicio/edit/{{id}}">
-                                        Editar
-                                    </a>
-                                    <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                        href="../../tipoServicio/delete/{{id}}">
-                                        Borrar
-                                    </a>
+                                <td >
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+												<button type="button" class="btn btn-secondary btn-sm"><a type="button" href="../../tipoServicio/edit/{{id}}" style="color: white;"> Editar </a></button>
+												<button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../tipoServicio/delete/{{id}}" onclick="return confirm('¿Esta seguro de eliminar tipo servicio :  {{descripcion}} ?')" style="color: white;">Borrar</a></button>
+    								</div>
                                 </td>
                             </tr>
                             {{/each}}
@@ -55,16 +51,11 @@
                                 {{#each tipos_servicio}}
                                     <tr>
                                         <td>{{descripcion}}</td>
-                                        <td style="padding: .15rem;">
-                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                                href="../../tipoServicio/edit/{{id}}">
-                                                Editar
-                                            </a>
-                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                                href="../../tipoServicio/delete/{{id}}">
-                                                Borrar
-                                            </a>
-
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+												<button type="button" class="btn btn-secondary btn-sm"><a type="button" href="../../mantenedores/tipoServicio/edit/{{id}}" style="color: white;"> Editar </a></button>
+												<button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../mantenedores/tipoServicio/delete/{{id}}" onclick="return confirm('¿Esta seguro de eliminar tipo servicio :  {{descripcion}} ?')" style="color: white;">Borrar</a></button>
+    								        </div>
                                         </td>
                                     </tr>
                                 {{/each}}
@@ -72,16 +63,11 @@
                                 {{#each tipos_servicio}}
                                     <tr>
                                         <td>{{descripcion}}</td>
-                                        <td style="padding: .15rem;">
-                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                                href="tipoServicio/edit/{{id}}">
-                                                Editar
-                                            </a>
-                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                                href="tipoServicio/delete/{{id}}">
-                                                Borrar
-                                            </a>
-
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+												<button type="button" class="btn btn-secondary btn-sm"><a type="button" href="tipoServicio/edit/{{id}}" style="color: white;"> Editar </a></button>
+												<button type="button" class="btn btn-danger btn-sm"><a type="button" href="tipoServicio/delete/{{id}}" onclick="return confirm('¿Esta seguro de eliminar tipo servicio :  {{descripcion}} ?')" style="color: white;">Borrar</a></button>
+    								        </div>
                                         </td>
                                     </tr>
                                 {{/each}}

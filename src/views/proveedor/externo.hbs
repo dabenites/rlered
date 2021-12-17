@@ -1,3 +1,14 @@
+
+<style>
+   .dataTables_filter{
+	    position: relative;
+  		float: left;
+   }
+   .dataTables_length{
+	    position: relative;
+  		float: right;
+   }
+</style>
 <div class="col-md-7 col-sm-7  ">
     <div class="x_panel">
         <div class="x_title">
@@ -23,15 +34,11 @@
                         <td>{{nombre}}</td>
                         <td>{{fono}}</td>
                         <td>{{mail}}</td>
-                        <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                href="../../externo/edit/{{id}}">
-                                Editar
-                            </a>
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="../../externo/delete/{{id}}" onclick="return confirm('¿Esta seguro de borrar al proveedor {{nombre}} ?')">
-                                Borrar
-                            </a>
+                        <td>
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="../../externo/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../externo/delete/{{id}}" onclick="return confirm('¿Esta seguro de borrar al proveedor {{nombre}} ?')" style="color: white;">Borrar</a></button>
+                            </div>
                         </td>
                     </tr>
                     {{/each}}
@@ -41,15 +48,11 @@
                         <td>{{nombre}}</td>
                         <td>{{fono}}</td>
                         <td>{{mail}}</td>
-                        <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                href="externo/edit/{{id}}">
-                                Editar
-                            </a>
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="externo/delete/{{id}}" onclick="return confirm('¿Esta seguro de borrar al proveedor {{nombre}} ?')">
-                                Borrar
-                            </a>
+                        <td>
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="externo/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="externo/delete/{{id}}" onclick="return confirm('¿Esta seguro de borrar al proveedor {{nombre}} ?')" style="color: white;">Borrar</a></button>
+                            </div>
                         </td>
                     </tr>
                     {{/each}}
@@ -69,7 +72,11 @@
             {{else}}
             <h2>Registrar Proveedor <!--<small>Se podra ingresar un costos externo a los proyectos</small>--></h2>
             {{/if}}
-
+            {{#if proveedor }}
+             <ul class="nav navbar-right panel_toolbox">
+				<li><a onclick="window.history.go(-1); return false;"><i class="fa fa-arrow-circle-left"></i> Volver</a></li>
+			</ul>
+            {{/if}}
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -112,10 +119,6 @@
                     <button type="submit" class="btn btn-warning btn-block">
                         Actualizar
                     </button>
-                     <button type="submit" class="btn btn-success btn-block"><a href="/proveedor/externo">
-                        Volver
-                     </a>
-                    </button>
                     {{else}}
                     <button type="submit" onvolumechange="" class="btn btn-warning btn-block">
                         Ingresar
@@ -138,6 +141,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
       $('#tablaProveedores').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         language: {
           "decimal": "",
           "emptyTable": "No hay información",

@@ -21,7 +21,7 @@ button.close {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <div class="x_panel">
 	<div class="x_title">
-	    <h2>Lista de contactos<small></small></h2>
+	    <h2>Lista de Contactos<small></small></h2>
 		<div class="navbar-right">
 		
 		</div>
@@ -63,9 +63,11 @@ button.close {
 									{{#if ../visor }}
 				
 									{{else}}	
-										<td>
-											<a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs" href="contacto/editar/{{id}}" > Editar</a>
-											<a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" onclick="return confirm('¿ Esta seguro de borrar contacto : {{name}} ?')" href="contacto/delete/{{id}}" > Eliminar</a>
+										<td>											
+											<div class="btn-group" role="group" aria-label="Basic example">
+												<button type="button" class="btn btn-secondary btn-sm"><a type="button" href="contacto/editar/{{id}}" style="color: white;"> Editar </a></button>
+												<button type="button" class="btn btn-danger btn-sm"><a type="button" href="contacto/delete/{{id}}" onclick="return confirm('¿Esta seguro de borrar el contacto {{name}} ?')" style="color: white;">Borrar</a></button>
+											</div>
 										</td>
 									{{/if}}
                                 </tr>

@@ -1,3 +1,13 @@
+<style>
+   .dataTables_filter{
+	    position: relative;
+  		float: left;
+   }
+   .dataTables_length{
+	    position: relative;
+  		float: right;
+   }
+</style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <div class="x_panel">
     <div class="x_title">
@@ -34,8 +44,10 @@
                     </select>
                 </div>
                 <div class="col-md-4 col-sm-4 ">
-                    <button type="submit" class="btn btn-primary">Revisar</button>
-                    <a href="/mantenedores/valoruf"> <button type="button" class="btn btn-primary">Volver</button></a>
+                 
+                        <button type="submit" class="btn btn-primary">Revisar</button>
+                  <!--      <a href="/mantenedores/valoruf"> <button type="button" class="btn btn-primary">Volver</button></a>
+                        -->
                 </div>
             </div>
             <div class="ln_solid"></div>
@@ -94,9 +106,10 @@
                 </tbody>
                 <tfoot>
                     <th></th>
-                    <th> <button type="button" onclick="getInfoDataTable();" class="btn btn-primary">Ingresar</button>
-                    </th>
                     <th></th>
+                    <th align="right"> <button type="button" onclick="getInfoDataTable();" class="btn btn-primary">Ingresar</button>
+                    </th>
+                    
                 </tfoot>
             </table>
         </form>
@@ -115,6 +128,9 @@
 
 <script>
    var tbl =  $('#valorUfManual').DataTable({
+       "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         language: {
           "decimal": "",
           "emptyTable": "No hay información",

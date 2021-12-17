@@ -33,6 +33,14 @@
             border: 0;
             -webkit-appearance: none;
         }
+         .dataTables_filter{
+	    position: relative;
+  		float: left;
+            }
+            .dataTables_length{
+                    position: relative;
+                    float: right;
+            }
     </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
@@ -106,7 +114,7 @@
                                                                     </div>
                                                                     <script>
                                                                         var nuevoalias = jQuery.noConflict();
-                                                                            nuevoalias(document).ready(function() {
+                                                                            
                                                                             nuevoalias( function() {
                                                                                     nuevoalias( "#lider{{idUsuario}}" ).autocomplete({
                                                                                     source: "buscarDesti/find=da",
@@ -117,12 +125,11 @@
                                                                                     }
                                                                                     });
                                                                                 } );
-                                                                            });
                                                                     </script>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="submit" class="btn btn-success">Ingresar</button>
+                                                            <button type="button" class="btn btn-success" onclick="verificarLider({{idUsuario}});">Ingresar</button>
                                                         </div>
                                                         </div>
                                                     </div>
@@ -134,7 +141,8 @@
                                     </tr>
                                      {{/each}}
                                 </tbody>
-                             </table>   
+                             </table>  
+                              
                          </div>
                          <div class="col-md-6">
                              <!--
@@ -233,6 +241,9 @@
 
 <script>
       $('#tablaEquipos').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         language: {
           "decimal": "",
           "emptyTable": "No hay información",
@@ -254,7 +265,11 @@
           }
         }
       });
-      $('#tablaPendientes').DataTable({
+
+      var table = $('#tablaPendientes').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         language: {
           "decimal": "",
           "emptyTable": "No hay información",
@@ -274,6 +289,56 @@
             "next": "Siguiente",
             "previous": "Anterior"
           }
-        }
+        },
+        "pageLength": 50
       });
+
+      $( document ).ready(function() {
+           table.page.len(10).draw();
+        });
+
+/*
+      $('#tablaPendientes').on('page.dt', function(){
+                var info = table.page.info();
+                console.log( 'Showing page: '+info.page+' of '+info.pages );
+                
+            table
+                .column( 0 )
+                .data()
+                .each( function ( value, index ) {
+                    //console.log( 'Data in index: '+index+' is: '+value );
+
+                                                                                    $( "#lider208" ).autocomplete({
+                                                                                    source: "buscarDesti/find=da",
+                                                                                    appendTo : "#asignar208",
+                                                                                    minLength: 2,
+                                                                                    select: function( event, ui ) {
+                                                                                        $('#idLider208').val(ui.item.id);
+                                                                                    }
+                                                                                    });
+                                                                               
+
+                } );
+            });
+            */
+
+
+      function verificarLider( idUsuario)
+      {
+
+          var idLider = $("#idLider"+idUsuario).val();
+
+          if (idLider > 0)
+          {
+                //document.llenadoBitacora.submit();
+                 $("#asginarPermiso" +idUsuario ).submit();
+          }
+          else
+          {
+               toastr.error('Agregue un Lider al colaborador', 'Alerta', {
+            "progressBar": true
+                    });
+          }
+
+      }
 </script>

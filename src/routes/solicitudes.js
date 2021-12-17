@@ -11,7 +11,7 @@ router.get('/permisos', isLoggedIn, async (req, res) => {
   // buscar los datos del usuario en las variables req
  
   //console.log("permisos de usuario");
-  const usuarios = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1");
+  const usuarios = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1 ORDER BY t1.nombre ASC");
 
 
   //res.render('solicitudes/permisos', { req ,usuarios,res,layout: 'template'});
@@ -520,8 +520,12 @@ router.get('/solicitudes/revisar/:id', async (req, res) => {
                                     "DATE_FORMAT(t3.fecha_inicio,'%H:%i' ) AS fecha_inicio," +
                                     "DATE_FORMAT(t3.fecha_termino,'%H:%i' ) AS fecha_termino, "+
                                     " t1.*, "+
-                                    ' t1.id' +
-                                    ' FROM sol_solicitud AS t1, sys_usuario AS t2, sol_permiso AS t3 '+
+                                    ' t1.id,' +
+                                    ' t1.idEstado as estadoActual ,' +
+                                    " t1a.comentario as comentarioSolicitud" +
+                                    ' FROM sol_solicitud AS t1 '+
+                                    " LEFT JOIN sol_solicitud_tracking as t1a ON t1.id = t1a.idSolicitud AND t1a.estado_inicial = 2,"+
+                                    ' sys_usuario AS t2, sol_permiso AS t3 '+
                                     ' WHERE' +
                                     ' t1.idTipoSolicitud = 2 AND t1.idUsuario = t2.idUsuario AND t3.idSolicitud = t1.id ' +
                                     ' AND ' + 
@@ -565,16 +569,38 @@ router.post('/updatePermisos', async (req,res) => {
   switch(req.body.estado)
   {
     case "2":
-      const resultPer2 = await pool.query("UPDATE sol_permiso set idEstado = 5 WHERE  idSolicitud = "+req.body.id_solicitud+" "); // Aprobado
+      const resultPer2 = await pool.query("UPDATE sol_permiso set idEstado = 5 WHERE  idSolicitud = "+req.body.id_solicitud+" "); // Anulado
       const result2 = await pool.query("UPDATE sol_solicitud set idEstado = 5 WHERE  id = "+req.body.id_solicitud+" ");
     break;
+
     case "1":
       const resultPer1 = await pool.query("UPDATE sol_permiso set idEstado = 3 WHERE  idSolicitud = "+req.body.id_solicitud+" "); // Aprobado
       const result1 = await pool.query("UPDATE sol_solicitud set idEstado = 3 WHERE  id = "+req.body.id_solicitud+" ");
+
+      const tracking1 = {idSolicitud : req.body.id_solicitud,
+        fecha   : new Date(),
+        estado_inicial : req.body.estado_actual,
+        estado_final : "3",
+        idUsuario : req.user.idUsuario,
+        comentario   : req.body.Observacion};
+
+      const result1Tr = await pool.query('INSERT INTO sol_solicitud_tracking set ? ', [tracking1]);
+
     break;
+
     case "0":
       const resultPer = await pool.query("UPDATE sol_permiso set idEstado = 6 WHERE idSolicitud = "+req.body.id_solicitud+" "); // Rechazado
       const result = await pool.query("UPDATE sol_solicitud set idEstado = 6 WHERE  id = "+req.body.id_solicitud+" ");
+
+      const tracking2 = {idSolicitud : req.body.id_solicitud,
+        fecha   : new Date(),
+        estado_inicial : req.body.estado_actual,
+        estado_final : "6",
+        idUsuario : req.user.idUsuario,
+        comentario   : req.body.Observacion};
+
+      const result2Tr = await pool.query('INSERT INTO sol_solicitud_tracking set ? ', [tracking2]);
+
     break;
   }
   
@@ -610,8 +636,29 @@ router.get('/avacaciones', isLoggedIn, async (req, res) => {
                                               " t1.idUsuario = t3.idUsuario "+ 
                                   "   GROUP BY t2.idSolicitud ");
 
-  //console.log(req.user);
-  res.render('proyecto/avacaciones', {soliVacaciones , req , layout: 'template'});
+      const historialVacaiones = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t1.fecha, DATE_FORMAT(t1.fecha, '%d-%m-%Y') as fecha,"+
+                                  " DATE_FORMAT(MAX(t2.fecha), '%d-%m-%Y') AS maxFecha, " +
+                                  " DATE_FORMAT(MIN(t2.fecha), '%d-%m-%Y') AS minFecha" +
+
+                                    " FROM  " +
+                                                " sol_solicitud AS t1 ,  " +
+                                                " sol_selec_dias AS t2 ,  " +
+                                                " sys_usuario AS t3" +
+                                                
+                                    " WHERE  " +
+                                                " t1.id = t2.idSolicitud"+
+                                    " AND  " +
+                                                " t1.idUsuario = t3.idUsuario "+
+                                    " AND  " +
+                                                " t1.idEstado = 3 "+
+                                      
+                                    " GROUP BY t2.idSolicitud ");
+
+
+
+
+  res.render('proyecto/avacaciones', {historial:req,historialVacaiones, soliVacaciones , req , layout: 'template'});
+  
 });
 
 router.get('/avacaciones/revisar/:id', async (req, res) => {
@@ -639,23 +686,26 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
                " t1.idUsuario = t3.idUsuario "+
    " GROUP BY t2.idSolicitud ");
 
-  const selecciona = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t1.fecha , t1.comentario,t1.comentario_anulacion, t1.fecha, DATE_FORMAT(t1.fecha, '%Y-%m-%d') as fecha, t4.descripcion, t4.id as idEstado "+
-  " FROM  " +
-              " sol_solicitud AS t1 ,  " +
-              " sol_selec_dias AS t2 ,  " +
-              " sol_estado AS t4,  " +
-              " sys_usuario AS t3" +
-  " WHERE  " +
-               " t1.idTipoSolicitud =  t1.idTipoSolicitud " +
-   " AND  " +
-               " t2.idSolicitud = " + id +""+
-  " AND  " +
-              " t1.id = t2.idSolicitud"+
-  " AND  " +
-              " t1.idEstado = t4.id"+
-  " AND  " +
-              " t1.idUsuario = t3.idUsuario "+
-  " GROUP BY t2.idSolicitud ");
+  const selecciona = await pool.query(" SELECT t1.idEstado as estadoActual,  SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias," +
+                                       " t3.*, t1.id, t1.fecha , t1.comentario,t1.comentario_anulacion, t1.fecha, "+
+                                       " DATE_FORMAT(t1.fecha, '%Y-%m-%d') as fecha, t4.descripcion, t4.id as idEstado, t1a.comentario as comentarioSolicitud "+
+                                      " FROM  " +
+                                                  " sol_solicitud AS t1   " +
+                                                  " LEFT JOIN sol_solicitud_tracking as t1a ON t1.id = t1a.idSolicitud AND t1a.estado_inicial = 2,"+
+                                                  " sol_selec_dias AS t2 ,  " +
+                                                  " sol_estado AS t4,  " +
+                                                  " sys_usuario AS t3" +
+                                      " WHERE  " +
+                                                  " t1.idTipoSolicitud =  t1.idTipoSolicitud " +
+                                      " AND  " +
+                                                  " t2.idSolicitud = " + id +""+
+                                      " AND  " +
+                                                  " t1.id = t2.idSolicitud"+
+                                      " AND  " +
+                                                  " t1.idEstado = t4.id"+
+                                      " AND  " +
+                                                  " t1.idUsuario = t3.idUsuario "+
+                                      " GROUP BY t2.idSolicitud ");
 
 
   const seleccionaList = await pool.query(" SELECT SUM(if (t2.medioDia = 'Y', 0.5 , 1)) AS Dias, t3.*, t1.id, t1.fecha, DATE_FORMAT(t1.fecha, '%d-%m-%Y') as fecha,"+
@@ -678,8 +728,9 @@ router.get('/avacaciones/revisar/:id', async (req, res) => {
                                                         " t1.idEstado = 3 "+
                                               
                                             " GROUP BY t2.idSolicitud ");
+
   const diasFecha = await pool.query("SELECT  DATE_FORMAT(t1.fecha, '%Y-%m-%d') as fecha, " +
-                                     "   if (t1.medioDia = 'Y', ' Medio dia', ' Dia completo') AS mediodia, " +
+                                     "   if (t1.medioDia = 'Y', ' Medio Día', ' Día Completo') AS mediodia, " +
                                      " if (t1.medioDia = 'Y', if(t1.hora = 'AM', ' Mañana',' Tarde'), '') AS hora " +
                                      " FROM  " +
                                               " sol_selec_dias AS t1 " +
@@ -719,13 +770,34 @@ router.post('/updateVacaciones', async (req,res) => {
       const result2 = await pool.query("UPDATE sol_solicitud set idEstado = 5 WHERE  id = "+req.body.id_solicitud+" ");
     break;
     case "1":
-      //console.log("UPDATE sol_selec_dias set idEstado = 3 WHERE  idSolicitud = "+req.body.id_solicitud+" ");
       const resultPer1 = await pool.query("UPDATE sol_selec_dias set idEstado = 3 WHERE  idSolicitud = "+req.body.id_solicitud+" "); // Aprobado
       const result1 = await pool.query("UPDATE sol_solicitud set idEstado = 3 WHERE  id = "+req.body.id_solicitud+" ");
+
+      // registrar el tracking de la aprobacion 
+      const tracking1 = {idSolicitud : req.body.id_solicitud,
+        fecha   : new Date(),
+        estado_inicial : req.body.estado_actual,
+        estado_final : "3",
+        idUsuario : req.user.idUsuario,
+        comentario   : req.body.Observacion};
+
+      const result1Tr = await pool.query('INSERT INTO sol_solicitud_tracking set ? ', [tracking1]);
+
     break;
     case "0":
-      const resultPer = await pool.query("UPDATE sol_selec_dias set idEstado = 4 WHERE idSolicitud = "+req.body.id_solicitud+" "); // Rechazado
-      const result = await pool.query("UPDATE sol_solicitud set idEstado = 4 WHERE  id = "+req.body.id_solicitud+" ");
+      const resultPer = await pool.query("UPDATE sol_selec_dias set idEstado = 6 WHERE idSolicitud = "+req.body.id_solicitud+" "); // Rechazado
+      const result = await pool.query("UPDATE sol_solicitud set idEstado = 6 WHERE  id = "+req.body.id_solicitud+" ");
+
+            // registrar el tracking de la aprobacion 
+      const tracking2 = {idSolicitud : req.body.id_solicitud,
+              fecha   : new Date(),
+              estado_inicial : req.body.estado_actual,
+              estado_final : "6",
+              idUsuario : req.user.idUsuario,
+              comentario   : req.body.Observacion};
+      
+      const result2Tr = await pool.query('INSERT INTO sol_solicitud_tracking set ? ', [tracking2]);
+
     break;
   }
   
@@ -911,8 +983,10 @@ router.get('/missolicitudes/:id', isLoggedIn, async (req, res) => {
                                           " t1.idEstado, " +
                                           " DATE_FORMAT(t1.fecha , '%Y-%m-%d')  AS fecha, " +
                                           " t1.comentario, " +
-                                          " t1.comentario_anulacion " +
-                                        " FROM sol_solicitud AS t1, " +
+                                          " t1.comentario_anulacion, " +
+                                          " t1a.comentario as comenAprob " +
+                                        " FROM sol_solicitud AS t1 " +
+                                          " LEFT JOIN sol_solicitud_tracking as t1a ON t1.id = t1a.idSolicitud AND t1a.estado_inicial = 2,"+
                                           " sol_tipo_solicitud AS t2, " +
                                           " sys_usuario AS t3, " +
                                           " sol_estado AS t4 " +
@@ -939,6 +1013,7 @@ router.get('/missolicitudes/:id', isLoggedIn, async (req, res) => {
 
 
   //console.log(horasextrasHistorial);
+  //console.log("asdsada");
 
   switch(solicitud[0].tipo)
   {
@@ -962,6 +1037,7 @@ router.get('/missolicitudes/:id', isLoggedIn, async (req, res) => {
         break;
         case 4:
         case 5:
+        case 6:
           res.render('solicitudes/missolicitudes', { vacaciones,horasextrasHistorial, solicitud:solicitud[0], solicitudes, req ,layout: 'template'});
         break;
 
@@ -996,6 +1072,7 @@ router.get('/missolicitudes/:id', isLoggedIn, async (req, res) => {
         break;
         case 4:
         case 5:
+        case 6:
           res.render('solicitudes/missolicitudes', {  permiso:permisos[0],solicitud:solicitud[0],horasextrasHistorial, solicitudes, req ,layout: 'template'});
         break;
 

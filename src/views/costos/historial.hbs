@@ -1,6 +1,17 @@
 <!doctype html>
 <html lang="en">
 
+<style>
+   .dataTables_filter{
+	    position: relative;
+  		float: left;
+   }
+   .dataTables_length{
+	    position: relative;
+  		float: right;
+   }
+</style>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,7 +28,7 @@
 </head>
 
 <body>
-    <div class="col-md-4 col-sm-4  ">
+    <div class="col-md-5 col-sm-5  ">
         <div class="x_panel">
             <div class="x_title">
                 <h2>Planillas cargadas</h2>
@@ -52,7 +63,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-8 ">
+    <div class="col-md-7 ">
          {{#if detalle}}
          <div class="x_panel">
             <div class="x_title">
@@ -101,6 +112,9 @@
 
 <script>
     $('#tablaHistorial').DataTable({
+         "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         language: {
           "decimal": "",
           "emptyTable": "No hay información",

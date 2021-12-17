@@ -1,3 +1,14 @@
+<style>
+   .dataTables_filter{
+	    position: relative;
+  		float: left;
+   }
+   .dataTables_length{
+	    position: relative;
+  		float: right;
+   }
+</style>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 <!-- Bootstrap CSS 
@@ -7,7 +18,7 @@
 <div class="col-md-6 col-sm-6  ">
     <div class="x_panel">
         <div class="x_title">
-            <h2>Categorias
+            <h2>Categorías
                 <!--<small>Las categoria son para agrupar al personal</small>-->
             </h2>
             <div class="clearfix"></div>
@@ -29,15 +40,11 @@
                         <td>{{centroCosto}}</td>
                         <td>{{categoria}}</td>
                         <td>{{valorHH}}</td>
-                        <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                href="../../categoria/edit/{{id}}">
-                                Editar
-                            </a>
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="../../categoria/delete/{{id}}">
-                                Borrar
-                            </a>
+                        <td>
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="../../categoria/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../categoria/delete/{{id}}" onclick="return confirm('¿Esta seguro de borrar la categoria {{categoria}} ?')" style="color: white;">Borrar</a></button>
+                            </div>
                         </td>
                     </tr>
                     {{/each}}
@@ -48,16 +55,11 @@
                             <td>{{centroCosto}}</td>
                             <td>{{categoria}}</td>
                             <td>{{valorHH}}</td>
-                            <td style="padding: .15rem;">
-                                <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                    href="../../categoria/edit/{{id}}">
-                                    Editar
-                                </a>
-                                <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs" onclick="return confirm('¿ Esta seguro de borrar la categoria : {{categoria}} ?')"
-                                    href="../../categoria/delete/{{id}}">
-                                    Borrar
-                                </a>
-
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="../../mantenedores/categoria/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                    <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../mantenedores/categoria/delete/{{id}}" onclick="return confirm('¿Esta seguro de borrar la categoria {{categoria}} ?')" style="color: white;">Borrar</a></button>
+                                </div>
                             </td>
                         </tr>
                         {{/each}}
@@ -67,16 +69,11 @@
                             <td>{{centroCosto}}</td>
                             <td>{{categoria}}</td>
                             <td>{{valorHH}}</td>
-                            <td style="padding: .15rem;">
-                                <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                    href="categoria/edit/{{id}}">
-                                    Editar
-                                </a>
-                                <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"  onclick="return confirm('¿ Esta seguro de borrar la categoria : {{categoria}} ?')"
-                                    href="categoria/delete/{{id}}">
-                                    Borrar
-                                </a>
-
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="categoria/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                    <button type="button" class="btn btn-danger btn-sm"><a type="button" href="categoria/delete/{{id}}" onclick="return confirm('¿Esta seguro de borrar la categoria {{categoria}} ?')" style="color: white;">Borrar</a></button>
+                                </div>
                             </td>
                         </tr>
                         {{/each}}
@@ -91,9 +88,9 @@
     <div class="x_panel">
         <div class="x_title">
             {{#if categoria }}
-            <h2>Actualizar Categoria <small>{{categoria.categoria}}</small></h2>
+            <h2>Actualizar Categoría <small>{{categoria.categoria}}</small></h2>
             {{else}}
-            <h2>Registrar Categorias <!--<small>Se podra seleccionar la categoria al momento de ingresar un usuario</small>-->
+            <h2>Registrar Categorías <!--<small>Se podra seleccionar la categoria al momento de ingresar un usuario</small>-->
             </h2>
             {{/if}}
 
@@ -192,6 +189,9 @@
 
 <script>
       $('#tablaCategoria').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         language: {
           "decimal": "",
           "emptyTable": "No hay información",

@@ -1,3 +1,23 @@
+<style>
+    .close {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+        }
+     .close:not(:disabled):not(.disabled) {
+            cursor: pointer;
+        }
+        button.close {
+            padding: 0;
+            background-color: transparent;
+            border: 0;
+            -webkit-appearance: none;
+        }
+</style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 <div class="col-md-5 col-sm-5  ">
@@ -73,6 +93,8 @@
 				</div>
     		</div>
             <div class="item form-group">
+                <label class="col-form-label col-md-7 col-sm-7 label-align" for="descripcion"></label>
+
                 <button  type="submit" onvolumechange=""class="btn btn-warning btn-block">
                                                 Ingresar
                                             </button>
@@ -84,7 +106,7 @@
 <div class="col-md-7 ">
     <div class="x_panel">
 		<div class="x_title">
-               <h2>Listado costos externos ingresados</h2>
+               <h2>Listado Costos Externos Ingresados</h2>
 		    <div class="clearfix"></div>
 		</div>
         <div class="x_content">
@@ -97,6 +119,7 @@
                         <th>Monto</th>
                         <th>Estado</th>
                         <th>Fecha Ingreso</th>
+                        <th></th>
                     </tr>
                 </thead>
                     <tbody>
@@ -108,6 +131,36 @@
                                 <td>{{costo}}</td>
                                 <td>{{descripcion}}</td>
                                 <td>{{fechaIngreso}}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group" aria-label="...">
+                                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#comentario{{idCosto}}"><i class="fa fa-comments"></i></button>
+                                    </div>
+                                    <div class="modal fade" id="comentario{{idCosto}}" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle">Comentarios</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                               <div class="item form-group">
+                                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="Etapa"> <b>Comentario Ingreso :</b> </label>
+                                                    <label class="col-form-label col-md-9 col-sm-9" for="Etapa"> {{comentarioIngreso}}</label>   
+                                                </div>
+                                                <div class="item form-group">
+                                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="Etapa"> <b>Comentario Aprobador :</b> </label>
+                                                    <label class="col-form-label col-md-9 col-sm-9 " for="Etapa">{{comentarioAProbador}} </label>   
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                         {{/each}} 
                     </tbody>

@@ -354,7 +354,49 @@ router.get('/listado', async (req, res) => {
 
   const proyectos = await pool.query(sql);
 
-  res.render('proyecto/listado', { proyectos, req, layout: 'template' });
+  
+
+  if (req.query.a === undefined)
+    {
+      res.render('proyecto/listado', { proyectos, req, layout: 'template' });
+    }
+    else
+        {
+            var verToask = {};
+            switch(req.query.a)
+            {
+                case 1: // Crear
+                case "1":
+                    verToask= {
+                    titulo : "Mensaje",
+                    body   : "Proyecto agregado correctamente.",
+                    tipo   : "Crear"
+                        };
+
+                        res.render('proyecto/listado', { verToask, proyectos, req, layout: 'template' });      
+                break;
+                case 2: // Actualizado
+                case "2":
+                    verToask = {
+                    titulo : "Mensaje",
+                    body   : "Proyecto actualizado correctamente.",
+                    tipo   : "Editar"
+                        };
+
+                        res.render('proyecto/listado', { verToask, proyectos, req, layout: 'template' });
+                break;
+                case 3: // Actualizado
+                case "3":
+                    verToask = {
+                    titulo : "Mensaje",
+                    body   : "Proyecto se ha eliminado correctamente.",
+                    tipo   : "Eliminar"
+                        };
+
+                        res.render('proyecto/listado', { verToask, proyectos, req, layout: 'template' });
+                break;
+            }
+        }
 
 });
 //buscarPais
@@ -476,7 +518,7 @@ router.get('/buscarDirector/:find', async (req, res) => {
   const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
                                        " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
                                        " AND t1.id_estado = 1" + 
-                                       " AND (t1.idCategoria IN (25,26,28,1) OR t1.idUsuario IN (39) )");
+                                       " AND (t1.idCategoria IN (25,26,28,1,42,27,41) OR t1.idUsuario IN (39,24) )");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
@@ -673,10 +715,12 @@ router.post('/cargarProyecto', async (req, res) => {
    const resultTracking = await pool.query('INSERT INTO pro_proyectos_tracking set ?', [newProyectoTracking]);
 
 
-  const tipo = await pool.query("SELECT * FROM proyecto_tipo");
-  const estado = await pool.query("SELECT * FROM pro_costo_externo_estado"); // REVISAR 
-
-  res.render('proyecto/addProyecto', { tipo,estado, req, layout: 'template' });
+ res.redirect(   url.format({
+    pathname:"../proyecto/listado",
+    query: {
+       "a": 1
+     }
+  }));
   
 
 });
@@ -688,7 +732,7 @@ router.post('/ActualizarProyecto', async (req, res) => {
     id_mandante,id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
     fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado , id,id_tipo_cobro, id_pais} = req.body;
 
-  //  console.log(req.body);
+    
   
   var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
   //req.user.idUsuario
@@ -728,8 +772,7 @@ router.post('/ActualizarProyecto', async (req, res) => {
      num_plano_estimado : num_planos_estimado
    };
 
-   const resultTrackingProyecto = await pool.query('UPDATE pro_proyectos set ? WHERE id = ?', [Proyecto,id]);
-
+   const resultTrackingProyecto = await pool.query('UPDATE pro_proyectos set ? WHERE id = ?', [Proyecto,id]); 
 
   const newProyectoTracking = { //Se gurdaran en un nuevo objeto
     // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
@@ -769,13 +812,12 @@ router.post('/ActualizarProyecto', async (req, res) => {
 
    const resultTracking = await pool.query('INSERT INTO pro_proyectos_tracking set ?', [newProyectoTracking]);
 
-  /*
-  const tipo = await pool.query("SELECT * FROM proyecto_tipo");
-  const estado = await pool.query("SELECT * FROM pro_costo_externo_estado"); // REVISAR 
-*/
-  
-//proyecto/listado
-res.redirect('/proyecto/listado');
+   res.redirect(   url.format({
+    pathname:"../proyecto/listado",
+    query: {
+       "a": 2
+     }
+  }));
 
 });
 router.post('/buscarPais', isLoggedIn, async (req, res) => {
@@ -897,6 +939,87 @@ router.get('/equipo/add/:idUsuario/:id', async (req, res) => {
   
 
 
+});
+
+router.post('/buscarCodigo', isLoggedIn, async (req, res) => {
+
+   // console.log(req.body.year:);
+
+    switch(req.body.pais)
+    {
+      case 1:
+      case '1':
+        switch(req.body.servicio)
+        {
+          case 1:
+          case '1':
+          case 2:
+          case '2':
+            const codigo1a = await pool.query(" SELECT  " +
+                                                " (max(t1.code) + 1) AS num " +
+                                            " FROM " +
+                                                " pro_proyectos AS t1 " +
+                                            " WHERE  " +
+                                                " t1.year = "+req.body.year+" " +
+                                            " AND  " +
+                                                " t1.code >= 0 AND 		t1.code <= 199"); 
+          //console.log(codigo[0].num);
+          res.send(String(codigo1a[0].num));
+          break;
+          case 3:
+          case '3':
+            const codigo1b = await pool.query(" SELECT  " +
+                                                " (max(t1.code) + 1) AS num " +
+                                            " FROM " +
+                                                " pro_proyectos AS t1 " +
+                                            " WHERE  " +
+                                                " t1.year = "+req.body.year+" " +
+                                            " AND  " +
+                                                " t1.code >= 400 AND 		t1.code <= 499"); 
+          //console.log(codigo[0].num);
+          res.send(String(codigo1b[0].num));
+          break;
+          default:
+            const codigo1c = await pool.query(" SELECT  " +
+                                                " (max(t1.code) + 1) AS num " +
+                                            " FROM " +
+                                                " pro_proyectos AS t1 " +
+                                            " WHERE  " +
+                                                " t1.year = "+req.body.year+" " +
+                                            " AND  " +
+                                                " t1.code >= 300 AND 		t1.code <= 399"); 
+          //console.log(codigo[0].num);
+          res.send(String(codigo1c[0].num));
+          break;
+        }
+        break;
+      case 6:
+      case '6':
+          const codigo = await pool.query(" SELECT  " +
+                                                " (max(t1.code) + 1) AS num " +
+                                            " FROM " +
+                                                " pro_proyectos AS t1 " +
+                                            " WHERE  " +
+                                                " t1.year = "+req.body.year+" " +
+                                            " AND  " +
+                                                " t1.code >= 200 AND 		t1.code <= 299"); 
+          //console.log(codigo[0].num);
+          res.send(String(codigo[0].num));
+          break;
+      default:
+        const codigo2 = await pool.query(" SELECT  " +
+                                                " (max(t1.code) + 1) AS num " +
+                                            " FROM " +
+                                                " pro_proyectos AS t1 " +
+                                            " WHERE  " +
+                                                " t1.year = "+req.body.year+" " +
+                                            " AND  " +
+                                                " t1.code >= 500 AND 		t1.code <= 599"); 
+          res.send(String(codigo2[0].num));
+        break;
+    }
+    
+  
 });
 
 

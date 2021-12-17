@@ -145,12 +145,9 @@
                         <div class="item form-group">
                             <label class="col-form-label col-md-4 col-sm-4 label-align" for="descripcion"></label>
                             <input type="hidden" id="estado" class="form-control" value="" name="estado" readonly />
-                            <input type="hidden" id="id_costo_externo" class="form-control"
-                                value="{{costoExterno.idCostoExterno}}" name="id_costo_externo" readonly />
-                            <button type="button" onclick="revisarAction(1);" class="btn btn-warning"
-                                type="reset">Aceptar</button>
-                            <button type="button" onclick="revisarAction(0);" class="btn btn-danger"
-                                type="button">Rechazar</button>
+                            <input type="hidden" id="id_costo_externo" class="form-control" value="{{costoExterno.idCostoExterno}}" name="id_costo_externo" readonly />
+                            <button type="button" onclick="revisarAction(0);" class="btn btn-danger" type="button">Rechazar</button>
+                            <button type="button" onclick="revisarAction(1);" class="btn btn-warning" type="reset">Aceptar</button>
                         </div>
                     </form>
                 </div>

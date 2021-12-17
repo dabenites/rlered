@@ -34,6 +34,14 @@
             border: 0;
             -webkit-appearance: none;
         }
+          .dataTables_filter{
+	    position: relative;
+  		float: left;
+            }
+            .dataTables_length{
+                    position: relative;
+                    float: right;
+            }
     </style>
 </head>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
@@ -253,7 +261,7 @@
                                 </div>
                             </div>
                             <div class="col-md-4 col-sm-4 ">
-                                <span class="section">4.- Configuración:</span>
+                                <span class="section">4.- Formato de Salida :</span>
                                 <div class="item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3 label-align"
                                         for="Destinatario">Formato Papel:</label>
@@ -321,50 +329,58 @@
                                 <td>{{fecha_solicitud}}</td>
                                 <td>{{nomDes}}</td>
                                 <td>
+                                    <!--
                                     <div class="form-group row">
                                         <div class="col-md-6">
                                             <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#ver{{id}}"> Ver Detalle </button>
-                                        <div class="modal fade" id="ver{{id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered" role="document">
-                                            <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLongTitle">Detalle Solicitud</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                 <div class="form-group row">
-                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Escala">Escala :</label>
-							                            <label class="col-form-label col-md-3 col-sm-3"	for="Escala">{{escala}}</label>
-                                                 </div>
-                                                 <div class="form-group row">
-                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Impresiones">Nº Impresiones :</label>
-                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Impresiones">{{nimpresion}}</label>
-                                                 </div>
-                                                 <div class="form-group row">
-                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Copias">Nº Copias :</label>
-                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Copias">{{ncopias}}</label>
-                                                 </div>
-                                                 <div class="form-group row">
-                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Papel">Formato Papel :</label>
-                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Papel">{{formatoPapel}}</label>
-                                                 </div>
-                                                 <div class="form-group row">
-                                                        <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Entrega">Formato Entrega :</label>
-                                                        <label class="col-form-label col-md-3 col-sm-3"	for="Entrega">{{formatoEntrega}}</label>
-                                                 </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            </div>
-                                            </div>
-                                        </div>
-                                        </div>
                                         </div>
                                         <div class="col-md-6">
                                             <a href="cambiaEstadoProceso/{{id}}"><button type="button" class="btn btn-warning btn-sm" >  En Proceso</button></a>
                                         </div>
+                                    </div>
+                                    -->
+                                    
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ver{{id}}">Detalle</button>
+                                            <div class="modal fade" id="ver{{id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLongTitle">Detalle Solicitud</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="form-group row">
+                                                                <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Escala">Escala :</label>
+                                                                <label class="col-form-label col-md-3 col-sm-3"	for="Escala">{{escala}}</label>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                                <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Impresiones">Nº Impresiones :</label>
+                                                                <label class="col-form-label col-md-3 col-sm-3"	for="Impresiones">{{nimpresion}}</label>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                                <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Copias">Nº Copias :</label>
+                                                                <label class="col-form-label col-md-3 col-sm-3"	for="Copias">{{ncopias}}</label>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                                <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Papel">Formato Papel :</label>
+                                                                <label class="col-form-label col-md-3 col-sm-3"	for="Papel">{{formatoPapel}}</label>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                                <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Entrega">Formato Entrega :</label>
+                                                                <label class="col-form-label col-md-3 col-sm-3"	for="Entrega">{{formatoEntrega}}</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
+
+                                        <a href="ploteo/cambiaEstadoProceso/{{id}}"><button type="button" class="btn btn-warning btn-sm">Proceso</button></a>
                                     </div>
                                 </td>
                             </tr>
@@ -401,10 +417,9 @@
                                 <td>{{fecha_solicitud}}</td>
                                 <td>{{nomDes}}</td>
                                 <td>
-                                    <div class="form-group row">
-                                        <div class="col-md-6">
-                                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#ver{{id}}"> Ver Detalle </button>
-                                        <div class="modal fade" id="ver{{id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ver{{id}}">Detalle</button>
+                                                                                <div class="modal fade" id="ver{{id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered" role="document">
                                             <div class="modal-content">
                                             <div class="modal-header">
@@ -441,10 +456,7 @@
                                             </div>
                                         </div>
                                         </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <a href="cambiaEstadoTerminado/{{id}}"><button type="button" class="btn btn-warning btn-sm" >Terminado</button></a>
-                                        </div>
+                                        <a href="ploteo/cambiaEstadoTerminado/{{id}}"><button type="button" class="btn btn-warning btn-sm">Terminado</button></a>
                                     </div>
                                 </td>
                             </tr>
@@ -481,9 +493,8 @@
                                 <td>{{fecha_solicitud}}</td>
                                 <td>{{nomDes}}</td>
                                 <td>
-                                    <div class="form-group row">
-                                        <div class="col-md-6">
-                                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#ver{{id}}"> Ver Detalle </button>
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ver{{id}}">Detalle</button>
                                         <div class="modal fade" id="ver{{id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered" role="document">
                                             <div class="modal-content">
@@ -521,7 +532,6 @@
                                             </div>
                                         </div>
                                         </div>
-                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -546,6 +556,9 @@
 
 <script>
  $('#tablaPendientes').DataTable({
+     "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         language: {
           "decimal": "",
           "emptyTable": "No hay información",
@@ -569,7 +582,38 @@
         "scrolly" : "50vh",
         "scrollCollapse" : true
       });
+      $('#tablaTerminados').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        },
+        "scrolly" : "50vh",
+        "scrollCollapse" : true
+      });
+
       $('#tablaHistorial').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
         language: {
           "decimal": "",
           "emptyTable": "No hay información",

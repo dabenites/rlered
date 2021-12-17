@@ -165,6 +165,7 @@ router.get('/facturas', isLoggedIn, async (req, res) => {
     const facturacion =  await pool.query("SELECT " +
                                                     " *, " +
                                                     " t1.id as idFacturacion," +
+                                                    " t4.nombre As nomSol ," +
                                                     " t2.nombre As nomPro ," +
                                                     " DATE_FORMAT(t1.fecha_solicitud, '%Y-%m-%d') as fechaSolicitante ," +
                                                     " t5.descripcion As estadoDes," +

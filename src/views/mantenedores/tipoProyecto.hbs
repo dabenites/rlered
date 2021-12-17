@@ -22,15 +22,12 @@
                     {{#each proyectos}}
                     <tr>
                         <td>{{descripcion}}</td>
-                        <td style="padding: .15rem;">
-                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                href="../../tipoProyecto/edit/{{id}}">
-                                Editar
-                            </a>
-                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                href="../../tipoProyecto/delete/{{id}}">
-                                Borrar
-                            </a>
+                        <td>
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="../../tipoProyecto/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../tipoProyecto/delete/{{id}}" style="color: white;"
+                                onclick="return confirm('¿Esta seguro de borrar al proveedor {{descripcion}} ?')">Borrar</a></button>
+                            </div>
                         </td>
                     </tr>
                     {{/each}}
@@ -39,15 +36,12 @@
                                 {{#each proyectos}}
                                     <tr>
                                         <td>{{descripcion}}</td>
-                                        <td style="padding: .15rem;">
-                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                                href="../../tipoProyecto/edit/{{id}}">
-                                                Editar
-                                            </a>
-                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"
-                                                href="../../tipoProyecto/delete/{{id}}">
-                                                Borrar
-                                            </a>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="../../mantenedores/tipoProyecto/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../mantenedores/tipoProyecto/delete/{{id}}" style="color: white;"
+                                                onclick="return confirm('¿Esta seguro de borrar al proveedor {{descripcion}} ?')">Borrar</a></button>
+                                            </div>
                                         </td>
                                     </tr>
                                 {{/each}}
@@ -55,15 +49,12 @@
                                 {{#each proyectos}}
                                     <tr>
                                         <td>{{descripcion}}</td>
-                                        <td style="padding: .15rem;">
-                                            <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
-                                                href="tipoProyecto/edit/{{id}}">
-                                                Editar
-                                            </a>
-                                            <a style="padding: .25rem;" type="button" class="btn btn-danger btn-xs"  onclick="return confirm('¿ Esta seguro de borrar el tipo proyecto : {{descripcion}} ?')"
-                                                href="tipoProyecto/delete/{{id}}">
-                                                Borrar
-                                            </a>
+                                        <td>
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="tipoProyecto/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="tipoProyecto/delete/{{id}}" style="color: white;"
+                                                onclick="return confirm('¿Esta seguro de borrar al proveedor {{descripcion}} ?')">Borrar</a></button>
+                                            </div>
                                         </td>
                                     </tr>
                                 {{/each}}
@@ -81,7 +72,7 @@
             {{#if proyecto }}
             <h2>Actualizar Proyectos<small>{{proyecto_tipo.proyecto_tipo}}</small></h2>
             {{else}}
-            <h2>Registrar proyecto </h2>
+            <h2>Ingresar Tipo Proyecto </h2>
             {{/if}}
 
             <div class="clearfix"></div>

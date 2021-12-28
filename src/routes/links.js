@@ -78,6 +78,12 @@ router.post('/edit/:id', async (req, res) => {
 });
 
 
+// Generador de scripts 
+
+//password
+
+
+
 
 
 module.exports = router;

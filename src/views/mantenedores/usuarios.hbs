@@ -19,8 +19,8 @@
             <h2>Usuarios<small></small></h2>
             <ul class="nav navbar-right panel_toolbox">
                 <td style="text-align: right;width:220px">
-                    <a style="padding: .50rem;" type="button" class="btn btn-info"
-                        href="/mantenedores/usuario/crear">Crear usuarios</a>
+                    <a type="button" class="btn btn-info" href="/mantenedores/usuario/crear">Crear usuarios</a>
+                    <a type="button" class="btn btn-secondary" href="/mantenedores/usuario/password">Generar Claves</a>
                 </td>
             </ul>
             <div class="clearfix"></div>
@@ -52,7 +52,7 @@
                         <td>
                             <div class="btn-group" role="group" aria-label="Basic example">
 								<button type="button" class="btn btn-secondary btn-sm"><a type="button" href="usuario/editar/{{idUsuario}}" style="color: white;"> Editar </a></button>
-								<button type="button" class="btn btn-warning btn-sm"><a type="button" href="usuario/permisos/{{idUsuario}}" onclick="return confirm('¿Esta seguro de borrar el usuario {{Nombre}} ?')" style="color: white;">Permisos</a></button>
+								<button type="button" class="btn btn-warning btn-sm"><a type="button" href="usuario/permisos/{{idUsuario}}" style="color: white;">Permisos</a></button>
                             </div>
                         </td>
                     </tr>

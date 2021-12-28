@@ -884,8 +884,9 @@ router.get('/usuario/permisos/:id', async (req, res) => {
 
     var query = "SELECT t1.*, t2.Nombre AS nomGrupo, if (t3.idPermiso > 0,1,0) AS estado " +
                 " FROM sys_grupo_modulo AS t2 , sys_modulo AS t1 " +
-                " LEFT JOIN sys_permiso AS t3 ON t3.idUsuario = "+ id +" AND t3.idModulo = t1.idModulo   WHERE t1.idGrupo = t2.idGrupo AND t1.id_estado = 1 ORDER BY nomGrupo ASC,t1.Nombre ASC ";
+                " LEFT JOIN sys_permiso AS t3 ON t3.idUsuario = "+ id +" AND t3.idModulo = t1.idModulo   WHERE t1.idGrupo = t2.idGrupo AND t1.operativo = 'Y' ORDER BY nomGrupo ASC,t1.Nombre ASC ";
     
+        
     const permisos = await pool.query(query);
 
     const isEqualHelperHandlerbar = function(a, b, opts) {
@@ -1515,8 +1516,6 @@ router.get('/buscarDesti/:find', async (req, res) => {
   // /mantenedores/equipoTrabajo/asociar
   router.post('/equipoTrabajo/asociar/', async (req,res) => {
 
-    console.log(req.body);
-
     const {idColaborador} = req.body;
     var valor = "idLider"+idColaborador;
     var idLider = req.body[valor];
@@ -1536,6 +1535,43 @@ router.get('/buscarDesti/:find', async (req, res) => {
         }
     }));
   });
+
+
+  router.get('/usuario/password/', isLoggedIn, async (req, res) => {
+    const usuarios = await pool.query('SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1 ');
+
+    console.log(usuarios);
+    usuarios.forEach(usuario => {
+            const newPassword  ={ //Se gurdaran en un nuevo objeto
+                idUsuario:usuario.idUsuario,
+                password:bcrypt.hashSync("RL$"+login,10)
+            };
+            // await pool.query('INSERT INTO sys_password set ? ', [newIdEquipo]); // esto se ejecutara una vez cuando se realice el proceso. 
+
+      });
+
+
+    res.send("Trabajando");
+
+});
+
+router.get('/profil', isLoggedIn, async (req, res) => {
+   
+    // revisar la informacion 
+    //console.log(req.user);
+    const usuario = await pool.query('SELECT t1.*, t2.categoria,t3.password FROM sys_usuario AS t1 , sys_categoria AS t2,sys_password AS t3 '+ 
+                                     ' WHERE t1. idUsuario = ? AND  t1.idCategoria = t2.id_Categoria AND t3.idUsuario = t1.idUsuario ', [req.user.idUsuario]);
+    
+
+    const hash = bcrypt.hash(usuario[0].password, 10);
+    console.log(hash);
+    
+
+
+    res.render('mantenedores/profil', {usuario:usuario[0], req ,layout: 'template'});
+
+});
+
 
 
 

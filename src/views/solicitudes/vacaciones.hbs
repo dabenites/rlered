@@ -48,8 +48,11 @@ button.close {
     border-top: 1px solid #ddd !important;
     font-weight: bold;
 } 
-.fc-toolbar {
+.fc-toolbar-title:first-letter  {
     text-transform: capitalize;
+}
+.green-button {
+  background-color: rgb(5, 156, 18) !important;
 }
 </style>
 
@@ -86,6 +89,12 @@ button.close {
         left: 'prev,next',
         center: 'title',
         right: 'Miboton,Miboton2'
+      },
+       views: {
+      dayGridMonth: { // name of view
+        titleFormat: { year: 'numeric', month: 'long' }
+        // other view-specific options here
+        }
       },
       initialDate: new Date(),
       hiddenDays: [0, 6],
@@ -143,7 +152,25 @@ button.close {
           }
         }
       },
+      viewDidMount: function(info) {
+      calendarEl.querySelectorAll('.fc-button').forEach((button) => {
+        
+        if (button.innerText === 'Solicitar Seleccionados') {
+          console.log(button.innerText);
+          button.classList.add('green-button')
+        }
+      });
+    },
       events: '/solicitudes/eventos',
+      eventClick: function(event) {
+          //alert(event);
+          //console.log(event.event);
+          //console.log(event.event._def.defId);
+          //var registro = calendar.getEventById(event.event._def.defId);
+          //var allEvents = calendar.getEvents();
+          //console.log(allEvents);
+         // event.remove();
+      },
       dateClick: function (info) {
         // console.log(jsEvent);
         var diaSolicitado = calendar.formatDate(info.dateStr, {
@@ -184,9 +211,53 @@ button.close {
 
       },
     });
+    calendar.on('eventClick', function (info) {
+      //calendar.getEventById(info.event.id).remove();
+      
+      var diaSolicitado = calendar.formatDate(info.event._instance.range.end, {
+          year: 'numeric',
+          month: 'numeric',
+          day: 'numeric'
+        });
+        
+        
+        var allEvents = calendar.getEvents();
+        var exists = false;
+        $.each(allEvents, function (index, value) {
+          var diaEvento = calendar.formatDate(value.start, {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric'
+          });
+
+          if (diaSolicitado == diaEvento)
+            {
+              //console.log(diaSolicitado);
+              var informacion = [];
+              const fecha = {
+                dia: diaSolicitado
+              };
+              informacion.push(fecha);
+              $.ajax({
+                type: 'post',
+                url: '/solicitudes/ajaxDelete',
+                contentType: 'application/json',
+                data: JSON.stringify(informacion),
+              });
+
+              value.remove();
+            }
+
+        });
+      
+
+
+    });
     calendar.setOption('locale', 'es');
     calendar.render();
   });
+
+
 
   function EliminarDia(id)
   {
@@ -219,6 +290,17 @@ button.close {
   {
     location.reload();
   }
+/*
+  (function() {
+    var elements = document.getElementsByClassName("fc-toolbar-title");
+   for (var i = 0, len = elements.length; i < len; i++) {
+     
+    elements[i].innerText = "DATA";
+    console.log(elements[i]);
+}
+})();
+*/
+
 </script>
 
 
@@ -226,7 +308,7 @@ button.close {
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle"> <small>Revisar dias ingresados</small> </h5>
+        <h5 class="modal-title" id="exampleModalLongTitle"> <small>Revisar Días Seleccionados</small> </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -257,7 +339,7 @@ button.close {
               <div class="clearfix"></div>
               <br />
                <div class="form-group row">
-                  <label for="staticEmail" class="col-sm-3 col-form-label">Aprobador * :</label>
+                  <label for="staticEmail" class="col-sm-3 col-form-label">Aprobador :</label>
                   <div class="col-sm-9">
                   <select class=" form-control" name="idAprobador" id="idAprobador">
                     {{#each usuarios}}
@@ -267,7 +349,7 @@ button.close {
                   </div>
                </div>  
                <div class="form-group row">
-                 <label for="staticEmail" class="col-sm-3 col-form-label">Nº Días * :</label>
+                 <label for="staticEmail" class="col-sm-3 col-form-label">Nº Días :</label>
                  <div class="col-sm-9">
                     <input type="txt" id="txtfecha" class="form-control" value="{{sol_selec_dias.fecha}}" name="txtfecha" Readonly />
                  </div>
@@ -276,7 +358,7 @@ button.close {
                   mostrar los dias dinamicamente 
                </div>
                <div class="form-group row">
-                 <label for="staticEmail" class="col-sm-3 col-form-label">Informar * :</label>
+                 <label for="staticEmail" class="col-sm-3 col-form-label">Informar :</label>
                  <div class="col-sm-9">
                     <select class=" form-control" name="idInformar" id="idInformar">
                         {{#each usuarios}}
@@ -286,7 +368,7 @@ button.close {
                  </div>
                </div>           
                <div class="form-group row">
-                  <label for="staticEmail" class="col-sm-3 col-form-label">Comentario * :</label>
+                  <label for="staticEmail" class="col-sm-3 col-form-label">Comentario :</label>
                   <div class="col-sm-9">
                       <textarea type="txt" id="comentario" name="comentario" required="required" class="form-control" rows="5" cols="84"></textarea>
                   </div>

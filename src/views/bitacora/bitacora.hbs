@@ -29,6 +29,9 @@
             border: 0;
             -webkit-appearance: none;
         }
+        .fc-toolbar {
+    text-transform: capitalize;
+}
 </style>
 
  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.css' rel='stylesheet' /> 
@@ -89,7 +92,7 @@
       var Per = "";
       if (diaInicial == diaTermino)
       {
-        Per = "Dia " + diaInicial + " Horario : " + horaInicial + " Hasta " + horaTermino;
+        Per = "Día " + diaInicial + " Horario : " + horaInicial + " Hasta " + horaTermino;
       }
       else
       {
@@ -165,7 +168,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle">Ingreso de horas bitacora </h5>
+          <h5 class="modal-title" id="exampleModalLongTitle">Ingresar Horas Bítacora </h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
           </button>
@@ -185,7 +188,7 @@
                   </label>
                 </div>
              <div class="item form-group">
-                <label>Perdiodo : </label>
+                <label>Periodo : </label>
                 <label id="periodo" name="periodo"></label>
                 <input id="fechaI" name="fechaI" type="hidden" value="">
                 <input id="horaI" name="horaI" type="hidden" value="">
@@ -226,7 +229,7 @@
                <div class="item form-group" id="divEtapa" name="divEtapa">
                  <label class="col-form-label col-md-3 col-sm-3 label-align" for="Etapa">Etapa  </label>
                   <select class=" form-control" name="idEtapaProyecto" id="idEtapaProyecto" onchange="CargaTareas(this.value);">
-                        <option value="0">Selecione</option>
+                        <option value="0">Seleccione</option>
                         {{#each etapas}}
                             <option value="{{id}}">{{descripcion}}</option>
                          {{/each}}

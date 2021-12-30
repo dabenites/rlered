@@ -101,22 +101,30 @@
                         {{/if}}
 
                         {{#if servicio }}
-                        <label for="ID Pais">Id Tipo Servicio* :</label>
+                        <label for="ID Pais">Id Tipo Servicio :</label>
                         <input type="text" id="id" class="form-control" value="{{servicio.id}}" name="id" readonly />
                         {{/if}}
-                        <label for="Nombre Pais">Descripción * :</label>
+                        <label for="Nombre Pais">Descripción :</label>
                         <input type="text" id="descripcion" class="form-control" value="{{servicio.descripcion}}" name="descripcion" required />
 
                         <br />
-                        {{#if servicio }}
-                        <button type="submit" class="btn btn-warning btn-block">
-                            Actualizar
-                        </button>
-                        {{else}}
-                        <button type="submit" class="btn btn-warning btn-block">
-                            Ingresar
-                        </button>
-                        {{/if}}
+                         <div class="form-group row">
+                                    <div class="col-md-5 col-sm-5 ">
+
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 ">
+                                     {{#if servicio }}
+                                        <button type="submit" class="btn btn-warning btn-block">
+                                            Actualizar
+                                        </button>
+                                        {{else}}
+                                        <button type="submit" class="btn btn-warning btn-block">
+                                            Ingresar
+                                        </button>
+                                        {{/if}}
+                                    </div>
+                            </div>
+
 
 
                     </form>

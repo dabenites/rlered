@@ -97,6 +97,7 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
        var diia =  fechaX.getDate();
 
       // console.log(annio + "///" + mees + "///" + diia);
+      
 
        if (start.toString() != fechaX.toString())
        {
@@ -222,8 +223,11 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
        else
        {
             // ahora comprobar si esta incluida la hora de almuerzo para poder dividir el proceso dos veces. 
-        if(analisisHoraI < analisisHoraAlmuerzoI && analisisHoraFI < analisisHoraAlmuerzoI) // revisar si las dos fechas son menores de la hora de almuerzo 
+           // console.log("revisar lunes - jueves que llegue antes de almuerzo hasta las 13:00" + analisisHoraI + "//" + analisisHoraAlmuerzoI + "//" + analisisHoraFI +"//" );
+        if(analisisHoraI < analisisHoraAlmuerzoI && analisisHoraFI <= analisisHoraAlmuerzoI) // ESto esta ok 
         {
+            //console.log("revisar lunes - jueves que llegue antes de almuerzo hasta las 13:00");
+
             const proyeto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [idProyecto]);
             
             //var difference = dateFormat(dateFormat(fechaX,"dd-mm-yyyy") + " " + hT + ":00", "yyyy-mm-dd h:MM:ss") - dateFormat(dateFormat(fechaX,"dd-mm-yyyy") + " " + hi + ":00", "yyyy-mm-dd h:MM:ss"); 
@@ -270,13 +274,63 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
             }
             
         }
+        else if(analisisHoraI < analisisHoraAlmuerzoI && analisisHoraFI <= analisisHoraAlmuerzoF) // ESto esta ok 
+        {
+            //console.log("revisar lunes - jueves que llegue antes de almuerzo hasta las 13:00");
+
+            const proyeto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [idProyecto]);
+            
+            //var difference = dateFormat(dateFormat(fechaX,"dd-mm-yyyy") + " " + hT + ":00", "yyyy-mm-dd h:MM:ss") - dateFormat(dateFormat(fechaX,"dd-mm-yyyy") + " " + hi + ":00", "yyyy-mm-dd h:MM:ss"); 
+            var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hi + ":00", "yyyy-mm-dd h:MM:ss")); 
+            var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " 13:00", "yyyy-mm-dd h:MM:ss"));
+
+            var difference = endTime.getTime() - startTime.getTime(); // This will give difference in milliseconds
+            var resultInHours = Math.round(difference / 60000) / 60;
+
+            if (tipoIngreso == "1")
+            {
+                const newRegistroBitacora  ={ //Se gurdaran en un nuevo objeto
+                    ini_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hi + ":00", "yyyy-mm-dd HH:MM:ss") ,
+                    fin_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " 13:00", "yyyy-mm-dd HH:MM:ss") ,
+                    title:proyeto[0].year + "-" +proyeto[0].code + " : " + proyeto[0].nombre,
+                    body:descripcion,
+                    id_session:req.user.idUsuario,
+                    id_project:idProyecto ,
+                    id_etapa:idEtapaProyecto,
+                    id_tarea:idTarea,
+                    numHH:resultInHours,
+                    modificacion:mod,
+                    costoHH : 15000,
+                    id_tipo : 1
+                };
+
+                const result = await pool.query('INSERT INTO bita_horas set ? ', [newRegistroBitacora]);
+            }
+            else
+            {
+                const newRegistroBitacora  ={ //Se gurdaran en un nuevo objeto
+                    ini_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hi + ":00", "yyyy-mm-dd HH:MM:ss") ,
+                    fin_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " 13:00", "yyyy-mm-dd HH:MM:ss") ,
+                    title:"Actividad No relacionada a Proyecto",
+                    body:descripcion,
+                    id_session:req.user.idUsuario,
+                    id_project:actividad ,
+                    numHH:resultInHours,
+                    costoHH : 15000,
+                    id_tipo : 2
+                };
+
+                const result = await pool.query('INSERT INTO bita_horas set ? ', [newRegistroBitacora]);
+            }
+            
+        }
         else if ( analisisHoraI > analisisHoraAlmuerzoF && analisisHoraFI > analisisHoraAlmuerzoF) // las dos horas son mayores a la hora de almuerzo
         {
             const proyeto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [idProyecto]);
            
             
-            var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hi + ":00", "yyyy-mm-dd h:MM:ss")); 
-            var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hT +":00", "yyyy-mm-dd h:MM:ss"));
+            var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hi + ":00", "yyyy-mm-dd HH:MM:ss")); 
+            var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hT +":00", "yyyy-mm-dd HH:MM:ss"));
 
             var difference = endTime.getTime() - startTime.getTime(); // This will give difference in milliseconds
             var resultInHours = Math.round(difference / 60000) / 60;
@@ -284,8 +338,8 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
             if (tipoIngreso == "1")
             {
                 const newRegistroBitacora  ={ //Se gurdaran en un nuevo objeto
-                    ini_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hi + ":00", "yyyy-mm-dd h:MM:ss") ,
-                    fin_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hT + ":00", "yyyy-mm-dd h:MM:ss") ,
+                    ini_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hi + ":00", "yyyy-mm-dd HH:MM:ss") ,
+                    fin_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hT + ":00", "yyyy-mm-dd HH:MM:ss") ,
                     title:proyeto[0].year + "-" +proyeto[0].code + " : " + proyeto[0].nombre,
                     body:descripcion,
                     id_session:req.user.idUsuario,
@@ -303,8 +357,8 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
             else
             {
                 const newRegistroBitacora  ={ //Se gurdaran en un nuevo objeto
-                    ini_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hi + ":00", "yyyy-mm-dd h:MM:ss") ,
-                    fin_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hT + ":00", "yyyy-mm-dd h:MM:ss") ,
+                    ini_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hi + ":00", "yyyy-mm-dd HH:MM:ss") ,
+                    fin_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hT + ":00", "yyyy-mm-dd HH:MM:ss") ,
                     title:"Actividad No relacionada a Proyecto",
                     body:descripcion,
                     id_session:req.user.idUsuario,
@@ -317,7 +371,9 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
                 const result = await pool.query('INSERT INTO bita_horas set ? ', [newRegistroBitacora]);  
             }
         }
-        else if ( (analisisHoraI < analisisHoraAlmuerzoI || analisisHoraI < analisisHoraAlmuerzoF) && (analisisHoraFI >= analisisHoraAlmuerzoF || analisisHoraFI >= analisisHoraAlmuerzoI))
+      //  else if ( (analisisHoraI < analisisHoraAlmuerzoI || analisisHoraI < analisisHoraAlmuerzoF) 
+      //        && (analisisHoraFI >= analisisHoraAlmuerzoF || analisisHoraFI >= analisisHoraAlmuerzoI))
+      else if (analisisHoraI < analisisHoraAlmuerzoI && analisisHoraFI > analisisHoraAlmuerzoF )
         {
             
             const proyeto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [idProyecto]);
@@ -400,6 +456,56 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
 
             }
 
+        }
+        else if ( analisisHoraI >= analisisHoraAlmuerzoI && analisisHoraI < analisisHoraAlmuerzoF) // las dos horas son mayores a la hora de almuerzo
+        {
+            console.log(analisisHoraI + " >=///" + analisisHoraAlmuerzoI + "///" + analisisHoraI + "//// <" + analisisHoraAlmuerzoF);
+            console.log(analisisHoraI + " >=///" + hT);
+
+            const proyeto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [idProyecto]);
+           
+            
+            var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " 14:00:00", "yyyy-mm-dd HH:MM:ss")); 
+            var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hT +":00", "yyyy-mm-dd HH:MM:ss"));
+
+            var difference = endTime.getTime() - startTime.getTime(); // This will give difference in milliseconds
+            var resultInHours = Math.round(difference / 60000) / 60;
+            
+            if (tipoIngreso == "1")
+            {
+                const newRegistroBitacora  ={ //Se gurdaran en un nuevo objeto
+                    ini_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " 14:00:00", "yyyy-mm-dd HH:MM:ss") ,
+                    fin_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hT + ":00", "yyyy-mm-dd HH:MM:ss") ,
+                    title:proyeto[0].year + "-" +proyeto[0].code + " : " + proyeto[0].nombre,
+                    body:descripcion,
+                    id_session:req.user.idUsuario,
+                    id_project:idProyecto ,
+                    id_etapa:idEtapaProyecto,
+                    id_tarea:idTarea,
+                    numHH:resultInHours,
+                    modificacion:mod,
+                    costoHH : 15000,
+                    id_tipo : 1
+                };
+
+                const result = await pool.query('INSERT INTO bita_horas set ? ', [newRegistroBitacora]);  
+            }
+            else
+            {
+                const newRegistroBitacora  ={ //Se gurdaran en un nuevo objeto
+                    ini_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " 14:00:00", "yyyy-mm-dd HH:MM:ss") ,
+                    fin_time: dateFormat(dateFormat(fechaX,"yyyy-mm-dd") + " " + hT + ":00", "yyyy-mm-dd HH:MM:ss") ,
+                    title:"Actividad No relacionada a Proyecto",
+                    body:descripcion,
+                    id_session:req.user.idUsuario,
+                    id_project:actividad ,
+                    numHH:resultInHours,
+                    costoHH : 15000,
+                    id_tipo : 2
+                };
+
+                const result = await pool.query('INSERT INTO bita_horas set ? ', [newRegistroBitacora]);  
+            }
         }
        }
       var newDate = fechaX.setDate(fechaX.getDate() + 1);

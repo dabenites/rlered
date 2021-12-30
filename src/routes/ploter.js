@@ -33,9 +33,21 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
                                                 " where t.id_estado = 3 AND t.id_proyecto = t2.id AND t.id_ingreso = t3.idUsuario ");
                                                                                             
 
-//    res.render('ploter/ingresar', { ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+    //console.log(req.user.idCategoria);
+
+    var esDocumento = false;
+
+    switch(req.user.idCategoria)
+    {
+        case 16:
+        case 1: // solo pruebas
+            esDocumento = true;
+        break;   
+    }
+    console.log(esDocumento);
+
     var mensaje = -1;
-    //console.log(req.query);
+  
     if (req.query.a !== undefined)
     {
         mensaje = req.query.a;
@@ -43,15 +55,7 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
 
     if (mensaje !== -1)
     { 
-       /*
-        const verToask = {
-        titulo : "Mensaje",
-        body   : "Solicitud ingresada correctamente.",
-        tipo   : "Crear"
-            };
-    
-        res.render('ploter/ingresar', {verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
-        */
+       
         var verToask = {};
                 switch(req.query.a)
                 {
@@ -62,8 +66,16 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
                         body   : "Solicitud ingresada correctamente.",
                         tipo   : "Crear"
                             };
-    
-                    res.render('ploter/ingresar', {verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+                    if (esDocumento === true)             
+                    {
+                        console.log("asdad");
+                        res.render('ploter/ingresar', {documento:'ok', verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+                    }
+                    else
+                    {
+                        res.render('ploter/ingresar', {verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+                    }
+                    
                     break;
                     case 2: // Asignado
                     case "2":
@@ -72,15 +84,30 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
                         body   : "Solicitud cambio de estado correctamente",
                         tipo   : "Editar"
                             };
-    
-                    res.render('ploter/ingresar', {verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+                            if (esDocumento === true)              
+                            {
+                                res.render('ploter/ingresar', {documento:'ok',verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+                            }
+                            else
+                            {
+                                res.render('ploter/ingresar', {verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+                            }
+                    
                     break;
                 }
 
     }
     else
     {
-        res.render('ploter/ingresar', { ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+        if (esDocumento === true)
+        {
+            res.render('ploter/ingresar', { documento:'ok',ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+        }
+        else
+        {
+            res.render('ploter/ingresar', { ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
+        }
+        
     }
 
 

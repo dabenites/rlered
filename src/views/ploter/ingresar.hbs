@@ -113,7 +113,7 @@
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="ingreso" role="tabpanel" aria-labelledby="ingreso-tab">
                     <form id="IngresoPloteo" name="IngresoPloteo" data-parsley-validate class="form-horizontal form-label-left" action="/ploter/addSolicitud" method="POST">
-                        <span class="section">1.- Servicio a solicitar </span>
+                        <span class="section">1.- Servicio a Solicitar </span>
                         <div class="form-group row">
                             <label class="col-md-1 col-sm-1"> <b>Trabajos</b>:
                             </label>
@@ -379,8 +379,9 @@
                                                 </div>
                                                 </div>
                                             </div>
-
-                                        <a href="ploteo/cambiaEstadoProceso/{{id}}"><button type="button" class="btn btn-warning btn-sm">Proceso</button></a>
+                                         {{#if ../documento }}
+                                            <a href="ploteo/cambiaEstadoProceso/{{id}}"><button type="button" class="btn btn-warning btn-sm">Proceso</button></a>
+                                         {{/if}}
                                     </div>
                                 </td>
                             </tr>
@@ -456,7 +457,9 @@
                                             </div>
                                         </div>
                                         </div>
+                                        {{#if ../documento }}
                                         <a href="ploteo/cambiaEstadoTerminado/{{id}}"><button type="button" class="btn btn-warning btn-sm">Terminado</button></a>
+                                        {{/if}}
                                     </div>
                                 </td>
                             </tr>

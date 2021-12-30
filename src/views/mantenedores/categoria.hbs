@@ -106,12 +106,12 @@
                     {{/if}}
 
                     {{#if categoria }}
-                    <label for="ID Categoria">Id Categoria* :</label>
+                    <label for="ID Categoria">Id Categoria :</label>
                     <input type="text" id="id" class="form-control" value="{{categoria.id}}" name="id" readonly />
                     {{/if}}
-                    <label for="Nombre Categoria">Nombre Categoría * :</label>
+                    <label for="Nombre Categoria">Nombre Categoría :</label>
                     <input type="text" id="name" class="form-control" value="{{categoria.categoria}}" name="name" required />
-                    <label for="Nombre Categoria">Centro Costo* :</label>
+                    <label for="Nombre Categoria">Centro Costo :</label>
                     <!-- <input type="text" id="name" class="form-control" value="{{categoria.categoria}}" name="name" required /> -->
                     <select class="form-control" name="idCentroCosto">
                         {{#if categoria }}
@@ -133,15 +133,25 @@
                     <input type="text" id="valorhh" class="form-control" value="{{categoria.valorHH}}" name="valorhh"
                         required />
                     <br />
-                    {{#if categoria }}
-                    <button type="submit" class="btn btn-warning btn-block">
-                        Actualizar
-                    </button>
-                    {{else}}
-                    <button type="button" onclick="validarIngreso();"  class="btn btn-warning btn-block">
-                        Ingresar
-                    </button>
-                    {{/if}}
+
+                     <div class="form-group row">
+                                    <div class="col-md-5 col-sm-5 ">
+
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 ">
+                                     {{#if categoria }}
+                                        <button type="submit" class="btn btn-warning btn-block">
+                                            Actualizar
+                                        </button>
+                                        {{else}}
+                                        <button type="button" onclick="validarIngreso();"  class="btn btn-warning btn-block">
+                                            Ingresar
+                                        </button>
+                                        {{/if}}
+                                    </div>
+                            </div>
+
+                   
 
 
                 </form>

@@ -1,4 +1,5 @@
 <link href="../../../template/vendors/switchery/dist/switchery.min.css" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <div class="col-md-6 col-sm-6  ">
     <div class="x_panel">
         <div class="x_title">
@@ -13,6 +14,7 @@
                 <table class="table table-hover" id="tablaPermisos" name="tablaPermisos">
                     <thead>
                         <tr>
+                            <th>ID Modulo</th>
                             <th>Grupo</th>
                             <th>Módulo</th>
                             <th>Estado</th>
@@ -22,15 +24,14 @@
 
                         {{#each permisos}}
                         <tr>
+                            <td>{{idModulo}}</td>
                             <td>{{nomGrupo}}</td>
                             <td>{{Nombre}}</td>
                             <td>
                                 {{#if (if_equal estado 1) }}
-                                <input type="checkbox" 
-                                    name="estado_{{idModulo}}_{{../usuario.idUsuario}}" checked />
+                                <input type="checkbox" name="estado_{{idModulo}}_{{../usuario.idUsuario}}" id="estado_{{idModulo}}_{{../usuario.idUsuario}}" checked />
                                 {{else}}
-                                <input type="checkbox" 
-                                    name="estado_{{idModulo}}_{{../usuario.idUsuario}}" />
+                                <input type="checkbox" name="estado_{{idModulo}}_{{../usuario.idUsuario}}" id="estado_{{idModulo}}_{{../usuario.idUsuario}}" />
                                 {{/if}}
 
                             </td>
@@ -38,7 +39,9 @@
                         {{/each}}
                     </tbody>
                 </table>
-                <button type="submit" class="btn btn-success btn-block">
+                <input type="hidden" name="id" id="id" value="{{usuario.idUsuario}}">
+                <input type="hidden" name="modules" id="modules" value=>
+                <button type="button" onclick="revisarData();" class="btn btn-success btn-block">
                     Ingresar
                 </button>
             </form>
@@ -51,9 +54,11 @@
 <script src="../../../template/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="../../../template/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script> 
 <script src="../../../template/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
-      $('#tablaPermisos').DataTable({
+     var table = $('#tablaPermisos').DataTable({
+         stateSave: true,
         language: {
           "decimal": "",
           "emptyTable": "No hay información",
@@ -75,4 +80,56 @@
           }
         }
       });
+
+      function revisarData()
+      {
+           var data = table.rows().data();
+           //var allPages = table.fnGetNodes();
+            var allPages = table.cells( ).nodes( );
+            var concatenar = "";
+        data.each(function (value, index) {
+            var estado = $("#estado_"+value[0]+"_"+$("#id").val());
+            //if($("#estado_"+value[0]+"_"+$("#id").val()).prop('checked') == true){
+            //    console.log(`For index ${index}, data value is ${value[0]}`);
+            //}
+            //console.log($(allPages).find("#estado_"+value[0]+"_"+$("#id").val()));
+            if ($(allPages).find("#estado_"+value[0]+"_"+$("#id").val()).prop('checked') == true)
+            {
+                
+                if (concatenar == "")
+                {
+                    concatenar = value[0];
+                }
+                else
+                {
+                    concatenar = concatenar + "," + value[0];
+                }
+            }
+            
+        });
+                
+        $("#modules").val(concatenar);
+        document.getElementById("demo-form").submit();
+      }
 </script>
+{{#if verToask }}
+<!--INFORMACIÓN-->
+<script>
+    if ("{{verToask.tipo}}" == "Editar") {
+        toastr.warning('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Crear") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Eliminar") {
+        toastr.error('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+
+</script>
+{{/if}}

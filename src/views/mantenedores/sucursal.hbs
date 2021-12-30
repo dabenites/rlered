@@ -82,12 +82,12 @@
                     {{/if}}
 
                     {{#if sucursal}}
-                    <label for="ID Centro">Id Sucursal* :</label>
+                    <label for="ID Centro">Id Sucursal :</label>
                     <input type="text" id="id" class="form-control" value="{{sucursal.id_Sucursal}}" name="id"
                         readonly />
                     {{/if}}
 
-                    <label for="Nombre Categoria">País * :</label>
+                    <label for="Nombre Categoria">País :</label>
                     <select class="form-control" name="id_pais">
                         {{#if sucursal }}
                         {{#each paises}}
@@ -106,24 +106,35 @@
                         {{/if}}
                     </select>
 
-                    <label for="Nombre Centro Costo">Dirección * :</label>
+                    <label for="Nombre Centro Costo">Dirección :</label>
                     <input type="text" id="direccion" class="form-control" value="{{sucursal.direccion}}"
                         name="direccion" required />
 
-                    <label for="Nombre Centro Costo">Fono * :</label>
+                    <label for="Nombre Centro Costo">Fono :</label>
                     <input type="text" id="fono" class="form-control" value="{{sucursal.fono}}" name="fono" required />
 
 
                     <br />
-                    {{#if sucursal }}
-                    <button type="submit" class="btn btn-warning btn-block">
-                        Actualizar
-                    </button>
-                    {{else}}
-                    <button type="submit" onvolumechange="" class="btn btn-warning btn-block">
-                        Ingresar
-                    </button>
-                    {{/if}}
+
+                                         <div class="form-group row">
+                                    <div class="col-md-5 col-sm-5 ">
+
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 ">
+                                    {{#if sucursal }}
+                                        <button type="submit" class="btn btn-warning btn-block">
+                                            Actualizar
+                                        </button>
+                                        {{else}}
+                                        <button type="submit" onvolumechange="" class="btn btn-warning btn-block">
+                                            Ingresar
+                                        </button>
+                                        {{/if}}
+                                    </div>
+                            </div>
+
+
+                   
 
 
                 </form>

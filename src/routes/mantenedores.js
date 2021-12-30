@@ -363,7 +363,7 @@ router.get('/centrocosto/delete/:id', async (req, res) => {
 /// TIPO DE PROYECTO
 /* AGREGAR */
 router.get('/tipoProyecto', isLoggedIn, async (req, res) => {
-    const proyectos = await pool.query('SELECT * FROM proyecto_tipo');
+    const proyectos = await pool.query('SELECT * FROM proyecto_tipo as t1 ORDER BY t1.descripcion ASC');
     
 
     if (req.query.a === undefined)
@@ -723,14 +723,6 @@ router.post('/editMoneda', async (req,res) => {
 });
 
 
-
-router.get('/sucursal', isLoggedIn, async (req, res) => {
-    const paises = await pool.query("SELECT * FROM pais ORDER By pais ASC");
-    const sucursales = await pool.query("SELECT t1.*, t2.pais FROM sys_sucursal as t1, pais as t2 where t1.id_pais = t2.id");
-
-    res.render('mantenedores/sucursal', { paises , sucursales, req ,layout: 'template'});
-}); 
-
 router.get('/usuario', isLoggedIn, async (req, res) => {
     
     const usuarios = await pool.query("SELECT * , t4.descripcion as estado FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3,  sys_usuario_estado as t4 "+
@@ -790,9 +782,9 @@ router.post('/editarUsuarios', async (req, res) => {
    const result = await pool.query('UPDATE sys_usuario set ? WHERE idUsuario = ?', [newUsario, idUsuario]);
 
   // const usuarios = await pool.query('SELECT * FROM sys_usuario');
-  const usuarios = await pool.query("SELECT *, t4.descripcion as estado FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3, sys_usuario_estado as t4  " +
-                                    " WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal"+
-                                    " AND t4.id = t1.id_estado AND t4.id = 1");
+  const usuarios = await pool.query("SELECT * , t4.descripcion as estado FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3,  sys_usuario_estado as t4 "+
+  "WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal "+
+  " AND t1.id_estado = t4.id");
    //console.log(usuarios);
 
    
@@ -832,7 +824,9 @@ router.post('/addUsuario', async (req, res) => {
 
    const result2 = await pool.query('INSERT INTO sys_password set ? ', [newPassword]);
 
-   const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
+   const usuarios = await pool.query("SELECT * , t4.descripcion as estado FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3,  sys_usuario_estado as t4 "+
+   "WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal "+
+   " AND t1.id_estado = t4.id");
    //console.log(usuarios);
     
 
@@ -902,7 +896,7 @@ router.get('/usuario/permisos/:id', async (req, res) => {
      };
      
     console.log(req.query);
-    
+
      if (req.query.a === undefined)
     {
         res.render('mantenedores/permisos', { permisos, usuario: usuario[0],req ,layout: 'template', helpers : {
@@ -1238,6 +1232,51 @@ router.post('/ajax', express.json({type: '*/*'}), async (req,res) => {
     res.send("OK");
 });
 
+router.get('/sucursal', isLoggedIn, async (req, res) => {
+    const paises = await pool.query("SELECT * FROM pais ORDER By pais ASC");
+    const sucursales = await pool.query("SELECT t1.*, t2.pais FROM sys_sucursal as t1, pais as t2 where t1.id_pais = t2.id");
+
+    //res.render('mantenedores/sucursal', { paises , sucursales, req ,layout: 'template'});
+    if (req.query.a === undefined)
+    {
+        res.render('mantenedores/sucursal', { paises , sucursales, req ,layout: 'template'});
+    }
+    else
+        {
+            var verToask = {};
+            switch(req.query.a)
+            {
+                case 1:
+                case "1":
+                    verToask= {
+                        titulo : "Mensaje",
+                        body   : "Sucursal cargada correctamente.",
+                        tipo   : "Crear"
+                            };
+                            res.render('mantenedores/sucursal', {verToask, paises , sucursales, req ,layout: 'template'});
+                break;
+                case 2:
+                case "2":
+                        verToask= {
+                            titulo : "Mensaje",
+                            body   : "Sucursal actualizada correctamente.",
+                            tipo   : "Editar"
+                                };
+                                res.render('mantenedores/sucursal', { verToask,paises , sucursales, req ,layout: 'template'});
+                break;
+                case 3:
+                case "3":
+                        verToask= {
+                            titulo : "Mensaje",
+                            body   : "Sucursal eliminada correctamente.",
+                            tipo   : "Eliminar"
+                                };
+                                res.render('mantenedores/sucursal', { verToask, paises , sucursales, req ,layout: 'template'});
+                break;
+            }
+        }
+
+}); 
 
 router.post('/addSucursal', async (req,res) => {
     const {  id_pais, direccion , fono } = req.body;//Obtener datos title,url,description
@@ -1263,9 +1302,16 @@ router.post('/addSucursal', async (req,res) => {
 
     
 
-    const sucursales = await pool.query("SELECT t1.*, t2.pais FROM sys_sucursal as t1, pais as t2 where t1.id_pais = t2.id");
-    const paises = await pool.query("SELECT * FROM pais ORDER By pais ASC");
-    res.render('mantenedores/sucursal', { verToask, req ,sucursales,paises,layout: 'template'});
+  //  const sucursales = await pool.query("SELECT t1.*, t2.pais FROM sys_sucursal as t1, pais as t2 where t1.id_pais = t2.id");
+  //  const paises = await pool.query("SELECT * FROM pais ORDER By pais ASC");
+  //  res.render('mantenedores/sucursal', { verToask, req ,sucursales,paises,layout: 'template'});
+  res.redirect(   url.format({
+    pathname:'/mantenedores/sucursal',
+            query: {
+            "a": 1
+            }
+        }));
+
 
 
 

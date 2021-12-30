@@ -9,6 +9,7 @@
   		float: right;
    }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <div class="col-md-7 col-sm-7  ">
     <div class="x_panel">
         <div class="x_title">
@@ -178,3 +179,25 @@
       });
 
 </script>
+
+{{#if verToask }}
+<!--INFORMACIÓN-->
+<script>
+    if ("{{verToask.tipo}}" == "Editar") {
+        toastr.warning('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Crear") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Eliminar") {
+        toastr.error('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+
+</script>
+{{/if}}

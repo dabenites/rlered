@@ -55,6 +55,7 @@ router.get('/listado', isLoggedIn, async (req, res) => {
 
     if (mensaje !== -1)
     { 
+       /*
         const verToask = {
         titulo : "Mensaje",
         body   : "Contacto actualizado",
@@ -62,6 +63,42 @@ router.get('/listado', isLoggedIn, async (req, res) => {
             };
     
         res.render('contacto/listado', { verToask, contactos , req ,layout: 'template'});
+        */
+        var verToask = {};
+        switch(req.query.a)
+        {
+            case 1: // Crear
+            case "1":
+                verToask= {
+                titulo : "Mensaje",
+                body   : "Contacto agregado correctamente.",
+                tipo   : "Crear"
+                    };
+
+                    res.render('contacto/listado', { verToask, contactos , req ,layout: 'template'});
+            break;
+            case 2: // Actualizado
+            case "2":
+                verToask = {
+                titulo : "Mensaje",
+                body   : "Contacto actualizado correctamente.",
+                tipo   : "Editar"
+                    };
+
+                    res.render('contacto/listado', { verToask, contactos , req ,layout: 'template'});
+            break;
+            case 3: // Actualizado
+            case "3":
+                verToask = {
+                titulo : "Mensaje",
+                body   : "Contacto eliminado correctamente.",
+                tipo   : "Eliminar"
+                    };
+
+                    res.render('contacto/listado', { verToask, contactos , req ,layout: 'template'});
+            break;
+        }
+
     }
     else
     {
@@ -197,7 +234,7 @@ router.post('/uptContacto', async (req,res) => {
     res.redirect(   url.format({
         pathname:'/contacto/listado',
         query: {
-           "a": 1
+           "a": 2
          }
       }));
 
@@ -252,52 +289,15 @@ router.get('/contacto/delete/:id', async (req, res) => {
    //console.log(nombre);
 
     await pool.query('DELETE FROM contacto WHERE id = ?', [id]);
-    //res.redirect('/mantenedores/usuario');
-
     
-    const verToask = {
-    
-        titulo : nombre[0].name,
-        body   : "Se ha eliminado correctamente ",
-        tipo   : "Eliminar"
-    };
+    //res.render('contacto/listado', { verToask, contactos , req ,layout: 'template'});
 
-  
-    const keys_words  = await pool.query("SELECT * FROM contacto_key");
-    const infokeys = {};
-    keys_words.forEach(function(elemento, indice, array) {
-        if (infokeys[elemento.id_contacto_key] === undefined)
-        {
-            infokeys[elemento.id_contacto_key] = elemento.descripcion;
-        }
-    });
-
-
-    const contactos  = await pool.query(" SELECT  * FROM contacto ");
-    //const contactos  = await pool.query("SELECT * FROM contacto  AS t WHERE t.keys_words != '' ");
-
-    contactos.forEach((element, i) => {
-        
-        //console.log(separa);
-        var categoria = "";
-        if (element["keys_words"] != null)
-        {
-            var separa = element["keys_words"].split(",");
-            separa.forEach(element => {
-                if (element != "")
-                {
-                    categoria = categoria + infokeys[element] + " ,";
+    res.redirect(   url.format({
+        pathname:'/contacto/listado',
+                query: {
+                "a": 3
                 }
-            });
-        }
-        if (categoria.length > 0)
-        {
-            categoria = categoria.substring(0,categoria.length - 1);
-        }
-        contactos[i]["keys_words"] = categoria;
-    });
-
-    res.render('contacto/listado', { verToask, contactos , req ,layout: 'template'});
+            }));
 
     
 });

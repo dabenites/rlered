@@ -21,85 +21,90 @@ router.post('/fileupload', async (req,res) => {
         var oldpath = files.filetoupload.path;
         var newpath =  "../rlered/src/uploads/planillaCostos/"+ files.filetoupload.name;
         rutaArchivoCargado = newpath;
-        fs.rename(oldpath, newpath, function (err) {
-            if (err) throw err;
-            var workbook = new Excel.Workbook(); 
-            var idLogDetalle = 0 ;
-            workbook.xlsx.readFile(newpath)
-                .then(function() {
-                    var worksheet = workbook.getWorksheet(1);
-                        worksheet.eachRow({ includeEmpty: true }, async function(row, rowNumber) {
-                        
-                        if (rowNumber == 2)
-                        {
-                            lectura["ano"] = row.values[3];
-                        }
-                        if (rowNumber == 3)
-                        {
-                            lectura["mes"] = row.values[3];
-                        }
-                        if (rowNumber > 5 )
-                        {
-                            if (lectura["informacion"] === undefined)
-                            {
-                                lectura["informacion"]  = [];
-                            }
 
-                            if (rowNumber >= 6 )
-                            {
-                                // Cargar el log de carga de la información
-                                if (rowNumber == 6)
-                                {
-                                    unLogIngreso = {
-                                        id_user : req.user.idUsuario,
-                                        fecha : new Date(),
-                                        annio : lectura["ano"] ,
-                                        mes : lectura["mes"]
-
-                                    };
-                                    const idLogIngreso = await pool.query('INSERT INTO sys_usuario_costo_ingreso set ?', [unLogIngreso]);
-                                    idLogDetalle = idLogIngreso.insertId;
-                                }
+        if (fs.existsSync(oldpath)) {
+            if (fs.existsSync("../rlered/src/uploads/planillaCostos/")) {
+                fs.rename(oldpath, newpath, function (err) {
+                    if (err) throw err;
+                    var workbook = new Excel.Workbook(); 
+                    var idLogDetalle = 0 ;
+                    workbook.xlsx.readFile(newpath)
+                        .then(function() {
+                            var worksheet = workbook.getWorksheet(1);
+                                worksheet.eachRow({ includeEmpty: true }, async function(row, rowNumber) {
                                 
-
-
-                                const existeCosto =  await pool.query("SELECT * FROM sys_usuario_costo AS t1 WHERE t1.annio = "+ lectura["ano"] +" AND t1.mes = "+lectura["mes"]+" AND t1.idUsuario = "+row.values[2]+"");
-                                const unCosto ={ 
-                                    annio :  lectura["ano"],
-                                    mes   :  lectura["mes"],
-                                    idUsuario :  row.values[2] ,
-                                    costo : row.values[7]
-                                   }; 
-                                   
-                                const unCostoLog ={ 
-                                    id_costo_ingreso : idLogDetalle,
-                                    annio :  lectura["ano"],
-                                    mes   :  lectura["mes"],
-                                    idUsuario :  row.values[2] ,
-                                    costo : row.values[7]
-                                   };
-
-                                var tieneResitros = false;        
-                                existeCosto.forEach(function(elemento, indice, array) {
-                                    tieneResitros = true;
-                                });
-                                
-                                if(tieneResitros)
+                                if (rowNumber == 2)
                                 {
-                                    const result = await pool.query("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
-                                    const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
+                                    lectura["ano"] = row.values[3];
                                 }
-                                else
+                                if (rowNumber == 3)
                                 {
-                                    const result = await pool.query('INSERT INTO sys_usuario_costo set ?', [unCosto]);
-                                    const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
-                                }  
-                            }          
-                            //
-                        }
-                    });
-                });
-          });
+                                    lectura["mes"] = row.values[3];
+                                }
+                                if (rowNumber > 5 )
+                                {
+                                    if (lectura["informacion"] === undefined)
+                                    {
+                                        lectura["informacion"]  = [];
+                                    }
+        
+                                    if (rowNumber >= 6 )
+                                    {
+                                        // Cargar el log de carga de la información
+                                        if (rowNumber == 6)
+                                        {
+                                            unLogIngreso = {
+                                                id_user : req.user.idUsuario,
+                                                fecha : new Date(),
+                                                annio : lectura["ano"] ,
+                                                mes : lectura["mes"]
+        
+                                            };
+                                            const idLogIngreso = await pool.query('INSERT INTO sys_usuario_costo_ingreso set ?', [unLogIngreso]);
+                                            idLogDetalle = idLogIngreso.insertId;
+                                        }
+                                        
+        
+        
+                                        const existeCosto =  await pool.query("SELECT * FROM sys_usuario_costo AS t1 WHERE t1.annio = "+ lectura["ano"] +" AND t1.mes = "+lectura["mes"]+" AND t1.idUsuario = "+row.values[2]+"");
+                                        const unCosto ={ 
+                                            annio :  lectura["ano"],
+                                            mes   :  lectura["mes"],
+                                            idUsuario :  row.values[2] ,
+                                            costo : row.values[7]
+                                           }; 
+                                           
+                                        const unCostoLog ={ 
+                                            id_costo_ingreso : idLogDetalle,
+                                            annio :  lectura["ano"],
+                                            mes   :  lectura["mes"],
+                                            idUsuario :  row.values[2] ,
+                                            costo : row.values[7]
+                                           };
+        
+                                        var tieneResitros = false;        
+                                        existeCosto.forEach(function(elemento, indice, array) {
+                                            tieneResitros = true;
+                                        });
+                                        
+                                        if(tieneResitros)
+                                        {
+                                            const result = await pool.query("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
+                                            const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
+                                        }
+                                        else
+                                        {
+                                            const result = await pool.query('INSERT INTO sys_usuario_costo set ?', [unCosto]);
+                                            const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
+                                        }  
+                                    }          
+                                    //
+                                }
+                            });
+                        });
+                  });
+            }
+        }
     })
 
    // res.redirect("../costos/usuario",);
@@ -243,6 +248,8 @@ router.get('/descargarPlanilla', isLoggedIn, async (req, res) => {
                                                 " t1.idSucursal = t3.id_Sucursal " +
                                         " AND  " +
                                                 " t1.idCategoria = t4.id_Categoria " +
+                                        " AND  " +
+                                                " t1.id_estado = 1 " +
                                         " AND  " +
                                                 " t3.id_pais = t6.id " +
                                         " AND  " +

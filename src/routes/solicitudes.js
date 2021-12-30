@@ -188,7 +188,7 @@ router.post('/getDiasEs', async (req,res) => {
 
 router.post('/getDiasIngresados', async (req,res) => {
   
-  const dias = await pool.query("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id FROM sol_selec_dias AS t WHERE t.idUsuario = " + req.user.idUsuario + " AND t.idEstado = 1 ORDER BY fecha DESC"); 
+  const dias = await pool.query("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id FROM sol_selec_dias AS t WHERE t.idUsuario = " + req.user.idUsuario + " AND t.idEstado = 1 ORDER BY fecha ASC"); 
   
   //console.log("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id FROM sol_selec_dias AS t WHERE t.idUsuario = " + req.user.idUsuario + " AND t.idEstado = 1");
 
@@ -361,6 +361,29 @@ router.post('/ajaxAdd', express.json({type: '/'}), async (req,res) => {
 
   res.render('solicitudes/vacaciones', { req ,vacacione,layout: 'template'})
 });
+
+router.post('/ajaxDelete', express.json({type: '/'}), async (req,res) => {
+  //res.json(req.body);
+//  console.log(req.user)
+var arrayDeCadenas = req.body[0].dia.split('/');
+//console.log(arrayDeCadenas);
+var fecha = arrayDeCadenas[2]+"-"+arrayDeCadenas[1]+"-"+arrayDeCadenas[0];
+var idUsuario =  req.user.idUsuario;
+
+//Guardar datos en la BD      
+
+//console.log(fecha);
+//console.log(idUsuario);
+//console.log('DELETE FROM sol_selec_dias WHERE idUsuario = ? AND fecha = ?  AND idSolicitud IS NULL');
+
+const result = await pool.query('DELETE FROM sol_selec_dias WHERE idUsuario = ? AND fecha = ?  AND idSolicitud IS NULL', [idUsuario,fecha]);
+
+const vacacione = await pool.query('SELECT * FROM sol_selec_dias');
+
+
+res.render('solicitudes/vacaciones', { req ,vacacione,layout: 'template'})
+});
+
 
 //eliminarDia
 
@@ -1132,7 +1155,28 @@ router.get('/horaextras', isLoggedIn, async (req, res) => {
                                                   " t1.idIngreso = "+req.user.idUsuario+"" +
                                           " ORDER BY t1.id DESC"); 
 
-  res.render('solicitudes/horasextras', {  horasExtras,req ,layout: 'template'});
+  //res.render('solicitudes/horasextras', {  horasExtras,req ,layout: 'template'});
+  var mensaje = -1;
+  if (req.query.a !== undefined)
+       {
+          mensaje = req.query.a;
+       }
+
+       if (mensaje !== -1)
+       { 
+           const verToask = {
+           titulo : "",
+           body   : "Solicitud de horas extras ingresada.",
+           tipo   : "Crear"
+               };
+       
+               res.render('solicitudes/horasextras', { verToask, horasExtras,req ,layout: 'template'});
+       }
+       else
+       {
+        res.render('solicitudes/horasextras', {  horasExtras,req ,layout: 'template'});
+       }
+
  });
  
 

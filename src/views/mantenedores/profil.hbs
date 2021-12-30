@@ -24,6 +24,8 @@
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
+                <form id="cambioContra" name="cambioContra" data-parsley-validate action="/mantenedores/cambioContrasena" method="POST">
+                
                 <div class="form-group row">
                     <label for="staticEmail" class="col-sm-2 col-form-label"></label>
                     <label for="staticEmail" class="col-sm-2 col-form-label"><b>Nombre</b></label>
@@ -56,13 +58,13 @@
                     <div class="col-sm-4">
                         <div class="col-auto">
                                 <div class="input-group mb-2">
-                                    <input type="password" class="form-control" id="contrasena" >
+                                    <input type="password" class="form-control" id="contrasena" name="contrasena">
                                     <div class="input-group-prepend">
                                     <div class="input-group-text"><i class="fa fa-eye" id="togglePassword">&nbsp;</i></div>
                                     </div>
                                 </div>
                         </div>
-                         <button type="button" class="btn btn-warning">Actualizar Contraseña</button>
+                         <button type="button" class="btn btn-warning" onclick="cargarContrasena();">Actualizar Contraseña</button>
                     </div>
                 </div>
                 <!-- 
@@ -74,6 +76,7 @@
                         </div>
                     </div>
                 -->
+                </form>
             </div>
         </div>
     </div>
@@ -99,7 +102,48 @@
     this.classList.toggle('bi-eye');
 });
 
+    function cargarContrasena()
+    {
+       // alert($("#contrasena").val());
+      /*
+       var contra = $("#contrasena").val();
+        $.ajax({
+							async: false,
+							type : 'POST', 
+							url	 : "/mantenedores/cambioContrasena", 
+							data : "contra="+contra,
+							success : function (resultado) 
+								{ 
+                                    
+								} 
+						});
+        */
+        document.getElementById("cambioContra").submit();
+    }
+
 </script>
+
+{{#if verToask }}
+<!--INFORMACIÓN-->
+<script>
+    if ("{{verToask.tipo}}" == "Editar") {
+        toastr.warning('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Crear") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Eliminar") {
+        toastr.error('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+
+</script>
+{{/if}}
 
 
 </html>

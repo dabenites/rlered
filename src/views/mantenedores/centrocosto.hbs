@@ -8,7 +8,7 @@
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            <table class="table table-hover">
+            <table class="table table-hover" >
                 <thead>
                     <tr>
                         <th>Nombre</th>
@@ -88,19 +88,30 @@
                     <label for="ID Centro">Id Centro Costo* :</label>
                     <input type="text" id="id" class="form-control" value="{{centro.id}}" name="id" readonly />
                     {{/if}}
-                    <label for="Nombre Centro Costo">Nombre Centro Costo * :</label>
+                    <label for="Nombre Centro Costo">Nombre Centro Costo :</label>
                     <input type="text" id="name" class="form-control" value="{{centro.centroCosto}}" name="name" required />
 
                     <br />
-                    {{#if centro }}
-                    <button type="submit" class="btn btn-warning btn-block">
-                        Actualizar
-                    </button>
-                    {{else}}
-                    <button type="button" onclick="validarIngreso();" class="btn btn-warning btn-block">
-                        Ingresar
-                    </button>
-                    {{/if}}
+
+                    <div class="form-group row">
+                                    <div class="col-md-5 col-sm-5 ">
+
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 ">
+                                    {{#if centro }}
+                                    <button type="submit" class="btn btn-warning btn-block">
+                                        Actualizar
+                                    </button>
+                                    {{else}}
+                                    <button type="button" onclick="validarIngreso();" class="btn btn-warning btn-block">
+                                        Ingresar
+                                    </button>
+                                    {{/if}}
+                                    </div>
+                            </div>
+
+
+                   
 
 
                 </form>

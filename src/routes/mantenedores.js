@@ -884,9 +884,12 @@ router.get('/usuario/permisos/:id', async (req, res) => {
 
     var query = "SELECT t1.*, t2.Nombre AS nomGrupo, if (t3.idPermiso > 0,1,0) AS estado " +
                 " FROM sys_grupo_modulo AS t2 , sys_modulo AS t1 " +
-                " LEFT JOIN sys_permiso AS t3 ON t3.idUsuario = "+ id +" AND t3.idModulo = t1.idModulo   WHERE t1.idGrupo = t2.idGrupo AND t1.operativo = 'Y' ORDER BY nomGrupo ASC,t1.Nombre ASC ";
+                " LEFT JOIN sys_permiso AS t3 ON t3.idUsuario = "+ id +" AND t3.idModulo = t1.idModulo   WHERE t1.idGrupo = t2.idGrupo AND t1.operativo = 'Y' " +
+                " GROUP BY t1.idModulo " +
+                " ORDER BY nomGrupo ASC , t1.Nombre ASC ";
     
-        
+    //console.log(query);
+
     const permisos = await pool.query(query);
 
     const isEqualHelperHandlerbar = function(a, b, opts) {
@@ -898,11 +901,28 @@ router.get('/usuario/permisos/:id', async (req, res) => {
          } 
      };
      
+    console.log(req.query);
+    
+     if (req.query.a === undefined)
+    {
+        res.render('mantenedores/permisos', { permisos, usuario: usuario[0],req ,layout: 'template', helpers : {
+            if_equal : isEqualHelperHandlerbar
+        }});
+    }
+    else
+    {
+        var verToask = {};
+        verToask = {
+            titulo : "Mensaje",
+            body   : "Permisos actualizado correctamente.",
+            tipo   : "Crear"
+                };
 
+                res.render('mantenedores/permisos', { verToask, permisos, usuario: usuario[0],req ,layout: 'template', helpers : {
+                    if_equal : isEqualHelperHandlerbar
+                }});
 
-    res.render('mantenedores/permisos', { permisos, usuario: usuario[0],req ,layout: 'template', helpers : {
-        if_equal : isEqualHelperHandlerbar
-    }});
+    }
 
 });
 
@@ -911,54 +931,39 @@ router.post('/usuario/permisos', async (req,res) => {
     
     //console.log(res.json(req.body));
     //__________________
+    const {modules,id} = req.body;
+    //console.log(modules);
 
-    
-    var parametros = JSON.stringify(req.body);
-    var informacion = parametros.split(',');
-    //console.log(informacion);
-
+   // var parametros = JSON.stringify(req.body);
+    var informacion = modules.split(',');
     var permisosUsuario = [];
-    var idUsuario = 0;
     informacion.forEach(element => {
-        var datos = element.split(':');
-        var especificos = datos[0].split('_');
-        //var especificos_2 = datos[0].split(',');
-        //console.log(especificos[1] + "////" + especificos[2]);
-        //___________________________________
-        if (esNumero(especificos[1]))
-        {
+        //console.log(element);
+        if (esNumero(element)){
             const permiso = {
-            idUsuario : especificos[2].substring(0, especificos[2].length - 1) ,
-            idModulo  : especificos[1]
-            }
-       
-            permisosUsuario.push(permiso);
-
+                          idUsuario : id ,
+                          idModulo  : element
+                          }
+                     
+          permisosUsuario.push(permiso);
         }
     });
-//    permisosUsuario[0].idUsuario;
-   // console.log(permisosUsuario);
-    const borrar = pool.query(' DELETE FROM  sys_permiso WHERE  idUsuario = ?', [permisosUsuario[0].idUsuario]); 
-    permisosUsuario.forEach(permiso => {
-       // console.log(permiso);
-    const result = pool.query('INSERT INTO  sys_permiso set ?', [permiso]);
-    });
+ //console.log(permisosUsuario);
+    const borrar = await pool.query(' DELETE FROM  sys_permiso WHERE  idUsuario = ?', [id]);
 
-    const usuario = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [permisosUsuario[0].idUsuario]);
-    
-    const verToask = {
-        titulo : usuario[0].Nombre,
-        body   : "Se le han dado los permisos necesarios ",
-        tipo   : "Permisos"
-    };
-    //console.log(verToask);
+    permisosUsuario.forEach(async (permiso) => {
+        // console.log(permiso);
+     const result = await pool.query('INSERT INTO  sys_permiso set ?', [permiso]);
+     });
 
-    //const usuarios = await pool.query('SELECT * FROM sys_usuario');
-    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
+     res.redirect(   url.format({
+        pathname:'/mantenedores/usuario/permisos/'+id,
+        query: {
+        "a": 1
+        }
+    }));
 
-    
 
-    res.render('mantenedores/usuarios', { verToask, req ,usuarios,layout: 'template'});
 
 });
 
@@ -1043,9 +1048,10 @@ router.get('/valoruf', isLoggedIn, async (req, ress) => {
     var https = require('https');
     //var informacion = JSON.parse();
     const indicacoresCL =  {};
+    const indicacoresCL2 =  [];
 
     // valores de la UF por el año actual
-    const valoresUF = await pool.query("SELECT *, FORMAT( t1.valor , 2) AS valorFormateado  FROM moneda_valor AS t1 WHERE t1.fecha_valor LIKE '"+ year +"-%' AND id_moneda = 4");
+    const valoresUF = await pool.query("SELECT *, FORMAT( t1.valor , 2) AS valorFormateado  FROM moneda_valor AS t1 WHERE t1.fecha_valor LIKE '"+ year +"-%' AND id_moneda = 4 ORDER BY t1.fecha_valor DESC");
     
     const infoUF = {};
     valoresUF.forEach(function(elemento, indice, array) {
@@ -1090,6 +1096,9 @@ router.get('/valoruf', isLoggedIn, async (req, ress) => {
                         indicacoresCL[dateFormat(informacion.serie[i].fecha,"yyyy-mm-dd")] = unValor;
                     }
               }
+
+           // const reversed = indicacoresCL.reverse();
+
             if (req.query.a === undefined)
             {
                 ress.render('mantenedores/valoruf', { annios , actualizarUF , indicacoresCL, year , req ,layout: 'template'});
@@ -1534,13 +1543,14 @@ router.get('/buscarDesti/:find', async (req, res) => {
         "a": 2
         }
     }));
+
   });
 
 
   router.get('/usuario/password/', isLoggedIn, async (req, res) => {
     const usuarios = await pool.query('SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1 ');
 
-    console.log(usuarios);
+    //console.log(usuarios);
     usuarios.forEach(usuario => {
             const newPassword  ={ //Se gurdaran en un nuevo objeto
                 idUsuario:usuario.idUsuario,
@@ -1563,15 +1573,48 @@ router.get('/profil', isLoggedIn, async (req, res) => {
                                      ' WHERE t1. idUsuario = ? AND  t1.idCategoria = t2.id_Categoria AND t3.idUsuario = t1.idUsuario ', [req.user.idUsuario]);
     
 
-    const hash = bcrypt.hash(usuario[0].password, 10);
-    console.log(hash);
+    //const hash = bcrypt.hash(usuario[0].password, 10);
+    //console.log(hash);
+    
+    if (req.query.a === undefined)
+    {
+        res.render('mantenedores/profil', {usuario:usuario[0], req ,layout: 'template'});
+    }
+    else
+    {
+        var verToask = {};
+        verToask = {
+            titulo : "Mensaje",
+            body   : "Cambio de contraseña realizado con exito",
+            tipo   : "Crear"
+                };
+
+        res.render('mantenedores/profil', {verToask, usuario:usuario[0], req ,layout: 'template'});
+
+    }
+
+
     
 
+});
+router.post('/cambioContrasena', isLoggedIn, async (req, res) => {
 
-    res.render('mantenedores/profil', {usuario:usuario[0], req ,layout: 'template'});
+    //console.log(req.body);
+    const {contrasena} = req.body;
+    //console.log(req.user.idUsuario);
+    //console.log(bcrypt.hashSync(contra,10));
+
+    await pool.query('UPDATE sys_password set password = ? WHERE idUsuario = ?', [bcrypt.hashSync(contrasena,10), req.user.idUsuario]);
+
+    res.redirect(   url.format({
+        pathname:'/mantenedores/profil',
+        query: {
+        "a": 1
+        }
+    }));
+
 
 });
-
 
 
 

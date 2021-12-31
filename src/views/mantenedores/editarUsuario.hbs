@@ -80,10 +80,10 @@
 					<div class="col-md-6 col-sm-6 ">
 						<select class="select2_single form-control" tabindex="-1" name="idCategoria">
 							{{#each categoria}}
-							{{#if (if_equal id_Categoria ../usuario.idCategoria) }}
-							<option value="{{id_Categoria}}" selected>{{categoria}}</option>
+							{{#if (if_equal id ../usuario.idCategoria) }}
+							<option value="{{id}}" selected>{{categoria}}</option>
 							{{else}}
-							<option value="{{id_Categoria}}">{{categoria}}</option>
+							<option value="{{id}}">{{categoria}}</option>
 							{{/if}}
 							{{/each}}
 

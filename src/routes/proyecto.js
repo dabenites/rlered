@@ -24,7 +24,7 @@ router.get('/iproyecto', isLoggedIn, async (req, res) => {
   const usuarios = await pool.query("SELECT * FROM sys_usuario");
   const pais = await pool.query("SELECT * FROM pais");
   const tipo = await pool.query("SELECT * FROM proyecto_tipo");
-  const categoria = await pool.query("SELECT * FROM categorias");
+  const categoria = await pool.query("SELECT * FROM sys_categoria");
   const proye = await pool.query("SELECT * FROM pro_proyectos_copy");
   const contacto = await pool.query("SELECT * FROM contacto");
   const proyectos = await pool.query("SELECT * FROM pro_proyectos_copy as t1 ORDER BY year DESC, code DESC");
@@ -349,7 +349,7 @@ router.get('/listado', async (req, res) => {
     break;
   }
 
-  // console.log(sql);
+   console.log(sql);
 
 
   const proyectos = await pool.query(sql);

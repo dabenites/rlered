@@ -127,7 +127,7 @@ router.get('/pais/delete/:id', async (req, res) => {
 
 /// CATEGORIAS 
 router.get('/categoria', isLoggedIn, async (req, res) => {
-    const categorias = await pool.query('SELECT t1.*, t2.centroCosto FROM categorias as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id ORDER BY t1.categoria ASC');
+    const categorias = await pool.query('SELECT t1.*, t2.centroCosto FROM sys_categoria as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id ORDER BY t1.categoria ASC');
     const centrosCostos = await pool.query('SELECT * FROM centro_costo');
     //console.log(centrosCostos);
     const isEqualHelperHandlerbar = function(a, b, opts) {
@@ -192,9 +192,9 @@ router.get('/categoria', isLoggedIn, async (req, res) => {
 
 router.get('/categoria/edit/:id', async (req, res) => {
     const { id } = req.params;
-    const categorias = await pool.query('SELECT * FROM categorias as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id ORDER BY t1.categoria ASC');
+    const categorias = await pool.query('SELECT * FROM sys_categoria as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id ORDER BY t1.categoria ASC');
     const centrosCostos = await pool.query('SELECT * FROM centro_costo');
-    const categoria = await pool.query('SELECT * FROM categorias WHERE id = ?', [id]);
+    const categoria = await pool.query('SELECT * FROM sys_categoria WHERE id = ?', [id]);
     //console.log(categoria[0]);
     const isEqualHelperHandlerbar = function(a, b, opts) {
        // console.log(a + "----" + b);
@@ -221,7 +221,7 @@ router.post('/editCategoria', async (req,res) => {
         valorHH : valorhh
     };
    //Guardar datos en la BD     
-   await pool.query('UPDATE categorias set ? WHERE id = ?', [newCategoria, id]);
+   await pool.query('UPDATE sys_categoria set ? WHERE id = ?', [newCategoria, id]);
    //res.redirect('../mantenedores/categoria');
 
    res.redirect(   url.format({
@@ -242,7 +242,7 @@ router.post('/eddCategoria', async (req,res) => {
         valorHH : valorhh
     };
   //Guardar datos en la BD     
-  const result = await pool.query('INSERT INTO categorias set ?', [newCategoria]);//Inserción
+  const result = await pool.query('INSERT INTO sys_categoria set ?', [newCategoria]);//Inserción
   //res.redirect('../mantenedores/categoria');
 
   res.redirect(   url.format({
@@ -257,9 +257,9 @@ router.post('/eddCategoria', async (req,res) => {
 router.get('/categoria/delete/:id', async (req, res) => {
     const { id } = req.params;
 
-    const nombre = await pool.query('SELECT categoria FROM categorias WHERE id = ?', [id]);
+    const nombre = await pool.query('SELECT categoria FROM sys_categoria WHERE id = ?', [id]);
     
-    await pool.query('DELETE FROM categorias WHERE ID = ?', [id]);
+    await pool.query('DELETE FROM sys_categoria WHERE ID = ?', [id]);
      
     res.redirect(   url.format({
         pathname:'/mantenedores/categoria',
@@ -726,7 +726,7 @@ router.post('/editMoneda', async (req,res) => {
 router.get('/usuario', isLoggedIn, async (req, res) => {
     
     const usuarios = await pool.query("SELECT * , t4.descripcion as estado FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3,  sys_usuario_estado as t4 "+
-                                       "WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal "+
+                                       "WHERE t1.idCategoria = t2.id AND t3.id_Sucursal = t1.idSucursal "+
                                        " AND t1.id_estado = t4.id");
     res.render('mantenedores/usuarios', { usuarios, req ,layout: 'template'});
 }); 
@@ -735,7 +735,7 @@ router.get('/usuario/editar/:id', isLoggedIn, async (req, res) => {
     const { id } = req.params;
     //console.log(req.params);
     //const usuarios = await pool.query('SELECT * FROM sys_usuario');
-    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
+    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id AND t3.id_Sucursal = t1.idSucursal");
     const usuario = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [id]);
     const categoria = await pool.query('SELECT * FROM sys_categoria');
     const sucursal = await pool.query('SELECT * FROM sys_sucursal');
@@ -783,7 +783,7 @@ router.post('/editarUsuarios', async (req, res) => {
 
   // const usuarios = await pool.query('SELECT * FROM sys_usuario');
   const usuarios = await pool.query("SELECT * , t4.descripcion as estado FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3,  sys_usuario_estado as t4 "+
-  "WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal "+
+  "WHERE t1.idCategoria = t2.id AND t3.id_Sucursal = t1.idSucursal "+
   " AND t1.id_estado = t4.id");
    //console.log(usuarios);
 
@@ -825,7 +825,7 @@ router.post('/addUsuario', async (req, res) => {
    const result2 = await pool.query('INSERT INTO sys_password set ? ', [newPassword]);
 
    const usuarios = await pool.query("SELECT * , t4.descripcion as estado FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3,  sys_usuario_estado as t4 "+
-   "WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal "+
+   "WHERE t1.idCategoria = t2.id AND t3.id_Sucursal = t1.idSucursal "+
    " AND t1.id_estado = t4.id");
    //console.log(usuarios);
     
@@ -853,7 +853,7 @@ router.get('/usuario/delete/:id', async (req, res) => {
     //res.redirect('/mantenedores/usuario');
 
     
-    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id_Categoria AND t3.id_Sucursal = t1.idSucursal");
+    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id AND t3.id_Sucursal = t1.idSucursal");
     //console.log(usuarios);
 
 
@@ -1458,7 +1458,7 @@ router.post('/ajax-validarNombreCategoria', async (req,res) => {
     
     const nombreACargar = req.body.name;
 
-    const nombreCategoria = await pool.query('SELECT * FROM categorias WHERE categoria = ?',[nombreACargar]);
+    const nombreCategoria = await pool.query('SELECT * FROM sys_categoria WHERE categoria = ?',[nombreACargar]);
 
     res.send(nombreCategoria);
 });
@@ -1597,13 +1597,17 @@ router.get('/buscarDesti/:find', async (req, res) => {
     const usuarios = await pool.query('SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1 ');
 
     //console.log(usuarios);
-    usuarios.forEach(usuario => {
+    usuarios.forEach( async  (usuario) => {
             const newPassword  ={ //Se gurdaran en un nuevo objeto
                 idUsuario:usuario.idUsuario,
-                password:bcrypt.hashSync("RL$"+login,10)
+                password:bcrypt.hashSync("RL$"+usuario.login,10)
             };
-            // await pool.query('INSERT INTO sys_password set ? ', [newIdEquipo]); // esto se ejecutara una vez cuando se realice el proceso. 
+            if (usuario.idUsuario != 1)
+            {
+                await pool.query('INSERT INTO sys_password set ? ', [newPassword]); // esto se ejecutara una vez cuando se realice el proceso. 
+                //console.log(bcrypt.hashSync("RL$"+usuario.login,10));
 
+            }
       });
 
 
@@ -1616,7 +1620,7 @@ router.get('/profil', isLoggedIn, async (req, res) => {
     // revisar la informacion 
     //console.log(req.user);
     const usuario = await pool.query('SELECT t1.*, t2.categoria,t3.password FROM sys_usuario AS t1 , sys_categoria AS t2,sys_password AS t3 '+ 
-                                     ' WHERE t1. idUsuario = ? AND  t1.idCategoria = t2.id_Categoria AND t3.idUsuario = t1.idUsuario ', [req.user.idUsuario]);
+                                     ' WHERE t1. idUsuario = ? AND  t1.idCategoria = t2.id AND t3.idUsuario = t1.idUsuario ', [req.user.idUsuario]);
     
 
     //const hash = bcrypt.hash(usuario[0].password, 10);

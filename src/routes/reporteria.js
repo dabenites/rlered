@@ -114,7 +114,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                 " FROM  " +
                                                 " bitacora AS t1, " +
                                                 " sys_usuario AS t2 " +
-                                                        " LEFT JOIN categorias AS t2a ON t2.idCategoria = t2a.id " +
+                                                        " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
                                                         " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
                                                 " WHERE  " +
                                                 " t1.project = ? " +
@@ -140,7 +140,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                 " FROM  " +
                                                 " bitacora AS t1, " +
                                                 " sys_usuario AS t2 " +
-                                                        " LEFT JOIN categorias AS t2a ON t2.idCategoria = t2a.id " +
+                                                        " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
                                                         " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
                                                 " WHERE  " +
                                                 " t1.project = ? " +
@@ -207,7 +207,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                 " FROM  " +
                                                 " bitacora AS t1, " +
                                                 " sys_usuario AS t2 " +
-                                                        " LEFT JOIN categorias AS t2a ON t2.idCategoria = t2a.id " +
+                                                        " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
                                                         " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
                                                 " WHERE  " +
                                                 " t1.project = ? " +
@@ -281,7 +281,7 @@ router.get('/proyectos/horas/:id',isLoggedIn,  async (req, res) => {
                                                 " FROM  " +
                                                 " bitacora AS t1, " +
                                                 " sys_usuario AS t2 " +
-                                                        " LEFT JOIN categorias AS t2a ON t2.idCategoria = t2a.id " +
+                                                        " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
                                                         " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
                                                 " WHERE  " +
                                                 " t1.project = ? " +
@@ -304,7 +304,7 @@ router.get('/proyectos/horas/:id',isLoggedIn,  async (req, res) => {
                                                 " FROM  " +
                                                 " bitacora AS t1, " +
                                                 " sys_usuario AS t2 " +
-                                                        " LEFT JOIN categorias AS t2a ON t2.idCategoria = t2a.id " +
+                                                        " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
                                                         " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
                                                 " WHERE  " +
                                                 " t1.project = ? " +

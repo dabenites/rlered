@@ -158,7 +158,7 @@ router.get('/duplicarAnterior', isLoggedIn, async (req, res) => {
                                         " WHERE  " +
                                                 " t1.idSucursal = t3.id_Sucursal " +
                                         " AND  " +
-                                                " t1.idCategoria = t4.id_Categoria " +
+                                                " t1.idCategoria = t4.id " +
                                         " AND  " +
                                                 " t3.id_pais = t6.id " +
                                         " AND  " +
@@ -247,7 +247,7 @@ router.get('/descargarPlanilla', isLoggedIn, async (req, res) => {
                                         " WHERE  " +
                                                 " t1.idSucursal = t3.id_Sucursal " +
                                         " AND  " +
-                                                " t1.idCategoria = t4.id_Categoria " +
+                                                " t1.idCategoria = t4.id " +
                                         " AND  " +
                                                 " t1.id_estado = 1 " +
                                         " AND  " +
@@ -350,7 +350,7 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
                                         " WHERE  " +
                                                 " t1.idSucursal = t3.id_Sucursal " +
                                         " AND  " +
-                                                " t1.idCategoria = t4.id_Categoria " +
+                                                " t1.idCategoria = t4.id " +
                                         " AND  " +
                                                 " t4.idCentroCosto = t5.id "+
                                         " AND " +

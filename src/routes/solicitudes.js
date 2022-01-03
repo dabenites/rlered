@@ -471,6 +471,10 @@ router.post('/AddIngreso', async (req,res) => {
     const result = pool.query("UPDATE sol_selec_dias set idEstado = 2 , idSolicitud = "+key+" , medioDia = '"+element.mediodia+"', hora = '"+element.hora+"'  WHERE idEstado = 1 AND id = "+element.id+" ");
   });
 
+  // Buscar la informacion del informante. 
+  //idInformar
+  
+
    res.redirect("../solicitudes/vacaciones");
 
 

@@ -324,7 +324,7 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
             }
             
         }
-        else if ( analisisHoraI > analisisHoraAlmuerzoF && analisisHoraFI > analisisHoraAlmuerzoF) // las dos horas son mayores a la hora de almuerzo
+        else if ( analisisHoraI >= analisisHoraAlmuerzoF && analisisHoraFI > analisisHoraAlmuerzoF) // las dos horas son mayores a la hora de almuerzo
         {
             const proyeto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [idProyecto]);
            
@@ -459,8 +459,8 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
         }
         else if ( analisisHoraI >= analisisHoraAlmuerzoI && analisisHoraI < analisisHoraAlmuerzoF) // las dos horas son mayores a la hora de almuerzo
         {
-            console.log(analisisHoraI + " >=///" + analisisHoraAlmuerzoI + "///" + analisisHoraI + "//// <" + analisisHoraAlmuerzoF);
-            console.log(analisisHoraI + " >=///" + hT);
+            //console.log(analisisHoraI + " >=///" + analisisHoraAlmuerzoI + "///" + analisisHoraI + "//// <" + analisisHoraAlmuerzoF);
+            //console.log(analisisHoraI + " >=///" + hT);
 
             const proyeto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [idProyecto]);
            

@@ -594,7 +594,6 @@ router.get('/buscarRevisor/:find', async (req, res) => {
 
 });
 
-
 //cargarFactura
 router.post('/cargarFactura', async (req, res) => {
 
@@ -618,7 +617,9 @@ router.post('/cargarFactura', async (req, res) => {
     roc: numroc,
     comentarios :comentario };
 
-   const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]);
+
+    
+//const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]);
 
   
 res.redirect('/proyecto/facturar/'+id_proyecto);

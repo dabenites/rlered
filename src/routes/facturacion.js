@@ -308,7 +308,6 @@ router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
                                         " AND  " +
                                                 " t2.id_proyecto = t3.id " );
 
-    console.log("1");
     // factura 
     const factura = await pool.query( " SELECT *,t1.id as id_facturacion FROM fact_facturas AS t1, fact_estados AS t2 WHERE t1.id = "+idFacturacion+" AND t1.id_estado = t2.id");
 

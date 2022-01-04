@@ -6,6 +6,8 @@ var url = require('url');
 
 const { isLoggedIn } = require('../lib/auth');
 
+const mensajeria = require('../mensajeria/mail');
+
 // Permisos 
 router.get('/permisos', isLoggedIn, async (req, res) => {
   // buscar los datos del usuario en las variables req
@@ -144,6 +146,15 @@ router.get('/vacaciones', isLoggedIn, async (req, res) => {
     const vacacione = await pool.query('SELECT * FROM sol_selec_dias');
     const usuarios = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1");
     const solicitud = await pool.query('SELECT * FROM sol_solicitud');
+
+    //mensajeria.EnviarMail().catch(console.error);
+   // const mail = {
+   //   to : "dbenites@renelagos.com"
+   // };
+   // mensajeria.EnvioMailNuevoProyecto(mail);
+
+    // console.log(mensajeria);
+
     res.render('solicitudes/vacaciones', { req ,vacacione,usuarios,solicitud,layout: 'template'});
 }); 
 
@@ -473,6 +484,41 @@ router.post('/AddIngreso', async (req,res) => {
 
   // Buscar la informacion del informante. 
   //idInformar
+
+  // Buscar la informacion 
+  if (idAprobador > 0)
+  {
+    const infoAprobador = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idAprobador]);
+
+    const mail = {
+      to : infoAprobador[0].Email,
+      comentario : comentario,
+      solicitante : req.user.Nombre
+    }
+
+    //console.log(vaca);
+    mensajeria.EnvioMailSolicitudVacaciones(mail);
+
+    if (idInformar > 0)
+    {
+      const infoInformar = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idAprobador]);
+
+      const mail = {
+        to : infoAprobador[0].Email,
+        comentario : comentario,
+        solicitante : req.user.Nombre
+      }
+  
+      //console.log(vaca);
+      mensajeria.EnvioMailSolicitudVacacionesNotificar(mail);
+
+    }
+  }
+  
+
+
+
+
   
 
    res.redirect("../solicitudes/vacaciones");

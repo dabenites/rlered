@@ -192,13 +192,13 @@ module.exports.MensajerErrores =  async function (objeto) {
                           },
                       });
   
-         const generico = objeto.consulta;
+    // const generico = objeto.consulta;
   
          const mailOptions = {
              from : "RLE - Planner <planner@renelagos.com>",
              to : "dbenites@renelagos.com",
              subject : "RLE - Planner - ALertas.",
-             text : generico
+             text : objeto
          };
   
          const result = await transporter.sendMail(mailOptions);

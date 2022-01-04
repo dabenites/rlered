@@ -617,13 +617,19 @@ router.post('/cargarFactura', async (req, res) => {
     roc: numroc,
     comentarios :comentario };
 
+    /*
     const cst = {
       consulta : newFactura
     };
 
-    mensajeria.MensajerErrores(cst)
-    
-//const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]);
+    const sql = " INSERT INTO fact_facturas (fecha_solicitud,id_proyecto,id_tipo_moneda,id_estado,id_tipo_cobro,num_ppto,monto_a_facturar,porc_ppto, " + 
+                " id_solicitante,fecha_cobro,es_roc,roc,comentarios) values " +
+                " ('"+fecha_ingreso+"','"+id_proyecto+"', '"+tipoMoneda+"',0, '"+tipoCobro+"' , '"+numPpto+"' , '"+monto+"' , '"+porc_presupuesto+"', '"+req.user.idUsuario+"' , '"+fecha_cobro+"' , '"+esroc+"' , '"+numroc+"' , '"+comentario+"' )";
+
+                console.log(sql);
+    mensajeria.MensajerErrores(sql)
+    */
+const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]);
 
   
 res.redirect('/proyecto/facturar/'+id_proyecto);

@@ -139,7 +139,7 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
         else
         {
             for (var i=0; i<impresion.length; i++) 
-            { if ( (i + 1) === trabajo.length) {impresionBD = impresionBD + impresion[i];} else {impresionBD = impresionBD + impresion[i]+ " + ";}  }
+            { if ( (i + 1) === impresion.length) {impresionBD = impresionBD + impresion[i];} else {impresionBD = impresionBD + impresion[i]+ " + ";}  }
         }
     }
     if (typeof series !== 'undefined') 

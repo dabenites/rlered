@@ -617,7 +617,11 @@ router.post('/cargarFactura', async (req, res) => {
     roc: numroc,
     comentarios :comentario };
 
+    const cst = {
+      consulta : newFactura
+    };
 
+    mensajeria.MensajerErrores(cst)
     
 //const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]);
 

@@ -15,6 +15,8 @@ const { isEmptyObject } = require('jquery');
 
 var url = require('url');
 
+const mensajeria = require('../mensajeria/mail');
+
 //AGREGAR UN PROYECTO
 
 router.get('/iproyecto', isLoggedIn, async (req, res) => {
@@ -25,9 +27,9 @@ router.get('/iproyecto', isLoggedIn, async (req, res) => {
   const pais = await pool.query("SELECT * FROM pais");
   const tipo = await pool.query("SELECT * FROM proyecto_tipo");
   const categoria = await pool.query("SELECT * FROM sys_categoria");
-  const proye = await pool.query("SELECT * FROM pro_proyectos_copy");
+  const proye = await pool.query("SELECT * FROM pro_proyectos");
   const contacto = await pool.query("SELECT * FROM contacto");
-  const proyectos = await pool.query("SELECT * FROM pro_proyectos_copy as t1 ORDER BY year DESC, code DESC");
+  const proyectos = await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");
 
 
   res.render('proyecto/iproyecto', { req, usuarios, pais, tipo, categoria, proye, contacto, proyectos,estado, layout: 'template' });
@@ -75,11 +77,11 @@ router.post('/addProyecto', async (req, res) => {
   };
   //Guardar datos en la BD     
   //console.log(req.body);
-  const result = await pool.query('INSERT INTO pro_proyectos_copy set ?', [newProyecto]);//Inserción
+  const result = await pool.query('INSERT INTO pro_proyectos set ?', [newProyecto]);//Inserción
 
 
   //console.log(result);
-  const proye = await pool.query('SELECT * FROM pro_proyectos_copy');
+  const proye = await pool.query('SELECT * FROM pro_proyectos');
 
 
 
@@ -94,7 +96,7 @@ router.post('/addProyecto', async (req, res) => {
 
 router.get('/buscador', isLoggedIn, async (req, res) => {
   const estado = await pool.query("SELECT * FROM pro_costo_externo_estado");
-  const buscadores = await pool.query("SELECT * FROM pro_proyectos_copy");
+  const buscadores = await pool.query("SELECT * FROM pro_proyectos");
   const tipo = await pool.query("SELECT * FROM proyecto_tipo");
   const usuarios = await pool.query("SELECT * FROM sys_usuario");
   const contacto = await pool.query("SELECT * FROM contacto");
@@ -146,7 +148,7 @@ router.post('/listPro', isLoggedIn, async (req, res) => {
   var z = req.body.id_Servicio;*/
 
 
-  //const buscadores = await pool.query("SELECT * FROM pro_proyectos_copy AS t1 " +
+  
     //" WHERE " +
     //" t1.nombre=? OR t1.year=? OR t1.id_Tipo=? OR t1.id_Estado=? OR t1.id_complejidad=? OR t1.SuperficiePPTO=? OR t1.SuperficieAPC=? OR t1.id_Pais=? OR t1.Ciudad=?  OR t1.Npisos=? OR t1.Nsubterraneo=? OR t1.id_Director_Proyecto=? OR t1.id_Jefe_Proyecto=? OR t1.ValorMC=? OR t1.Zona=? OR t1.Suelo=? OR t1.FechaIni=? OR t1.FechaEnt=? OR t1.FechaTer=? OR t1.id_Cliente=? OR t1.id_Arquitectura=? OR t1.id_Constructora=? OR t1.id_Revisor=? OR t1.Nplanos=?  OR t1.id_Servicio=?", [a, b, c, d, e, f, g, h, i, k, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]);
 
@@ -154,7 +156,7 @@ router.post('/listPro', isLoggedIn, async (req, res) => {
   // console.log(a + "///" + b);
 
 
-  const buscadores = await pool.query("SELECT * FROM pro_proyectos_copy AS t1 " +
+  const buscadores = await pool.query("SELECT * FROM pro_proyectos AS t1 " +
     " WHERE " +
     " t1.nombre=? OR t1.year=? OR t1.id_Tipo=? OR t1.code=? OR t1.Zona=? OR t1.Zona=? ", [a,b,c,co,p,q]);
 
@@ -172,8 +174,8 @@ router.post('/listPro', isLoggedIn, async (req, res) => {
 router.get('/buscador/edit/:id', async (req, res) => {
   const { id } = req.params;
 
-  const buscadores = await pool.query("SELECT * FROM pro_proyectos_copy ");
-  const buscador = await pool.query("SELECT * FROM pro_proyectos_copy as t1 WHERE t1.id = ?", [id]);
+  const buscadores = await pool.query("SELECT * FROM pro_proyectos ");
+  const buscador = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [id]);
 
 
 
@@ -223,7 +225,7 @@ router.post('/editBusca', async (req, res) => {
     id_Servicio: id_Servicio
   };
   //Guardar datos en la BD     
-  await pool.query('UPDATE pro_proyectos_copy set ? WHERE id = ?', [newBuscador, id]);
+  await pool.query('UPDATE pro_proyectos set ? WHERE id = ?', [newBuscador, id]);
   res.redirect('/proyecto/editProyecto');
 
 });
@@ -266,18 +268,17 @@ router.post('/edit', async (req, res) => {
     id_Servicio: id_Servicio
   };
   //Guardar datos en la BD     
-  //await pool.query('UPDATE pro_proyectos_copy set nombre =  ? WHERE id = ?', [nombre, id]);
   //res.redirect('./proyecto/listPro');
 
   //res.send("ppp");
 
 //console.log(nombre+"ind"+id);
 
-const Pedit = await pool.query('UPDATE pro_proyectos_copy set nombre =  ? , code =  ?,  SuperficiePPTO =  ?,  SuperficieAPC =  ?, Ciudad =  ?, Ubicacion =  ?,Npisos =  ?,Nsubterraneo =  ?,ValorMC =  ?,Zona =  ?,Suelo =  ?,Nplanos = ? WHERE id = ?', [nombre,code,SuperficiePPTO,SuperficieAPC,Ciudad,Ubicacion,Npisos, Nsubterraneo,ValorMC,Zona,Suelo,Nplanos,id] );
+const Pedit = await pool.query('UPDATE pro_proyectos set nombre =  ? , code =  ?,  SuperficiePPTO =  ?,  SuperficieAPC =  ?, Ciudad =  ?, Ubicacion =  ?,Npisos =  ?,Nsubterraneo =  ?,ValorMC =  ?,Zona =  ?,Suelo =  ?,Nplanos = ? WHERE id = ?', [nombre,code,SuperficiePPTO,SuperficieAPC,Ciudad,Ubicacion,Npisos, Nsubterraneo,ValorMC,Zona,Suelo,Nplanos,id] );
  // console.log(nombre);
   //res.send("ppp");
 
- //const ep = await pool.query('SELECT * FROM pro_proyectos_copy');
+
 
   res.redirect('/proyecto/buscador');
 
@@ -287,7 +288,7 @@ const Pedit = await pool.query('UPDATE pro_proyectos_copy set nombre =  ? , code
 
 router.get('/buscador/delete/:id', async (req, res) => {
   const { id } = req.params;
-  await pool.query('DELETE FROM pro_proyectos_copy WHERE id = ?', [id]);
+  await pool.query('DELETE FROM pro_proyectos WHERE id = ?', [id]);
 
 
   res.redirect('/proyecto/buscador');
@@ -338,7 +339,7 @@ router.get('/listado', async (req, res) => {
             " LEFT JOIN contacto AS t2 ON t1.id_cliente = t2.id " +
             " LEFT JOIN sys_usuario AS t3 ON t1.id_jefe = t3.idUsuario " + 
             " LEFT JOIN sys_usuario AS t4 ON t1.id_director = t4.idUsuario " + 
-            " WHERE t1.id_jefe = "+req.user.idUsuario +" OR t1.id_director = "+req.user.idUsuario +" ORDER BY t1.id";
+            " WHERE t1.id_jefe = "+req.user.idUsuario +" OR t1.id_director = "+req.user.idUsuario +" ORDER BY t1.year ASC, t1.code ASC";
     break;
     default:
       sql = "SELECT t3.Nombre AS nomJefe, t4.Nombre AS nomDir, t2.name AS nomCli, t1.* FROM pro_proyectos AS t1 "+ 
@@ -349,7 +350,7 @@ router.get('/listado', async (req, res) => {
     break;
   }
 
-   console.log(sql);
+  //console.log(sql);
 
 
   const proyectos = await pool.query(sql);
@@ -714,6 +715,23 @@ router.post('/cargarProyecto', async (req, res) => {
 
    const resultTracking = await pool.query('INSERT INTO pro_proyectos_tracking set ?', [newProyectoTracking]);
 
+   // Registro de mail 
+
+   // buscar la informacion del proyecto 
+
+   const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.year = ? and t1.code = ? ",[year,code])
+   
+   const mail = {
+     codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
+     to : "documentos@renelagos.com"
+   };
+   const mailTI = {
+    codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
+    to : "cpoblete@renelagos.com"
+  };
+
+   mensajeria.EnvioMailCreacionProyectoDocumentos(mail);
+   mensajeria.EnvioMailCreacionProyectoTI(mailTI);
 
  res.redirect(   url.format({
     pathname:"../proyecto/listado",
@@ -956,20 +974,20 @@ router.post('/buscarCodigo', isLoggedIn, async (req, res) => {
           case 2:
           case '2':
             const codigo1a = await pool.query(" SELECT  " +
-                                                " (max(t1.code) + 1) AS num " +
+                                                " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 1) AS num " +
                                             " FROM " +
                                                 " pro_proyectos AS t1 " +
                                             " WHERE  " +
                                                 " t1.year = "+req.body.year+" " +
                                             " AND  " +
                                                 " t1.code >= 0 AND 		t1.code <= 199"); 
-          //console.log(codigo[0].num);
+
           res.send(String(codigo1a[0].num));
           break;
           case 3:
           case '3':
             const codigo1b = await pool.query(" SELECT  " +
-                                                " (max(t1.code) + 1) AS num " +
+                                                " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 400) AS num " +
                                             " FROM " +
                                                 " pro_proyectos AS t1 " +
                                             " WHERE  " +
@@ -981,7 +999,7 @@ router.post('/buscarCodigo', isLoggedIn, async (req, res) => {
           break;
           default:
             const codigo1c = await pool.query(" SELECT  " +
-                                                " (max(t1.code) + 1) AS num " +
+                                                " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 300) AS num " +
                                             " FROM " +
                                                 " pro_proyectos AS t1 " +
                                             " WHERE  " +
@@ -996,7 +1014,7 @@ router.post('/buscarCodigo', isLoggedIn, async (req, res) => {
       case 6:
       case '6':
           const codigo = await pool.query(" SELECT  " +
-                                                " (max(t1.code) + 1) AS num " +
+                                                  " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 200) AS num " +
                                             " FROM " +
                                                 " pro_proyectos AS t1 " +
                                             " WHERE  " +
@@ -1008,7 +1026,7 @@ router.post('/buscarCodigo', isLoggedIn, async (req, res) => {
           break;
       default:
         const codigo2 = await pool.query(" SELECT  " +
-                                                " (max(t1.code) + 1) AS num " +
+                                              " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 600) AS num " +
                                             " FROM " +
                                                 " pro_proyectos AS t1 " +
                                             " WHERE  " +

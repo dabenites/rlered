@@ -117,7 +117,18 @@ router.post('/IngresoPermiso', isLoggedIn, async (req, res) => {
     }
 
 
+
     const infoSolicitud = await pool.query('INSERT INTO sol_permiso  set ? ', [det_permiso]);
+
+    const infoAprobador = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idAprobador]);
+
+    const mail = {
+      to : infoAprobador[0].Email,
+      comentario : comentario,
+      solicitante : req.user.Nombre
+    }
+
+    mensajeria.EnvioMailSolicitudPermiso(mail);
 
     // cargada el detalle de la solicitud 
 

@@ -471,17 +471,18 @@ router.get('/editar/:id', async (req, res) => {
   // // 
 
   const proyectos = await pool.query("SELECT * , t1.id as idPro, " +
-                                    " t1a.idUsuario AS idDir, " +
+                                    " t1.id_director AS idDir, " +
                                      " t1a.Nombre AS nomDir, " +
                                      " t1.id_pais AS id_pais, " +
                                      " t1.zona AS zona, " +
+                                     " t1.id_estado as id_estado,"+
                                      " t1.suelo AS suelo, " +
                                      " t1.categoria AS categoria, " +
-                                     " t1b.idUsuario AS idJefe, t1b.Nombre AS nomJefe, " +
-                                     " t1c.id AS idMan , t1c.name nomMan, " +
-                                     " t1d.id AS idCli , t1d.name nomCli, " +
-                                     " t1e.id AS idArq , t1e.name nomArq, " +
-                                     " t1f.id AS idRev , t1f.name nomRev, " +
+                                     " t1.id_jefe AS idJefe, t1b.Nombre AS nomJefe, " +
+                                     " t1.id_mandante AS idMan , t1c.name nomMan, " +
+                                     " t1.id_cliente AS idCli , t1d.name nomCli, " +
+                                     " t1.id_arquitecto AS idArq , t1e.name nomArq, " +
+                                     " t1.id_revisor AS idRev , t1f.name nomRev, " +
                                      " t1p.simbolo AS simbolo," +
                                      " CONCAT(t1p.simbolo,' /', 'm <sup> 2</sup>')  AS sm2" +
                                      " FROM pro_proyectos AS t1 " +
@@ -643,10 +644,8 @@ res.redirect('/proyecto/facturar/'+id_proyecto);
 router.post('/cargarProyecto', async (req, res) => {
 
   const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
-    id_mandante,id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
+    id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
     fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado,id_tipo_cobro,id_pais} = req.body;
-
-    //console.log(req.body);
 
     const newProyecto = { //Se gurdaran en un nuevo objeto
       // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
@@ -659,7 +658,7 @@ router.post('/cargarProyecto', async (req, res) => {
        id_estado: id_Estado,
        id_director: id_director,
        id_jefe: id_jefe,
-       id_mandante: id_mandante,
+       id_mandante: id_cliente,
        id_cliente: id_cliente,
        id_arquitecto: id_arquitecto,
        id_revisor: id_revisor,
@@ -698,7 +697,6 @@ router.post('/cargarProyecto', async (req, res) => {
      id_estado: id_Estado,
      id_director: id_director,
      id_jefe: id_jefe,
-     id_mandante: id_mandante,
      id_cliente: id_cliente,
      id_arquitecto: id_arquitecto,
      id_revisor: id_revisor,
@@ -738,7 +736,7 @@ router.post('/cargarProyecto', async (req, res) => {
    };
    const mailTI = {
     codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
-    to : "cpoblete@renelagos.com"
+    to : "computacion@renelagos.com"
   };
 
    mensajeria.EnvioMailCreacionProyectoDocumentos(mail);
@@ -758,10 +756,9 @@ router.post('/cargarProyecto', async (req, res) => {
 router.post('/ActualizarProyecto', async (req, res) => {
 
   const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
-    id_mandante,id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
+    id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
     fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado , id,id_tipo_cobro, id_pais} = req.body;
 
-    
   
   var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
   //req.user.idUsuario
@@ -777,7 +774,6 @@ router.post('/ActualizarProyecto', async (req, res) => {
      id_estado: id_Estado,
      id_director: id_director,
      id_jefe: id_jefe,
-     id_mandante: id_mandante,
      id_cliente: id_cliente,
      id_arquitecto: id_arquitecto,
      id_revisor: id_revisor,
@@ -814,7 +810,7 @@ router.post('/ActualizarProyecto', async (req, res) => {
      id_estado: id_Estado,
      id_director: id_director,
      id_jefe: id_jefe,
-     id_mandante: id_mandante,
+     //id_mandante: id_mandante,
      id_cliente: id_cliente,
      id_arquitecto: id_arquitecto,
      id_revisor: id_revisor,

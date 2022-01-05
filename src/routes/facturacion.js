@@ -161,7 +161,7 @@ router.get('/facturas', isLoggedIn, async (req, res) => {
 
     // buscar el listado de todas las facturas.
 
-    const estados =  await pool.query("SELECT * FROM fact_estados as t1 UNION SELECT '%', 'Todos' FROM fact_estados WHERE id = 0");
+    const estados =  await pool.query("SELECT * FROM fact_estados as t1 UNION SELECT '%', 'Todos' ,'color' FROM fact_estados WHERE id = 0");
     const facturacion =  await pool.query("SELECT " +
                                                     " *, " +
                                                     " t1.id as idFacturacion," +
@@ -169,6 +169,7 @@ router.get('/facturas', isLoggedIn, async (req, res) => {
                                                     " t2.nombre As nomPro ," +
                                                     " DATE_FORMAT(t1.fecha_solicitud, '%Y-%m-%d') as fechaSolicitante ," +
                                                     " t5.descripcion As estadoDes," +
+                                                    " t5.color as color ," +
                                                     " t6.descripcion As tipoCobroDes ," +  
                                                     " t2a.name As nameCliente " +
                                           " FROM " +
@@ -190,7 +191,8 @@ router.get('/facturas', isLoggedIn, async (req, res) => {
                                         " ORDER BY fechaSolicitante DESC");
 
 
-    //console.log(facturacion);
+   // console.log(facturacion);
+
     const isEqualHelperHandlerbar = function(a, b, opts) {
         // console.log(a + "----" + b);
          if (a == b) {
@@ -221,7 +223,7 @@ router.post('/facturas', isLoggedIn, async (req, res) => {
         estadoLogica = " ";
     }
 
-    const estados =  await pool.query("SELECT * FROM fact_estados as t1 UNION SELECT '%', 'Todos' FROM fact_estados WHERE id = 0");
+    const estados =  await pool.query("SELECT * FROM fact_estados as t1 UNION SELECT '%', 'Todos','color'  FROM fact_estados WHERE id = 0");
 
     const facturacion =  await pool.query("SELECT " +
                                                     " *, " +

@@ -49,6 +49,46 @@ const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
 
 }
 
+module.exports.EnvioMailSolicitudPermiso =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+         const generico = "Estimado/a:\n" +
+                          " \t Se ha generado una solicitud de aprobacion de permiso por " + objeto.solicitante + "\n" +
+                          " Comentario : " + objeto.comentario + "\n"+
+                          " Saludos, \n"+
+                          " RLE - Planner";
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : objeto.to,
+             subject : "RLE - Planner - Solicitud de Permiso.",
+             text : generico
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
+
 module.exports.EnvioMailSolicitudVacacionesNotificar =  async function (objeto) {
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
@@ -205,4 +245,6 @@ module.exports.MensajerErrores =  async function (objeto) {
   
   }
 
+
+  
 //main().catch(console.error);

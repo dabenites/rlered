@@ -84,7 +84,7 @@
                         <td style="text-align: center;">{{fecha_cobro}}</td>
                         <td style="text-align: center;">{{num_factura}}</td>
                         <td style="text-align: center;">{{roc}}</td>
-                        <td style="text-align: center;">{{estadoDes}}</td>
+                        <td style="text-align: center;background:#{{color}}">{{estadoDes}}</td>
                         <td style="text-align: center;">{{tipoCobroDes}}</td>
                         <td style="text-align: center;">
                               <a style="padding: .25rem;" type="button" class="btn btn-secondary btn-xs"
@@ -114,8 +114,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
-        /*
-        $('#tablafacturacion thead tr').clone(true).appendTo('#tablafacturacion thead');
+      /*  $('#tablafacturacion thead tr').clone(true).appendTo('#tablafacturacion thead');
         $('#tablafacturacion thead tr:eq(1) th').each(function (i) {
             var title = $(this).text();
           
@@ -137,6 +136,7 @@
             }
         });
         */
+
       var table = $('#tablafacturacion').DataTable({
         language: {
           "decimal": "",

@@ -13,6 +13,8 @@ const { isLoggedIn } = require('../lib/auth');
 const { isArray } = require('util');
 const { isEmptyObject } = require('jquery');
 
+const mensajeria = require('../mensajeria/mail');
+
 router.post('/fileupload', async (req,res) => {
    
     var form = new formidable.IncomingForm();
@@ -558,6 +560,7 @@ router.post('/addCostoExterno', isLoggedIn, async (req, res) => {
     const result = await pool.query('INSERT INTO pro_costo_externo set ? ', [newCostoExterno]);
 
     const proveedores =  await pool.query("SELECT * FROM prov_externo ORDER BY nombre ASC");
+    const proveedor =  await pool.query("SELECT * FROM prov_externo as t1 WHERE t1.id = ?",[idProveedor]);
     const centros =  await pool.query("SELECT * FROM centro_costo ORDER BY centroCosto ASC");
     const monedas =  await pool.query("SELECT * FROM moneda_tipo as t1 WHERE  t1.id_moneda in (1,2,4)");
     const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");
@@ -578,6 +581,23 @@ router.post('/addCostoExterno', isLoggedIn, async (req, res) => {
         body   : "Se ha ingresado correctamente",
         tipo   : "Crear"
     };
+
+    const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.id =  ? ",[idProyecto]);
+
+    const mailContabilidad = {
+       to : "contabilidad@renelagos.com",
+       // to : "dbenites@renelagos.com",
+        proveedor : proveedor[0].nombre,
+        orden : numoc,
+        descripcion : descripcion,
+        proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
+        solicitante : req.user.Nombre
+      }
+
+
+    // Enviar notificaciones a finanzas.
+    mensajeria.EnvioMailSolicitudCostoExterno(mailContabilidad);
+
 
     res.render('proyecto/costoexterno', {verToask, proveedores,centros,monedas, proyectos , costosExternos, req ,layout: 'template'});
 

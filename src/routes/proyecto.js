@@ -630,6 +630,17 @@ router.post('/cargarFactura', async (req, res) => {
                 console.log(sql);
     mensajeria.MensajerErrores(sql)
     */
+    const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.id =  ? ",[id_proyecto]);
+
+    const facturacion = {
+      to : 'contabilidad@renelagos.com',
+      comentario : comentario,
+      proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
+      solicitante : req.user.Nombre
+    };
+
+   mensajeria.EnvioMailIngresoFactura(facturacion);
+
 const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]);
 
   

@@ -155,16 +155,9 @@ router.post('/IngresoPermiso', isLoggedIn, async (req, res) => {
 router.get('/vacaciones', isLoggedIn, async (req, res) => {
     // buscar los datos del usuario en las variables req
     const vacacione = await pool.query('SELECT * FROM sol_selec_dias');
-    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1");
+    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1 ORDER BY t1.Nombre ASC");
     const solicitud = await pool.query('SELECT * FROM sol_solicitud');
 
-    //mensajeria.EnviarMail().catch(console.error);
-   // const mail = {
-   //   to : "dbenites@renelagos.com"
-   // };
-   // mensajeria.EnvioMailNuevoProyecto(mail);
-
-    // console.log(mensajeria);
 
     res.render('solicitudes/vacaciones', { req ,vacacione,usuarios,solicitud,layout: 'template'});
 }); 
@@ -197,7 +190,7 @@ router.post('/getDiasEs', async (req,res) => {
   // ir a preguntar a la base de datoscuantos dias tiene solicitado el usuario.
 
    const informacionDias = await pool.query("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id " +
-                                            "  FROM sol_selec_dias AS t WHERE t.idUsuario = "+req.user.idUsuario+" AND t.idEstado = 1 "); 
+                                            "  FROM sol_selec_dias AS t WHERE t.idUsuario = "+req.user.idUsuario+" AND t.idEstado = 1 ORDER BY fecha ASC"); 
   
 
 
@@ -1287,7 +1280,36 @@ router.post('/addHorasExtras', async (req,res) => {
   numhh:num_hh,
   comentario: comentario
 }
+
 const he = await pool.query('INSERT INTO sol_horaextra  set ? ', [horaExtra]);
+
+const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.id =  ? ",[idProyecto]);
+
+// NOTIFICACIONES 
+// cambniar la noteficacio
+const mailFinanzas = {
+  to : "contabilidad@renelagos.com",
+  comentario : comentario,
+  proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
+  solicitante : req.user.Nombre
+}
+
+ mensajeria.EnvioMailHorasIngresoFinanzas(mailFinanzas);
+
+ if (infoProyecto[0].id_jefe > 0)
+ {
+    const infoJefe = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [infoProyecto[0].id_jefe]);
+
+    const mailJefeProyecto = {
+      to : infoJefe[0].Email,
+      comentario : comentario,
+      proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
+      solicitante : req.user.Nombre
+    }
+
+    mensajeria.EnvioMailHorasIngresoFinanzas(mailJefeProyecto);
+
+ }
    
     res.redirect(   url.format({
       pathname:"../solicitudes/horaextras",
@@ -1362,6 +1384,19 @@ router.post('/uhorasextras', async (req,res) => {
 
   const {id,estado,comentario} = req.body;
 
+  // sol_horaextra
+  const infoSolicitud = await pool.query('SELECT * FROM sol_horaextra as t1 where t1.id = ? ', [id]);
+
+  const infoIngreso = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [infoSolicitud[0].idIngreso]);
+
+  const infoAsignada = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [infoSolicitud[0].idSolicitante]);
+
+
+  const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.id =  ? ",[infoSolicitud[0].idProyecto])
+
+
+
+
   switch(estado)
   {
     case 1:
@@ -1377,7 +1412,15 @@ router.post('/uhorasextras', async (req,res) => {
 
      const result = pool.query("UPDATE sol_horaextra set idEstado = 3 WHERE  id = "+id+" ");
 
+      const mailAprobado = {
+        to : infoIngreso[0].Email,
+        comentario : comentario,
+        estado : "Aprobado",
+        proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
+        solicitante : infoAsignada[0].Nombre
+      };
 
+      mensajeria.EnvioMailHorasRespuesta(mailAprobado);
       break;
     case 2:
     case "2":
@@ -1391,6 +1434,17 @@ router.post('/uhorasextras', async (req,res) => {
       const result01 = await pool.query('INSERT INTO sol_horaextra_tracking set ? ', [tracking2]);
 
       const result1 = pool.query("UPDATE sol_horaextra set idEstado = 6 WHERE  id = "+id+" ");
+
+      const mailRechazado = {
+        to : infoIngreso[0].Email,
+        comentario : comentario,
+        estado : "Rechazado",
+        proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
+        solicitante : infoAsignada[0].Nombre
+      };
+
+      mensajeria.EnvioMailHorasRespuesta(mailRechazado);
+
       break;
   }
   

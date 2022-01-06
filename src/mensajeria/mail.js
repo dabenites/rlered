@@ -209,6 +209,225 @@ module.exports.EnvioMailCreacionProyectoTI =  async function (objeto) {
   
   }
 
+module.exports.EnvioMailHorasIngresoFinanzas =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+         const generico = "Estimado/a:\n" +
+                          " \t Solicitud de horas extras en el proyecto "+ objeto.proyecto +", ingresado por "+ objeto.solicitante+" \n" +
+                          " Comentario : "+objeto.comentario +" \n"+
+                          " Saludos, \n"+
+                          " RLE - Planner";
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : objeto.to,
+             subject : "RLE - Planner - Horas Extras.",
+             text : generico
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
+
+module.exports.EnvioMailHorasRespuesta =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+         const generico = "Estimado/a:\n" +
+                          " \t Solicitud de horas extras en el proyecto "+ objeto.proyecto +", asignadas ha : "+ objeto.solicitante+" ha sido procesada. \n" +
+                          " Estado : "+objeto.estado +" \n"+
+                          " Comentario : "+objeto.comentario +" \n"+
+                          " Saludos, \n"+
+                          " RLE - Planner";
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : objeto.to,
+             subject : "RLE - Planner - Horas Extras.",
+             text : generico
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
+
+module.exports.EnvioMailIngresoFactura =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+         const generico = "Estimado/a:\n" +
+                          " \t Solicitud de facturación "+ objeto.proyecto +", ingresado por "+ objeto.solicitante+" \n" +
+                          " Comentario : "+objeto.comentario +" \n"+
+                          " Saludos, \n"+
+                          " RLE - Planner";
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : objeto.to,
+             subject : "RLE - Planner - Ingreso Facturación.",
+             text : generico
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
+
+module.exports.EnvioMailIngresoPloter =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+         const generico = "Estimado/a:\n" +
+                          " \t Solicitud de ploteo en el proyecto :  "+ objeto.proyecto +", ingresado por "+ objeto.solicitante+" \n" +
+                          " Destinatario  : "+objeto.destinario +" \n"+
+                          " Trabajo  : "+objeto.trabajo +" \n"+
+                          " Impresión : "+objeto.impresion +" \n"+
+                          " Ruta : "+objeto.ruta +" \n"+
+                          " Fecha Entrega : "+objeto.fecha_entrega +" \n"+
+                          " Fecha Solicitud : "+objeto.fecha_solicitud +" \n"+
+                          " Comentario : "+objeto.comentario +" \n"+
+                          " Serie : "+objeto.serie +" \n"+
+                          " Serie Especial : "+objeto.serieespecial +" \n"+
+                          " Escala : "+objeto.escala +" \n"+
+                          " Nº Impresion : "+objeto.nimpresion +" \n"+
+                          " Nº Copias : "+objeto.ncopias +" \n"+
+                          " Formato Papel : "+objeto.formatoPapel +" \n"+
+                          " Formato Entrega : "+objeto.formatoEntrega +" \n\n"+
+
+                          " Saludos, \n"+
+                          " RLE - Planner";
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : objeto.to,
+             subject : "RLE - Planner - Solicitud Ploteo.",
+             text : generico
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
+
+module.exports.EnvioMailSolicitudCostoExterno =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+         const generico = "Estimado/a:\n" +
+                          " \t Solicitud de aprobacion costo externo en el proyecto :  "+ objeto.proyecto +", ingresado por "+ objeto.solicitante+" \n" +
+                          " Proveedor  : "+objeto.proveedor +" \n"+
+                          " Nº Orden Compra : "+objeto.orden +" \n"+
+                          " Descripcion : "+objeto.descripcion +" \n"+
+                          " Saludos, \n"+
+                          " RLE - Planner";
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : objeto.to,
+             subject : "RLE - Planner - Solicitud Aprobación Costo Externo.",
+             text : generico
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
+
+
+
 module.exports.MensajerErrores =  async function (objeto) {
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
@@ -246,5 +465,5 @@ module.exports.MensajerErrores =  async function (objeto) {
   }
 
 
-  
+
 //main().catch(console.error);

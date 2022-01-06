@@ -10,6 +10,8 @@ const { isLoggedIn } = require('../lib/auth');
 
 var url = require('url');
 
+const mensajeria = require('../mensajeria/mail');
+
 
 router.get('/ploteo', isLoggedIn, async (req, res) => {
  
@@ -44,7 +46,7 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
             esDocumento = true;
         break;   
     }
-    console.log(esDocumento);
+   // console.log(esDocumento);
 
     var mensaje = -1;
   
@@ -177,6 +179,36 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
 
 
     const result = await pool.query('INSERT INTO sol_ploteo set ?', [solicitud]);
+
+
+    const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.id =  ? ",[idProyecto]);
+    const infoDestinatario = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idDestinatario]);
+
+    const mailPloter = {
+        to : "documentos@renelagos.com",
+        id_proyecto : idProyecto,
+        id_ingreso : req.user.idUsuario,
+        id_destinatario : idDestinatario,
+        destinario : infoDestinatario[0].Nombre,
+        id_estado : 1,
+        trabajo : trabajosBD,
+        impresion : impresionBD,
+        ruta : ruta, // es cuando se tiene que entregar el trabajo,
+        fecha_entrega : fecheHora,
+        fecha_solicitud : fechaActual,
+        comentario : comentarios ,
+        serie : seriesBD,
+        serieespecial : otroarch,
+        escala : escalas,
+        nimpresion : ncopias,
+        ncopias : ncopiasCD,
+        formatoPapel : formapapel,
+        formatoEntrega : formatoEntrega,
+        proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
+        solicitante : req.user.Nombre
+      }
+
+      mensajeria.EnvioMailIngresoPloter(mailPloter);
 
     //res.redirect('/ploter/ploteo/');
     res.redirect(   url.format({

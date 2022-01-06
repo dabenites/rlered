@@ -276,6 +276,7 @@ router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
                                             "    t2a.Nombre AS solicitante," +
                                             "    t2.fecha_solicitud, " +
                                             "    t2.monto_a_facturar, " +
+                                            "    t2.num_factura, " +
                                             "    t2.porc_ppto, " +
                                             "    t3.descripcion AS estado, " +
                                             "    t2.id AS id_factura, " +

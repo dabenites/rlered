@@ -584,6 +584,7 @@ router.get('/buscarArquitecto/:find', async (req, res) => {
   res.json(arquitectos);
 
 });
+
 router.get('/buscarRevisor/:find', async (req, res) => {
   
   // BUSCAR DIRECTOR  
@@ -856,6 +857,7 @@ router.post('/ActualizarProyecto', async (req, res) => {
   }));
 
 });
+
 router.post('/buscarPais', isLoggedIn, async (req, res) => {
 
   //console.log(req.body.pais);
@@ -954,6 +956,7 @@ router.get('/equipo/delete/:id', async (req, res) => {
 
 
 });
+
 router.get('/equipo/add/:idUsuario/:id', async (req, res) => {
   const { id,idUsuario } = req.params;
 
@@ -1057,6 +1060,158 @@ router.post('/buscarCodigo', isLoggedIn, async (req, res) => {
     
   
 });
+
+// Buscador de preyectos. 
+router.get('/buscadorPr', isLoggedIn, async (req, res) => {
+
+
+  // buiscar la informacion de todos los jefes de proyectos y directores.
+
+  const jefes = await pool.query("SELECT " +
+                                  " t2.idUsuario, " +
+                                  " t2.Nombre  " +
+                                  " FROM  " +
+                                      " pro_proyectos AS t1, " +
+                                      " sys_usuario AS t2 " +
+                                  " WHERE  " +
+                                      " t1.id_jefe = t2.idUsuario "  +
+                                      " GROUP BY t1.id_jefe " +
+                                      " ORDER BY t2.Nombre ASC"); 
+
+  const directores = await pool.query("SELECT " +
+                                      " t2.idUsuario, " +
+                                      " t2.Nombre  " +
+                                      " FROM  " +
+                                          " pro_proyectos AS t1, " +
+                                          " sys_usuario AS t2 " +
+                                      " WHERE  " +
+                                          " t1.id_director = t2.idUsuario "  +
+                                          " GROUP BY t1.id_director " +
+                                          " ORDER BY t2.Nombre ASC"); 
+
+  const tipos_proyecto = await pool.query("SELECT * FROM proyecto_tipo");
+
+  const zonas = await pool.query("SELECT * FROM pro_proyectos GROUP BY zona");
+  const suelos = await pool.query("SELECT * FROM pro_proyectos GROUP BY suelo");
+  const categorias = await pool.query("SELECT * FROM pro_proyectos GROUP BY categoria");
+
+res.render('proyecto/buscadorProyecto', { jefes , directores ,tipos_proyecto ,zonas,suelos, categorias,req,  layout: 'template' });
+
+});
+
+router.post('/filtroProyecto', isLoggedIn, async (req, res) => {
+
+  //_________________Filtrar los proyectos. 
+  //console.clear();
+  //console.log(req.body);
+  //
+  //_______________________________________
+
+  const {nombre,codigo,director,jefe,tipo_proyecto,id_cliente,id_arquitecto,numpisos,numsubte,zona,suelo,categoria} = req.body;
+
+
+  let consulta  =  "SELECT t1.*, t2.nombre AS nomJefe ,t3.Nombre AS nomDir , t4.name AS nomCli FROM pro_proyectos as t1 " +
+                  " LEFT JOIN sys_usuario AS t2 ON t1.id_jefe = t2.idUsuario LEFT JOIN sys_usuario AS t3 ON t1.id_director = t3.idUsuario"+
+                  " LEFT JOIN contacto AS t4 ON t1.id_cliente = t4.id  WHERE 1 = 1";
+
+  if ( nombre != '')
+  {
+    consulta += " AND t1.nombre like '%"+nombre+"%'";
+  }
+  if (codigo != '')
+  {
+    consulta += " AND CONCAT(t1.year,'-',t1.code) LIKE '%"+codigo+"%'"
+  }
+
+  if (director != '0')
+  {
+    consulta += " AND t1.id_director = "+director+"";
+  }
+
+  if (jefe != '0')
+  {
+    consulta += " AND t1.id_jefe = "+jefe+"";
+  }
+
+  if (tipo_proyecto != '0')
+  {
+    consulta += " AND t1.id_tipo_proyecto = "+tipo_proyecto+"";
+  }
+
+  if (id_cliente != '0')
+  {
+    consulta += " AND t1.id_cliente = "+id_cliente+"";
+  }
+
+  if (id_arquitecto != '0')
+  {
+    consulta += " AND t1.id_arquitecto = "+id_arquitecto+"";
+  }
+
+  if (numpisos != '')
+  {
+    consulta += " AND t1.num_pisos = "+numpisos+"";
+  }
+
+  if (numsubte != '')
+  {
+    consulta += " AND t1.num_subterraneo = "+numsubte+"";
+  }
+
+  if (zona != '0')
+  {
+    consulta += " AND t1.zona = '"+zona+"'";
+  }
+
+  if (suelo != '0')
+  {
+    consulta += " AND t1.suelo = '"+suelo+"'";
+  }
+
+  if (categoria != '0')
+  {
+    consulta += " AND t1.categoria = '"+categoria+"'";
+  }
+
+
+  const jefes = await pool.query("SELECT " +
+                                  " t2.idUsuario, " +
+                                  " t2.Nombre  " +
+                                  " FROM  " +
+                                      " pro_proyectos AS t1, " +
+                                      " sys_usuario AS t2 " +
+                                  " WHERE  " +
+                                      " t1.id_jefe = t2.idUsuario "  +
+                                      " GROUP BY t1.id_jefe " +
+                                      " ORDER BY t2.Nombre ASC"); 
+
+  const directores = await pool.query("SELECT " +
+                                      " t2.idUsuario, " +
+                                      " t2.Nombre  " +
+                                      " FROM  " +
+                                          " pro_proyectos AS t1, " +
+                                          " sys_usuario AS t2 " +
+                                      " WHERE  " +
+                                          " t1.id_director = t2.idUsuario "  +
+                                          " GROUP BY t1.id_director " +
+                                          " ORDER BY t2.Nombre ASC"); 
+
+  const tipos_proyecto = await pool.query("SELECT * FROM proyecto_tipo");
+
+//console.clear();
+//console.log(consulta);
+  const proyectos =  await pool.query(consulta);
+
+  const zonas = await pool.query("SELECT * FROM pro_proyectos GROUP BY zona");
+  const suelos = await pool.query("SELECT * FROM pro_proyectos GROUP BY suelo");
+  const categorias = await pool.query("SELECT * FROM pro_proyectos GROUP BY categoria");
+
+  
+  res.render('proyecto/buscadorProyecto', { jefes , directores ,proyectos ,tipos_proyecto,zonas,suelos, categorias, req,  layout: 'template' });
+
+});
+
+
 
 
 

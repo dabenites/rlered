@@ -506,8 +506,10 @@ router.get('/editar/:id', async (req, res) => {
               return false
           } 
       };
-
-
+  
+  // Revisión
+  
+ 
   res.render('proyecto/uptProyecto', {monedas,zonas, suelo,categoria, proyecto:proyectos[0], tipo, complejidad, servicio, estado, req, layout: 'template' , helpers : { if_equal : isEqualHelperHandlerbar}});
 
 
@@ -526,6 +528,58 @@ router.get('/buscarDirector/:find', async (req, res) => {
   res.json(directores);
 
 });
+
+router.get('/buscarIngRev/:find', async (req, res) => {
+  
+  // BUSCAR DIRECTOR  
+  const nombre = req.query.term;
+  const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1,sys_categoria AS t2"+
+                                       " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
+                                       " AND t1.id_estado = 1" + 
+                                       " AND t1.idCategoria = t2.id" +
+                                       " AND t2.idCentroCosto IN (2,7,5)");
+  
+  res.setHeader('Content-Type', 'application/json');
+  res.json(directores);
+
+});
+
+router.get('/buscarCoord/:find', async (req, res) => {
+  
+  // BUSCAR DIRECTOR  
+  const nombre = req.query.term;
+  const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
+                                       " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
+                                       " AND t1.id_estado = 1" + 
+                                       " AND  t1.idUsuario IN (52)");
+  
+  res.setHeader('Content-Type', 'application/json');
+  res.json(directores);
+
+});
+
+router.get('/buscarProA/:find', async (req, res) => {
+  
+  // BUSCAR DIRECTOR  
+  const nombre = req.query.term;
+
+
+  console.log("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
+  " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
+  " AND t1.id_estado = 1" + 
+  " AND t1.idUsuario IN (39, 34) )");
+  const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
+                                       " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
+                                       " AND t1.id_estado = 1" + 
+                                       " AND t1.idUsuario IN (39, 34) ");
+  
+  res.setHeader('Content-Type', 'application/json');
+  res.json(directores);
+
+});
+
+
+
 
 router.get('/buscarJefe/:find', async (req, res) => {
   
@@ -1095,7 +1149,15 @@ router.get('/buscadorPr', isLoggedIn, async (req, res) => {
   const suelos = await pool.query("SELECT * FROM pro_proyectos GROUP BY suelo");
   const categorias = await pool.query("SELECT * FROM pro_proyectos GROUP BY categoria");
 
-res.render('proyecto/buscadorProyecto', { jefes , directores ,tipos_proyecto ,zonas,suelos, categorias,req,  layout: 'template' });
+  const isEqualHelperHandlerbar = function(a, b, opts) {
+    if (a == b) {
+        return true
+    } else { 
+        return false
+    } 
+};
+
+res.render('proyecto/buscadorProyecto', { jefes , directores ,tipos_proyecto ,zonas,suelos, categorias,req,  layout: 'template', helpers : { if_equal : isEqualHelperHandlerbar} });
 
 });
 
@@ -1110,7 +1172,10 @@ router.post('/filtroProyecto', isLoggedIn, async (req, res) => {
   const {nombre,codigo,director,jefe,tipo_proyecto,id_cliente,id_arquitecto,numpisos,numsubte,zona,suelo,categoria} = req.body;
 
 
-  let consulta  =  "SELECT t1.*, t2.nombre AS nomJefe ,t3.Nombre AS nomDir , t4.name AS nomCli FROM pro_proyectos as t1 " +
+  let consulta  =  "SELECT t1.*, t2.nombre AS nomJefe ,t3.Nombre AS nomDir , t4.name AS nomCli"+
+                   "  , t5.descripcion AS servicio, t6.descripcion AS tipo FROM pro_proyectos as t1 " +
+                  "  LEFT JOIN proyecto_servicio AS t5 ON t1.id_tipo_servicio = t5.id " +
+                   " LEFT JOIN proyecto_tipo AS t6 ON t1.id_tipo_proyecto = t6.id  " +
                   " LEFT JOIN sys_usuario AS t2 ON t1.id_jefe = t2.idUsuario LEFT JOIN sys_usuario AS t3 ON t1.id_director = t3.idUsuario"+
                   " LEFT JOIN contacto AS t4 ON t1.id_cliente = t4.id  WHERE 1 = 1";
 
@@ -1199,15 +1264,36 @@ router.post('/filtroProyecto', isLoggedIn, async (req, res) => {
   const tipos_proyecto = await pool.query("SELECT * FROM proyecto_tipo");
 
 //console.clear();
-//console.log(consulta);
+
   const proyectos =  await pool.query(consulta);
 
   const zonas = await pool.query("SELECT * FROM pro_proyectos GROUP BY zona");
   const suelos = await pool.query("SELECT * FROM pro_proyectos GROUP BY suelo");
   const categorias = await pool.query("SELECT * FROM pro_proyectos GROUP BY categoria");
 
+
+  const isEqualHelperHandlerbar = function(a, b, opts) {
+    if (a == b) {
+        return true
+    } else { 
+        return false
+    } 
+};
+
+  if (proyectos.length === 0)
+  {
+    const verToask = {
+      titulo : "Mensaje",
+      body   : "No se encontraron proyectos con los filtros ingresados.",
+      tipo   : "Editar"
+          };
+    res.render('proyecto/buscadorProyecto', { parametros :req.body, jefes , verToask, directores ,proyectos ,tipos_proyecto,zonas,suelos, categorias, req,  layout: 'template', helpers : { if_equal : isEqualHelperHandlerbar} });
+  }
+  else
+  {
+    res.render('proyecto/buscadorProyecto', { parametros :req.body, jefes , directores ,proyectos ,tipos_proyecto,zonas,suelos, categorias, req,  layout: 'template', helpers : { if_equal : isEqualHelperHandlerbar} });
+  }
   
-  res.render('proyecto/buscadorProyecto', { jefes , directores ,proyectos ,tipos_proyecto,zonas,suelos, categorias, req,  layout: 'template' });
 
 });
 

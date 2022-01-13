@@ -1,6 +1,7 @@
 
 <!--LISTAR-->
   <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
   <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
   <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
   <script	src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyCXQ6ltnbOZRP3U7JH3evn5O5OnfR--O4I"></script>
@@ -315,12 +316,6 @@
                                     <input type="date" id="fecha_inicio" name="fecha_inicio"  class="form-control" onchange="fechaInicio();">
                                 </div>
                         </div>
-                        <div class="form-group row">
-                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Entrega:</label>
-                                <div class="col-md-6 col-sm-6">
-                                    <input type="date" id="fecha_entrega" name="fecha_entrega"  class="form-control">
-                                </div>
-                        </div>
                 </div>
             </div>
         </div>
@@ -341,14 +336,14 @@
           &nbsp;
       </div>
                           <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Director Proyecto:</label>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eDirector">Director Proyecto:</label>
 							<div class="col-md-9 col-sm-9">
 							    <input id="director" name="director"  class="form-control">
                                 <input type="hidden" id="id_director" name="id_director" value="0">
 							</div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Jefe Proyecto:</label>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eJefe">Jefe Proyecto:</label>
 							<div class="col-md-9 col-sm-9">
 							    <input id="jefe" name="jefe"  class="form-control">
                                 <input type="hidden" id="id_jefe" name="id_jefe" value="0">
@@ -364,14 +359,14 @@
                     </div>
                     -->
                     <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Cliente / Contacto:</label>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eclienteContacto">Cliente / Contacto:</label>
 							<div class="col-md-9 col-sm-9">
 							    <input id="cliente" name="cliente"  class="form-control">
                                 <input type="hidden" id="id_cliente" name="id_cliente" required="required" class="form-control" value="0">
 							</div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Arquitecto:</label>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eArquitecto">Arquitecto:</label>
 							<div class="col-md-9 col-sm-9">
 							    <input id="arquitecto" name="arquitecto" class="form-control">
                                 <input type="hidden" id="id_arquitecto" name="id_arquitecto"  class="form-control" value="0">
@@ -395,7 +390,7 @@
       <div class="form-group row">
           &nbsp;
       </div>
-        <div class="form-group row">
+        <div class="form-group row" id="erevisor">
                         <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Revisor:</label>
 							<div class="col-md-7 col-sm-7">
 							    <input id="revisor" name="revisor"  class="form-control">
@@ -403,14 +398,20 @@
 							</div>
         </div>
 
-        <div class="form-group row">
-                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Termino:</label>
+        <div class="form-group row" id="eFechaEstimadaApc">
+                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Estimada APC:</label>
                                 <div class="col-md-2 col-sm-2">
                                     <input type="date" id="fecha_termino" name="fecha_termino"  class="form-control" onchange="fechaTermino();">
                                 </div>
         </div>
-
         <div class="form-group row">
+                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="efechaEntregaApl">Fecha Entrega APL:</label>
+                                <div class="col-md-2 col-sm-2">
+                                    <input type="date" id="fecha_entrega" name="fecha_entrega"  class="form-control">
+                                </div>
+                        </div>
+
+        <div class="form-group row" id="esuperficie">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie APL</label>
 				<div class="col-md-7 col-sm-7">
 				    <input type="number" id="superficie_apl" name="superficie_apl"  class="form-control">
@@ -443,7 +444,7 @@
 					</select>
 				</div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row" id="eplanos">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Nº Planos Estimado</label>
 				<div class="col-md-7 col-sm-7">
 				    <input type="number" id="num_planos_estimado" name="num_planos_estimado"  class="form-control">
@@ -480,6 +481,8 @@
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 <script>
     function ModificaTipoCobro ()
     {
@@ -617,6 +620,12 @@ function validarFormulario()
         // realizar el envio 
         $( "#cargaProyecto" ).submit();
     }
+    else
+    {
+        toastr.warning('Ingrese los datos requeridos en Datos Generales.', 'Mensaje', {
+            "progressBar": true
+        });
+    }
 }
 
 function fechaInicio ()
@@ -725,6 +734,8 @@ function buscaCodigo()
     var pais       =  $( "#id_pais" ).val();
     var servicio   =  $( "#id_servicio" ).val();
 
+    cargaServicio(servicio);
+
     if ((year != "" && year > 0)
     && (pais != "" && pais > 0)
     && (servicio != "" && servicio > 0))
@@ -741,6 +752,98 @@ function buscaCodigo()
                                      });
     }
 
+
+}
+
+function cargaServicio(id_servicio)
+{
+    if (id_servicio != 0)
+    {
+        if (id_servicio == 2) // coordinación cambiar los labels 
+        {
+            $("#settings-tab").html("Entrega");
+            $("#eplanos").hide();
+            $("#erevisor").hide();
+            $("#esuperficie").hide();
+            $("#eFechaEstimadaApc").hide();
+
+            $("#eDirector").html("Profesional Responsable:");
+            $("#eJefe").html("Coordinador:");
+            $("#eclienteContacto").html("Ingeniero Revisor:");
+            $("#eArquitecto").html("Calculista:");
+
+            $("#eArquitecto").html("Calculista:");
+            $("#efechaEntregaApl").html("Fecha Entrega:");
+
+            // Ingeniero Revisor sera por centros de costos
+            nuevoalias( "#cliente" ).autocomplete({
+                source: "buscarIngRev/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_cliente').val(ui.item.id);
+                }
+                });
+
+            // Coordinador solo simon
+            nuevoalias( "#jefe" ).autocomplete({
+                source: "buscarCoord/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_jefe').val(ui.item.id);
+                }
+                });
+
+            // Prof a cargo Mariane y Luis
+            nuevoalias( "#director" ).autocomplete({
+                source: "buscarProA/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_director').val(ui.item.id);
+                }
+                });
+        }
+        else
+        {
+            $("#settings-tab").html("Información APL");
+            $("#eplanos").show();
+            $("#erevisor").show();
+            $("#esuperficie").show();
+            $("#eFechaEstimadaApc").show();
+
+            $("#eDirector").html("Director Proyecto:");
+            $("#eJefe").html("Jefe Proyecto:");
+            $("#eclienteContacto").html("Cliente / Contacto:");
+            $("#eArquitecto").html("Arquitecto:");
+            $("#efechaEntregaApl").html("Fecha Entrega APL:");
+
+            nuevoalias( "#director" ).autocomplete({
+                source: "buscarDirector/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_director').val(ui.item.id);
+                }
+                });
+
+            nuevoalias( "#jefe" ).autocomplete({
+                source: "buscarJefe/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_jefe').val(ui.item.id);
+                }
+                });
+
+            nuevoalias( "#cliente" ).autocomplete({
+                source: "buscarCliente/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_cliente').val(ui.item.id);
+                }
+                });
+
+
+        }
+        
+    }
 }
 
 

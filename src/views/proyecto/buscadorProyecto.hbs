@@ -2,6 +2,7 @@
   <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
   <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
   <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
  <script>
         var nuevoalias = jQuery.noConflict();
@@ -39,11 +40,11 @@
                  <div class="col-md-3 col-sm-3">
                         <div class="item form-group">
                             <label class="col-form-label col-md-4 col-sm-4 label-align" for="code">Nombre :</label>
-                            <div class="col-md-7 col-sm-7 "><input type="text" id="nombre" name="nombre" class="form-control"></div>
+                            <div class="col-md-7 col-sm-7 "><input type="text" id="nombre" name="nombre" class="form-control" value="{{parametros.nombre}}"></div>
                         </div>
                         <div class="item form-group">
                             <label class="col-form-label col-md-4 col-sm-4 label-align" for="code">Código :</label>
-                            <div class="col-md-7 col-sm-7 "><input type="text" id="codigo" name="codigo" class="form-control"></div>
+                            <div class="col-md-7 col-sm-7 "><input type="text" id="codigo" name="codigo" class="form-control" value="{{parametros.codigo}}"></div>
                         </div>
                         <div class="item form-group">
                             <label class="col-form-label col-md-4 col-sm-4 label-align" for="code">Director :</label>
@@ -51,7 +52,12 @@
                                 <select class="select2_single form-control"  name="director" id="director">
                                     <option value="0">Seleccione</option>
                                         {{#each directores}}
-                                            <option value="{{idUsuario}}">{{Nombre}}</option>
+                                            {{#if (if_equal idUsuario ../parametros.director) }}
+                                                <option value="{{idUsuario}}" selected>{{Nombre}}</option>
+                                            {{else}}
+                                                <option value="{{idUsuario}}">{{Nombre}}</option>
+                                            {{/if}}
+                                            
                                         {{/each}}
                                 </select>
                             </div>
@@ -62,7 +68,11 @@
                                 <select class="select2_single form-control"  name="jefe" id="jefe">
                                     <option value="0">Seleccione</option>
                                         {{#each jefes}}
-                                            <option value="{{idUsuario}}">{{Nombre}}</option>
+                                            {{#if (if_equal idUsuario ../parametros.jefe) }}
+                                                <option value="{{idUsuario}}" selected>{{Nombre}}</option>
+                                            {{else}}
+                                                <option value="{{idUsuario}}">{{Nombre}}</option>
+                                            {{/if}}
                                         {{/each}}
                                 </select>
                             </div>
@@ -75,7 +85,12 @@
                                 <select class="select2_single form-control"  name="tipo_proyecto" id="tipo_proyecto">
                                     <option value="0">Seleccione</option>
                                         {{#each tipos_proyecto}}
-                                            <option value="{{id}}">{{descripcion}}</option>
+                                            {{#if (if_equal id ../parametros.tipo_proyecto) }}
+                                                <option value="{{id}}" selected>{{descripcion}}</option>
+                                             {{else}}
+                                                <option value="{{id}}">{{descripcion}}</option>
+                                             {{/if}}
+                                            
                                         {{/each}}
                                 </select>
                             </div>
@@ -83,13 +98,13 @@
                     <div class="item form-group">
                             <label class="col-form-label col-md-4 col-sm-4 label-align" for="code">Nº Pisos:</label>
                             <div class="col-md-7 col-sm-7 ">
-                                <input type="text" id="numpisos" name="numpisos" class="form-control">
+                                <input type="text" id="numpisos" name="numpisos" class="form-control" value="{{parametros.numpisos}}">
                             </div>
                     </div>
                      <div class="item form-group">
                             <label class="col-form-label col-md-4 col-sm-4 label-align" for="code">Nº Subterraneo:</label>
                             <div class="col-md-7 col-sm-7 ">
-                                <input type="text" id="numsubte" name="numsubte" class="form-control">
+                                <input type="text" id="numsubte" name="numsubte" class="form-control" value="{{parametros.numsubte}}">
                             </div>
                     </div>
                  </div>
@@ -97,15 +112,15 @@
                     <div class="item form-group">
                             <label class="col-form-label col-md-4 col-sm-4 label-align" for="code">Cliente / Contacto:</label>
                             <div class="col-md-8 col-sm-8 ">
-                                <input id="cliente" name="cliente"  class="form-control">
-                                <input type="hidden" id="id_cliente" name="id_cliente" required="required" class="form-control" value="0">
+                                <input id="cliente" name="cliente"  class="form-control" value="{{parametros.cliente}}">
+                                <input type="hidden" id="id_cliente" name="id_cliente" required="required" class="form-control" value="0" value="{{parametros.id_cliente}}">
                             </div>
                     </div>
                     <div class="item form-group">
                             <label class="col-form-label col-md-4 col-sm-4 label-align" for="code">Arquitecto:</label>
                             <div class="col-md-8 col-sm-8 ">
-                                 <input id="arquitecto" name="arquitecto" class="form-control">
-                                <input type="hidden" id="id_arquitecto" name="id_arquitecto"  class="form-control" value="0">
+                                 <input id="arquitecto" name="arquitecto" class="form-control" value="{{parametros.arquitecto}}">
+                                <input type="hidden" id="id_arquitecto" name="id_arquitecto"  class="form-control" value="0" value="{{parametros.id_arquitecto}}">
                             </div>
                     </div>
                  </div>
@@ -116,7 +131,12 @@
                                 <select class="select2_single form-control"  name="zona" id="zona">
                                     <option value="0">Seleccione</option>
                                         {{#each zonas}}
-                                            <option value="{{zona}}">{{zona}}</option>
+                                            {{#if (if_equal zona ../parametros.zona) }}
+                                                <option value="{{zona}}" selected>{{zona}}</option>
+                                            {{else}}
+                                                <option value="{{zona}}">{{zona}}</option>
+                                            {{/if}}
+                                            
                                         {{/each}}
                                 </select>
                             </div>
@@ -127,7 +147,12 @@
                                <select class="select2_single form-control"  name="suelo" id="suelo">
                                     <option value="0">Seleccione</option>
                                         {{#each suelos}}
-                                            <option value="{{suelo}}">{{suelo}}</option>
+                                            {{#if (if_equal suelo ../parametros.suelo) }}
+                                                <option value="{{suelo}}" selected>{{suelo}}</option>
+                                            {{else}}
+                                                <option value="{{suelo}}">{{suelo}}</option>
+                                            {{/if}}
+                                            
                                         {{/each}}
                                 </select>
                             </div>
@@ -138,7 +163,12 @@
                                  <select class="select2_single form-control"  name="categoria" id="categoria">
                                     <option value="0">Seleccione</option>
                                         {{#each categorias}}
-                                            <option value="{{categoria}}">{{categoria}}</option>
+                                              {{#if (if_equal categoria ../parametros.categoria) }}
+                                                <option value="{{categoria}}" selected>{{categoria}}</option>
+                                              {{else}}
+                                                <option value="{{categoria}}">{{categoria}}</option>
+                                              {{/if}}
+                                            
                                         {{/each}}
                                 </select>
                             </div>
@@ -169,6 +199,8 @@
                 <thead>
                     <tr>
                         <th>Proyecto</th>
+                        <th>Tipo Servicio</th>
+                        <th>Tipo Proyecto</th>
                         <th>Contacto / Cliente</th>
                         <th>Director</th>
                         <th>Jefe</th>
@@ -178,6 +210,8 @@
                     {{#each proyectos}}
                     <tr>
                         <td>{{year}}-{{code}} : {{nombre}}</td>
+                        <td>{{servicio}}</td>
+                        <td>{{tipo}}</td>
                         <td>{{nomCli}}</td>
                         <td>{{nomDir}}</td>
                         <td>{{nomJefe}}</td>
@@ -234,3 +268,25 @@
             }
         });
 </script>
+
+{{#if verToask }}
+<!--INFORMACIÓN-->
+<script>
+    if ("{{verToask.tipo}}" == "Editar") {
+        toastr.warning('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Crear") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Eliminar") {
+        toastr.error('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+
+</script>
+{{/if}}

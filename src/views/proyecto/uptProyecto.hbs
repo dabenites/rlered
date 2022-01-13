@@ -8,6 +8,90 @@
   <script>
         var nuevoalias = jQuery.noConflict();
 	    nuevoalias(document).ready(function() {
+            let tipo_servicio = nuevoalias("#id_servicio").val();
+            //alert(tipo_servicio);
+            if (tipo_servicio == 2)
+            {
+            $("#settings-tab").html("Entrega");
+            $("#eplanos").hide();
+            $("#erevisor").hide();
+            $("#esuperficie").hide();
+            $("#eFechaEstimadaApc").hide();
+
+            $("#eDirector").html("Profesional Responsable:");
+            $("#eJefe").html("Coordinador:");
+            $("#eclienteContacto").html("Ingeniero Revisor:");
+            $("#eArquitecto").html("Calculista:");
+
+            $("#eArquitecto").html("Calculista:");
+            $("#efechaEntregaApl").html("Fecha Entrega:");
+
+
+            	nuevoalias( function() {
+                           // Prof a cargo Mariane y Luis
+                nuevoalias( "#director" ).autocomplete({
+                source: "../buscarProA/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_director').val(ui.item.id);
+                }
+                });
+                
+                
+                            // Coordinador solo simon
+                nuevoalias( "#jefe" ).autocomplete({
+                source: "../buscarCoord/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_jefe').val(ui.item.id);
+                }
+                });
+
+                nuevoalias( "#mandante" ).autocomplete({
+                source: "../buscarMandante/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_mandante').val(ui.item.id);
+                }
+                });
+                // Ingeniero Revisor sera por centros de costos
+            nuevoalias( "#cliente" ).autocomplete({
+                source: "../buscarIngRev/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_cliente').val(ui.item.id);
+                }
+                });
+                nuevoalias( "#arquitecto" ).autocomplete({
+                source: "../buscarArquitecto/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_arquitecto').val(ui.item.id);
+                }
+                });
+                nuevoalias( "#revisor" ).autocomplete({
+                source: "../buscarRevisor/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_revisor').val(ui.item.id);
+                }
+                });
+            } );
+
+            }
+            else
+            {
+                $("#settings-tab").html("Información APL");
+            $("#eplanos").show();
+            $("#erevisor").show();
+            $("#esuperficie").show();
+            $("#eFechaEstimadaApc").show();
+
+            $("#eDirector").html("Director Proyecto:");
+            $("#eJefe").html("Jefe Proyecto:");
+            $("#eclienteContacto").html("Cliente / Contacto:");
+            $("#eArquitecto").html("Arquitecto:");
+            $("#efechaEntregaApl").html("Fecha Entrega APL:");
 	      nuevoalias( function() {
                 nuevoalias( "#director" ).autocomplete({
                 source: "../buscarDirector/find=da",
@@ -53,6 +137,7 @@
                 });
             } );
 
+            }
             // 
             var searchInput = 'direccion';
             var autocomplete;
@@ -160,7 +245,7 @@
                     <div class="form-group row">
                          <label class="col-form-label col-md-3 col-sm-3 label-align">Tipo Servicio:</label>
 									<div class="col-md-7 col-sm-7">
-										<select class="select2_single form-control" tabindex="-1" name="id_servicio" id="id_servicio">
+										<select class="select2_single form-control" tabindex="-1" name="id_servicio" id="id_servicio" readonly>
                                                {{#each servicio}}
 											        <!-- <option value="{{id}}">{{descripcion}}</option> -->
                                                     {{#if (if_equal id ../proyecto.id_tipo_servicio) }}
@@ -309,12 +394,6 @@
                                     <input type="date" id="fecha_inicio" name="fecha_inicio"  class="form-control" value="{{proyecto.fecha_inicio}}" onchange="fechaInicio();">
                                 </div>
                         </div>
-                        <div class="form-group row">
-                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Entrega:</label>
-                                <div class="col-md-6 col-sm-6">
-                                    <input type="date" id="fecha_entrega" name="fecha_entrega"  class="form-control" value="{{proyecto.fecha_entrega}}">
-                                </div>
-                        </div>
                 </div>
             </div>
         </div>
@@ -335,14 +414,14 @@
           &nbsp;
       </div>
                           <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Director :</label>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eDirector">Director Proyecto:</label>
 							<div class="col-md-9 col-sm-9">
 							    <input id="director" name="director"  class="form-control" value="{{proyecto.nomDir}}">
                                 <input type="hidden" id="id_director" name="id_director" value="{{proyecto.idDir}}">
 							</div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Jefe:</label>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eJefe">Jefe Proyecto:</label>
 							<div class="col-md-9 col-sm-9">
 							    <input id="jefe" name="jefe"  class="form-control" value="{{proyecto.nomJefe}}">
                                 <input type="hidden" id="id_jefe" name="id_jefe" value="{{proyecto.idJefe}}">
@@ -358,14 +437,14 @@
                     </div>
                     -->
                     <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Cliente / Contacto:</label>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eclienteContacto">Cliente / Contacto:</label>
 							<div class="col-md-9 col-sm-9">
 							    <input id="cliente" name="cliente"  class="form-control" value="{{proyecto.nomCli}}">
                                 <input type="hidden" id="id_cliente" name="id_cliente" required="required" class="form-control" value="{{proyecto.idCli}}">
 							</div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Arquitecto:</label>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eArquitecto">Arquitecto:</label>
 							<div class="col-md-9 col-sm-9">
 							    <input id="arquitecto" name="arquitecto" class="form-control" value="{{proyecto.nomArq}}">
                                 <input type="hidden" id="id_arquitecto" name="id_arquitecto"  value="{{proyecto.idArq}}" class="form-control">
@@ -389,20 +468,26 @@
       <div class="form-group row">
           &nbsp;
       </div>
-                          <div class="form-group row">
+                          <div class="form-group row" id="erevisor">
                         <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Revisor:</label>
 							<div class="col-md-9 col-sm-9">
 							    <input id="revisor" name="revisor"  class="form-control" value="{{proyecto.nomRev}}">
                                 <input type="hidden" id="id_revisor" name="id_revisor" value="{{proyecto.idRev}}" class="form-control">
 							</div>
                     </div>
-      <div class="form-group row">
-                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Termino:</label>
+      <div class="form-group row" id="eFechaEstimadaApc">
+                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Fecha Estimada APC</label>
                                 <div class="col-md-4 col-sm-4">
                                     <input type="date" id="fecha_termino" name="fecha_termino"  class="form-control" value="{{proyecto.fecha_termino}}" onchange="fechaTermino();">
                                 </div>
                         </div>
-        <div class="form-group row">
+                        <div class="form-group row">
+                             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="efechaEntregaApl">Fecha Entrega APL:</label>
+                                <div class="col-md-6 col-sm-6">
+                                    <input type="date" id="fecha_entrega" name="fecha_entrega"  class="form-control" value="{{proyecto.fecha_entrega}}">
+                                </div>
+                        </div>
+        <div class="form-group row" id="esuperficie">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie APL</label>
 				<div class="col-md-4 col-sm-4">
 				    <input type="number" id="superficie_apl" name="superficie_apl"  class="form-control" value="{{proyecto.superficie_apl}}">
@@ -456,7 +541,7 @@
 					</select>
 				</div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row" id="eplanos">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Nº Planos Estimado</label>
 				<div class="col-md-4 col-sm-4">
 				    <input type="number" id="num_planos_estimado" name="num_planos_estimado"  class="form-control" value="{{proyecto.num_plano_estimado}}">

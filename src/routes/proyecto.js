@@ -588,7 +588,7 @@ router.get('/buscarJefe/:find', async (req, res) => {
   const jefes =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 " +
                                   " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
                                   " AND t1.id_estado = 1"+
-                                  " AND t1.idCategoria IN (25,26,28,1,24,22)");
+                                  " AND t1.idCategoria IN (25,26,28,1,24,22,43)");
 
   res.setHeader('Content-Type', 'application/json');
   res.json(jefes);
@@ -800,13 +800,24 @@ router.post('/cargarProyecto', async (req, res) => {
      codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
      to : "documentos@renelagos.com"
    };
+
    const mailTI = {
     codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
     to : "computacion@renelagos.com"
   };
 
+  const infoIngresa = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [req.user.idUsuario]);
+
+  const mailIngreso = {
+    codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
+    to : infoIngresa[0].Email
+  };
+
+
+
    mensajeria.EnvioMailCreacionProyectoDocumentos(mail);
    mensajeria.EnvioMailCreacionProyectoTI(mailTI);
+   mensajeria.EnvioMailCreacion(mailIngreso);
 
  res.redirect(   url.format({
     pathname:"../proyecto/listado",
@@ -1163,11 +1174,11 @@ res.render('proyecto/buscadorProyecto', { jefes , directores ,tipos_proyecto ,zo
 
 router.post('/filtroProyecto', isLoggedIn, async (req, res) => {
 
-  //_________________Filtrar los proyectos. 
-  //console.clear();
-  //console.log(req.body);
-  //
-  //_______________________________________
+  //  _________________Filtrar los proyectos. 
+  //  console.clear();
+  //  console.log(req.body);
+  //  
+  //  _______________________________________
 
   const {nombre,codigo,director,jefe,tipo_proyecto,id_cliente,id_arquitecto,numpisos,numsubte,zona,suelo,categoria} = req.body;
 

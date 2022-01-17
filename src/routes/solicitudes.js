@@ -228,7 +228,8 @@ router.post('/getPermisosSolicitados', async (req,res) => {
 
 router.get('/getPermisos', async (req,res) => {
   
-  const permisosIngresados = await pool.query("SELECT * FROM sol_solicitud AS t , sol_permiso AS t2 WHERE " +
+  const permisosIngresados = await pool.query("SELECT *, DATE_FORMAT(t2.fecha_inicio,'%Y-%m-%d %H:%i') AS fecha_inicio "+
+                                              " , DATE_FORMAT(t2.fecha_termino,'%Y-%m-%d %H:%i') AS fecha_termino FROM sol_solicitud AS t , sol_permiso AS t2 WHERE " +
                                 " t.idUsuario = " +req.user.idUsuario + " AND t.idTipoSolicitud = 2 AND " + 
                                 " t.id = t2.idSolicitud"); 
 

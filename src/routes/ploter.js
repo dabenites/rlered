@@ -300,6 +300,41 @@ router.get('/buscarPro/:find', async (req, res) => {
 
     const proyecto = await pool.query('UPDATE sol_ploteo set id_estado = 3 , fecha_e_terminado = ? WHERE id = ?', [fechaActual,id]);
 
+    // buscar la informacion de ploteo 
+    // Primero preguntar si la persona que ingreso la solicitud es la mismna que el destinatario.
+
+    const inforPloteo = await pool.query('SELECT * FROM sol_ploteo AS t1 WHERE  t1.id = ?',[id]);
+
+    if (inforPloteo[0].id_ingreso == inforPloteo[0].id_destinatario )
+    {
+        const infoIngresa = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [inforPloteo[0].id_destinatario]);
+
+        const mailTerminoIgual = {
+            to : infoIngresa[0].Email
+          };
+
+        mensajeria.EnviaAvisoTerminoPloteo(mailTerminoIgual);
+    }
+    else
+    {
+        const infoIngresa1 = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [inforPloteo[0].id_destinatario]);
+        const infoIngresa2 = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [inforPloteo[0].id_ingreso]);
+
+        const mailTerminoIgual1 = {
+            to : infoIngresa1[0].Email
+          };
+
+        const mailTerminoIgual2 = {
+            to : infoIngresa2[0].Email
+          };
+
+          mensajeria.EnviaAvisoTerminoPloteo(mailTerminoIgual1);
+          mensajeria.EnviaAvisoTerminoPloteo(mailTerminoIgual2);
+
+    }
+
+
+
     res.redirect(   url.format({
         pathname:'/ploter/ploteo',
         query: {

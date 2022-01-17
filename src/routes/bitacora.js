@@ -129,8 +129,8 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
             {
                 if (analisisHoraFI > analisisHoraAlmuerzoViernes) // solo puede llenar horas hasta las 13:30 los dias viernes 
                 {                    
-                    var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hi + ":00", "yyyy-mm-dd h:MM:ss")); 
-                    var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + "13:30:00", "yyyy-mm-dd h:MM:ss"));
+                    var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hi + ":00", "yyyy-mm-dd HH:MM:ss")); 
+                    var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + "13:30:00", "yyyy-mm-dd HH:MM:ss"));
 
                     var difference = endTime.getTime() - startTime.getTime(); // This will give difference in milliseconds
                     var resultInHours = Math.round(difference / 60000) / 60;
@@ -176,8 +176,8 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
                 }
                 else
                 {
-                    var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hi + ":00", "yyyy-mm-dd h:MM:ss")); 
-                    var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hT + ":00", "yyyy-mm-dd h:MM:ss"));
+                    var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hi + ":00", "yyyy-mm-dd HH:MM:ss")); 
+                    var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hT + ":00", "yyyy-mm-dd HH:MM:ss"));
                     var difference = endTime.getTime() - startTime.getTime(); // This will give difference in milliseconds
                     var resultInHours = Math.round(difference / 60000) / 60;
 
@@ -231,8 +231,8 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
             const proyeto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [idProyecto]);
             
             //var difference = dateFormat(dateFormat(fechaX,"dd-mm-yyyy") + " " + hT + ":00", "yyyy-mm-dd h:MM:ss") - dateFormat(dateFormat(fechaX,"dd-mm-yyyy") + " " + hi + ":00", "yyyy-mm-dd h:MM:ss"); 
-            var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hi + ":00", "yyyy-mm-dd h:MM:ss")); 
-            var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hT +":00", "yyyy-mm-dd h:MM:ss"));
+            var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hi + ":00", "yyyy-mm-dd HH:MM:ss")); 
+            var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hT +":00", "yyyy-mm-dd HH:MM:ss"));
 
             var difference = endTime.getTime() - startTime.getTime(); // This will give difference in milliseconds
             var resultInHours = Math.round(difference / 60000) / 60;
@@ -281,8 +281,8 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
             const proyeto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [idProyecto]);
             
             //var difference = dateFormat(dateFormat(fechaX,"dd-mm-yyyy") + " " + hT + ":00", "yyyy-mm-dd h:MM:ss") - dateFormat(dateFormat(fechaX,"dd-mm-yyyy") + " " + hi + ":00", "yyyy-mm-dd h:MM:ss"); 
-            var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hi + ":00", "yyyy-mm-dd h:MM:ss")); 
-            var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " 13:00", "yyyy-mm-dd h:MM:ss"));
+            var startTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " " + hi + ":00", "yyyy-mm-dd HH:MM:ss")); 
+            var endTime = new Date(dateFormat(annio+"-" +mees + "-" + diia + " 13:00", "yyyy-mm-dd HH:MM:ss"));
 
             var difference = endTime.getTime() - startTime.getTime(); // This will give difference in milliseconds
             var resultInHours = Math.round(difference / 60000) / 60;

@@ -169,6 +169,43 @@ module.exports.EnvioMailCreacionProyectoDocumentos =  async function (objeto) {
   
   }
 
+module.exports.EnvioMailCreacion= async function(objeto){
+    const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+        CLIENTD_SECRET,
+        REDIRECT_URI);
+
+oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+
+const accessToken = await oAuthClient.getAccessToken();
+const transporter = nodemailer.createTransport({
+service : "gmail",
+auth : {
+type : "OAuth2",
+user : "planner@renelagos.com",
+clientId :CLIENTD_ID,
+clientSecret : CLIENTD_SECRET,
+refreshToken: REFRESH_TOKEN,
+accessToken : accessToken,
+},
+});
+
+const generico = "Estimado/a:\n" +
+" \t Ha generado un proyecto, Se ha informado a TI y Documentos para crear los permisos y carpetas correspondientes a las carpetas. Proyecto con código : \n" +
+""+objeto.codigo +" \n"+
+" Saludos, \n"+
+" RLE - Planner";
+
+const mailOptions = {
+from : "RLE - Planner <planner@renelagos.com>",
+to : objeto.to,
+subject : "RLE - Planner - Nuevo Proyecto.",
+text : generico
+};
+
+const result = await transporter.sendMail(mailOptions);
+}
+
+
 module.exports.EnvioMailCreacionProyectoTI =  async function (objeto) {
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
@@ -419,6 +456,45 @@ module.exports.EnvioMailSolicitudCostoExterno =  async function (objeto) {
              from : "RLE - Planner <planner@renelagos.com>",
              to : objeto.to,
              subject : "RLE - Planner - Solicitud Aprobación Costo Externo.",
+             text : generico
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
+
+module.exports.EnviaAvisoTerminoPloteo =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+         const generico = "Estimado/a:\n" +
+                          " \t Solicitud de ploteo fue terminada, favor revisar. \n" +
+                          " Saludos, \n"+
+                          " RLE - Planner";
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : objeto.to,
+             subject : "RLE - Planner - Solicitud Ploteo Terminada.",
              text : generico
          };
   

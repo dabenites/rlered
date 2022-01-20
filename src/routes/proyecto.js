@@ -578,9 +578,6 @@ router.get('/buscarProA/:find', async (req, res) => {
 
 });
 
-
-
-
 router.get('/buscarJefe/:find', async (req, res) => {
   
   // BUSCAR DIRECTOR  

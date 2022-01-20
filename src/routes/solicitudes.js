@@ -282,7 +282,7 @@ router.get('/getPermisos', async (req,res) => {
 
 router.get('/eventos', async (req,res) => {
 
-  const dias = await pool.query('SELECT * FROM sol_selec_dias AS t WHERE t.idUsuario = '+req.user.idUsuario+' AND t.idEstado in(1,2,3)'); 
+  const dias = await pool.query('SELECT t.* FROM sol_selec_dias AS t, sol_solicitud AS t2  WHERE t.idUsuario = '+req.user.idUsuario+' AND t.idEstado in(1,2,3)  AND t.idSolicitud = t2.id AND t2.idEstado IN (1,2,3,4)'); 
   const diaSolicitados = [];
   dias.forEach(element => {
     switch(element.idEstado)
@@ -418,12 +418,17 @@ res.send("OK");
 router.post('/AddIngreso', async (req,res) => {
 
   
-  //onsole.log(req.body)
+  console.log(req.body);
+
+ 
+
+  
   var idUsuario =  req.user.idUsuario;
   var idAprobador =  req.body.idAprobador;
   var idInformar = req.body.idInformar;
   var comentario = req.body.comentario;
   var fecha = new Date();
+
 
   const datos = JSON.parse(JSON.stringify(req.body));
 
@@ -504,6 +509,17 @@ router.post('/AddIngreso', async (req,res) => {
     //console.log(vaca);
     mensajeria.EnvioMailSolicitudVacaciones(mail);
 
+    //enviar mail a RRHH
+    const mailRRHH = {
+      to : 'rrhh@renelagos.com',
+      comentario : comentario,
+      solicitante : req.user.Nombre
+    }
+
+    mensajeria.EnvioMailSolicitudVacaciones(mailRRHH);
+
+    /*
+
     if (idInformar > 0)
     {
       const infoInformar = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idAprobador]);
@@ -514,10 +530,45 @@ router.post('/AddIngreso', async (req,res) => {
         solicitante : req.user.Nombre
       }
   
-      //console.log(vaca);
       mensajeria.EnvioMailSolicitudVacacionesNotificar(mail);
 
     }
+    */
+    if (idInformar !== undefined)
+    {
+      if (Array.isArray(idInformar))
+      {
+        idInformar.forEach( async(dat)=>{
+
+          const infoInformarN = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [dat]);
+
+        const mailN = {
+          to : infoInformarN[0].Email,
+          comentario : comentario,
+          solicitante : req.user.Nombre
+        }
+    
+        mensajeria.EnvioMailSolicitudVacacionesNotificar(mailN);
+
+         
+        });
+      }
+      else
+      {
+        const infoInformar = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idAprobador]);
+
+        const mail = {
+          to : infoAprobador[0].Email,
+          comentario : comentario,
+          solicitante : req.user.Nombre
+        }
+    
+        mensajeria.EnvioMailSolicitudVacacionesNotificar(mail);
+
+        
+      }
+    }
+
   }
   
 
@@ -879,6 +930,18 @@ router.post('/updateVacaciones', async (req,res) => {
     break;
   }
   
+
+  const result1Info1 = await pool.query("SELECT * FROM sol_solicitud AS t1, sys_usuario  AS t2 WHERE t1.id = ? AND t1.idUsuario = t2.idUsuario ",[req.body.id_solicitud]);
+
+      const mail1 = {
+        to : "rrhh@renelagos.com",
+        nombre : result1Info1[0].nombre,
+        aprobador : req.user.Nombre
+      }
+
+  mensajeria.EnvioMailCambioEstadoVacaciones(mail1);
+
+
   res.redirect("../solicitudes/avacaciones");
   //res.send("asdd");
 

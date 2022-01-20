@@ -27,6 +27,7 @@ router.post('/buscarAnnio',isLoggedIn,  async (req, res) => {
 
 });
 
+
 router.post('/buscarProyecto',isLoggedIn,  async (req, res) => {
     
     // Buscar todos los proyectos correspondiente a este Id Pais
@@ -319,5 +320,177 @@ router.get('/proyectos/horas/:id',isLoggedIn,  async (req, res) => {
         res.send(JSON.stringify(cinternos));
 });
 //proyecto/2413
+
+router.get('/horas',isLoggedIn,  async (req, res) => {
+    
+       // const paises = await pool.query('SELECT * FROM pais as t1 ORDER BY t1.pais ASC');
+    
+       // res.render('reporteria/buscarProyecto', {paises,  req , layout: 'template'});
+
+       res.render('reporteria/bhoras', {  req , layout: 'template'});
+    
+    });
+
+router.post('/cargaOpciones',isLoggedIn,  async (req, res) => {
+    
+        let annios = {};
+       // console.log(req.body);
+        switch(req.body.opcion)
+        {
+                case '1': // usuarios 
+                //SELECT t1.idUsuario AS id , t1.Nombre AS descripcion  FROM sys_usuario AS t1 WHERE t1.id_estado = 1 AND t1.idUsuario NOT IN (1,2) ORDER BY t1.Nombre ASC
+                 annios = await pool.query("SELECT t1.idUsuario AS id ,"+
+                                                " t1.Nombre AS descripcion  " +
+                                                " FROM sys_usuario AS t1 WHERE t1.id_estado = 1 AND t1.idUsuario NOT IN (1,2) ORDER BY t1.Nombre ASC");
+
+                res.render('reporteria/annio', {  annios, req , layout: 'blanco'});
+                break;
+                case '2': // Centro Costo
+                annios = await pool.query( "SELECT t1.id AS id , t1.centroCosto AS descripcion FROM centro_costo AS t1 ORDER BY t1.centroCosto ASC");
+                res.render('reporteria/annio', {  annios, req , layout: 'blanco'});
+                break;
+                case '3': // Jefatura Directa
+                annios = await pool.query(" SELECT t2.idUsuario AS id, t2.Nombre AS descripcion " +
+                                                " FROM sys_usuario_equipo AS t1, sys_usuario AS t2 " +
+                                                " WHERE t1.id_lider_equipo = t2.idUsuario GROUP BY t1.id_lider_equipo ORDER BY t2.Nombre asc ");
+                res.render('reporteria/annio', {  annios, req , layout: 'blanco'});
+
+                break;
+        }
+
+        
+    
+    });
+
+    router.post('/buscarHoras',isLoggedIn,  async (req, res) => {
+    
+      // console.log(req.body);
+      // stipoOpcion: '3',
+      // opcion: '52',
+        // fecha_inicio: '2022-01-01',
+        // fecha_termino: '2022-01-31'
+
+        let consulta = "";
+        let parametros = {
+                fecha_inicio : req.body.fecha_inicio,
+                fecha_termino : req.body.fecha_termino
+        };
+
+        switch(req.body.stipoOpcion)
+        {
+          case 1:
+          case '1':
+                consulta = " SELECT t1.idUsuario, " +
+		                " t1.Nombre, " +
+		                " t4.centroCosto, " +
+		                " t3.categoria, " +
+		                " if (t2.id_lider_equipo is NOT NULL , (SELECT t1a.Nombre FROM sys_usuario AS t1a WHERE t1a.idUsuario = t2.id_lider_equipo) , 'N/A') AS lider " +
+                                " FROM  " +
+                        " sys_usuario AS t1 " +
+                                        " LEFT JOIN sys_usuario_equipo AS t2 ON t1.idUsuario = t2.id_colaborador, " +
+                        " sys_categoria AS t3, " +
+                        " centro_costo AS t4 " +
+                        " WHERE  " +
+                                " t1.idUsuario = "+req.body.opcion+" " +
+                        " AND  " +
+                                " t1.idCategoria = t3.id " +
+                        " AND  " +
+                                " t3.idCentroCosto = t4.id " ;
+                break; // USUARIOS ESPECIFICOS 
+          case 2:
+          case '2':
+                consulta = " SELECT t1.idUsuario, "+
+                                " t1.Nombre, " +
+                                " t4.centroCosto, " +
+                                " t3.categoria, " +
+                                " if (t2.id_lider_equipo is NOT NULL , (SELECT t1a.Nombre FROM sys_usuario AS t1a WHERE t1a.idUsuario = t2.id_lider_equipo) , 'N/A') AS lider " +
+                            " FROM " +
+                                " sys_usuario AS t1 " +
+                                " LEFT JOIN sys_usuario_equipo AS t2 ON t1.idUsuario = t2.id_colaborador, " +
+                                " sys_categoria AS t3, " +
+                                " centro_costo AS t4 " +
+                                " WHERE  " +
+                                                " t4.id = "+req.body.opcion+" " +
+                                " AND  " +
+                                                " t1.idCategoria = t3.id " +
+                                " AND  " +
+                                                " t3.idCentroCosto = t4.id " +
+                                " AND  " +
+                                                " t1.id_estado = 1 " +
+                                " ORDER BY categoria ASC, Nombre ASC ";
+
+                break; // Usuarios por centro de costo 
+          case 3:
+          case '3':
+                  consulta = "SELECT "+
+                                        " t2.idUsuario, " +
+                                        " t2.Nombre, " +
+                                        " t3.categoria, " +
+                                        " t4.centroCosto, " +
+                                        " t5.Nombre AS lider " +
+                            " FROM " +
+                                        " sys_usuario_equipo AS t1, " +
+                                        " sys_usuario AS t2, " +
+                                        " sys_categoria AS t3, " +
+                                        " centro_costo AS t4, " +
+                                        " sys_usuario AS t5 " +
+                           " WHERE  " +
+                                        " t1.id_lider_equipo = "+req.body.opcion+" "  +
+                           " AND  " +
+                                        " t1.id_colaborador = t2.idUsuario " +
+                            " AND  " +
+                                        " t2.idCategoria = t3.id " +
+                           " AND   " +
+                                        " t3.idCentroCosto = t4.id " +
+                           " AND  " +
+                                        " t1.id_lider_equipo = t5.idUsuario"  +
+                          "   AND " +
+	                                " t2.id_estado = 1"; 
+                break; // usuarios por jefatura directa
+        }
+        
+        let informacion = [];
+
+        let inf =  await pool.query(consulta);
+
+        for (const e of inf) {
+                let consulta2 = " SELECT  " +
+                                                " IF(	SUM( TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600) IS null , 0 ,SUM( TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600))  AS horas " +
+                                        " FROM  " +
+                                                " bita_horas AS t1 " +
+                                        " WHERE  " +
+                                                    "    t1.id_session = "+e.idUsuario+" "+
+                                        " AND  " +
+                                                  "      t1.ini_time BETWEEN '"+req.body.fecha_inicio+"' AND '"+ req.body.fecha_termino +"' " ;
+                let consulta3 = "SELECT " +
+                                        " if (SUM(t.numhh) IS NULL , 0 ,SUM(t.numhh))  AS cantidad " +
+                                "  FROM " +
+                                " sol_horaextra AS t " +
+                                " WHERE  " +
+                                        " t.idEstado = 3 " +
+                                " AND  " +
+                                        " t.idSolicitante = "+e.idUsuario+" " +
+                                " AND  " +
+                                        " t.fecha_solicitante BETWEEN  '"+req.body.fecha_inicio+"' AND '"+ req.body.fecha_termino +"'";
+
+                //console.log(consulta3);
+
+                let horasBita =  await pool.query(consulta2);                                  
+                let horasBitaExtra =  await pool.query(consulta3); 
+                informacion.push({
+                        idUsuario: e.idUsuario,
+                                Nombre: e.Nombre,
+                                centroCosto: e.centroCosto,
+                                categoria: e.categoria,
+                                lider: e.lider,
+                                horas : horasBita[0].horas,
+                                horaextras : horasBitaExtra[0].cantidad
+                })
+              }
+
+        res.render('reporteria/infoHoras', {  informacion, parametros,  req , layout: 'template'});
+    
+    });
+    
 
 module.exports = router;

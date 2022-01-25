@@ -827,20 +827,24 @@ router.post('/cargarProyecto', async (req, res) => {
    // Registro de mail 
 
    // buscar la informacion del proyecto 
+   const infoIngresa = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [req.user.idUsuario]);
+
 
    const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.year = ? and t1.code = ? ",[year,code])
    
    const mail = {
      codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
-     to : "documentos@renelagos.com"
+     to : "documentos@renelagos.com",
+     ingresado : infoIngresa[0].Nombre
    };
 
    const mailTI = {
     codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
-    to : "computacion@renelagos.com"
+    to : "computacion@renelagos.com",
+    ingresado : infoIngresa[0].Nombre
   };
 
-  const infoIngresa = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [req.user.idUsuario]);
+  
 
   const mailIngreso = {
     codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,

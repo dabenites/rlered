@@ -36,14 +36,51 @@
 </head>
 
 <body>
-    <div class="dashboard">
-        <div class="container">
-            <div class="row justify-content-center pt-5 mt-5 m-1">
-                <div class="col-md-6  col-sm-8 col-xl-4 col-lg-5 log<!--mx-auto-->">
-                    <div class="log">
-                          <img src="contenido/images/logo2.png" class="img-log" alt="" />  
+      <div class="form-group row">
+          <div class="col-md-2 col-sm-2">
+                  <div class="x_panel">
+                    <div class="x_title">
+                            <h2>Información de Bitácora </h2>
+                        <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="form-group row">
+                                 <label class="col-form-label col-md-7 col-sm-7 label-align">Mes Anterior :</label>
+                                 <label class="col-form-label col-md-4">{{infoHoras.mesAnterior}} hrs.</label>
+                            </div>
+                            <div class="form-group row">
+                                 <label class="col-form-label col-md-7 col-sm-7 label-align">Mes Actual :</label>
+                                 <label class="col-form-label col-md-4">{{infoHoras.mesActual}} hrs.</label>
+                            </div>
+                            <div class="form-group row">
+                                 <label class="col-form-label col-md-7 col-sm-7 label-align">Semana Anterior : </label>
+                                  <label class="col-form-label col-md-4">{{infoHoras.semanaAnterior}} hrs.</label>
+                            </div>
+                           <!--
+                                <div class="alert alert-primary d-flex align-items-center" role="alert">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                </svg>
+                                <div>
+                                    En la semana se tienen que cargar 33 HH
+                                </div>
+                            </div>
+                            -->
+                        </div>
+                 </div>  
+          </div>
+          <div class="col-md-9 col-sm-9">
+                <div class="dashboard">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-md-6 log<!--mx-auto-->">
+                                <div class="log">
+                                    <img src="contenido/images/logo2.png" class="img-log" alt="" />  
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+          </div>
+      </div>
 </body>

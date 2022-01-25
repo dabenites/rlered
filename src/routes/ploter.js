@@ -126,6 +126,9 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
     var impresionBD = "";
     var seriesBD = "";
 
+    //console.log(req.body);
+
+
     if (typeof trabajo !== 'undefined') 
     {
         if (typeof trabajo === 'string'){ trabajosBD = trabajo;}
@@ -144,9 +147,12 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
             { if ( (i + 1) === impresion.length) {impresionBD = impresionBD + impresion[i];} else {impresionBD = impresionBD + impresion[i]+ " + ";}  }
         }
     }
+    
+
     if (typeof series !== 'undefined') 
     {
         if (typeof series === 'string'){ seriesBD = series;}
+        else
         {
             for (var i=0; i<series.length; i++) 
             { if ( (i + 1) === series.length) {seriesBD = seriesBD + series[i];} else {seriesBD = seriesBD + series[i]+ " + ";}  }

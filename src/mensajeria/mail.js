@@ -164,8 +164,9 @@ module.exports.EnvioMailCreacionProyectoDocumentos =  async function (objeto) {
                       });
   
          const generico = "Estimado/a:\n" +
-                          " \t Se informa que se ha generado un proyecto nuevo en planner con el siguiente código. \n" +
-                          ""+objeto.codigo +" \n"+
+                          " \t Se informa que se ha generado un proyecto nuevo en planner. \n" +
+                          " Codigo : "+objeto.codigo +" \n"+
+                          " Ingresado por : "+ objeto.ingresado +" \n"+
                           " Saludos, \n"+
                           " RLE - Planner";
   
@@ -240,8 +241,9 @@ module.exports.EnvioMailCreacionProyectoTI =  async function (objeto) {
                       });
   
          const generico = "Estimado/a:\n" +
-                          " \t Se informa que se ha generado un proyecto nuevo en planner con el siguiente código. \n" +
-                          ""+objeto.codigo +" \n"+
+                          " \t Se informa que se ha generado un proyecto nuevo en planner. \n" +
+                          " Codigo : "+objeto.codigo +" \n"+
+                          " Ingresado por : "+ objeto.ingresado +" \n"+
                           " Saludos, \n"+
                           " RLE - Planner";
   

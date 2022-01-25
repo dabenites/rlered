@@ -485,7 +485,7 @@ router.post('/cargaOpciones',isLoggedIn,  async (req, res) => {
                                 lider: e.lider,
                                 horas : horasBita[0].horas,
                                 horaextras : horasBitaExtra[0].cantidad
-                })
+                });
               }
 
         res.render('reporteria/infoHoras', {  informacion, parametros,  req , layout: 'template'});

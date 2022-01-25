@@ -337,37 +337,51 @@
       </div>
                           <div class="form-group row">
                         <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eDirector">Director Proyecto:</label>
-							<div class="col-md-9 col-sm-9">
+							<div class="col-md-8 col-sm-8">
 							    <input id="director" name="director"  class="form-control">
                                 <input type="hidden" id="id_director" name="id_director" value="0">
 							</div>
                     </div>
                     <div class="form-group row">
                         <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eJefe">Jefe Proyecto:</label>
-							<div class="col-md-9 col-sm-9">
+							<div class="col-md-8 col-sm-8">
 							    <input id="jefe" name="jefe"  class="form-control">
                                 <input type="hidden" id="id_jefe" name="id_jefe" value="0">
 							</div>
                     </div>
-                    <!--
-                        <div class="form-group row">
-                        <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Mandante:</label>
-							<div class="col-md-9 col-sm-9">
-							    <input id="mandante" name="mandante"  class="form-control">
-                                <input type="hidden" id="id_mandante" name="id_mandante"  class="form-control">
-							</div>
-                    </div>
-                    -->
+                  
                     <div class="form-group row">
                         <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eclienteContacto">Cliente / Contacto:</label>
-							<div class="col-md-9 col-sm-9">
+							<div class="col-md-8 col-sm-8">
 							    <input id="cliente" name="cliente"  class="form-control">
                                 <input type="hidden" id="id_cliente" name="id_cliente" required="required" class="form-control" value="0">
 							</div>
+                            <div class="col-md-1 col-sm-1">
+                               <!--  <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-user-plus"></i></button> 	 -->
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ...
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary">Save changes</button>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="eArquitecto">Arquitecto:</label>
-							<div class="col-md-9 col-sm-9">
+							<div class="col-md-8 col-sm-8">
 							    <input id="arquitecto" name="arquitecto" class="form-control">
                                 <input type="hidden" id="id_arquitecto" name="id_arquitecto"  class="form-control" value="0">
 							</div>
@@ -481,6 +495,7 @@
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"  integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>

@@ -4,8 +4,28 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
   <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
   <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
   <script	src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyCXQ6ltnbOZRP3U7JH3evn5O5OnfR--O4I"></script>
-
+ <style>
+     .close {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+        }
+        .close:not(:disabled):not(.disabled) {
+            cursor: pointer;
+        }
+        button.close {
+            padding: 0;
+            background-color: transparent;
+            border: 0;
+            -webkit-appearance: none;
+        }
+ </style>
   <script>
         var nuevoalias = jQuery.noConflict();
 	    nuevoalias(document).ready(function() {
@@ -357,26 +377,50 @@
                                 <input type="hidden" id="id_cliente" name="id_cliente" required="required" class="form-control" value="0">
 							</div>
                             <div class="col-md-1 col-sm-1">
-                               <!--  <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-user-plus"></i></button> 	 -->
-
+                                <!--  <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#ver" onclick="verFormulario();"><i class="fa fa-user-plus"></i></button> -->
                                 <!-- Modal -->
-                                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <div class="modal fade" id="ver" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-lg-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLongTitle">Agregar Contacto</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                            <div class="modal-body">
+                                                   <form name="vContacto" id="vContacto">
+                                                        <table width="100%">										
+                                                            <tr>
+                                                                <td></td>
+                                                                <td style="padding-right:5px;" align=right class="PopUpCheck">Nombre</td>
+                                                                <td colspan="3" class="PopUpCheck"> 
+                                                                    <input class="form-control" placeholder="Nombre Contancto" id="iNombreContacto" required name="iNombreContacto" onkeypress="desactivaIngreso();"> 
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan=6 style="padding-top:5px;" align=center class="PopUpCheck">
+                                                                <table>
+                                                                    <tr>
+                                                                        <td style="padding-right:5px;"><label>Comprobar&nbsp; similitud : </label></td>
+                                                                        <td><button type="button" class="btn btn-warning" onclick="VerificarIngreso();">Verificar</button></td>
+                                                                    </tr>
+                                                                </table>
+                                                                </td>
+                                                                                                            
+                                                            </tr>									
+                                                            <tr>
+                                                                <td id="respVerificacion" colspan="6">
+                                                                                                            
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </form>	
+                                            </div>
+                                            </div>
                                         </div>
-                                        <div class="modal-body">
-                                            ...
                                         </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <button type="button" class="btn btn-primary">Save changes</button>
-                                        </div>
-                                        </div>
-                                    </div>
-                                </div>
+
                             </div>
                     </div>
                     <div class="form-group row">
@@ -861,7 +905,177 @@ function cargaServicio(id_servicio)
     }
 }
 
+function verFormulario()
+{
+$('.PopUpCheck').show();
+$('#respVerificacion').html('');
+$('#iNombreContacto').val(''); 
 
+}
+function VerificarIngreso ( )
+{
+	
+	var INombreContacto = $("#iNombreContacto").val();
+	$('#buttonInsertContacto').show();
+	$('#buttonVolver').hide();
+	if ( iNombreContacto != "")
+	{
+
+
+		var TableContactoForm = '';
+			$.ajax({
+							async: false,
+							type : 'POST', 
+							url	 : "/costos/ajaxNombre", 
+							data : "NombreContacto="+INombreContacto,
+							success : function (resultado) 
+								{ 
+		
+									TableContactoForm = resultado; 
+									ActivaIngresoContacto ();
+								} 
+						});
+						
+		if (TableContactoForm === "1")
+		{
+			document.getElementById("respVerificacion").innerHTML = "";
+			FormIngresoContacto();
+		}
+		else
+		{
+			document.getElementById("respVerificacion").innerHTML = TableContactoForm;
+		}
+	}
+	else
+	{
+		// Sin nombre 
+	
+	}
+	
+	$( "#buttonCerrar" ).removeClass( "btn btn-primary" ).addClass( "btn btn-default" );
+	
+	
+}
+
+function ActivaIngresoContacto ()
+{
+
+	$("#buttonInsertContacto").removeAttr("disabled");
+}
+
+function desactivaIngreso ()
+{
+	$('#buttonInsertContacto').attr('disabled','disabled');
+	//--------------------------------------------------------->
+}
+
+function FormIngresoContacto()
+{
+	
+
+	$.ajax({
+							async: false,
+							type : 'POST', 
+							url	 : "/contacto/ajaxNombre", 
+							data : "NombreContacto="+INombreContacto,
+							success : function (resultado) 
+								{ 
+		
+									TableContactoForm = resultado; 
+									ActivaIngresoContacto ();
+								} 
+						});
+
+
+	document.getElementById("respVerificacion").innerHTML = '';
+	var INombreContacto = $("#iNombreContacto").val();
+	var TableContactoForm = '';
+	$.ajax
+		(
+			{
+				async: false,
+				type : 'POST', 
+				url	 : "/contacto/bFormIngreso", 
+				data : "iNombreContacto="+INombreContacto,
+					success : function (resultado) 
+						{ 
+		
+							TableContactoForm = resultado; 
+							ActivaIngresoContacto ();
+						} 
+			}
+		);
+	
+	document.getElementById("respVerificacion").innerHTML = TableContactoForm;
+	
+	$('#buttonInsertContacto').hide();
+	$('#buttonVolver').show();
+	// cambiar clase al boton Cerrar para seguir con una misma linea de colores
+	$( "#buttonCerrar" ).removeClass( "btn btn-default" ).addClass( "btn btn-primary" );
+	// ocultar div de check similitud 
+	$('.PopUpCheck').hide();
+}
+
+function InsertarContactoCloseForm ()
+{
+	var obj	= creaObjetoContacto();
+	
+	var TableContactoForm = '';
+	$.ajax
+		(
+			{
+				async: false,
+				type : 'POST', 
+				url	 : "/contacto/addContacto", 
+				data : obj,
+					success : function (resultado) 
+						{ 
+							TableContactoForm = resultado; 
+							 //location.reload();
+                             //$("#ver").close();
+                              $('#ver').modal('hide');
+                             toastr.success('Contacto Agregado', 'Mensaje', {
+                                            "progressBar": true
+                                        });
+						} 
+			}
+		);
+
+	// revisar el reeenvio. 
+
+	
+}
+function creaObjetoContacto ()
+{
+	var obj = new Object();
+		var nombre 		    	= $( "#iNombreContacto" );
+		var direccion	   	 	= $( "#iDireccionContacto" );
+		var telefono	    	= $( "#iTelefonoContacto" );
+		var tipo_conctacto  	= $( "#iTipoContacto" );
+		var empresa_asociada  	= $( "#iEmpresaAsociada" );
+		var movil	    		= $( "#iMovilContacto" );
+		var url   				= $( "#iUrlContacto" );
+		var e_mail 				= $( "#iMailContacto" );
+		var comentario			= $( "#iComentarioContacto" );
+		//var concepto			= $( "#concepto" );
+		var concepto = "";
+				$('input[name="concepto[]"]:checked').each(function() {
+					concepto += $(this).val() + ",";
+				});
+	
+	obj.nombre			= nombre.val(); 
+	obj.direccion		= direccion.val(); 
+	obj.telefono		= telefono.val(); 
+	obj.tipo_conctacto	= tipo_conctacto.val(); 
+	obj.empresa_asociada = empresa_asociada.val(); 
+	obj.movil			= movil.val(); 
+	obj.url				= url.val(); 
+	obj.e_mail			= e_mail.val(); 
+	obj.comentario		= comentario.val(); 
+	obj.concepto		= concepto; 
+	
+	return obj;	
+}
 
 </script>
 

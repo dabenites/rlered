@@ -714,11 +714,9 @@ router.post('/cargarFactura', async (req, res) => {
     mensajeria.MensajerErrores(sql)
     */
     const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.id =  ? ",[id_proyecto]);
-
     // agregar el director de proyecto.
-    const infoDirector = await pool.query("if (COUNT(t1.idUsuario) = 0 , 'N/A', t1.Nombre) AS nom FROM sys_usuario as t1 where t1.idUsuario =  ? ", infoProyecto[0].id_director);
-
-
+    
+    const infoDirector = await pool.query("SELECT if(COUNT(t1.idUsuario)=0,'N/A',t1.Nombre) AS  nom FROM sys_usuario as t1 where t1.idUsuario =  "+[infoProyecto[0].id_director]+" ");
 
     const facturacion = {
       to : 'contabilidad@renelagos.com',
@@ -728,9 +726,9 @@ router.post('/cargarFactura', async (req, res) => {
       director : infoDirector[0].nom
     };
 
-   mensajeria.EnvioMailIngresoFactura(facturacion);
+ mensajeria.EnvioMailIngresoFactura(facturacion); 
 
-const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]);
+const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]); 
 
   
 res.redirect('/proyecto/facturar/'+id_proyecto);

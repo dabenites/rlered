@@ -555,8 +555,8 @@ router.get('/getBitacora', async (req,res) => {
 	                                " t1.idUsuario = "+req.user.idUsuario+" "+
                                     " UNION " +
                                     " SELECT " +
-                                    "    CONCAT(t1.id,t2.id) as id_bitacora_time,  DATE_FORMAT(t2.fecha,'%Y-%c-%d 08:00') AS ini_time,  " +
-                                    "    DATE_FORMAT(t2.fecha,'%Y-%c-%d 18:30') AS fin_time, " +
+                                    "    CONCAT(t1.id,t2.id) as id_bitacora_time,  DATE_FORMAT(t2.fecha,'%Y-%m-%d 08:00') AS ini_time,  " +
+                                    "    DATE_FORMAT(t2.fecha,'%Y-%m-%d 18:30') AS fin_time, " +
                                     "    'Vacaciones','Vacaciones', 'Vacaciones',  '',  '' AS nombre , 3 as tipo " +
                                     "    FROM  " +
                                     "        sol_solicitud AS t1, " +
@@ -570,13 +570,13 @@ router.get('/getBitacora', async (req,res) => {
                                     "    AND  " +
                                     "        t1.id = t2.idSolicitud " );                           
 
-    const HorasRegsitradas = [];
+    let HorasRegsitradas = [];
     horas.forEach(element => {
 
             switch(element.tipo)
             {
                 case 1: // normales 
-                const registro = {
+                let registro = {
                     title : element.year +"-"+ element.code + " : " + element.nombre,
                     start : element.ini_time,
                     end: element.fin_time,
@@ -588,7 +588,7 @@ router.get('/getBitacora', async (req,res) => {
                 HorasRegsitradas.push(registro);
                 break;
                 case 2: // Permisos
-                const registroP = {
+                let registroP = {
                     title : element.year +"-"+ element.code + " : " + element.nombre,
                     start : element.ini_time,
                     end: element.fin_time,
@@ -601,7 +601,7 @@ router.get('/getBitacora', async (req,res) => {
                 HorasRegsitradas.push(registroP);
                 break;
                 case 3: // Vacaciones
-                const registroV = {
+                let registroV = {
                     title : element.year +"-"+ element.code + " : " + element.nombre,
                     start : element.ini_time,
                     end: element.fin_time,
@@ -617,7 +617,7 @@ router.get('/getBitacora', async (req,res) => {
 
     });
 
-   //console.log(HorasRegsitradas);
+   console.log(HorasRegsitradas);
 
    res.send(HorasRegsitradas);
   }); 

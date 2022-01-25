@@ -324,6 +324,7 @@ router.get('/listado', async (req, res) => {
  // Todos los demas pueden ver todo. 
   //console.log(req.user);
   var sql = ""
+  //console.log(req.user);
   switch(req.user.idCategoria)
   {
     case 21:
@@ -335,11 +336,21 @@ router.get('/listado', async (req, res) => {
     case 41:
     case 42:
     case 46:
+
       sql = " SELECT t3.Nombre AS nomJefe, t4.Nombre AS nomDir, t2.name AS nomCli, t1.*  FROM pro_proyectos AS t1 " +
             " LEFT JOIN contacto AS t2 ON t1.id_cliente = t2.id " +
             " LEFT JOIN sys_usuario AS t3 ON t1.id_jefe = t3.idUsuario " + 
             " LEFT JOIN sys_usuario AS t4 ON t1.id_director = t4.idUsuario " + 
-            " WHERE t1.id_jefe = "+req.user.idUsuario +" OR t1.id_director = "+req.user.idUsuario +" ORDER BY t1.year ASC, t1.code ASC";
+            " WHERE t1.id_jefe = "+req.user.idUsuario +" OR t1.id_director = "+req.user.idUsuario +" " + // ORDER BY t1.year ASC, t1.code ASC";
+            " UNION " +
+            " SELECT t3.Nombre AS nomJefe, t4.Nombre AS nomDir, t2.name AS nomCli, t1.*  FROM pro_proyectos AS t1   " +
+            " LEFT JOIN contacto AS t2 ON t1.id_cliente = t2.id   " +
+            " LEFT JOIN sys_usuario AS t3 ON t1.id_jefe = t3.idUsuario   " +
+            " LEFT JOIN sys_usuario AS t4 ON t1.id_director = t4.idUsuario, " +
+            " pro_equipo AS t5   " +
+            " WHERE t1.id = t5.id_proyecto AND t5.id_usuario = "+req.user.idUsuario+" " 
+            " GROUP BY id " 
+            " ORDER BY year DESC, code DESC ";
     break;
     default:
       sql = "SELECT t3.Nombre AS nomJefe, t4.Nombre AS nomDir, t2.name AS nomCli, t1.* FROM pro_proyectos AS t1 "+ 
@@ -406,7 +417,13 @@ router.get('/facturar/:id', async (req, res) => {
   const { id } = req.params;
  
   //______ cargar template. 
-  const proyectos = await pool.query("SELECT * FROM pro_proyectos AS t1  WHERE t1.id = "+id+"");
+  const proyectos = await pool.query( " SELECT t1.*, t2.Nombre AS director, t3.Nombre AS jefe, t4.descripcion AS servicio , t5.descripcion AS tipo" +
+                                      " FROM pro_proyectos AS t1 " +
+                                      " LEFT JOIN sys_usuario AS t2 ON t1.id_director = t2.idUsuario " +
+                                      " LEFT JOIN sys_usuario AS t3 ON t1.id_jefe = t3.idUsuario "+
+                                      " LEFT JOIN proyecto_servicio AS t4 ON t1.id_tipo_servicio = t4.id " +
+                                      " LEFT JOIN proyecto_tipo AS t5 ON t1.id_tipo_proyecto = t5.id "+
+                                      " WHERE t1.id = "+id+" ");
 
   const facturacion =  await pool.query("SELECT " +
                                                     " *, " +
@@ -442,7 +459,21 @@ router.get('/facturar/:id', async (req, res) => {
   // console.log(nombre);
 
   const monedas = await pool.query("SELECT * FROM moneda_tipo AS t1 WHERE t1.factura = 'Y'");
-  const tipoCobro = await pool.query("SELECT * FROM fact_tipo_cobro");
+
+ // Aqui dar un inteligencia segun el tipo de proyecto son los tipos de cobro
+
+ let tipoCobro = {};
+if (proyectos[0].id_tipo_servicio == 2)
+{
+  tipoCobro =  await pool.query("SELECT * FROM fact_tipo_cobro as t1 where t1.revision = 'Y'");
+
+}
+else
+{
+  tipoCobro =  await pool.query("SELECT * FROM fact_tipo_cobro as t1 where t1.proyecto = 'Y'");
+}
+
+  
 
   var  estado  = true;
 
@@ -684,11 +715,17 @@ router.post('/cargarFactura', async (req, res) => {
     */
     const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.id =  ? ",[id_proyecto]);
 
+    // agregar el director de proyecto.
+    const infoDirector = await pool.query("if (COUNT(t1.idUsuario) = 0 , 'N/A', t1.Nombre) AS nom FROM sys_usuario as t1 where t1.idUsuario =  ? ", infoProyecto[0].id_director);
+
+
+
     const facturacion = {
       to : 'contabilidad@renelagos.com',
       comentario : comentario,
       proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
-      solicitante : req.user.Nombre
+      solicitante : req.user.Nombre,
+      director : infoDirector[0].nom
     };
 
    mensajeria.EnvioMailIngresoFactura(facturacion);

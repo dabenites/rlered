@@ -31,11 +31,19 @@ const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
                             accessToken : accessToken,
                         },
                     });
+    
+       
+    var infoDias = "";
+           objeto.dias.forEach(element => {
+                                    infoDias += " " + element.fecha + ", es medio dia  " + element.medioDia + "\n";
+                                  });
 
-       const generico = "Estimado/a:\n" +
+       let  generico = "Estimado/a:\n" +
                         " \t Se ha generado una solicitud de aprobacion de vacaciones por " + objeto.solicitante + "\n" +
-                        " Comentario : " + objeto.comentario + "\n"+
-                        " Saludos, \n"+
+                        " Comentario : " + objeto.comentario + "\n";
+                        " Dias  : \n";
+            generico +=   infoDias;
+            generico +=   " Saludos, \n"+
                         " RLE - Planner";
 
        const mailOptions = {
@@ -111,11 +119,14 @@ module.exports.EnvioMailSolicitudVacacionesNotificar =  async function (objeto) 
                               accessToken : accessToken,
                           },
                       });
-  
-         const generico = "Estimado/a:\n" +
+        
+       
+
+         let generico = "Estimado/a:\n" +
                           " \t Se informa que " + objeto.solicitante + " ha solicitado Vacaciones. \n" +
                           " Comentario : " + objeto.comentario + "\n"+
-                          " Saludos, \n"+
+                          " Dias : \n";
+                generico += " Saludos, \n"+
                           " RLE - Planner";
   
          const mailOptions = {
@@ -204,7 +215,6 @@ text : generico
 
 const result = await transporter.sendMail(mailOptions);
 }
-
 
 module.exports.EnvioMailCreacionProyectoTI =  async function (objeto) {
     // Generate test SMTP service account from ethereal.email
@@ -353,6 +363,7 @@ module.exports.EnvioMailIngresoFactura =  async function (objeto) {
          const generico = "Estimado/a:\n" +
                           " \t Solicitud de facturación "+ objeto.proyecto +", ingresado por "+ objeto.solicitante+" \n" +
                           " Comentario : "+objeto.comentario +" \n"+
+                          " Director Proyecto : "+objeto.director +" \n"+
                           " Saludos, \n"+
                           " RLE - Planner";
   
@@ -537,7 +548,6 @@ module.exports.MensajerErrores =  async function (objeto) {
          const result = await transporter.sendMail(mailOptions);
   
   }
-
 
 module.exports.EnvioMailCambioEstadoVacaciones =  async function (objeto) {
     // Generate test SMTP service account from ethereal.email

@@ -418,7 +418,7 @@ res.send("OK");
 router.post('/AddIngreso', async (req,res) => {
 
   
-  console.log(req.body);
+ // console.log(req.body);
 
  
 
@@ -500,40 +500,34 @@ router.post('/AddIngreso', async (req,res) => {
   {
     const infoAprobador = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idAprobador]);
 
+    // Obtener informacion de los dias a solicitar. 
+    const infoDias =  await pool.query("SELECT DATE_FORMAT(t1.fecha,'%Y-%m-%d') AS fecha, t1.medioDia FROM sol_selec_dias as t1 where t1.idSolicitud = ? ORDER BY t1.fecha DESC", [key]);
+
+
     const mail = {
       to : infoAprobador[0].Email,
       comentario : comentario,
-      solicitante : req.user.Nombre
+      solicitante : req.user.Nombre,
+      dias : infoDias
     }
+    
 
-    //console.log(vaca);
+
+    //console.log(infoDias);
     mensajeria.EnvioMailSolicitudVacaciones(mail);
-
+    
     //enviar mail a RRHH
     const mailRRHH = {
       to : 'rrhh@renelagos.com',
       comentario : comentario,
-      solicitante : req.user.Nombre
+      solicitante : req.user.Nombre,
+      dias : infoDias
     }
 
     mensajeria.EnvioMailSolicitudVacaciones(mailRRHH);
 
-    /*
 
-    if (idInformar > 0)
-    {
-      const infoInformar = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idAprobador]);
 
-      const mail = {
-        to : infoAprobador[0].Email,
-        comentario : comentario,
-        solicitante : req.user.Nombre
-      }
-  
-      mensajeria.EnvioMailSolicitudVacacionesNotificar(mail);
-
-    }
-    */
     if (idInformar !== undefined)
     {
       if (Array.isArray(idInformar))

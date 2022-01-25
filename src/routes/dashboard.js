@@ -63,8 +63,8 @@ router.get('/', isLoggedIn, async (req, res) => {
                                             " t1.ini_time BETWEEN '"+fechaSemanaActualLunes.getFullYear() + '-'+ (fechaSemanaActualLunes.getMonth()+1)+"-"+fechaSemanaActualLunes.getDate()+" 00:00:01' "+
                                  " AND '"+fechaSemanaActualDomingo.getFullYear() + '-'+ (fechaSemanaActualDomingo.getMonth()+1)+"-"+fechaSemanaActualDomingo.getDate()+" 23:59:59' ";
 
-      console.log(semana_anterior);
-      
+    //  console.log(semana_anterior);
+
    let infoSemanaAnteriorer =  await pool.query(semana_anterior);
 
    let infoHoras = {

@@ -38,7 +38,8 @@
  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.css' rel='stylesheet' /> 
  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.4.0/main.min.js"></script> 
  <script src='../core/locales/es.js'></script>
- 
+ <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+
  <script>
 
    document.addEventListener('DOMContentLoaded', function() {
@@ -69,7 +70,7 @@
     hiddenDays: [0],
     allDaySlot: false,
     contentHeight: 650,
-    //slotDuration: '00:15',
+    slotDuration: '00:15',
     height: 650,
     selectable: true,
     select: function(info) {
@@ -116,7 +117,7 @@
                     // 
                   $('#exampleModalEliminar').modal('toggle');  
                   $('#idEliminar').val(event.event._def.extendedProps.myId);  
-                  
+
                 }
       }
       else
@@ -134,7 +135,26 @@
  var nuevoalias = jQuery.noConflict();
  
   nuevoalias( document ).ready(function() {
-   // console.log( "ready!" );
+    // 
+    let contador = 0;
+    $(".fc-timegrid-slot-label").each(function()
+    {
+      if (contador == 0){
+        nuevoalias(this).attr('rowspan', '4');
+        contador += 1;
+
+      }
+      else if (contador == 3)
+      {
+          nuevoalias(this).remove();
+          contador = 0; 
+      }
+      else
+      {
+        nuevoalias(this).remove();
+        contador += 1;
+      }
+    });
 });
 
   </script>

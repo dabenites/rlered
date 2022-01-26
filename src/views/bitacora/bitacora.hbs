@@ -32,6 +32,17 @@
         .fc-toolbar {
     text-transform: capitalize;
 }
+  .fc-timegrid-slot {
+    height: 8px !important; 
+    border-bottom: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 7px;
+    font-weight: bold;
+  }
+  .fc-timegrid-slot-label-frame{
+    text-align: center !important;
+  }
 
 </style>
 
@@ -134,7 +145,7 @@
 
  var nuevoalias = jQuery.noConflict();
  
-  nuevoalias( document ).ready(function() {
+ nuevoalias( document ).ready(function() {
     // 
     let contador = 0;
     $(".fc-timegrid-slot-label").each(function()
@@ -142,17 +153,20 @@
       if (contador == 0){
         nuevoalias(this).attr('rowspan', '4');
         contador += 1;
+        nuevoalias(this).css("font-size", "1rem");
 
       }
       else if (contador == 3)
       {
           nuevoalias(this).remove();
           contador = 0; 
+          nuevoalias(this).css("font-size", "1rem");
       }
       else
       {
         nuevoalias(this).remove();
         contador += 1;
+       nuevoalias(this).css("font-size", "1rem");
       }
     });
 });

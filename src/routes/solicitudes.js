@@ -155,7 +155,7 @@ router.post('/IngresoPermiso', isLoggedIn, async (req, res) => {
 router.get('/vacaciones', isLoggedIn, async (req, res) => {
     // buscar los datos del usuario en las variables req
     const vacacione = await pool.query('SELECT * FROM sol_selec_dias');
-    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1 ORDER BY t1.Nombre ASC");
+    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1  AND t1.idUsuario not in (1) ORDER BY t1.Nombre ASC");
     const solicitud = await pool.query('SELECT * FROM sol_solicitud');
 
 
@@ -929,8 +929,9 @@ router.post('/updateVacaciones', async (req,res) => {
 
       const mail1 = {
         to : "rrhh@renelagos.com",
-        nombre : result1Info1[0].nombre,
-        aprobador : req.user.Nombre
+        nombre : result1Info1[0].Nombre,
+        aprobador : req.user.Nombre,
+        comentario : req.body.Observacion
       }
 
   mensajeria.EnvioMailCambioEstadoVacaciones(mail1);

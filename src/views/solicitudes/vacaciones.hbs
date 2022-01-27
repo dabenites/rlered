@@ -341,7 +341,8 @@ button.close {
                <div class="form-group row">
                   <label for="staticEmail" class="col-sm-3 col-form-label">Aprobador :</label>
                   <div class="col-sm-9">
-                  <select class=" form-control" name="idAprobador" id="idAprobador">
+                  <select class=" form-control" name="idAprobador" id="idAprobador" required="required">
+                    <option value="">Seleccione</option>
                     {{#each usuarios}}
                         <option value="{{idUsuario}}">{{Nombre}}</option>
                     {{/each}}

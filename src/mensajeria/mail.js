@@ -576,7 +576,8 @@ module.exports.EnvioMailCambioEstadoVacaciones =  async function (objeto) {
   
          const generico = "Estimado/a:\n" +
                           " \t Se informa que se ha cambiado el estado de una solicitud de vacaciones ingresada po " +objeto.nombre +". \n" +
-                          " Encargado de actualizacion : " + objeto +"\n" +
+                          " Encargado de actualizacion : " + objeto.aprobador +"\n" +
+                          " Comentario Aprobacion : " + objeto.comentario +"\n" +
                           " Saludos, \n"+
                           " RLE - Planner";
   

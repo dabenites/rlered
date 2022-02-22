@@ -216,6 +216,16 @@ button.close {
                     {{/each}}
                   </select>
              </div>
+             <div class="form-group row">
+                 <label for="staticEmail" class="col-sm-3 col-form-label">Informar :</label>
+                 <div class="col-sm-9">
+                    <select class=" form-control" name="idInformar" id="idInformar" multiple>
+                        {{#each usuarios}}
+                        <option value="{{idUsuario}}">{{Nombre}}</option>
+                        {{/each}}
+                    </select>
+                 </div>
+               </div>
               <div class="item form-group">
                 <label class="col-form-label col-md-3 col-sm-3 label-align" for="txtComentario">Comentario<span
                     class="required"></span>

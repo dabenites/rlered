@@ -51,14 +51,14 @@
                             <div class="form-group row">
                                 <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Nº Presupuesto"><b></b>Nº Presupuesto:</b></label>
                                 <div class="col-md-7 col-sm-7 ">
-										<input type="text" id="numPpto" name="numPpto" required="required" class="form-control">
+										<input type="text" id="numPpto" name="numPpto" class="form-control">
 									</div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Tipo Moneda"><b></b>Tipo Moneda:</b></label>
                                 <div class="col-md-7 col-sm-7 ">
-                                        <select class="select2_single form-control" tabindex="-1" name="tipoMoneda" id="tipoMoneda">
-											<option>Seleccione una opción</option>
+                                        <select class="select2_single form-control" tabindex="-1" name="tipoMoneda" id="tipoMoneda" required="required">
+											<option value="">Seleccione una opción</option>
 											{{#each monedas}}
 											<option value="{{id_moneda}}">{{descripcion}}</option>
 											{{/each}}
@@ -74,14 +74,14 @@
                             <div class="form-group row">
                                 <label class="col-form-label col-md-4 col-sm-4 label-align"	for="% Presupuesto"><b></b>% Presupuesto:</b></label>
                                 <div class="col-md-7 col-sm-7 ">
-										<input type="text" id="porc_presupuesto" name="porc_presupuesto" required="required" class="form-control">
+										<input type="text" id="porc_presupuesto" name="porc_presupuesto" class="form-control">
 									</div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Tipo Cobro"><b></b>Tipo Cobro:</b></label>
                                     <div class="col-md-7 col-sm-7 ">
-										<select class="select2_single form-control" tabindex="-1" name="tipoCobro" id="tipoCobro">
-											<option>Seleccione una opción</option>
+										<select class="select2_single form-control" tabindex="-1" name="tipoCobro" id="tipoCobro" required="required">
+											<option value="">Seleccione una opción</option>
 											{{#each tipoCobro}}
 											    <option value="{{id}}">{{descripcion}}</option>
 											{{/each}}

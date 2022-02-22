@@ -50,9 +50,7 @@ router.get('/permisos', isLoggedIn, async (req, res) => {
 router.post('/IngresoPermiso', isLoggedIn, async (req, res) => {
   // buscar los datos del usuario en las variables req
  
-  
-
- const { tipoP,fechaI,horaI ,fechaT,horaT,idActividad,idAprobador,comentario} = req.body; 
+ const { tipoP,fechaI,horaI ,fechaT,horaT,idActividad,idAprobador,comentario,idInformar} = req.body; 
  var horai = horaI.substring(0, 5);
  var horaf = horaT.substring(0, 5);
  
@@ -130,7 +128,42 @@ router.post('/IngresoPermiso', isLoggedIn, async (req, res) => {
 
     mensajeria.EnvioMailSolicitudPermiso(mail);
 
-    // cargada el detalle de la solicitud 
+    
+    if (idInformar !== undefined)
+    {
+      if (Array.isArray(idInformar))
+      {
+        idInformar.forEach( async(dat)=>{
+
+          const infoInformarN = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [dat]);
+
+        const mailN = {
+          to : infoInformarN[0].Email,
+          comentario : comentario,
+          solicitante : req.user.Nombre
+        }
+    
+        mensajeria.EnvioMailSolicitudPermiso(mailN);
+
+         
+        });
+      }
+      else
+      {
+        const infoInformar = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idInformar]);
+
+        const mail = {
+          to : infoInformar[0].Email,
+          comentario : comentario,
+          solicitante : req.user.Nombre
+        }
+    
+        mensajeria.EnvioMailSolicitudPermiso(mail);
+
+        
+      }
+    }
+
 
     res.redirect("../solicitudes/permisos");
  }
@@ -549,7 +582,7 @@ router.post('/AddIngreso', async (req,res) => {
       }
       else
       {
-        const infoInformar = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idAprobador]);
+        const infoInformar = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idInformar]);
 
         const mail = {
           to : infoAprobador[0].Email,
@@ -575,8 +608,6 @@ router.post('/AddIngreso', async (req,res) => {
 
 
 });
-
-
 
 router.get('/apermisos', async (req,res) => {
 
@@ -1514,6 +1545,34 @@ router.post('/uhorasextras', async (req,res) => {
      }
   }));
 
+});
+
+
+// ORDEN COMPRA 
+
+router.get('/ordencompra', async (req,res) => {
+
+  // empresas 
+  const empresas = await pool.query('SELECT * FROM sys_empresa'); 
+
+  res.render('solicitudes/ordencompra', { req ,empresas, layout: 'template'});
+
+}); 
+
+router.post('/buscaEmpresa', isLoggedIn, async (req, res) => {
+
+  const { id} = req.body;
+
+  const empresa = await pool.query('SELECT * FROM sys_empresa  as t1 WHERE t1.id = ?',[id]); 
+
+  const informacion = {
+    rut : empresa[0].rut,
+    razonsocial : empresa[0].razonsocial
+  }
+
+
+
+  res.send(informacion);
 });
 
 

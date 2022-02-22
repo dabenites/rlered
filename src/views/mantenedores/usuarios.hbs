@@ -20,7 +20,7 @@
             <ul class="nav navbar-right panel_toolbox">
                 <td style="text-align: right;width:220px">
                     <a type="button" class="btn btn-info" href="/mantenedores/usuario/crear">Crear usuarios</a>
-                   <!--  <a type="button" class="btn btn-secondary" href="/mantenedores/usuario/password">Generar Claves</a> -->
+                    <!--<a type="button" class="btn btn-secondary" href="/mantenedores/usuario/password">Generar Claves</a> -->
                 </td>
             </ul>
             <div class="clearfix"></div>
@@ -53,6 +53,7 @@
                             <div class="btn-group" role="group" aria-label="Basic example">
 								<button type="button" class="btn btn-secondary btn-sm"><a type="button" href="usuario/editar/{{idUsuario}}" style="color: white;"> Editar </a></button>
 								<button type="button" class="btn btn-warning btn-sm"><a type="button" href="usuario/permisos/{{idUsuario}}" style="color: white;">Permisos</a></button>
+                                <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="usuario/pwd/{{idUsuario}}" onclick="return confirm('¿Esta seguro desea dejar la password por defecto ?')" style="color: white;">Password</a></button> 
                             </div>
                         </td>
                     </tr>

@@ -813,9 +813,9 @@ router.post('/cargarFactura', async (req, res) => {
     };
 
  // Descomentar una vez terminaada las pruebas para el ingreso de facturaciones.    
- // mensajeria.EnvioMailIngresoFactura(facturacion); 
- // mensajeria.EnvioMailIngresoFactura(mailAvisoClaudio); 
- // mensajeria.EnvioMailIngresoFactura(mailAvisoMario); 
+  mensajeria.EnvioMailIngresoFactura(facturacion); 
+  mensajeria.EnvioMailIngresoFactura(mailAvisoClaudio); 
+  mensajeria.EnvioMailIngresoFactura(mailAvisoMario); 
 
 const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]); 
 

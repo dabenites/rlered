@@ -501,30 +501,67 @@ router.get('/editar/:id', async (req, res) => {
   
   // // 
 
-  const proyectos = await pool.query("SELECT * , t1.id as idPro, " +
-                                    " t1.id_director AS idDir, " +
-                                     " t1a.Nombre AS nomDir, " +
-                                     " t1.id_pais AS id_pais, " +
-                                     " t1.zona AS zona, " +
-                                     " t1.id_estado as id_estado,"+
-                                     " t1.suelo AS suelo, " +
-                                     " t1.categoria AS categoria, " +
-                                     " t1.id_jefe AS idJefe, t1b.Nombre AS nomJefe, " +
-                                     " t1.id_mandante AS idMan , t1c.name nomMan, " +
-                                     " t1.id_cliente AS idCli , t1d.name nomCli, " +
-                                     " t1.id_arquitecto AS idArq , t1e.name nomArq, " +
-                                     " t1.id_revisor AS idRev , t1f.name nomRev, " +
-                                     " t1p.simbolo AS simbolo," +
-                                     " CONCAT(t1p.simbolo,' /', 'm <sup> 2</sup>')  AS sm2" +
-                                     " FROM pro_proyectos AS t1 " +
-                                     " LEFT JOIN sys_usuario AS t1a ON t1.id_director = t1a.idUsuario " +
-                                     " LEFT JOIN sys_usuario AS t1b ON t1.id_jefe = t1b.idUsuario " +
-                                     " LEFT JOIN contacto AS t1c ON t1.id_mandante = t1c.id " +
-                                     " LEFT JOIN contacto AS t1d ON t1.id_cliente = t1d.id " +
-                                     " LEFT JOIN contacto AS t1e ON t1.id_arquitecto = t1e.id " +
-                                     " LEFT JOIN contacto AS t1f ON t1.id_revisor = t1f.id " +
-                                     " LEFT JOIN moneda_tipo AS t1p ON t1.id_tipo_moneda = t1p.id_moneda " +
-                                     " WHERE t1.id = ?",[id]);
+
+  const pre =  await pool.query("SELECT * from pro_proyectos AS t1 WHERE t1.id = ? ", [id]);
+  let proyectos;
+  if (pre[0].id_tipo_servicio == 2)
+  {
+    console.log("Buscar la informacion del ing revi");
+    
+    proyectos = await pool.query("SELECT * , t1.id as idPro, " +
+    " t1.id_director AS idDir, " +
+     " t1a.Nombre AS nomDir, " +
+     " t1.id_pais AS id_pais, " +
+     " t1.zona AS zona, " +
+     " t1.id_estado as id_estado,"+
+     " t1.suelo AS suelo, " +
+     " t1.categoria AS categoria, " +
+     " t1.id_jefe AS idJefe, t1b.Nombre AS nomJefe, " +
+     " t1.id_mandante AS idMan , t1c.name nomMan, " +
+     " t1.id_cliente AS idCli , t1d.Nombre as  nomCli, " +
+     " t1.id_arquitecto AS idArq , t1e.name nomArq, " +
+     " t1.id_revisor AS idRev , t1f.name nomRev, " +
+     " t1p.simbolo AS simbolo," +
+     " CONCAT(t1p.simbolo,' /', 'm <sup> 2</sup>')  AS sm2" +
+     " FROM pro_proyectos AS t1 " +
+     " LEFT JOIN sys_usuario AS t1a ON t1.id_director = t1a.idUsuario " +
+     " LEFT JOIN sys_usuario AS t1b ON t1.id_jefe = t1b.idUsuario " +
+     " LEFT JOIN contacto AS t1c ON t1.id_mandante = t1c.id " +
+     " LEFT JOIN sys_usuario AS t1d ON t1.id_cliente = t1d.idUsuario " +
+     " LEFT JOIN contacto AS t1e ON t1.id_arquitecto = t1e.id " +
+     " LEFT JOIN contacto AS t1f ON t1.id_revisor = t1f.id " +
+     " LEFT JOIN moneda_tipo AS t1p ON t1.id_tipo_moneda = t1p.id_moneda " +
+     " WHERE t1.id = ?",[id]);
+  }
+  else
+  {
+    proyectos = await pool.query("SELECT * , t1.id as idPro, " +
+    " t1.id_director AS idDir, " +
+     " t1a.Nombre AS nomDir, " +
+     " t1.id_pais AS id_pais, " +
+     " t1.zona AS zona, " +
+     " t1.id_estado as id_estado,"+
+     " t1.suelo AS suelo, " +
+     " t1.categoria AS categoria, " +
+     " t1.id_jefe AS idJefe, t1b.Nombre AS nomJefe, " +
+     " t1.id_mandante AS idMan , t1c.name nomMan, " +
+     " t1.id_cliente AS idCli , t1d.name nomCli, " +
+     " t1.id_arquitecto AS idArq , t1e.name nomArq, " +
+     " t1.id_revisor AS idRev , t1f.name nomRev, " +
+     " t1p.simbolo AS simbolo," +
+     " CONCAT(t1p.simbolo,' /', 'm <sup> 2</sup>')  AS sm2" +
+     " FROM pro_proyectos AS t1 " +
+     " LEFT JOIN sys_usuario AS t1a ON t1.id_director = t1a.idUsuario " +
+     " LEFT JOIN sys_usuario AS t1b ON t1.id_jefe = t1b.idUsuario " +
+     " LEFT JOIN contacto AS t1c ON t1.id_mandante = t1c.id " +
+     " LEFT JOIN contacto AS t1d ON t1.id_cliente = t1d.id " +
+     " LEFT JOIN contacto AS t1e ON t1.id_arquitecto = t1e.id " +
+     " LEFT JOIN contacto AS t1f ON t1.id_revisor = t1f.id " +
+     " LEFT JOIN moneda_tipo AS t1p ON t1.id_tipo_moneda = t1p.id_moneda " +
+     " WHERE t1.id = ?",[id]);
+
+  }
+
 
   const zonas = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+proyectos[0].id_pais+" AND t1.id_parametro = 1 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
   const suelo = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+proyectos[0].id_pais+" AND t1.id_parametro = 2 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
@@ -553,7 +590,7 @@ router.get('/buscarDirector/:find', async (req, res) => {
   const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
                                        " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
                                        " AND t1.id_estado = 1" + 
-                                       " AND (t1.idCategoria IN (25,26,28,1,42,27,41) OR t1.idUsuario IN (39,24) )");
+                                       " AND (t1.idCategoria IN (25,26,28,1,42,27,41,43) OR t1.idUsuario IN (39,24) )");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
@@ -589,6 +626,20 @@ router.get('/buscarCoord/:find', async (req, res) => {
 
 });
 
+router.get('/buscarCoordPe/:find', async (req, res) => {
+  
+  // BUSCAR DIRECTOR  
+  const nombre = req.query.term;
+  const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
+                                       " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
+                                       " AND t1.id_estado = 1" + 
+                                       " AND  t1.idUsuario IN (86)");
+  
+  res.setHeader('Content-Type', 'application/json');
+  res.json(directores);
+
+});
+
 router.get('/buscarProA/:find', async (req, res) => {
   
   // BUSCAR DIRECTOR  
@@ -603,6 +654,26 @@ router.get('/buscarProA/:find', async (req, res) => {
                                        " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
                                        " AND t1.id_estado = 1" + 
                                        " AND t1.idUsuario IN (39, 34) ");
+  
+  res.setHeader('Content-Type', 'application/json');
+  res.json(directores);
+
+});
+
+router.get('/buscarProAPe/:find', async (req, res) => {
+  
+  // BUSCAR DIRECTOR  
+  const nombre = req.query.term;
+
+
+  console.log("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
+  " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
+  " AND t1.id_estado = 1" + 
+  " AND t1.idUsuario IN (39, 34) )");
+  const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
+                                       " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
+                                       " AND t1.id_estado = 1" + 
+                                       " AND t1.idUsuario IN (86) ");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
@@ -726,7 +797,25 @@ router.post('/cargarFactura', async (req, res) => {
       director : infoDirector[0].nom
     };
 
- mensajeria.EnvioMailIngresoFactura(facturacion); 
+    const mailAvisoClaudio = {
+      to : 'cgahona@renelagos.com',
+      comentario : comentario,
+      proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
+      solicitante : req.user.Nombre,
+      director : infoDirector[0].nom
+    };
+    const mailAvisoMario = {
+      to : 'mcastillo@renelagos.com',
+      comentario : comentario,
+      proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
+      solicitante : req.user.Nombre,
+      director : infoDirector[0].nom
+    };
+
+ // Descomentar una vez terminaada las pruebas para el ingreso de facturaciones.    
+ // mensajeria.EnvioMailIngresoFactura(facturacion); 
+ // mensajeria.EnvioMailIngresoFactura(mailAvisoClaudio); 
+ // mensajeria.EnvioMailIngresoFactura(mailAvisoMario); 
 
 const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]); 
 

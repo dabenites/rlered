@@ -125,6 +125,69 @@ router.get('/pais/delete/:id', async (req, res) => {
 
 });
 
+// AREA NEGOCIO 
+router.get('/areanegocio', isLoggedIn, async (req, res) => {
+
+    const areasNegocio = await pool.query('SELECT * FROM area_negocio');
+
+    const isEqualHelperHandlerbar = function(a, b, opts) {
+        if (a == b) {
+            return true
+        } else { 
+            return false
+        } 
+    };
+
+    
+    if (req.query.a === undefined)
+    {
+        res.render('mantenedores/areanegocio', { req ,areasNegocio, layout: 'template', helpers : {
+            if_equal : isEqualHelperHandlerbar
+        }});
+    }
+    else
+        {
+            var verToask = {};
+            switch(req.query.a)
+            {
+                case 1: // Crear
+                case "1":
+                    verToask= {
+                    titulo : "Mensaje",
+                    body   : "Area Negocio agregado correctamente.",
+                    tipo   : "Crear"
+                        };
+
+                        res.render('mantenedores/areanegocio', { verToask, req ,areasNegocio, layout: 'template', helpers : {
+                            if_equal : isEqualHelperHandlerbar
+                        }});
+                break;
+               
+            }
+        }
+
+
+});
+
+router.post('/eddAreaNeogcio', async (req,res) => {
+    const {   name } = req.body;//Obtener datos title,url,description
+
+    const newAreaNeogcio  ={ //Se gurdaran en un nuevo objeto
+        areanegocio : name
+    };
+  //Guardar datos en la BD     
+  const result = await pool.query('INSERT INTO area_negocio set ?', [newAreaNeogcio]);//Inserción
+  //res.redirect('../mantenedores/categoria');
+
+  res.redirect(   url.format({
+    pathname:'/mantenedores/areanegocio',
+            query: {
+            "a": 1
+            }
+        }));
+});
+
+
 /// CATEGORIAS 
 router.get('/categoria', isLoggedIn, async (req, res) => {
     const categorias = await pool.query('SELECT t1.*, t2.centroCosto FROM sys_categoria as t1 , centro_costo as t2 where t1.idCentroCosto = t2.id ORDER BY t1.categoria ASC');
@@ -271,23 +334,26 @@ router.get('/categoria/delete/:id', async (req, res) => {
 
 /// CENTRO COSTO 
 router.get('/centrocosto', isLoggedIn, async (req, res) => {
-    const centrosCostos = await pool.query('SELECT * FROM centro_costo as t1 ORDER BY t1.centroCosto ASC');
-    res.render('mantenedores/centrocosto', { req ,centrosCostos, layout: 'template'});
+    const centrosCostos = await pool.query('SELECT t1.*, t2.id as idNegocio, t2.areanegocio FROM centro_costo as t1, area_negocio AS t2 WHERE t1.idAreaNegocio = t2.id ORDER BY t1.centroCosto ASC');
+    const areaNegocios = await pool.query('SELECT * FROM area_negocio');
+
+    res.render('mantenedores/centrocosto', { req ,centrosCostos,areaNegocios, layout: 'template'});
 });
 
 router.post('/addCentroCosto', async (req,res) => {
-    const { name } = req.body; //Obtener datos title,url,description
+    const { name, idAreaNegocio} = req.body; //Obtener datos title,url,description
 
     const newCenctroCosto  ={ //Se gurdaran en un nuevo objeto
-        centroCosto : name 
+        centroCosto : name ,
+        idAreaNegocio :idAreaNegocio
     };
     //Guardar datos en la BD     
     const result = await pool.query('INSERT INTO centro_costo set ?', [newCenctroCosto]);//Inserción
     //res.redirect('../mantenedores/centrocosto');
 
-    const centrosCostos = await pool.query('SELECT * FROM centro_costo as t1 ORDER BY t1.centroCosto ASC');
+    const centrosCostos = await pool.query('SELECT t1.*, t2.id as idNegocio, t2.areanegocio FROM centro_costo as t1, area_negocio AS t2 WHERE t1.idAreaNegocio = t2.id ORDER BY t1.centroCosto ASC');
     //console.log(usuarios);
-
+    const areaNegocios = await pool.query('SELECT * FROM area_negocio');
     
     const verToask = {
         titulo : name,
@@ -295,32 +361,45 @@ router.post('/addCentroCosto', async (req,res) => {
         tipo   : "Crear"
     };
     //console.log(verToask);
-    res.render('mantenedores/centrocosto', { verToask, req ,centrosCostos,layout: 'template'});
+    res.render('mantenedores/centrocosto', { verToask, req ,centrosCostos,areaNegocios, layout: 'template'});
 
 
 })
 
 router.get('/centrocosto/edit/:id', async (req, res) => {
     const { id } = req.params;
-    const centrosCostos = await pool.query('SELECT * FROM centro_costo as t1 ORDER BY t1.centroCosto ASC');
+    const centrosCostos = await pool.query('SELECT t1.*, t2.id as idNegocio, t2.areanegocio FROM centro_costo as t1, area_negocio AS t2 WHERE t1.idAreaNegocio = t2.id ORDER BY t1.centroCosto ASC');
+    const areaNegocios = await pool.query('SELECT * FROM area_negocio');
+
     const centro = await pool.query('SELECT * FROM centro_costo WHERE id = ?', [id]);
-    //console.log(centro);
-    
-    res.render('mantenedores/centrocosto', { req , centrosCostos, centro: centro[0], layout: 'template'});
+    console.log(centro);
+    const isEqualHelperHandlerbar = function(a, b, opts) {
+        if (a == b) {
+            return true
+        } else { 
+            return false
+        } 
+    };
+
+
+    res.render('mantenedores/centrocosto', { req , centrosCostos,areaNegocios, centro: centro[0], layout: 'template', helpers : {
+        if_equal : isEqualHelperHandlerbar
+    }});
     
 });
 
 router.post('/editCentroCosto', async (req,res) => {
-    const {  id, name } = req.body; //Obtener datos title,url,description
+    const {  id, name , idAreaNegocio} = req.body; //Obtener datos title,url,description
 
     const newCentroCosto  ={ //Se gurdaran en un nuevo objeto
-        centroCosto : name 
+        centroCosto : name ,
+        idAreaNegocio:idAreaNegocio
     };
     //Guardar datos en la BD     
     await pool.query('UPDATE centro_costo set ? WHERE id = ?', [newCentroCosto, id]);
   
 
-    const centrosCostos = await pool.query('SELECT * FROM centro_costo as t1 ORDER BY t1.centroCosto ASC');
+    const centrosCostos = await pool.query('SELECT t1.*, t2.id as idNegocio, t2.areanegocio FROM centro_costo as t1, area_negocio AS t2 WHERE t1.idAreaNegocio = t2.id ORDER BY t1.centroCosto ASC');
     //console.log(usuarios);
 
     
@@ -728,6 +807,7 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
     const usuarios = await pool.query("SELECT * , t4.descripcion as estado FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3,  sys_usuario_estado as t4 "+
                                        "WHERE t1.idCategoria = t2.id AND t3.id_Sucursal = t1.idSucursal "+
                                        " AND t1.id_estado = t4.id");
+                                       
     res.render('mantenedores/usuarios', { usuarios, req ,layout: 'template'});
 }); 
 
@@ -895,8 +975,6 @@ router.get('/usuario/permisos/:id', async (req, res) => {
          } 
      };
      
-    console.log(req.query);
-
      if (req.query.a === undefined)
     {
         res.render('mantenedores/permisos', { permisos, usuario: usuario[0],req ,layout: 'template', helpers : {
@@ -917,6 +995,35 @@ router.get('/usuario/permisos/:id', async (req, res) => {
                 }});
 
     }
+
+});
+
+
+router.get('/usuario/pwd/:id', async (req, res) => {
+    const { id } = req.params;
+
+    const usuario = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.idUsuario = ?",[id]);
+
+    const usuarios = await pool.query("SELECT * FROM sys_usuario as t1, sys_categoria as t2,sys_sucursal as t3  WHERE t1.idCategoria = t2.id AND t3.id_Sucursal = t1.idSucursal");
+    
+        
+    const newPassword  ={ 
+        idUsuario : usuario[0].idUsuario,
+        password:bcrypt.hashSync("RL$"+usuario[0].login,10)
+    };
+
+
+    const info = await pool.query('UPDATE sys_password set ? WHERE idUsuario = ?', [newPassword, id]);
+
+    const verToask = {
+        titulo : usuario[0].Nombre,
+        body   : "Se ha actualizado la contraseña correctamente",
+        tipo   : "Editar"
+    };
+    //console.log(verToask);
+    res.render('mantenedores/usuarios', { verToask, req ,usuarios,layout: 'template'});
+
+    
 
 });
 

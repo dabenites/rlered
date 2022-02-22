@@ -816,6 +816,7 @@ function buscaCodigo()
 
 function cargaServicio(id_servicio)
 {
+    let pais       =  $( "#id_pais" ).val();
     if (id_servicio != 0)
     {
         if (id_servicio == 2) // coordinación cambiar los labels 
@@ -829,22 +830,65 @@ function cargaServicio(id_servicio)
             $("#eDirector").html("Profesional Responsable:");
             $("#eJefe").html("Coordinador:");
             $("#eclienteContacto").html("Ingeniero Revisor:");
-            $("#eArquitecto").html("Calculista:");
 
-            $("#eArquitecto").html("Calculista:");
+            if (pais == 1)
+            {
+                $("#eArquitecto").html("Calculista:");
+            }
+            else if (pais == 6)
+            {
+                $("#eArquitecto").html("Cliente:");
+            }
+            else
+            {
+                $("#eArquitecto").html("Calculista:");
+            }
+            
             $("#efechaEntregaApl").html("Fecha Entrega:");
 
             // Ingeniero Revisor sera por centros de costos
-            nuevoalias( "#cliente" ).autocomplete({
-                source: "buscarIngRev/find=da",
+                nuevoalias( "#cliente" ).autocomplete({
+                    source: "buscarIngRev/find=da",
+                    minLength: 2,
+                    select: function( event, ui ) {
+                        nuevoalias('#id_cliente').val(ui.item.id);
+                    }
+                    });
+            
+
+
+            // Prof a cargo Mariane y Luis
+            if (pais == 6)
+            {
+                nuevoalias( "#director" ).autocomplete({
+                source: "buscarProAPe/find=da",
                 minLength: 2,
                 select: function( event, ui ) {
-                    nuevoalias('#id_cliente').val(ui.item.id);
+                    nuevoalias('#id_director').val(ui.item.id);
+                }
+                }); 
+
+                 nuevoalias( "#jefe" ).autocomplete({
+                source: "buscarCoordPe/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_jefe').val(ui.item.id);
                 }
                 });
 
-            // Coordinador solo simon
-            nuevoalias( "#jefe" ).autocomplete({
+            }
+            else
+            {
+                nuevoalias( "#director" ).autocomplete({
+                    source: "buscarProA/find=da",
+                    minLength: 2,
+                    select: function( event, ui ) {
+                        nuevoalias('#id_director').val(ui.item.id);
+                    }
+                    });   
+
+                    // Coordinador solo simon
+                nuevoalias( "#jefe" ).autocomplete({
                 source: "buscarCoord/find=da",
                 minLength: 2,
                 select: function( event, ui ) {
@@ -852,14 +896,9 @@ function cargaServicio(id_servicio)
                 }
                 });
 
-            // Prof a cargo Mariane y Luis
-            nuevoalias( "#director" ).autocomplete({
-                source: "buscarProA/find=da",
-                minLength: 2,
-                select: function( event, ui ) {
-                    nuevoalias('#id_director').val(ui.item.id);
-                }
-                });
+            }
+
+            
         }
         else
         {

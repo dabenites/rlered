@@ -106,6 +106,15 @@ router.post('/fileupload', async (req,res) => {
                         });
                   });
             }
+            else
+            {
+                mensajeria.MensajerErrores("Ingreso Costo externo \n Error al mover el archivo fisico subido al servidor pero no se mueve a la carpeta de destino");    
+            }
+        }
+        else    
+        {
+            // mandar un aviso que no encuentra el path. fisico para subir el archivo. 
+            mensajeria.MensajerErrores("Ingreso Costo externo \n No se encuentra el path fisico en el servido de Heroku");
         }
     })
 

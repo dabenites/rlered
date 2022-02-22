@@ -12,6 +12,7 @@
                 <thead>
                     <tr>
                         <th>Nombre</th>
+                        <th>Area Negocio</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
@@ -20,6 +21,7 @@
                         {{#each centrosCostos}}
                             <tr>
                                 <td>{{centroCosto}}</td>
+                                <td>{{areanegocio}}</td>
                                 <td>
                                     <div class="btn-group" role="group" aria-label="Basic example">
                                     <button type="button" class="btn btn-secondary btn-sm"><a type="button"href="../../centrocosto/edit/{{id}}" style="color: white;"> Editar </a></button>
@@ -34,6 +36,7 @@
                             {{#each centrosCostos}}
                                 <tr>
                                     <td>{{centroCosto}}</td>
+                                     <td>{{areanegocio}}</td>
                                 
                                         <td >
                                             <div class="btn-group" role="group" aria-label="Basic example">
@@ -48,6 +51,7 @@
                             {{#each centrosCostos}}
                                 <tr>
                                     <td>{{centroCosto}}</td>
+                                     <td>{{areanegocio}}</td>
                                 
                                         <td >
                                             <div class="btn-group" role="group" aria-label="Basic example">
@@ -91,6 +95,27 @@
                     {{/if}}
                     <label for="Nombre Centro Costo">Nombre Centro Costo :</label>
                     <input type="text" id="name" class="form-control" value="{{centro.centroCosto}}" name="name" required />
+                    {{#if centro }}
+                    <label for="ID Centro">Area Negocio</label>
+                    <select class="select2_single form-control" tabindex="-1" name="idAreaNegocio">
+							{{#each areaNegocios}}
+							{{#if (if_equal id ../centro.idAreaNegocio) }}
+							<option value="{{id}}" selected>{{areanegocio}}</option>
+							{{else}}
+							<option value="{{id}}">{{areanegocio}}</option>
+							{{/if}}
+							{{/each}}
+
+						</select>
+                    {{else}}
+                    <label for="ID Centro">Area Negocio</label>
+                         <select class="select2_single form-control" tabindex="-1" name="idAreaNegocio">
+							{{#each areaNegocios}}
+							    <option value="{{id}}">{{areanegocio}}</option>
+							{{/each}}
+
+						</select>
+                    {{/if}}
 
                     <br />
 

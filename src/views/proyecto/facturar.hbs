@@ -1,3 +1,26 @@
+<head>
+    <style>
+        .close {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+        }
+        .close:not(:disabled):not(.disabled) {
+            cursor: pointer;
+        }
+        button.close {
+            padding: 0;
+            background-color: transparent;
+            border: 0;
+            -webkit-appearance: none;
+        }
+    </style>
+</head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 <div class="col-md-12 col-sm-12 ">
     <div class="x_panel">
         <div class="x_title">
@@ -24,6 +47,7 @@
                         <div class="col-md-5 col-sm-5 ">
                             <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario"><b>Tipo Servicio </b></label>
                             <label class="col-form-label col-md-6 col-sm-6"	for="Destinatario"> {{proyecto.servicio}}</label>
+                            <input type="hidden" id="id_tipo_servicio" name="id_tipo_servicio" value="{{proyecto.id_tipo_servicio}}">
                         </div>
                         <div class="col-md-4 col-sm-4 ">
                             <label class="col-form-label col-md-4 col-sm-4 label-align"	for="Destinatario"><b>Tipo Proyecto </b></label>
@@ -177,6 +201,30 @@
                                 </div>
             </div>
     </div>
+    <div class="modal fade" id="facturar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Requisitos para Facturar</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                        <div class="modal-body">
+                            
+                            <div id="datosfaltantes">
+
+                            </div>
+                           
+                            
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" style="color: white;"><a  href="/proyecto/editar/{{proyecto.id}}" target="_blank"  style="color: white;"> Editar </a></button>
+                            <button type="button" class="btn btn-success" data-dismiss="modal">Cerrar</button>
+                         </div>
+                    </div>
+                </div>
+    </div>
 </div>
 {{else}}
 <div class="col-md-12 col-sm-12 ">
@@ -197,6 +245,58 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
+    function ValidarIngreso ( )
+	{
+        let tipo_servicio = $("#id_tipo_servicio").val();   // tipo de servicio 
+        let tipo_cobro    = $("#tipoCobro").val();          // tipo de cobro
+        let proyecto      = $("#id_proyecto").val();        // id del proyecto  
+
+        let informacion = {tipo_servicio,tipo_cobro,proyecto };
+
+        let estado = true;
+        $.ajax({
+							async: false,
+							method:'POST',
+							url : '/proyecto/validoFactura',
+							data : informacion,
+							success : function(result)
+							{     
+                                if (Object.keys(result).length != 0)
+                                {
+                                    toastr.warning('Faltan parametros del proyecto para ingresar la factura', "Aviso", {
+                                                                            "progressBar": true
+                                                                        });
+
+                                    $('#facturar').modal('show');
+                                    $("#datosfaltantes").html(result.data);
+                                    estado = false;
+                                }
+                                else
+                                {
+                                    //alert("Todo correcto");
+                                    //$("#ingresoFactura").submit();
+                                }                                
+							}
+					});
+
+
+		
+
+        return estado;
+	};
+
+    $("#ingresoFactura").submit(function(e){
+	
+	
+	if (ValidarIngreso() == false)
+	{
+		e.preventDefault(); 
+
+	}
+	
+	//e.preventDefault(); 
+ });
+
       $('#tablafacturacion').DataTable({
         language: {
           "decimal": "",

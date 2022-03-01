@@ -1434,7 +1434,265 @@ router.post('/filtroProyecto', isLoggedIn, async (req, res) => {
 });
 
 
+router.post('/validoFactura', isLoggedIn, async (req, res) => {
 
+  //tipo_servicio: '1',
+  //tipo_cobro: '1',
+  //proyecto: '2562'
+  const {tipo_servicio,tipo_cobro,proyecto} =  req.body;
+  
+  const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?",[proyecto]);
+  
+  //console.log(infoProyecto);
+  const {id_tipo_proyecto,id_estado,superficie_pre,id_complejidad,num_pisos,num_subterraneo,id_pais,nombre} = infoProyecto[0]; // DATOS GENERALES
+  const {id_tipo_moneda,valor_metro_cuadrado,valor_proyecto,fecha_inicio} = infoProyecto[0]; // DATOS FINACIEROS
+  const {id_director,id_jefe,id_cliente,id_arquitecto} = infoProyecto[0]; // DATOS EQUIPO
+  const {id_revisor,fecha_entrega,fecha_termino,superficie_apl,zona,suelo,categoria,num_plano_estimado} = infoProyecto[0]; // Informacion APL
 
+  let verificacion = new Object();
+  let error = false;
+  let datos = "<ul>";
+
+  switch(tipo_servicio)
+  {
+    // Revisión
+    case 2:
+    case "2":
+      switch(tipo_cobro)
+      {
+        case 1:
+        case "1":
+        case 8:
+        case "8":  
+        if (id_tipo_proyecto == 0 || id_tipo_proyecto == ""){verificacion.TipoProyecto = id_tipo_proyecto;}
+        if (id_estado == 0 || id_estado == ""){verificacion.Estado = id_estado;}
+        if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
+        if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
+        if (num_pisos == 0 || num_pisos == ""){verificacion.NumPisos = num_pisos;}
+        if (num_subterraneo == 0 || num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+
+        if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
+        if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
+        if (valor_proyecto == 0 || valor_proyecto == ""){verificacion.ValorProyecto = valor_proyecto;}
+        if (fecha_inicio == 0 || fecha_inicio == ""){verificacion.FechaInicio = fecha_inicio;}
+        break;
+        
+        case 9:
+        case "9":
+          if (id_tipo_proyecto == 0 || id_tipo_proyecto == ""){verificacion.TipoProyecto = id_tipo_proyecto;}
+          if (id_estado == 0 || id_estado == ""){verificacion.Estado = id_estado;}
+          if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
+          if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
+          if (num_pisos == 0 || num_pisos == ""){verificacion.NumPisos = num_pisos;}
+          if (num_subterraneo == 0 || num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+  
+          if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
+          if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
+          if (valor_proyecto == 0 || valor_proyecto == ""){verificacion.ValorProyecto = valor_proyecto;}
+          if (fecha_inicio == 0 || fecha_inicio == ""){verificacion.FechaInicio = fecha_inicio;}
+          
+          if (id_director == 0 || id_director == ""){verificacion.Responsable = id_director;}
+          if (id_jefe == 0 || id_jefe == ""){verificacion.Coordinador = id_jefe;}
+          if (id_cliente == 0 || id_cliente == ""){verificacion.IngRevisor = id_cliente;}
+          if (id_arquitecto == 0 || id_arquitecto == ""){verificacion.Calculista = id_arquitecto;}
+        break;
+        case 10:
+        case "10":
+          if (id_tipo_proyecto == 0 || id_tipo_proyecto == ""){verificacion.TipoProyecto = id_tipo_proyecto;}
+          if (id_estado == 0 || id_estado == ""){verificacion.Estado = id_estado;}
+          if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
+          if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
+          if (num_pisos == 0 || num_pisos == ""){verificacion.NumPisos = num_pisos;}
+          if (num_subterraneo == 0 || num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+  
+          if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
+          if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
+          if (valor_proyecto == 0 || valor_proyecto == ""){verificacion.ValorProyecto = valor_proyecto;}
+          if (fecha_inicio == 0 || fecha_inicio == ""){verificacion.FechaInicio = fecha_inicio;}
+          
+          if (id_director == 0 || id_director == ""){verificacion.Responsable = id_director;}
+          if (id_jefe == 0 || id_jefe == ""){verificacion.Coordinador = id_jefe;}
+          if (id_cliente == 0 || id_cliente == ""){verificacion.IngRevisor = id_cliente;}
+          if (id_arquitecto == 0 || id_arquitecto == ""){verificacion.Calculista = id_arquitecto;}
+
+          if (fecha_entrega == 0 || fecha_entrega == ""){verificacion.FechaEntrega = fecha_entrega;}
+          if (zona == 0 || zona == ""){verificacion.Zona = zona;}
+          if (suelo == 0 || suelo == ""){verificacion.Suelo = suelo;}
+          if (categoria == 0 || categoria == ""){verificacion.Categoria = categoria;}
+        break;
+      }
+    break;
+    default:
+      // tipo_cobro
+      switch(tipo_cobro)
+      {
+        case 1:
+        case "1":
+        case 2:
+        case "2":        
+        if (id_tipo_proyecto == 0 || id_tipo_proyecto == ""){verificacion.TipoProyecto = id_tipo_proyecto;}
+        if (id_estado == 0 || id_estado == ""){verificacion.Estado = id_estado;}
+        if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
+        if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
+        if (num_pisos == 0 || num_pisos == ""){verificacion.NumPisos = num_pisos;}
+        if (num_subterraneo == 0 || num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+
+        if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
+        if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
+        if (valor_proyecto == 0 || valor_proyecto == ""){verificacion.ValorProyecto = valor_proyecto;}
+        if (fecha_inicio == 0 || fecha_inicio == ""){verificacion.FechaInicio = fecha_inicio;}
+
+        if (id_director == 0 || id_director == ""){verificacion.Director = id_director;}
+        if (id_jefe == 0 || id_jefe == ""){verificacion.Jefe = id_jefe;}
+        if (id_cliente == 0 || id_cliente == ""){verificacion.Cliente = id_cliente;}
+        if (id_arquitecto == 0 || id_arquitecto == ""){verificacion.Arquitecto = id_arquitecto;}
+        break;
+        case 3:
+        case "3":
+        case 4:
+        case "4":   
+        case 5:
+        case "5":
+        case 6:
+        case "6":
+          //console.log(infoProyecto);
+          if (id_tipo_proyecto == 0 || id_tipo_proyecto == ""){verificacion.TipoProyecto = id_tipo_proyecto;}
+          if (id_estado == 0 || id_estado == ""){verificacion.Estado = id_estado;}
+          if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
+          if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
+          if (num_pisos == 0 || num_pisos == ""){verificacion.NumPisos = num_pisos;}
+          if (num_subterraneo == 0 || num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+  
+          if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
+          if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
+          if (valor_proyecto == 0 || valor_proyecto == ""){verificacion.ValorProyecto = valor_proyecto;}
+          if (fecha_inicio == 0 || fecha_inicio == ""){verificacion.FechaInicio = fecha_inicio;}
+  
+          if (id_director == 0 || id_director == ""){verificacion.Director = id_director;}
+          if (id_jefe == 0 || id_jefe == ""){verificacion.Jefe = id_jefe;}
+          if (id_cliente == 0 || id_cliente == ""){verificacion.Cliente = id_cliente;}
+          if (id_arquitecto == 0 || id_arquitecto == ""){verificacion.Arquitecto = id_arquitecto;}
+
+          if (id_revisor == 0 || id_revisor == ""){verificacion.Revisor = id_revisor;}
+          if (fecha_entrega == 0 || fecha_entrega == ""){verificacion.FechaAPC = fecha_entrega;}
+          if (fecha_termino == 0 || fecha_termino == ""){verificacion.FechaAPL = fecha_termino;}
+          if (superficie_apl == 0 || superficie_apl == ""){verificacion.SuperficieAPL = superficie_apl;}
+          if (zona == 0 || zona == ""){verificacion.Zona = zona;}
+          if (suelo == 0 || suelo == ""){verificacion.Suelo = suelo;}
+          if (categoria == 0 || categoria == ""){verificacion.Categoria = categoria;}
+          if (num_plano_estimado == 0 || num_plano_estimado == ""){verificacion.PlanoEstimado = num_plano_estimado;}
+
+        break;   
+       case 7:
+       case "7":
+        if (id_pais == 0 || id_pais == ""){verificacion.Pais = id_pais;}
+        if (nombre == 0 || nombre == ""){verificacion.Nombre = nombre;}
+       break;
+      }
+	  break;
+	  }
+
+    Object.entries(verificacion).forEach( function(elemento, indice, array){
+      //console.log(array[indice][0]);
+      error = true;
+      switch(array[indice][0])
+      {
+        case "TipoProyecto":
+          datos +=" <li>Tipo Proyecto </li>";
+        break;
+        case "Estado":
+          datos +=" <li>Estado </li>";
+        break;
+        case "Complejidad":
+          datos +=" <li>Complejidad </li>";
+        break;
+        case "SuperficiePre":
+          datos +=" <li>Superficie Preliminar </li>";
+        break;
+        case "NumPisos":
+          datos +="<li> Nº Pisos</li>";
+        break;
+        case "NumSubte":
+          datos +="<li> Nº Subterraneo</li>";
+        break;
+        case "TipoMoneda":
+          datos +=" <li>Tipo Moneda</li>";
+        break;
+        case "ValorMetroCuadrado":
+          datos +=" <li>Valor Metro Cuadrado</li>";
+        break;
+        case "ValorProyecto":
+          datos +="<li> Valor Proyecto</li>";
+        break;
+        case "FechaInicio":
+          datos +="<li> Fecha Inicio</li>";
+        break;
+        case "Director":
+          datos +=" <li>Director Proyecto</li>";
+        break;
+        case "Jefe":
+          datos +="<li> Jefe Proyecto</li>";
+        break;
+        case "Cliente":
+          datos +="<li> Cliente</li>";
+        break;
+        case "Arquitecto":
+          datos +="<li> Arquitecto</li>";
+        break;
+        case "Revisor":
+          datos +="<li> Revisor</li>";
+        break;
+        case "FechaAPC":
+          datos +="<li> Fecha APC</li>";
+        break;
+        case "FechaAPL":
+          datos +="<li> Fecha APL</li>";
+        break;
+        case "SuperficieAPL":
+          datos +="<li> Superficie APL</li>";
+        break;
+        case "Zona":
+          datos +="<li>Zona</li>";
+        break;
+        case "Suelo":
+          datos +="<li>Suelo</li>";
+        break;
+        case "Categoria":
+          datos +="<li>Categoria</li>";
+        break;
+        case "PlanoEstimado":
+          datos +="<li>Nº Planos Estimado</li>";
+        break;
+        case "Responsable":
+          datos +="<li>Profesional Responsable</li>";
+        break;
+        case "Coordinador":
+          datos +="<li>Coordinador</li>";
+        break;
+        case "IngRevisor":
+          datos +="<li>Ingeniero Revisor</li>";
+        break;
+        case "Calculista":
+          datos +="<li>Calculista</li>";
+        break;
+        case "FechaEntrega":
+          datos +="<li>Fecha Entrega</li>";
+          break;
+      }
+    });
+      
+
+    // colocar los nombres correctos. 
+    console.log(verificacion);
+      
+    datos += "</ul>";
+    if (error)
+    {
+      verificacion.data = datos;
+    }
+
+    res.send(verificacion);
+    
+  });
 
 module.exports = router;

@@ -7,6 +7,7 @@ var url = require('url');
 const { isLoggedIn } = require('../lib/auth');
 
 const mensajeria = require('../mensajeria/mail');
+const { Console, count } = require('console');
 
 // Permisos 
 router.get('/permisos', isLoggedIn, async (req, res) => {
@@ -1555,7 +1556,29 @@ router.get('/ordencompra', async (req,res) => {
   // empresas 
   const empresas = await pool.query('SELECT * FROM sys_empresa'); 
 
-  res.render('solicitudes/ordencompra', { req ,empresas, layout: 'template'});
+  const solicitantes = await pool.query('SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1 ORDER BY t1.Nombre ASC'); 
+  const directores = await pool.query('SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1 AND t1.idCategoria IN (25,26,27,34,38,39,41,42,43,47,48,50,52,54) ORDER BY t1.Nombre ASC'); 
+
+  const centroCostos = await pool.query('SELECT * FROM centro_costo'); 
+  const proyectos = await pool.query('SELECT * FROM pro_proyectos'); 
+  const etapas = await pool.query('SELECT * FROM orden_compra_etapa'); 
+  const monedas = await pool.query("SELECT * FROM moneda_tipo as t1 WHERE t1.factura = 'Y'"); 
+
+
+  // preguntar si existen requerimientos para esta persona que esta logeada.
+  const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 WHERE t1.id_ingreso = ? AND t1.id_solicitud = 0 AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
+
+  if (requerimientos.length > 0)
+  {
+    res.render('solicitudes/ordencompra', { req ,empresas,directores,centroCostos, solicitantes,etapas, monedas, proyectos,requerimientos, layout: 'template'});
+  }
+  else
+  {
+    res.render('solicitudes/ordencompra', { req ,empresas,directores,centroCostos, solicitantes,etapas, monedas, proyectos, layout: 'template'});
+  }
+
+  
+  
 
 }); 
 
@@ -1574,6 +1597,161 @@ router.post('/buscaEmpresa', isLoggedIn, async (req, res) => {
 
   res.send(informacion);
 });
+
+router.post('/buscaProveedor', isLoggedIn, async (req, res) => {
+
+  const { id} = req.body;
+  let opciones;
+  switch(id)
+  {
+    case "1":
+      opciones = await pool.query('SELECT t1.id, t1.nombre as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
+    break;
+    case "2":
+      opciones = await pool.query('SELECT t1.id, t1.razon_social as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
+    break;
+  }
+  
+
+  
+
+
+  res.render('bitacora/optionValues', {opciones, layout: 'blanco'});
+});
+
+
+router.post('/buscaProveedorRut', isLoggedIn, async (req, res) => {
+
+  const { id} = req.body;
+
+  const proovedor = await pool.query('SELECT * FROM prov_externo  as t1 WHERE t1.id = ?',[id]); 
+
+  const informacion = {
+    rut : proovedor[0].rut,
+  }
+
+
+
+  res.send(informacion);
+});
+
+router.post('/buscaCentroCosto', isLoggedIn, async (req, res) => {
+
+  const { id} = req.body;
+
+  const centroCosto = await pool.query('SELECT * FROM centro_costo  as t1 WHERE t1.id = ?',[id]); 
+
+  const informacion = {
+    areanegocio : centroCosto[0].idAreaNegocio,
+  }
+
+
+
+  res.send(informacion);
+});
+
+
+router.post('/ordecompradetalle', isLoggedIn, async (req, res) => {
+
+  const { cantidad,descripcion,precioUnitario,moneda,tipocambio} = req.body;
+
+  const detalle  ={ //Se gurdaran en un nuevo objeto
+
+    id_ingreso :  req.user.idUsuario,
+    id_moneda: moneda,
+    cantidad : cantidad,
+    precio_unitario : precioUnitario,
+    tipo_cambio : tipocambio,
+    descripcion:descripcion
+  }
+
+  const infoPermiso = await pool.query('INSERT INTO orden_compra_requerimiento  set ? ', [detalle]);
+
+  // buscar toda la informacion relacionada a la persona que esta ignresando los requerimientos de la OC
+
+  const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 WHERE t1.id_ingreso = ? AND t1.id_solicitud = 0 AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
+
+
+
+  res.render('solicitudes/ordencompradetalle', { requerimientos,layout: 'blanco'});
+
+
+});
+
+//ordecompradetalleEliminar
+
+
+router.post('/ordecompradetalleEliminar', isLoggedIn, async (req, res) => {
+
+  const { id} = req.body;
+
+  // 
+
+  const result = await pool.query('DELETE FROM orden_compra_requerimiento WHERE id = ? ', [id]);
+
+  const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 WHERE t1.id_ingreso = ? AND t1.id_solicitud = 0 AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
+  
+  res.render('solicitudes/ordencompradetalle', { requerimientos,layout: 'blanco'});
+
+
+
+});
+
+router.post('/addOC', isLoggedIn, async (req, res) => {
+
+  const {id_tipo_proveedor,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro} = req.body
+  
+  const oc  ={ //Se gurdaran en un nuevo objeto
+
+    id_tipo : id_tipo_proveedor,
+    id_proveedor: razonsocialpro,
+    id_solicitante :  id_solicitante,
+    id_director : id_director,
+    id_centro_costo : id_centro_costo,
+    id_ingreso: req.user.idUsuario,
+    id_proyecto: id_proyecto,
+    id_etapa: id_etapa,
+    fecha : new Date()
+  };
+
+  const ingresoOC = await pool.query('INSERT INTO orden_compra  set ? ', [oc]);
+
+  const result = pool.query("UPDATE orden_compra_requerimiento set id_solicitud = ? WHERE id_solicitud = 0 AND id_ingreso = ?", [ingresoOC.insertId,req.user.idUsuario]);
+
+  /*
+  emisor: '1',
+  razonsocial: 'Rene Lagos y Asociados Ingenieros civiles SpA ',
+  rut: '78956640-2',
+  id_tipo_proveedor: '1',
+  razonsocialpro: '4',
+  rutproveedor: '0',
+  rutproidproveedorveedor: '',
+  id_solicitante: '73',
+  id_director: '15',
+  id_centro_costo: '2',
+  id_proyecto: '5',
+  id_etapa: '3',
+  cantidad: '',
+  descripcion: '',
+  punitario: '',
+  id_moneda: '',
+  tipocambio: ''
+*/
+  res.redirect(   url.format({
+    pathname:'/solicitudes/ordencompra',
+    query: {
+       "a": 1
+     }
+  }));
+
+
+});
+
+
+
+
+
+
 
 
 module.exports = router;

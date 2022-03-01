@@ -512,7 +512,7 @@
 				<div class="col-md-4 col-sm-4">
 				    <!-- <input type="text" id="zona" name="zona"  class="form-control" value="{{proyecto.zona}}"> -->
                     <select class="select2_single form-control" tabindex="-1" name="zona" id="zona">
-						<!-- <option value="0">Ingrese una dirección</option>							-->
+						<option value="">Seleccione</option>
                         {{#each zonas}}
                             {{#if (if_equal valor ../proyecto.zona) }}
                                     <option value="{{valor}}" selected>{{valor}}</option>
@@ -528,7 +528,7 @@
 				<div class="col-md-4 col-sm-4">
 				    <!-- <input type="text" id="suelo" name="suelo"  class="form-control" value="{{proyecto.suelo}}"> -->
                     <select class="select2_single form-control" tabindex="-1" name="suelo" id="suelo">
-						<!-- <option value="0">Ingrese una dirección</option>							-->
+						<option value="">Seleccione</option>
                         {{#each suelo}}
                             {{#if (if_equal valor ../proyecto.suelo) }}
                                     <option value="{{valor}}" selected>{{valor}}</option>
@@ -544,7 +544,7 @@
 				<div class="col-md-4 col-sm-4">
 				    <!-- input type="text" id="categoria" name="categoria"  class="form-control" value="{{proyecto.categoria}}"> -->
                     <select class="select2_single form-control" tabindex="-1" name="categoria" id="categoria">
-						<!-- <option value="0">Ingrese una dirección</option>							 -->
+						<option value="">Seleccione</option>
                         {{#each categoria}}
                             {{#if (if_equal valor ../proyecto.categoria) }}
                                     <option value="{{valor}}" selected>{{valor}}</option>

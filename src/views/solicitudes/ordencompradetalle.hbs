@@ -1,0 +1,58 @@
+<table class="table table-hover" id="tableRequerimiento">
+                    <thead>
+                        <tr>
+                            <th>Cantidad</th>
+                            <th>Descripción</th>
+                            <th>Precio Unitario</th>
+                            <th>Moneda</th>
+                            <th>Monto</th>
+                            <th>Monto en $</th>
+                            <th> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each requerimientos}}
+                             <tr>
+                                <td>{{cantidad}}</td>
+                                <td>{{descripcion}}</td>
+                                <td>{{precio_unitario}}</td>
+                                <td>{{mon}}</td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="EliminarRegistro({{id}});">Eliminar</button>
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                    <tfoot>
+                            <th style="border-bottom-width: 0px;">
+                                <td style="border-bottom-width: 0px;"></td>
+                                <td style="border-bottom-width: 0px;">
+                                    <button type="button" class="btn btn-success btn-sm" onclick="ingresarOC();">Ingresar</button>
+                                </td>
+                            </th>
+                            
+                        </tfoot>
+                    
+</table>
+
+<script>
+    function EliminarRegistro (id)
+    {
+        // cargar la informacion del detalle. 
+        let informacion = {  id  };
+        
+
+        $.ajax({
+              type: 'post',
+              url: '/solicitudes/ordecompradetalleEliminar',
+              data: informacion,
+              dataType: 'text'
+               })
+              .done(function (data) {
+                $('#tablaInformacion').html(data);
+              });
+    
+    }
+</script>

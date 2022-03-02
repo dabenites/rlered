@@ -17,195 +17,227 @@ const mensajeria = require('../mensajeria/mail');
 
 router.post('/fileupload', async (req,res) => {
    
-    var form = new formidable.IncomingForm();
-    const lectura = [];
-    form.parse(req, function (err, fields, files) {
-        var oldpath = files.filetoupload.path;
-        var newpath =  "../rlered/src/uploads/planillaCostos/"+ files.filetoupload.name;
-        rutaArchivoCargado = newpath;
-
-        if (fs.existsSync(oldpath)) {
-            if (fs.existsSync("../rlered/src/uploads/planillaCostos/")) {
-                fs.rename(oldpath, newpath, function (err) {
-                    if (err) throw err;
-                    var workbook = new Excel.Workbook(); 
-                    var idLogDetalle = 0 ;
-                    workbook.xlsx.readFile(newpath)
-                        .then(function() {
-                            var worksheet = workbook.getWorksheet(1);
-                                worksheet.eachRow({ includeEmpty: true }, async function(row, rowNumber) {
-                                
-                                if (rowNumber == 2)
-                                {
-                                    lectura["ano"] = row.values[3];
-                                }
-                                if (rowNumber == 3)
-                                {
-                                    lectura["mes"] = row.values[3];
-                                }
-                                if (rowNumber > 5 )
-                                {
-                                    if (lectura["informacion"] === undefined)
+    try {
+        var form = new formidable.IncomingForm();
+        const lectura = [];
+        form.parse(req, function (err, fields, files) {
+            var oldpath = files.filetoupload.path;
+            var newpath =  "../rlered/src/uploads/planillaCostos/"+ files.filetoupload.name;
+            rutaArchivoCargado = newpath;
+    
+            if (fs.existsSync(oldpath)) {
+                if (fs.existsSync("../rlered/src/uploads/planillaCostos/")) {
+                    fs.rename(oldpath, newpath, function (err) {
+                        if (err) throw err;
+                        var workbook = new Excel.Workbook(); 
+                        var idLogDetalle = 0 ;
+                        workbook.xlsx.readFile(newpath)
+                            .then(function() {
+                                var worksheet = workbook.getWorksheet(1);
+                                    worksheet.eachRow({ includeEmpty: true }, async function(row, rowNumber) {
+                                    
+                                    if (rowNumber == 2)
                                     {
-                                        lectura["informacion"]  = [];
+                                        lectura["ano"] = row.values[3];
                                     }
-        
-                                    if (rowNumber >= 6 )
+                                    if (rowNumber == 3)
                                     {
-                                        // Cargar el log de carga de la información
-                                        if (rowNumber == 6)
+                                        lectura["mes"] = row.values[3];
+                                    }
+                                    if (rowNumber > 5 )
+                                    {
+                                        if (lectura["informacion"] === undefined)
                                         {
-                                            unLogIngreso = {
-                                                id_user : req.user.idUsuario,
-                                                fecha : new Date(),
-                                                annio : lectura["ano"] ,
-                                                mes : lectura["mes"]
-        
-                                            };
-                                            const idLogIngreso = await pool.query('INSERT INTO sys_usuario_costo_ingreso set ?', [unLogIngreso]);
-                                            idLogDetalle = idLogIngreso.insertId;
+                                            lectura["informacion"]  = [];
                                         }
-                                        
-        
-        
-                                        const existeCosto =  await pool.query("SELECT * FROM sys_usuario_costo AS t1 WHERE t1.annio = "+ lectura["ano"] +" AND t1.mes = "+lectura["mes"]+" AND t1.idUsuario = "+row.values[2]+"");
-                                        const unCosto ={ 
-                                            annio :  lectura["ano"],
-                                            mes   :  lectura["mes"],
-                                            idUsuario :  row.values[2] ,
-                                            costo : row.values[7]
-                                           }; 
-                                           
-                                        const unCostoLog ={ 
-                                            id_costo_ingreso : idLogDetalle,
-                                            annio :  lectura["ano"],
-                                            mes   :  lectura["mes"],
-                                            idUsuario :  row.values[2] ,
-                                            costo : row.values[7]
-                                           };
-        
-                                        var tieneResitros = false;        
-                                        existeCosto.forEach(function(elemento, indice, array) {
-                                            tieneResitros = true;
-                                        });
-                                        
-                                        if(tieneResitros)
+            
+                                        if (rowNumber >= 6 )
                                         {
-                                            const result = await pool.query("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
-                                            const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
-                                        }
-                                        else
-                                        {
-                                            const result = await pool.query('INSERT INTO sys_usuario_costo set ?', [unCosto]);
-                                            const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
-                                        }  
-                                    }          
-                                    //
-                                }
+                                            // Cargar el log de carga de la información
+                                            if (rowNumber == 6)
+                                            {
+                                                unLogIngreso = {
+                                                    id_user : req.user.idUsuario,
+                                                    fecha : new Date(),
+                                                    annio : lectura["ano"] ,
+                                                    mes : lectura["mes"]
+            
+                                                };
+                                                const idLogIngreso = await pool.query('INSERT INTO sys_usuario_costo_ingreso set ?', [unLogIngreso]);
+                                                idLogDetalle = idLogIngreso.insertId;
+                                            }
+                                            
+            
+            
+                                            const existeCosto =  await pool.query("SELECT * FROM sys_usuario_costo AS t1 WHERE t1.annio = "+ lectura["ano"] +" AND t1.mes = "+lectura["mes"]+" AND t1.idUsuario = "+row.values[2]+"");
+                                            const unCosto ={ 
+                                                annio :  lectura["ano"],
+                                                mes   :  lectura["mes"],
+                                                idUsuario :  row.values[2] ,
+                                                costo : row.values[7]
+                                               }; 
+                                               
+                                            const unCostoLog ={ 
+                                                id_costo_ingreso : idLogDetalle,
+                                                annio :  lectura["ano"],
+                                                mes   :  lectura["mes"],
+                                                idUsuario :  row.values[2] ,
+                                                costo : row.values[7]
+                                               };
+            
+                                            var tieneResitros = false;        
+                                            existeCosto.forEach(function(elemento, indice, array) {
+                                                tieneResitros = true;
+                                            });
+                                            
+                                            if(tieneResitros)
+                                            {
+                                                const result = await pool.query("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
+                                                const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
+                                            }
+                                            else
+                                            {
+                                                const result = await pool.query('INSERT INTO sys_usuario_costo set ?', [unCosto]);
+                                                const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
+                                            }  
+                                        }          
+                                        //
+                                    }
+                                });
                             });
-                        });
-                  });
+                      });
+                }
+                else
+                {
+                    mensajeria.MensajerErrores("Ingreso Costo externo \n Error al mover el archivo fisico subido al servidor pero no se mueve a la carpeta de destino");    
+                }
             }
-            else
+            else    
             {
-                mensajeria.MensajerErrores("Ingreso Costo externo \n Error al mover el archivo fisico subido al servidor pero no se mueve a la carpeta de destino");    
+                // mandar un aviso que no encuentra el path. fisico para subir el archivo. 
+                mensajeria.MensajerErrores("Ingreso Costo externo \n No se encuentra el path fisico en el servido de Heroku");
             }
-        }
-        else    
-        {
-            // mandar un aviso que no encuentra el path. fisico para subir el archivo. 
-            mensajeria.MensajerErrores("Ingreso Costo externo \n No se encuentra el path fisico en el servido de Heroku");
-        }
-    })
-
-   // res.redirect("../costos/usuario",);
-   res.redirect(   url.format({
-    pathname:"../costos/usuario",
-    query: {
-       "a": 1
-     }
-  }));
+        })
+    
+       // res.redirect("../costos/usuario",);
+       res.redirect(   url.format({
+        pathname:"../costos/usuario",
+        query: {
+           "a": 1
+         }
+      }));
+        
+    } catch (error) {
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /fileupload \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+    }
 
 });
 
-
 router.get('/duplicarAnterior', isLoggedIn, async (req, res) => {
-    var year = req.query.anio;
-    var mes = req.query.mes;
 
-    var yearA = "";
-    var mesA = "";
-    if (mes == 1)
-    {
-        yearA = year - 1;
-        mesA  = 12;
+    try {
+        var year = req.query.anio;
+        var mes = req.query.mes;
+
+        var yearA = "";
+        var mesA = "";
+        if (mes == 1)
+        {
+            yearA = year - 1;
+            mesA  = 12;
+        }
+        else
+        {
+            yearA = year;
+            mesA  = mes -1;
+        }
+        
+        //Buscar la informacion de los usuarios.
+        const costos  = await pool.query(" SELECT " +
+                                                        " t2.*, " +
+                                                        " t1.idUsuario," +
+                                                        " t1.Nombre," +
+                                                        " t4.categoria," +
+                                                        " t5.centroCosto, " +
+                                                        " t6.pais, " +
+                                                        " t2.costo " +
+                                            " FROM  " +
+                                                        " sys_usuario AS t1 " +
+                                            " LEFT JOIN sys_usuario_costo AS t2 ON ( t1.idUsuario = t2.idUsuario AND t2.annio =  "+ yearA +" AND t2.mes = "+ mesA +"), "+
+                                            " sys_sucursal AS t3, " +
+                                            " sys_categoria AS t4, " +
+                                            " centro_costo AS t5, " +
+                                            " pais AS t6 "  +
+                                            " WHERE  " +
+                                                    " t1.idSucursal = t3.id_Sucursal " +
+                                            " AND  " +
+                                                    " t1.idCategoria = t4.id " +
+                                            " AND  " +
+                                                    " t3.id_pais = t6.id " +
+                                            " AND  " +
+                                                    " t4.idCentroCosto = t5.id ");
+
+            // borro la informacion completa del mes para duplicar el anterior
+            const result = pool.query("DELETE FROM sys_usuario_costo WHERE annio = "+year+" AND mes = "+mes+""); 
+            //console.log(costos);
+
+            costos.forEach(function(elemento, indice, array) {
+                // carga la informacion del mes anterior.
+                const newCostoMes  ={ //Se gurdaran en un nuevo objeto
+                                    annio :year, 
+                                    mes : mes,
+                                    idUsuario : elemento.idUsuario,
+                                    costo : elemento.costo
+                                    };
+                const result = pool.query('INSERT INTO sys_usuario_costo set ?', [newCostoMes]);
+
+                });
+
+        res.redirect("../costos/usuario?anio="+year+"&mes="+mes+"");
+    } catch (error) {
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /duplicarAnterior \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
     }
-    else
-    {
-        yearA = year;
-        mesA  = mes -1;
-    }
-
-    //res.send("Mensaje de informacion year" + year + " MEs " + mes);
-
-    //Primero preguntar si tengo la informacion en el mes mencionado.
-    
-    //Buscar la informacion de los usuarios.
-    const costos  = await pool.query(" SELECT " +
-                                                    " t2.*, " +
-                                                    " t1.idUsuario," +
-                                                    " t1.Nombre," +
-                                                    " t4.categoria," +
-                                                    " t5.centroCosto, " +
-                                                    " t6.pais, " +
-                                                    " t2.costo " +
-                                        " FROM  " +
-                                                    " sys_usuario AS t1 " +
-                                        " LEFT JOIN sys_usuario_costo AS t2 ON ( t1.idUsuario = t2.idUsuario AND t2.annio =  "+ yearA +" AND t2.mes = "+ mesA +"), "+
-                                        " sys_sucursal AS t3, " +
-                                        " sys_categoria AS t4, " +
-                                        " centro_costo AS t5, " +
-                                        " pais AS t6 "  +
-                                        " WHERE  " +
-                                                " t1.idSucursal = t3.id_Sucursal " +
-                                        " AND  " +
-                                                " t1.idCategoria = t4.id " +
-                                        " AND  " +
-                                                " t3.id_pais = t6.id " +
-                                        " AND  " +
-                                                " t4.idCentroCosto = t5.id ");
-
-        // borro la informacion completa del mes para duplicar el anterior
-        const result = pool.query("DELETE FROM sys_usuario_costo WHERE annio = "+year+" AND mes = "+mes+""); 
-        //console.log(costos);
-
-        costos.forEach(function(elemento, indice, array) {
-            // carga la informacion del mes anterior.
-            const newCostoMes  ={ //Se gurdaran en un nuevo objeto
-                                annio :year, 
-                                mes : mes,
-                                idUsuario : elemento.idUsuario,
-                                costo : elemento.costo
-                                };
-            const result = pool.query('INSERT INTO sys_usuario_costo set ?', [newCostoMes]);
-
-            });
-
-    res.redirect("../costos/usuario?anio="+year+"&mes="+mes+"");
-
 });
 
 router.get('/historial', isLoggedIn, async (req, res) => {
   
-    const costos =  await pool.query("SELECT * ,DATE_FORMAT(t1.fecha, '%Y-%m-%d') AS fecha FROM sys_usuario_costo_ingreso AS t1, sys_usuario AS t2 WHERE t1.id_user = t2.idUsuario ORDER BY t1.id DESC");
+    try {
 
-    res.render('costos/historial', { costos,req ,layout: 'template'});
+        const costos =  await pool.query("SELECT * ,DATE_FORMAT(t1.fecha, '%Y-%m-%d') AS fecha FROM sys_usuario_costo_ingreso AS t1, sys_usuario AS t2 WHERE t1.id_user = t2.idUsuario ORDER BY t1.id DESC");
+
+        res.render('costos/historial', { costos,req ,layout: 'template'});  
+        
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /historial \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
+
+    }
+
 
 }); 
 
-
 router.get('/historial/:id', async (req, res) => {
-    const { id } = req.params;
+
+    try {
+        const { id } = req.params;
     
     const costos =  await pool.query("SELECT * ,DATE_FORMAT(t1.fecha, '%Y-%m-%d') AS fecha FROM sys_usuario_costo_ingreso AS t1, sys_usuario AS t2 WHERE t1.id_user = t2.idUsuario ORDER BY t1.id DESC");
     const detalle = await pool.query("SELECT * FROM sys_usuario_costo_ingreso_detalle AS t1, sys_usuario AS t2 WHERE t1.id_costo_ingreso = "+id+" AND  t1.idUsuario = t2.idUsuario");
@@ -215,10 +247,23 @@ router.get('/historial/:id', async (req, res) => {
 
     res.render('costos/historial', { costos,detalle,req ,layout: 'template'});
 
+        
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /historial/:id \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
+
+    }
 });
 
-
 router.get('/descargarPlanilla', isLoggedIn, async (req, res) => {
+
+try {
 
     var year = req.query.anio;
     var mes = req.query.mes;
@@ -289,13 +334,23 @@ router.get('/descargarPlanilla', isLoggedIn, async (req, res) => {
   
   // write into response
   workbook.xlsx.write(res);
-
-
+    
+} catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /descargarPlanilla \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+}
   
 }); 
 
 router.get('/usuario', isLoggedIn, async (req, res) => {
-    var fecha = new Date();
+
+    try {
+        var fecha = new Date();
     var year = fecha.getFullYear();
     var mes = fecha.getMonth() + 1;
     const annios = [];
@@ -385,44 +440,60 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
     {
         res.render('costos/usuario', { annios, messes, costos,year,mes, req ,layout: 'template'});
     }
-    
-    
-
-
-
-
+    } catch (error) {
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /usuario \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
+    }
 }); 
 
 router.get('/eproyectos', isLoggedIn, async (req, res) => {
 
-    const proveedores =  await pool.query("SELECT * FROM prov_externo ORDER BY nombre ASC");
-    const centros =  await pool.query("SELECT * FROM centro_costo ORDER BY centroCosto ASC");
-    const monedas =  await pool.query("SELECT * FROM moneda_tipo as t1 WHERE  t1.factura = 'Y'");
-    const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");
+    try {
+        const proveedores =  await pool.query("SELECT * FROM prov_externo ORDER BY nombre ASC");
+        const centros =  await pool.query("SELECT * FROM centro_costo ORDER BY centroCosto ASC");
+        const monedas =  await pool.query("SELECT * FROM moneda_tipo as t1 WHERE  t1.factura = 'Y'");
+        const proyectos =  await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");
+    
+    
+        // Seleccicionar los costos que el ha ingresado
+        const costosExternos = await pool.query("SELECT " + 
+                                                "* " +
+                                                " , DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso " +
+                                                " , t4.nombre as proveedor, t2.nombre as nomProyecto, t1.id as idCosto, t1.descripcion as comentarioIngreso ," +
+                                                " t1a.descripcion as comentarioAProbador"+
+                                                " FROM pro_costo_externo as t1 "+
+                                                " LEFT JOIN pro_costo_externo_tracking as t1a ON t1.id = t1a.id_pro_costo_externo ," +
+                                                " pro_proyectos as t2, " +
+                                                " prov_externo as t4, " +
+                                                " pro_costo_externo_estado as t3 " +
+                                                " WHERE t1.id_ingreso = "+req.user.idUsuario+"" + 
+                                                " AND t1.id_proyecto = t2.id" +
+                                                " AND t1.id_prov_externo = t4.id" +
+                                                " AND t1.id_estado = t3.id");
+    
+        res.render('proyecto/costoexterno', {proveedores,centros,monedas, proyectos ,costosExternos, req ,layout: 'template'});
+    
+    } catch (error) {
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /eproyectos \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
+    }
 
-
-    // Seleccicionar los costos que el ha ingresado
-    const costosExternos = await pool.query("SELECT " + 
-                                            "* " +
-                                            " , DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso " +
-                                            " , t4.nombre as proveedor, t2.nombre as nomProyecto, t1.id as idCosto, t1.descripcion as comentarioIngreso ," +
-                                            " t1a.descripcion as comentarioAProbador"+
-                                            " FROM pro_costo_externo as t1 "+
-                                            " LEFT JOIN pro_costo_externo_tracking as t1a ON t1.id = t1a.id_pro_costo_externo ," +
-                                            " pro_proyectos as t2, " +
-                                            " prov_externo as t4, " +
-                                            " pro_costo_externo_estado as t3 " +
-                                            " WHERE t1.id_ingreso = "+req.user.idUsuario+"" + 
-                                            " AND t1.id_proyecto = t2.id" +
-                                            " AND t1.id_prov_externo = t4.id" +
-                                            " AND t1.id_estado = t3.id");
-
-    res.render('proyecto/costoexterno', {proveedores,centros,monedas, proyectos ,costosExternos, req ,layout: 'template'});
-
+   
 });
 
 router.get('/aproyectos', isLoggedIn, async (req, res) => {
  
+    try {
     // Seleccicionar los costos que el ha ingresado
     const costosExternos = await pool.query("SELECT " + 
                                             "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso ,"+
@@ -439,12 +510,24 @@ router.get('/aproyectos', isLoggedIn, async (req, res) => {
                                             " AND t5.id = t1.id_prov_externo" );
 
 
-    res.render('proyecto/acostoexterno', {costosExternos, req ,layout: 'template'});
+    res.render('proyecto/acostoexterno', {costosExternos, req ,layout: 'template'});    
+    } catch (error) {
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /aproyectos \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
+    }
+    
 
 });
 
 router.get('/costoexterno/revisar/:id', async (req, res) => {
-    const { id } = req.params;
+
+    try {
+        const { id } = req.params;
     
     const costosExternos = await pool.query("SELECT " + 
     "* , t1.id as idCostoExterno,  DATE_FORMAT(t1.fecha_ingreso, '%Y-%m-%d') as fechaIngreso , t5.nombre as proveedor, t2.nombre as nomProyecto, t4.nombre AS nomSol" +
@@ -489,14 +572,22 @@ router.get('/costoexterno/revisar/:id', async (req, res) => {
     
     //console.log(costosExternos[0]);
     res.render('proyecto/acostoexterno', {costosExternos,  costoExterno: costoExterno[0],costosAnteriores, req ,layout: 'template'});
-
-
+    } catch (error) {
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /costoexterno/revisar/:id \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
+    }
 });
 
-
-
 router.post('/updateCostoExterno', isLoggedIn, async (req, res) => {
-    //res.send("mostrar mensaje para la carga");
+
+    try {
+
+        //res.send("mostrar mensaje para la carga");
     
     const { Observacion,estado,id_costo_externo} = req.body;
     // estado 0 rechazado
@@ -541,15 +632,25 @@ router.post('/updateCostoExterno', isLoggedIn, async (req, res) => {
 
     res.render('proyecto/acostoexterno', {costosExternos, req ,layout: 'template'});
 
+        
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /updateCostoExterno \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
 
-
-
-
+    }
 });
 
 router.post('/addCostoExterno', isLoggedIn, async (req, res) => {
 
-    const { idProyecto,idProveedor,idCentroCosto,idTipoMoneda,costo,numhh,numoc,descripcion} = req.body;
+    try {
+
+        const { idProyecto,idProveedor,idCentroCosto,idTipoMoneda,costo,numhh,numoc,descripcion} = req.body;
     var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
 
     const newCostoExterno  ={ //Se gurdaran en un nuevo objeto
@@ -610,58 +711,95 @@ router.post('/addCostoExterno', isLoggedIn, async (req, res) => {
 
     res.render('proyecto/costoexterno', {verToask, proveedores,centros,monedas, proyectos , costosExternos, req ,layout: 'template'});
 
+        
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /addCostoExterno \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
 
+    }
+
+    
 });
 
 router.post('/ajax', express.json({type: '*/*'}), async (req,res) => {
     //res.json(req.body);
 
-    
-    var id = req.body[0].vid;
-    var valor = req.body[0].vvalor;
-    var nombre = req.body[0].vnombre;
-    var annio = req.body[0].vannio;
-    var mes = req.body[0].vmes;
+    try {
+        var id = req.body[0].vid;
+        var valor = req.body[0].vvalor;
+        var nombre = req.body[0].vnombre;
+        var annio = req.body[0].vannio;
+        var mes = req.body[0].vmes;
 
-    //console.log("ID" + id + "VALOR" + valor + "NOIMBRE" + nombre + "ANNIO" + annio + "MEs" + mes);
+        //console.log("ID" + id + "VALOR" + valor + "NOIMBRE" + nombre + "ANNIO" + annio + "MEs" + mes);
 
-    const result = await pool.query('UPDATE sys_usuario_costo set costo  = ? WHERE annio = ? AND mes = ? AND idUsuario = ?', [valor,annio,mes,id]);
+        const result = await pool.query('UPDATE sys_usuario_costo set costo  = ? WHERE annio = ? AND mes = ? AND idUsuario = ?', [valor,annio,mes,id]);
 
 
 
-    res.send("OK");
+        res.send("OK");
+
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /ajax \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
+
+    }
+
 });
 
 //ajaxNombre
 
 router.post('/ajaxNombre', express.json({type: '*/*'}), async (req,res) => {
-    //res.json(req.body);
+    try {
+       // validar no exista un valor con el mismo nombre que se ingreso. 
 
-    // validar no exista un valor con el mismo nombre que se ingreso. 
+        const {NombreContacto} =     req.body;
 
-    const {NombreContacto} =     req.body;
-
-    //console.log(NombreContacto);
-    const contactos = await pool.query("SELECT  * FROM contacto where name = '"+NombreContacto+"'"  );
-    if (contactos.length === 0)
-    {
-        if (NombreContacto === "")
+        //console.log(NombreContacto);
+        const contactos = await pool.query("SELECT  * FROM contacto where name = '"+NombreContacto+"'"  );
+        if (contactos.length === 0)
         {
-            res.send("Ingresar un nombre de contacto valido");
+            if (NombreContacto === "")
+            {
+                res.send("Ingresar un nombre de contacto valido");
+            }
+            else
+            {
+                res.send("1");
+            }
+            
         }
         else
         {
-            res.send("1");
+            //alert("Existe un contacto con el mismo nombre");
+            //console.log("existe un contacto con el mismo nombre");
+            res.send("Existe un contacto con el mismo nombre");
         }
+    
+    } catch (error) {
         
-    }
-    else
-    {
-        //alert("Existe un contacto con el mismo nombre");
-        //console.log("existe un contacto con el mismo nombre");
-        res.send("Existe un contacto con el mismo nombre");
-    }
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /ajaxNombre \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
 
+
+    }
     
 });
 

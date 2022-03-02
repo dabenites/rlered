@@ -40,10 +40,6 @@ router.get('/permisos', isLoggedIn, async (req, res) => {
     {
       res.render('solicitudes/permisos', { req ,usuarios,res,layout: 'template'});
     }
-
-
-  
-
 }); 
 
 

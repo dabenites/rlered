@@ -20,6 +20,7 @@ const mensajeria = require('../mensajeria/mail');
 //AGREGAR UN PROYECTO
 
 router.get('/iproyecto', isLoggedIn, async (req, res) => {
+  try {
   // const proyectos = await pool.query("SELECT * FROM pro_proyectos as t1, proyecto_tipo as t2 WHERE t1.Tipo = t2.Descripcion");
   
   const estado = await pool.query("SELECT * FROM pro_costo_externo_estado");
@@ -32,82 +33,125 @@ router.get('/iproyecto', isLoggedIn, async (req, res) => {
   const proyectos = await pool.query("SELECT * FROM pro_proyectos as t1 ORDER BY year DESC, code DESC");
 
 
-  res.render('proyecto/iproyecto', { req, usuarios, pais, tipo, categoria, proye, contacto, proyectos,estado, layout: 'template' });
+  res.render('proyecto/iproyecto', { req, usuarios, pais, tipo, categoria, proye, contacto, proyectos,estado, layout: 'template' });  
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /iproyecto \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+
+  
 });
 
 
 router.post('/addProyecto', async (req, res) => {
-  const { nombre, year,code, id_Tipo,id_Estado, id_complejidad, SuperficiePPTO, SuperficieAPC, id_Pais, Ciudad,
-    Ubicacion, Npisos, Nsubterraneo, id_Director_Proyecto, id_Jefe_Proyecto, ValorMC, Zona, Suelo, FechaIni, FechaEnt,
-    FechaTer, id_Cliente, id_Arquitectura, id_Constructora, id_Revisor, Nplanos, id_Servicio } = req.body; //Obtener datos title,url,description
 
-
-
-  const newProyecto = { //Se gurdaran en un nuevo objeto
-   // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
-    nombre: nombre,
-    year: year,
-    code:code,
-    id_Tipo: id_Tipo,
-    id_Estado: id_Estado,
-    id_complejidad: id_complejidad,
-    SuperficiePPTO: SuperficiePPTO,
-    SuperficieAPC: SuperficieAPC,
-    id_Pais: id_Pais,
-    Ciudad: Ciudad,
-    Ubicacion: Ubicacion,
-    Npisos: Npisos,
-    Nsubterraneo: Nsubterraneo,
-    id_Director_Proyecto: id_Director_Proyecto,
-    id_Jefe_Proyecto: id_Jefe_Proyecto,
-    ValorMC: ValorMC,
-    Zona: Zona,
-    Suelo: Suelo,
-    FechaIni: FechaIni,
-    FechaEnt: FechaEnt,
-    FechaTer: FechaTer,
-    id_Cliente: id_Cliente,
-    id_Arquitectura: id_Arquitectura,
-    id_Constructora: id_Constructora,
-    id_Revisor: id_Revisor,
-    Nplanos: Nplanos,
-    id_Servicio: id_Servicio
-
-
-  };
+  try {
+    const { nombre, year,code, id_Tipo,id_Estado, id_complejidad, SuperficiePPTO, SuperficieAPC, id_Pais, Ciudad,
+      Ubicacion, Npisos, Nsubterraneo, id_Director_Proyecto, id_Jefe_Proyecto, ValorMC, Zona, Suelo, FechaIni, FechaEnt,
+      FechaTer, id_Cliente, id_Arquitectura, id_Constructora, id_Revisor, Nplanos, id_Servicio } = req.body; //Obtener datos title,url,description
+  
+  
+  
+    const newProyecto = { //Se gurdaran en un nuevo objeto
+     // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
+      nombre: nombre,
+      year: year,
+      code:code,
+      id_Tipo: id_Tipo,
+      id_Estado: id_Estado,
+      id_complejidad: id_complejidad,
+      SuperficiePPTO: SuperficiePPTO,
+      SuperficieAPC: SuperficieAPC,
+      id_Pais: id_Pais,
+      Ciudad: Ciudad,
+      Ubicacion: Ubicacion,
+      Npisos: Npisos,
+      Nsubterraneo: Nsubterraneo,
+      id_Director_Proyecto: id_Director_Proyecto,
+      id_Jefe_Proyecto: id_Jefe_Proyecto,
+      ValorMC: ValorMC,
+      Zona: Zona,
+      Suelo: Suelo,
+      FechaIni: FechaIni,
+      FechaEnt: FechaEnt,
+      FechaTer: FechaTer,
+      id_Cliente: id_Cliente,
+      id_Arquitectura: id_Arquitectura,
+      id_Constructora: id_Constructora,
+      id_Revisor: id_Revisor,
+      Nplanos: Nplanos,
+      id_Servicio: id_Servicio
+  
+  
+    };
+    //Guardar datos en la BD     
   //Guardar datos en la BD     
-  //console.log(req.body);
-  const result = await pool.query('INSERT INTO pro_proyectos set ?', [newProyecto]);//Inserción
+    //Guardar datos en la BD     
+  //Guardar datos en la BD     
+    //Guardar datos en la BD     
+    //console.log(req.body);
+    const result = await pool.query('INSERT INTO pro_proyectos set ?', [newProyecto]);//Inserción
+  
+  
+    //console.log(result);
+    const proye = await pool.query('SELECT * FROM pro_proyectos');
+  
+  
+  
+    res.render('proyecto/buscador', { req, proye, layout: 'template' });
+  
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /addProyecto \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
 
+  }
 
-  //console.log(result);
-  const proye = await pool.query('SELECT * FROM pro_proyectos');
-
-
-
-  res.render('proyecto/buscador', { req, proye, layout: 'template' });
-
+  
 });
-
-
-
 
 //BUSCADOR inicial bd
 
 router.get('/buscador', isLoggedIn, async (req, res) => {
-  const estado = await pool.query("SELECT * FROM pro_costo_externo_estado");
-  const buscadores = await pool.query("SELECT * FROM pro_proyectos");
-  const tipo = await pool.query("SELECT * FROM proyecto_tipo");
-  const usuarios = await pool.query("SELECT * FROM sys_usuario");
-  const contacto = await pool.query("SELECT * FROM contacto");
-  const paises = await pool.query("SELECT * FROM pais");
 
+  try {
 
-  res.render('proyecto/buscador', { req, buscadores, tipo, usuarios, contacto,estado,paises, layout: 'template' });
+    const estado = await pool.query("SELECT * FROM pro_costo_externo_estado");
+    const buscadores = await pool.query("SELECT * FROM pro_proyectos");
+    const tipo = await pool.query("SELECT * FROM proyecto_tipo");
+    const usuarios = await pool.query("SELECT * FROM sys_usuario");
+    const contacto = await pool.query("SELECT * FROM contacto");
+    const paises = await pool.query("SELECT * FROM pais");
+  
+  
+    res.render('proyecto/buscador', { req, buscadores, tipo, usuarios, contacto,estado,paises, layout: 'template' });
+
+    
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscador \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+
+ 
 });
-
-
-
 
 //LISTAR PROYECTOS
 
@@ -120,42 +164,15 @@ router.post('/listPro', isLoggedIn, async (req, res) => {
   // const contacto = await pool.query("SELECT * FROM contacto");
 
 
+try {
   var a = req.body.nombre;
   var b = req.body.year;
   var c = req.body.id_Tipo;
   var co = req.body.code;
-  /*var d = req.body.id_Estado;
-  var e = req.body.id_complejidad;
-  var f = req.body.SuperficiePPTO;
-  var g = req.body.SuperficieAPC;
-  var h = req.body.id_Pais;
-  var i = req.body.Ciudad;
-  var k = req.body.Npisos;
-  var l = req.body.Nsubterraneo;
-  var m = req.body.id_Director_Proyecto;
-  var n = req.body.id_Jefe_Proyecto;
-  var o = req.body.ValorMC;*/
+  
   var p = req.body.Zona;
   var q = req.body.Suelo;
-  /*var r = req.body.FechaIni;
-  var s = req.body.FechaEnt;
-  var t = req.body.FechaTer;
-  var u = req.body.id_Cliente;
-  var v = req.body.id_Arquitectura;
-  var w = req.body.id_Constructora;
-  var x = req.body.id_Revisor;
-  var y = req.body.Nplanos;
-  var z = req.body.id_Servicio;*/
-
-
   
-    //" WHERE " +
-    //" t1.nombre=? OR t1.year=? OR t1.id_Tipo=? OR t1.id_Estado=? OR t1.id_complejidad=? OR t1.SuperficiePPTO=? OR t1.SuperficieAPC=? OR t1.id_Pais=? OR t1.Ciudad=?  OR t1.Npisos=? OR t1.Nsubterraneo=? OR t1.id_Director_Proyecto=? OR t1.id_Jefe_Proyecto=? OR t1.ValorMC=? OR t1.Zona=? OR t1.Suelo=? OR t1.FechaIni=? OR t1.FechaEnt=? OR t1.FechaTer=? OR t1.id_Cliente=? OR t1.id_Arquitectura=? OR t1.id_Constructora=? OR t1.id_Revisor=? OR t1.Nplanos=?  OR t1.id_Servicio=?", [a, b, c, d, e, f, g, h, i, k, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]);
-
-
-  // console.log(a + "///" + b);
-
-
   const buscadores = await pool.query("SELECT * FROM pro_proyectos AS t1 " +
     " WHERE " +
     " t1.nombre=? OR t1.year=? OR t1.id_Tipo=? OR t1.code=? OR t1.Zona=? OR t1.Zona=? ", [a,b,c,co,p,q]);
@@ -166,132 +183,200 @@ router.post('/listPro', isLoggedIn, async (req, res) => {
       another: "item"
     });
 
+} catch (error) {
+  mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /listPro \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+}
+
+  
   //res.render('proyecto/listPro', { req, buscadores, layout: 'template' });
 });
 
 
 
 router.get('/buscador/edit/:id', async (req, res) => {
-  const { id } = req.params;
 
-  const buscadores = await pool.query("SELECT * FROM pro_proyectos ");
-  const buscador = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [id]);
+  try {
+    
+    const { id } = req.params;
 
+    const buscadores = await pool.query("SELECT * FROM pro_proyectos ");
+    const buscador = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?", [id]);
+  
+  
+  
+    res.render('proyecto/editProyecto', {
+      buscadores, buscador: buscador[0], req, layout: 'template'//, helpers: {
+        //if_equal: isEqualHelperHandlerbar
+      //}
+    });
 
-
-  res.render('proyecto/editProyecto', {
-    buscadores, buscador: buscador[0], req, layout: 'template'//, helpers: {
-      //if_equal: isEqualHelperHandlerbar
-    //}
-  });
+  } catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscador/edit/:id' \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+ 
 });
 
 
 
 router.post('/editBusca', async (req, res) => {
-  const { id,nombre, year,code, id_Tipo,id_Estado, id_complejidad, SuperficiePPTO, SuperficieAPC, id_Pais, Ciudad,
-    Ubicacion, Npisos, Nsubterraneo, id_Director_Proyecto, id_Jefe_Proyecto, ValorMC, Zona, Suelo, FechaIni, FechaEnt,
-    FechaTer, id_Cliente, id_Arquitectura, id_Constructora, id_Revisor, Nplanos, id_Servicio } = req.body; //Obtener datos title,url,description
 
-  const newBuscador = { //Se gurdaran en un nuevo objeto
+  try {
+    const { id,nombre, year,code, id_Tipo,id_Estado, id_complejidad, SuperficiePPTO, SuperficieAPC, id_Pais, Ciudad,
+      Ubicacion, Npisos, Nsubterraneo, id_Director_Proyecto, id_Jefe_Proyecto, ValorMC, Zona, Suelo, FechaIni, FechaEnt,
+      FechaTer, id_Cliente, id_Arquitectura, id_Constructora, id_Revisor, Nplanos, id_Servicio } = req.body; //Obtener datos title,url,description
   
+    const newBuscador = { //Se gurdaran en un nuevo objeto
     
-    nombre: nombre,
-    year: year,
-    code:code,
-    id_Tipo: id_Tipo,
-    id_Estado: id_Estado,
-    id_complejidad: id_complejidad,
-    SuperficiePPTO: SuperficiePPTO,
-    SuperficieAPC: SuperficieAPC,
-    id_Pais: id_Pais,
-    Ciudad: Ciudad,
-    Ubicacion: Ubicacion,
-    Npisos: Npisos,
-    Nsubterraneo: Nsubterraneo,
-    id_Director_Proyecto: id_Director_Proyecto,
-    id_Jefe_Proyecto: id_Jefe_Proyecto,
-    ValorMC: ValorMC,
-    Zona: Zona,
-    Suelo: Suelo,
-    FechaIni: FechaIni,
-    FechaEnt: FechaEnt,
-    FechaTer: FechaTer,
-    id_Cliente: id_Cliente,
-    id_Arquitectura: id_Arquitectura,
-    id_Constructora: id_Constructora,
-    id_Revisor: id_Revisor,
-    Nplanos: Nplanos,
-    id_Servicio: id_Servicio
-  };
-  //Guardar datos en la BD     
-  await pool.query('UPDATE pro_proyectos set ? WHERE id = ?', [newBuscador, id]);
-  res.redirect('/proyecto/editProyecto');
+      
+      nombre: nombre,
+      year: year,
+      code:code,
+      id_Tipo: id_Tipo,
+      id_Estado: id_Estado,
+      id_complejidad: id_complejidad,
+      SuperficiePPTO: SuperficiePPTO,
+      SuperficieAPC: SuperficieAPC,
+      id_Pais: id_Pais,
+      Ciudad: Ciudad,
+      Ubicacion: Ubicacion,
+      Npisos: Npisos,
+      Nsubterraneo: Nsubterraneo,
+      id_Director_Proyecto: id_Director_Proyecto,
+      id_Jefe_Proyecto: id_Jefe_Proyecto,
+      ValorMC: ValorMC,
+      Zona: Zona,
+      Suelo: Suelo,
+      FechaIni: FechaIni,
+      FechaEnt: FechaEnt,
+      FechaTer: FechaTer,
+      id_Cliente: id_Cliente,
+      id_Arquitectura: id_Arquitectura,
+      id_Constructora: id_Constructora,
+      id_Revisor: id_Revisor,
+      Nplanos: Nplanos,
+      id_Servicio: id_Servicio
+    };
+    //Guardar datos en la BD     
+    await pool.query('UPDATE pro_proyectos set ? WHERE id = ?', [newBuscador, id]);
+    res.redirect('/proyecto/editProyecto');
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /editBusca' \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+
+  
 
 });
 
 
 router.post('/edit', async (req, res) => {
-  const { id,nombre, year,code, id_Tipo,id_Estado, id_complejidad, SuperficiePPTO, SuperficieAPC, id_Pais, Ciudad,
-    Ubicacion, Npisos, Nsubterraneo, id_Director_Proyecto, id_Jefe_Proyecto, ValorMC, Zona, Suelo, FechaIni, FechaEnt,
-    FechaTer, id_Cliente, id_Arquitectura, id_Constructora, id_Revisor, Nplanos, id_Servicio } = req.body; //Obtener datos title,url,description
 
-  const newBuscador = { //Se gurdaran en un nuevo objeto
+  try {
+    const { id,nombre, year,code, id_Tipo,id_Estado, id_complejidad, SuperficiePPTO, SuperficieAPC, id_Pais, Ciudad,
+      Ubicacion, Npisos, Nsubterraneo, id_Director_Proyecto, id_Jefe_Proyecto, ValorMC, Zona, Suelo, FechaIni, FechaEnt,
+      FechaTer, id_Cliente, id_Arquitectura, id_Constructora, id_Revisor, Nplanos, id_Servicio } = req.body; //Obtener datos title,url,description
   
-    id:id,
-    nombre: nombre,
-    year: year,
-    code:code,
-    id_Tipo: id_Tipo,
-    id_Estado: id_Estado,
-    id_complejidad: id_complejidad,
-    SuperficiePPTO: SuperficiePPTO,
-    SuperficieAPC: SuperficieAPC,
-    id_Pais: id_Pais,
-    Ciudad: Ciudad,
-    Ubicacion: Ubicacion,
-    Npisos: Npisos,
-    Nsubterraneo: Nsubterraneo,
-    id_Director_Proyecto: id_Director_Proyecto,
-    id_Jefe_Proyecto: id_Jefe_Proyecto,
-    ValorMC: ValorMC,
-    Zona: Zona,
-    Suelo: Suelo,
-    FechaIni: FechaIni,
-    FechaEnt: FechaEnt,
-    FechaTer: FechaTer,
-    id_Cliente: id_Cliente,
-    id_Arquitectura: id_Arquitectura,
-    id_Constructora: id_Constructora,
-    id_Revisor: id_Revisor,
-    Nplanos: Nplanos,
-    id_Servicio: id_Servicio
-  };
-  //Guardar datos en la BD     
-  //res.redirect('./proyecto/listPro');
+    const newBuscador = { //Se gurdaran en un nuevo objeto
+    
+      id:id,
+      nombre: nombre,
+      year: year,
+      code:code,
+      id_Tipo: id_Tipo,
+      id_Estado: id_Estado,
+      id_complejidad: id_complejidad,
+      SuperficiePPTO: SuperficiePPTO,
+      SuperficieAPC: SuperficieAPC,
+      id_Pais: id_Pais,
+      Ciudad: Ciudad,
+      Ubicacion: Ubicacion,
+      Npisos: Npisos,
+      Nsubterraneo: Nsubterraneo,
+      id_Director_Proyecto: id_Director_Proyecto,
+      id_Jefe_Proyecto: id_Jefe_Proyecto,
+      ValorMC: ValorMC,
+      Zona: Zona,
+      Suelo: Suelo,
+      FechaIni: FechaIni,
+      FechaEnt: FechaEnt,
+      FechaTer: FechaTer,
+      id_Cliente: id_Cliente,
+      id_Arquitectura: id_Arquitectura,
+      id_Constructora: id_Constructora,
+      id_Revisor: id_Revisor,
+      Nplanos: Nplanos,
+      id_Servicio: id_Servicio
+    };
+    //Guardar datos en la BD     
+    //res.redirect('./proyecto/listPro');
+  
+    //res.send("ppp");
+  
+  //console.log(nombre+"ind"+id);
+  
+  const Pedit = await pool.query('UPDATE pro_proyectos set nombre =  ? , code =  ?,  SuperficiePPTO =  ?,  SuperficieAPC =  ?, Ciudad =  ?, Ubicacion =  ?,Npisos =  ?,Nsubterraneo =  ?,ValorMC =  ?,Zona =  ?,Suelo =  ?,Nplanos = ? WHERE id = ?', [nombre,code,SuperficiePPTO,SuperficieAPC,Ciudad,Ubicacion,Npisos, Nsubterraneo,ValorMC,Zona,Suelo,Nplanos,id] );
+   // console.log(nombre);
+    //res.send("ppp");
+  
+  
+  
+    res.redirect('/proyecto/buscador');
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /edit' \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
 
-  //res.send("ppp");
+  }
 
-//console.log(nombre+"ind"+id);
-
-const Pedit = await pool.query('UPDATE pro_proyectos set nombre =  ? , code =  ?,  SuperficiePPTO =  ?,  SuperficieAPC =  ?, Ciudad =  ?, Ubicacion =  ?,Npisos =  ?,Nsubterraneo =  ?,ValorMC =  ?,Zona =  ?,Suelo =  ?,Nplanos = ? WHERE id = ?', [nombre,code,SuperficiePPTO,SuperficieAPC,Ciudad,Ubicacion,Npisos, Nsubterraneo,ValorMC,Zona,Suelo,Nplanos,id] );
- // console.log(nombre);
-  //res.send("ppp");
-
-
-
-  res.redirect('/proyecto/buscador');
-
+  
 });
 
 
 
 router.get('/buscador/delete/:id', async (req, res) => {
-  const { id } = req.params;
-  await pool.query('DELETE FROM pro_proyectos WHERE id = ?', [id]);
 
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM pro_proyectos WHERE id = ?', [id]);
+  
+  
+    res.redirect('/proyecto/buscador');
+  } catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /edit' \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
 
-  res.redirect('/proyecto/buscador');
+ 
 
 
 });
@@ -300,12 +385,24 @@ router.get('/buscador/delete/:id', async (req, res) => {
 // addPro
 router.get('/addPro', async (req, res) => {
 
-  const tipo = await pool.query("SELECT * FROM proyecto_tipo");
+  try {
+    const tipo = await pool.query("SELECT * FROM proyecto_tipo");
   const estado = await pool.query("SELECT * FROM proyecto_estado");
   const servicio = await pool.query("SELECT * FROM proyecto_servicio");  
   // // 
 
   res.render('proyecto/addProyecto', {servicio, tipo,estado, req, layout: 'template' });
+  
+  } catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /addPro' \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+
   
 });
 
@@ -313,9 +410,9 @@ router.get('/addPro', async (req, res) => {
 
 // listado
 router.get('/listado', async (req, res) => {
+  try {
 
-  
-  // Filtrar segun la categoria de la persona. 
+      // Filtrar segun la categoria de la persona. 
   // JP // Director  // ING A // ING B
  // ING A 21
  // ING B 22
@@ -410,11 +507,24 @@ router.get('/listado', async (req, res) => {
             }
         }
 
+    
+  } catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /listado' \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+  
 });
 //buscarPais
 
 router.get('/facturar/:id', async (req, res) => {
-  const { id } = req.params;
+
+  try {
+    const { id } = req.params;
  
   //______ cargar template. 
   const proyectos = await pool.query( " SELECT t1.*, t2.Nombre AS director, t3.Nombre AS jefe, t4.descripcion AS servicio , t5.descripcion AS tipo" +
@@ -484,10 +594,23 @@ else
   res.render('proyecto/facturar', { factura:true,facturacion,monedas,tipoCobro, proyecto: proyectos[0], req, layout: 'template' });
   else
   res.render('proyecto/facturar', { facturacion,monedas,tipoCobro, proyecto: proyectos[0], req, layout: 'template' });
+  } catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /facturar/:id' \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+
+  
 });
 
 router.get('/editar/:id', async (req, res) => {
-  const { id } = req.params;
+
+  try {
+    const { id } = req.params;
  
   const tipo = await pool.query("SELECT * FROM proyecto_tipo");
 
@@ -580,12 +703,24 @@ router.get('/editar/:id', async (req, res) => {
  
   res.render('proyecto/uptProyecto', {monedas,zonas, suelo,categoria, proyecto:proyectos[0], tipo, complejidad, servicio, estado, req, layout: 'template' , helpers : { if_equal : isEqualHelperHandlerbar}});
 
+  } catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /editar/:id \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+  
 
 });
 
 router.get('/buscarDirector/:find', async (req, res) => {
-  
-  // BUSCAR DIRECTOR  
+
+  try {
+
+    // BUSCAR DIRECTOR  
   const nombre = req.query.term;
   const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
                                        " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
@@ -595,11 +730,25 @@ router.get('/buscarDirector/:find', async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
 
+    
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarDirector/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
 });
 
 router.get('/buscarIngRev/:find', async (req, res) => {
   
-  // BUSCAR DIRECTOR  
+  try {
+
+    // BUSCAR DIRECTOR  
   const nombre = req.query.term;
   const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1,sys_categoria AS t2"+
                                        " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
@@ -610,10 +759,25 @@ router.get('/buscarIngRev/:find', async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
 
+    
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarIngRev/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+
+
 });
 
 router.get('/buscarCoord/:find', async (req, res) => {
   
+  try {
   // BUSCAR DIRECTOR  
   const nombre = req.query.term;
   const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
@@ -623,12 +787,26 @@ router.get('/buscarCoord/:find', async (req, res) => {
   
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarCoord/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+
+
 
 });
 
 router.get('/buscarCoordPe/:find', async (req, res) => {
   
-  // BUSCAR DIRECTOR  
+  try {
+    // BUSCAR DIRECTOR  
   const nombre = req.query.term;
   const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
                                        " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
@@ -638,11 +816,26 @@ router.get('/buscarCoordPe/:find', async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
 
+
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarCoordPe/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+
+  
 });
 
 router.get('/buscarProA/:find', async (req, res) => {
   
-  // BUSCAR DIRECTOR  
+  try {
+    // BUSCAR DIRECTOR  
   const nombre = req.query.term;
 
 
@@ -657,12 +850,25 @@ router.get('/buscarProA/:find', async (req, res) => {
   
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarProA/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+  
 
 });
 
 router.get('/buscarProAPe/:find', async (req, res) => {
   
-  // BUSCAR DIRECTOR  
+  try {
+     // BUSCAR DIRECTOR  
   const nombre = req.query.term;
 
 
@@ -677,12 +883,27 @@ router.get('/buscarProAPe/:find', async (req, res) => {
   
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
+  } catch (error) {
+    
+     
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarProAPe/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+ 
 
 });
 
 router.get('/buscarJefe/:find', async (req, res) => {
   
-  // BUSCAR DIRECTOR  
+  try {
+
+     // BUSCAR DIRECTOR  
   const nombre = req.query.term;
   const jefes =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 " +
                                   " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
@@ -691,68 +912,159 @@ router.get('/buscarJefe/:find', async (req, res) => {
 
   res.setHeader('Content-Type', 'application/json');
   res.json(jefes);
+    
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarJefe/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+ 
 
 });
 
 router.get('/buscarMandante/:find', async (req, res) => {
   
-  // BUSCAR DIRECTOR  
+  try {
+    // BUSCAR DIRECTOR  
   const nombre = req.query.term;
   const jefes =  await pool.query("SELECT t1.id AS id, t1.name AS value FROM contacto AS t1 WHERE t1.name LIKE '%"+nombre+"%'");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(jefes);
 
+    
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarMandante/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+  
+
 });
 
 router.get('/buscarMandante/:find', async (req, res) => {
   
-  // BUSCAR DIRECTOR  
+  try {
+    // BUSCAR DIRECTOR  
   const nombre = req.query.term;
   const mandantes =  await pool.query("SELECT t1.id AS id, t1.name AS value FROM contacto AS t1 WHERE t1.name LIKE '%"+nombre+"%'");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(mandantes);
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarMandante/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+  
 
 });
 
 router.get('/buscarCliente/:find', async (req, res) => {
   
-  // BUSCAR DIRECTOR  
+  try {
+
+    // BUSCAR DIRECTOR  
   const nombre = req.query.term;
   const clientes =  await pool.query("SELECT t1.id AS id, t1.name AS value FROM contacto AS t1 WHERE t1.name LIKE '%"+nombre+"%'");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(clientes);
 
+    
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarCliente/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+  
+
 });
 
 router.get('/buscarArquitecto/:find', async (req, res) => {
   
-  // BUSCAR DIRECTOR  
+
+  try {
+
+    // BUSCAR DIRECTOR  
   const nombre = req.query.term;
   const arquitectos =  await pool.query("SELECT t1.id AS id, t1.name AS value FROM contacto AS t1 WHERE t1.name LIKE '%"+nombre+"%'");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(arquitectos);
+    
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarArquitecto/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+  
 
 });
 
 router.get('/buscarRevisor/:find', async (req, res) => {
   
-  // BUSCAR DIRECTOR  
+
+  try {
+
+    // BUSCAR DIRECTOR  
   const nombre = req.query.term;
   const revisores =  await pool.query("SELECT t1.id AS id, t1.name AS value FROM contacto AS t1 WHERE t1.name LIKE '%"+nombre+"%'");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(revisores);
 
+    
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarRevisor/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+  
+
 });
 
 //cargarFactura
 router.post('/cargarFactura', async (req, res) => {
 
-  const {numPpto,monto,porc_presupuesto,esroc,numroc,fecha_cobro,comentario,tipoCobro,tipoMoneda,id_proyecto} = req.body;
+  try {
+    const {numPpto,monto,porc_presupuesto,esroc,numroc,fecha_cobro,comentario,tipoCobro,tipoMoneda,id_proyecto} = req.body;
 
   var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
 
@@ -821,6 +1133,19 @@ const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFa
 
   
 res.redirect('/proyecto/facturar/'+id_proyecto);
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /cargarFactura \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+
+  
 
 });
 
@@ -830,22 +1155,61 @@ res.redirect('/proyecto/facturar/'+id_proyecto);
 //router.post()
 router.post('/cargarProyecto', async (req, res) => {
 
-  const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
-    id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
-    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado,id_tipo_cobro,id_pais} = req.body;
-
-    const newProyecto = { //Se gurdaran en un nuevo objeto
+  try {
+    const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
+      id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
+      fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado,id_tipo_cobro,id_pais} = req.body;
+  
+      const newProyecto = { //Se gurdaran en un nuevo objeto
+        // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
+         nombre: nombre,
+         year: year,
+         code:code,
+         id_tipo_moneda : id_tipo_cobro,
+         id_tipo_proyecto: id_tipo_proyecto,
+         id_tipo_servicio: id_servicio,
+         id_estado: id_Estado,
+         id_director: id_director,
+         id_jefe: id_jefe,
+         id_mandante: id_cliente,
+         id_cliente: id_cliente,
+         id_arquitecto: id_arquitecto,
+         id_revisor: id_revisor,
+         latitud :loc_lat,
+         altitud : loc_long,
+         direccion : direccion,
+         id_complejidad : id_Complejidad,
+         id_pais : id_pais,
+         superficie_pre : superficie_pre,
+         superficie_apl : superficie_apl,
+         valor_proyecto : valor_proyecto,
+         valor_metro_cuadrado : valor_x_m2,
+         fecha_inicio : fecha_inicio,
+         fecha_entrega : fecha_entrega,
+         fecha_termino : fecha_termino,
+         num_pisos : num_pisos,
+         num_subterraneo : num_subte,
+         zona : zona,
+         suelo : suelo,
+         categoria : categoria,
+         num_plano_estimado : num_planos_estimado
+       };
+    
+    const result = await pool.query('INSERT INTO pro_proyectos set ?', [newProyecto]);
+    
+    var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
+    //req.user.idUsuario
+  
+    const newProyectoTracking = { //Se gurdaran en un nuevo objeto
       // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
        nombre: nombre,
        year: year,
        code:code,
-       id_tipo_moneda : id_tipo_cobro,
        id_tipo_proyecto: id_tipo_proyecto,
        id_tipo_servicio: id_servicio,
        id_estado: id_Estado,
        id_director: id_director,
        id_jefe: id_jefe,
-       id_mandante: id_cliente,
        id_cliente: id_cliente,
        id_arquitecto: id_arquitecto,
        id_revisor: id_revisor,
@@ -866,90 +1230,63 @@ router.post('/cargarProyecto', async (req, res) => {
        zona : zona,
        suelo : suelo,
        categoria : categoria,
-       num_plano_estimado : num_planos_estimado
+       num_plano_estimado : num_planos_estimado,
+       fecha_estado : fecha_ingreso,
+       id_usuario : req.user.idUsuario
      };
   
-  const result = await pool.query('INSERT INTO pro_proyectos set ?', [newProyecto]);
+     const resultTracking = await pool.query('INSERT INTO pro_proyectos_tracking set ?', [newProyectoTracking]);
   
-  var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
-  //req.user.idUsuario
-
-  const newProyectoTracking = { //Se gurdaran en un nuevo objeto
-    // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
-     nombre: nombre,
-     year: year,
-     code:code,
-     id_tipo_proyecto: id_tipo_proyecto,
-     id_tipo_servicio: id_servicio,
-     id_estado: id_Estado,
-     id_director: id_director,
-     id_jefe: id_jefe,
-     id_cliente: id_cliente,
-     id_arquitecto: id_arquitecto,
-     id_revisor: id_revisor,
-     latitud :loc_lat,
-     altitud : loc_long,
-     direccion : direccion,
-     id_complejidad : id_Complejidad,
-     id_pais : id_pais,
-     superficie_pre : superficie_pre,
-     superficie_apl : superficie_apl,
-     valor_proyecto : valor_proyecto,
-     valor_metro_cuadrado : valor_x_m2,
-     fecha_inicio : fecha_inicio,
-     fecha_entrega : fecha_entrega,
-     fecha_termino : fecha_termino,
-     num_pisos : num_pisos,
-     num_subterraneo : num_subte,
-     zona : zona,
-     suelo : suelo,
-     categoria : categoria,
-     num_plano_estimado : num_planos_estimado,
-     fecha_estado : fecha_ingreso,
-     id_usuario : req.user.idUsuario
-   };
-
-   const resultTracking = await pool.query('INSERT INTO pro_proyectos_tracking set ?', [newProyectoTracking]);
-
-   // Registro de mail 
-
-   // buscar la informacion del proyecto 
-   const infoIngresa = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [req.user.idUsuario]);
-
-
-   const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.year = ? and t1.code = ? ",[year,code])
-   
-   const mail = {
-     codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
-     to : "documentos@renelagos.com",
-     ingresado : infoIngresa[0].Nombre
-   };
-
-   const mailTI = {
-    codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
-    to : "computacion@renelagos.com",
-    ingresado : infoIngresa[0].Nombre
-  };
+     // Registro de mail 
+  
+     // buscar la informacion del proyecto 
+     const infoIngresa = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [req.user.idUsuario]);
+  
+  
+     const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.year = ? and t1.code = ? ",[year,code])
+     
+     const mail = {
+       codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
+       to : "documentos@renelagos.com",
+       ingresado : infoIngresa[0].Nombre
+     };
+  
+     const mailTI = {
+      codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
+      to : "computacion@renelagos.com",
+      ingresado : infoIngresa[0].Nombre
+    };
+  
+    
+  
+    const mailIngreso = {
+      codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
+      to : infoIngresa[0].Email
+    };
+  
+  
+  
+     mensajeria.EnvioMailCreacionProyectoDocumentos(mail);
+     mensajeria.EnvioMailCreacionProyectoTI(mailTI);
+     mensajeria.EnvioMailCreacion(mailIngreso);
+  
+   res.redirect(   url.format({
+      pathname:"../proyecto/listado",
+      query: {
+         "a": 1
+       }
+    }));
+  } catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /cargarProyecto \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
 
   
-
-  const mailIngreso = {
-    codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
-    to : infoIngresa[0].Email
-  };
-
-
-
-   mensajeria.EnvioMailCreacionProyectoDocumentos(mail);
-   mensajeria.EnvioMailCreacionProyectoTI(mailTI);
-   mensajeria.EnvioMailCreacion(mailIngreso);
-
- res.redirect(   url.format({
-    pathname:"../proyecto/listado",
-    query: {
-       "a": 1
-     }
-  }));
   
 
 });
@@ -957,131 +1294,155 @@ router.post('/cargarProyecto', async (req, res) => {
 
 router.post('/ActualizarProyecto', async (req, res) => {
 
-  const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
-    id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
-    fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado , id,id_tipo_cobro, id_pais} = req.body;
-
+  try {
+    const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
+      id_cliente,id_arquitecto,loc_lat,loc_long,direccion,id_Complejidad,id_revisor,superficie_apl,
+      fecha_inicio,fecha_entrega,fecha_termino,num_pisos,num_subte,zona,suelo,categoria,num_planos_estimado , id,id_tipo_cobro, id_pais} = req.body;
   
-  var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
-  //req.user.idUsuario
+    
+    var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
+    //req.user.idUsuario
+  
+    const Proyecto = { //Se gurdaran en un nuevo objeto
+      // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
+       nombre: nombre,
+       year: year,
+       code:code,
+       id_tipo_moneda : id_tipo_cobro,
+       id_tipo_proyecto: id_tipo_proyecto,
+       id_tipo_servicio: id_servicio,
+       id_estado: id_Estado,
+       id_director: id_director,
+       id_jefe: id_jefe,
+       id_cliente: id_cliente,
+       id_arquitecto: id_arquitecto,
+       id_revisor: id_revisor,
+       latitud :loc_lat,
+       altitud : loc_long,
+       direccion : direccion,
+       id_complejidad : id_Complejidad,
+       id_pais:id_pais,
+       superficie_pre : superficie_pre,
+       superficie_apl : superficie_apl,
+       valor_proyecto : valor_proyecto,
+       valor_metro_cuadrado : valor_x_m2,
+       fecha_inicio : fecha_inicio,
+       fecha_entrega : fecha_entrega,
+       fecha_termino : fecha_termino,
+       num_pisos : num_pisos,
+       num_subterraneo : num_subte,
+       zona : zona,
+       suelo : suelo,
+       categoria : categoria,
+       num_plano_estimado : num_planos_estimado
+     };
+  
+     const resultTrackingProyecto = await pool.query('UPDATE pro_proyectos set ? WHERE id = ?', [Proyecto,id]); 
+  
+    const newProyectoTracking = { //Se gurdaran en un nuevo objeto
+      // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
+       nombre: nombre,
+       year: year,
+       code:code,
+       id_tipo_moneda : id_tipo_cobro,
+       id_tipo_proyecto: id_tipo_proyecto,
+       id_tipo_servicio: id_servicio,
+       id_estado: id_Estado,
+       id_director: id_director,
+       id_jefe: id_jefe,
+       //id_mandante: id_mandante,
+       id_cliente: id_cliente,
+       id_arquitecto: id_arquitecto,
+       id_revisor: id_revisor,
+       latitud :loc_lat,
+       altitud : loc_long,
+       direccion : direccion,
+       id_complejidad : id_Complejidad,
+       superficie_pre : superficie_pre,
+       superficie_apl : superficie_apl,
+       valor_proyecto : valor_proyecto,
+       valor_metro_cuadrado : valor_x_m2,
+       fecha_inicio : fecha_inicio,
+       fecha_entrega : fecha_entrega,
+       fecha_termino : fecha_termino,
+       num_pisos : num_pisos,
+       num_subterraneo : num_subte,
+       zona : zona,
+       suelo : suelo,
+       categoria : categoria,
+       num_plano_estimado : num_planos_estimado,
+       fecha_estado : fecha_ingreso,
+       id_usuario : req.user.idUsuario
+     };
+  
+     const resultTracking = await pool.query('INSERT INTO pro_proyectos_tracking set ?', [newProyectoTracking]);
+  
+     res.redirect(   url.format({
+      pathname:"../proyecto/listado",
+      query: {
+         "a": 2
+       }
+    }));
+  } catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /ActualizarProyecto \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
 
-  const Proyecto = { //Se gurdaran en un nuevo objeto
-    // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
-     nombre: nombre,
-     year: year,
-     code:code,
-     id_tipo_moneda : id_tipo_cobro,
-     id_tipo_proyecto: id_tipo_proyecto,
-     id_tipo_servicio: id_servicio,
-     id_estado: id_Estado,
-     id_director: id_director,
-     id_jefe: id_jefe,
-     id_cliente: id_cliente,
-     id_arquitecto: id_arquitecto,
-     id_revisor: id_revisor,
-     latitud :loc_lat,
-     altitud : loc_long,
-     direccion : direccion,
-     id_complejidad : id_Complejidad,
-     id_pais:id_pais,
-     superficie_pre : superficie_pre,
-     superficie_apl : superficie_apl,
-     valor_proyecto : valor_proyecto,
-     valor_metro_cuadrado : valor_x_m2,
-     fecha_inicio : fecha_inicio,
-     fecha_entrega : fecha_entrega,
-     fecha_termino : fecha_termino,
-     num_pisos : num_pisos,
-     num_subterraneo : num_subte,
-     zona : zona,
-     suelo : suelo,
-     categoria : categoria,
-     num_plano_estimado : num_planos_estimado
-   };
-
-   const resultTrackingProyecto = await pool.query('UPDATE pro_proyectos set ? WHERE id = ?', [Proyecto,id]); 
-
-  const newProyectoTracking = { //Se gurdaran en un nuevo objeto
-    // Nproyecto : Nproyecto, nombre : proyecto[0].year + "-" +proyecto[0].code + " " + proyecto[0].nombre,
-     nombre: nombre,
-     year: year,
-     code:code,
-     id_tipo_moneda : id_tipo_cobro,
-     id_tipo_proyecto: id_tipo_proyecto,
-     id_tipo_servicio: id_servicio,
-     id_estado: id_Estado,
-     id_director: id_director,
-     id_jefe: id_jefe,
-     //id_mandante: id_mandante,
-     id_cliente: id_cliente,
-     id_arquitecto: id_arquitecto,
-     id_revisor: id_revisor,
-     latitud :loc_lat,
-     altitud : loc_long,
-     direccion : direccion,
-     id_complejidad : id_Complejidad,
-     superficie_pre : superficie_pre,
-     superficie_apl : superficie_apl,
-     valor_proyecto : valor_proyecto,
-     valor_metro_cuadrado : valor_x_m2,
-     fecha_inicio : fecha_inicio,
-     fecha_entrega : fecha_entrega,
-     fecha_termino : fecha_termino,
-     num_pisos : num_pisos,
-     num_subterraneo : num_subte,
-     zona : zona,
-     suelo : suelo,
-     categoria : categoria,
-     num_plano_estimado : num_planos_estimado,
-     fecha_estado : fecha_ingreso,
-     id_usuario : req.user.idUsuario
-   };
-
-   const resultTracking = await pool.query('INSERT INTO pro_proyectos_tracking set ?', [newProyectoTracking]);
-
-   res.redirect(   url.format({
-    pathname:"../proyecto/listado",
-    query: {
-       "a": 2
-     }
-  }));
+ 
 
 });
 
 router.post('/buscarPais', isLoggedIn, async (req, res) => {
 
-  //console.log(req.body.pais);
-  const sql = " SELECT * " +
-                  " FROM  " +
-                " pais	 AS t1 " +
-                " WHERE  " +
-                " t1.pais LIKE '%"+ req.body.pais +"%' ";
+  try {
+     //console.log(req.body.pais);
+            const sql = " SELECT * " +
+            " FROM  " +
+          " pais	 AS t1 " +
+          " WHERE  " +
+          " t1.pais LIKE '%"+ req.body.pais +"%' ";
 
-  const pais = await pool.query( sql);
+          const pais = await pool.query( sql);
 
-  if (pais.length === 0 )
-  {
-    const respuesta = { estado : 0};
-    res.send(respuesta);
-  }
-  else
-  {
-    // los valores de la zona
-    const zona = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+pais[0].id+" AND t1.id_parametro = 1 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
-    const suelo = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+pais[0].id+" AND t1.id_parametro = 2 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
-    const categoria = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+pais[0].id+" AND t1.id_parametro = 3 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
+          if (pais.length === 0 )
+          {
+          const respuesta = { estado : 0};
+          res.send(respuesta);
+          }
+          else
+          {
+          // los valores de la zona
+          const zona = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+pais[0].id+" AND t1.id_parametro = 1 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
+          const suelo = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+pais[0].id+" AND t1.id_parametro = 2 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
+          const categoria = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+pais[0].id+" AND t1.id_parametro = 3 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
+
+          const respuesta = { estado : 1, id_pais : pais[0].id,zona : zona,suelo : suelo,categoria : categoria};
+          //console.log(respuesta);
+          res.send(respuesta);
+          }
+
+  } catch (error) {
     
-    const respuesta = { estado : 1, id_pais : pais[0].id,zona : zona,suelo : suelo,categoria : categoria};
-    //console.log(respuesta);
-    res.send(respuesta);
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarPais \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
   }
-
-
-  
 });
 
 router.get('/equipo/:id', async (req, res) => {
-  const { id } = req.params;
+
+  try {
+    const { id } = req.params;
 
   const proyectos = await pool.query("SELECT *, t1.id as idProyecto FROM pro_proyectos AS t1  WHERE t1.id = "+id+""); 
   const equipo_proyecto =  await pool.query("SELECT t1.id , t2.Nombre FROM pro_equipo AS t1, sys_usuario AS t2 WHERE t1.id_proyecto = "+id+" AND t1.id_usuario = t2.idUsuario");
@@ -1122,11 +1483,26 @@ router.get('/equipo/:id', async (req, res) => {
                     break;
                 }
             }
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /equipo/:id \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+  
 
 });
 
 router.get('/equipo/delete/:id', async (req, res) => {
-  const { id } = req.params;
+
+  try {
+    
+    const { id } = req.params;
 
   console.log(req.params);
   console.log(req.body);
@@ -1142,13 +1518,21 @@ router.get('/equipo/delete/:id', async (req, res) => {
      }
   }));
 
-  
-
-
+  } catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /equipo/delete/:id \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
 });
 
 router.get('/equipo/add/:idUsuario/:id', async (req, res) => {
-  const { id,idUsuario } = req.params;
+
+  try {
+    const { id,idUsuario } = req.params;
 
   
   const newEquipoProyecto = { //Se gurdaran en un nuevo objeto
@@ -1165,97 +1549,115 @@ router.get('/equipo/add/:idUsuario/:id', async (req, res) => {
        "a": 2
      }
   }));
+  } catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /equipo/add/:idUsuario/:id \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
   
-
-
 });
 
 router.post('/buscarCodigo', isLoggedIn, async (req, res) => {
 
-   // console.log(req.body.year:);
 
-    switch(req.body.pais)
-    {
-      case 1:
-      case '1':
-        switch(req.body.servicio)
-        {
-          case 1:
-          case '1':
-          case 2:
-          case '2':
-            const codigo1a = await pool.query(" SELECT  " +
-                                                " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 1) AS num " +
-                                            " FROM " +
-                                                " pro_proyectos AS t1 " +
-                                            " WHERE  " +
-                                                " t1.year = "+req.body.year+" " +
-                                            " AND  " +
-                                                " t1.code >= 0 AND 		t1.code <= 199"); 
+  try {
+     // console.log(req.body.year:);
 
-          res.send(String(codigo1a[0].num));
-          break;
-          case 3:
-          case '3':
-            const codigo1b = await pool.query(" SELECT  " +
-                                                " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 400) AS num " +
-                                            " FROM " +
-                                                " pro_proyectos AS t1 " +
-                                            " WHERE  " +
-                                                " t1.year = "+req.body.year+" " +
-                                            " AND  " +
-                                                " t1.code >= 400 AND 		t1.code <= 499"); 
-          //console.log(codigo[0].num);
-          res.send(String(codigo1b[0].num));
-          break;
-          default:
-            const codigo1c = await pool.query(" SELECT  " +
-                                                " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 300) AS num " +
-                                            " FROM " +
-                                                " pro_proyectos AS t1 " +
-                                            " WHERE  " +
-                                                " t1.year = "+req.body.year+" " +
-                                            " AND  " +
-                                                " t1.code >= 300 AND 		t1.code <= 399"); 
-          //console.log(codigo[0].num);
-          res.send(String(codigo1c[0].num));
-          break;
-        }
-        break;
-      case 6:
-      case '6':
-          const codigo = await pool.query(" SELECT  " +
-                                                  " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 200) AS num " +
-                                            " FROM " +
-                                                " pro_proyectos AS t1 " +
-                                            " WHERE  " +
-                                                " t1.year = "+req.body.year+" " +
-                                            " AND  " +
-                                                " t1.code >= 200 AND 		t1.code <= 299"); 
-          //console.log(codigo[0].num);
-          res.send(String(codigo[0].num));
-          break;
-      default:
-        const codigo2 = await pool.query(" SELECT  " +
-                                              " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 600) AS num " +
-                                            " FROM " +
-                                                " pro_proyectos AS t1 " +
-                                            " WHERE  " +
-                                                " t1.year = "+req.body.year+" " +
-                                            " AND  " +
-                                                " t1.code >= 500 AND 		t1.code <= 599"); 
-          res.send(String(codigo2[0].num));
-        break;
-    }
-    
-  
+     switch(req.body.pais)
+     {
+       case 1:
+       case '1':
+         switch(req.body.servicio)
+         {
+           case 1:
+           case '1':
+           case 2:
+           case '2':
+             const codigo1a = await pool.query(" SELECT  " +
+                                                 " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 1) AS num " +
+                                             " FROM " +
+                                                 " pro_proyectos AS t1 " +
+                                             " WHERE  " +
+                                                 " t1.year = "+req.body.year+" " +
+                                             " AND  " +
+                                                 " t1.code >= 0 AND 		t1.code <= 199"); 
+ 
+           res.send(String(codigo1a[0].num));
+           break;
+           case 3:
+           case '3':
+             const codigo1b = await pool.query(" SELECT  " +
+                                                 " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 400) AS num " +
+                                             " FROM " +
+                                                 " pro_proyectos AS t1 " +
+                                             " WHERE  " +
+                                                 " t1.year = "+req.body.year+" " +
+                                             " AND  " +
+                                                 " t1.code >= 400 AND 		t1.code <= 499"); 
+           //console.log(codigo[0].num);
+           res.send(String(codigo1b[0].num));
+           break;
+           default:
+             const codigo1c = await pool.query(" SELECT  " +
+                                                 " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 300) AS num " +
+                                             " FROM " +
+                                                 " pro_proyectos AS t1 " +
+                                             " WHERE  " +
+                                                 " t1.year = "+req.body.year+" " +
+                                             " AND  " +
+                                                 " t1.code >= 300 AND 		t1.code <= 399"); 
+           //console.log(codigo[0].num);
+           res.send(String(codigo1c[0].num));
+           break;
+         }
+         break;
+       case 6:
+       case '6':
+           const codigo = await pool.query(" SELECT  " +
+                                                   " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 200) AS num " +
+                                             " FROM " +
+                                                 " pro_proyectos AS t1 " +
+                                             " WHERE  " +
+                                                 " t1.year = "+req.body.year+" " +
+                                             " AND  " +
+                                                 " t1.code >= 200 AND 		t1.code <= 299"); 
+           //console.log(codigo[0].num);
+           res.send(String(codigo[0].num));
+           break;
+       default:
+         const codigo2 = await pool.query(" SELECT  " +
+                                               " if ( (max(t1.code) + 1) > 0 , (max(t1.code) + 1) , 600) AS num " +
+                                             " FROM " +
+                                                 " pro_proyectos AS t1 " +
+                                             " WHERE  " +
+                                                 " t1.year = "+req.body.year+" " +
+                                             " AND  " +
+                                                 " t1.code >= 500 AND 		t1.code <= 599"); 
+           res.send(String(codigo2[0].num));
+         break;
+     }
+     
+  } catch (error) {
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarCodigo \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
 });
 
 // Buscador de preyectos. 
 router.get('/buscadorPr', isLoggedIn, async (req, res) => {
 
-
-  // buiscar la informacion de todos los jefes de proyectos y directores.
+  try {
+    
+      // buiscar la informacion de todos los jefes de proyectos y directores.
 
   const jefes = await pool.query("SELECT " +
                                   " t2.idUsuario, " +
@@ -1295,17 +1697,26 @@ router.get('/buscadorPr', isLoggedIn, async (req, res) => {
 
 res.render('proyecto/buscadorProyecto', { jefes , directores ,tipos_proyecto ,zonas,suelos, categorias,req,  layout: 'template', helpers : { if_equal : isEqualHelperHandlerbar} });
 
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /cargarProyecto \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+
+
 });
 
 router.post('/filtroProyecto', isLoggedIn, async (req, res) => {
 
-  //  _________________Filtrar los proyectos. 
-  //  console.clear();
-  //  console.log(req.body);
-  //  
-  //  _______________________________________
-
-  const {nombre,codigo,director,jefe,tipo_proyecto,id_cliente,id_arquitecto,numpisos,numsubte,zona,suelo,categoria} = req.body;
+  try {
+    
+    const {nombre,codigo,director,jefe,tipo_proyecto,id_cliente,id_arquitecto,numpisos,numsubte,zona,suelo,categoria} = req.body;
 
 
   let consulta  =  "SELECT t1.*, t2.nombre AS nomJefe ,t3.Nombre AS nomDir , t4.name AS nomCli"+
@@ -1431,12 +1842,26 @@ router.post('/filtroProyecto', isLoggedIn, async (req, res) => {
   }
   
 
+
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /filtroProyecto \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
 });
 
 
 router.post('/validoFactura', isLoggedIn, async (req, res) => {
 
-  //tipo_servicio: '1',
+  try {
+    
+    //tipo_servicio: '1',
   //tipo_cobro: '1',
   //proyecto: '2562'
   const {tipo_servicio,tipo_cobro,proyecto} =  req.body;
@@ -1692,6 +2117,20 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
     }
 
     res.send(verificacion);
+    
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /validoFactura \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+
+  
     
   });
 

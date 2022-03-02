@@ -8,54 +8,75 @@ var url = require('url');
 
 const { isLoggedIn } = require('../lib/auth');
 
+const mensajeria = require('../mensajeria/mail');
+
+
 router.get('/externo', isLoggedIn, async (req, res) => {
-    
-   const proveedores = await pool.query("SELECT * FROM prov_externo ");
 
-  // res.render('proveedor/externo', { proveedores, req ,layout: 'template'});
-  if (req.query.a === undefined)
-    {
-        res.render('proveedor/externo', { proveedores, req ,layout: 'template'});
+    try {
+
+        const proveedores = await pool.query("SELECT * FROM prov_externo ");
+
+        // res.render('proveedor/externo', { proveedores, req ,layout: 'template'});
+        if (req.query.a === undefined)
+          {
+              res.render('proveedor/externo', { proveedores, req ,layout: 'template'});
+          }
+          else
+              {
+                  var verToask = {};
+                  switch(req.query.a)
+                  {
+                      case 1:
+                      case "1":
+                          verToask= {
+                              titulo : "Mensaje",
+                              body   : "Proveedor cargado correctamente.",
+                              tipo   : "Crear"
+                                  };
+                          res.render('proveedor/externo', { verToask, proveedores, req ,layout: 'template'});
+                      break;
+                      case 2:
+                      case "2":
+                              verToask= {
+                                  titulo : "Mensaje",
+                                  body   : "Proveedor actualizado correctamente.",
+                                  tipo   : "Editar"
+                                      };
+                              res.render('proveedor/externo', { verToask, proveedores, req ,layout: 'template'});
+                      break;
+                      case 3:
+                      case "3":
+                              verToask= {
+                                  titulo : "Mensaje",
+                                  body   : "Proveedor eliminado correctamente.",
+                                  tipo   : "Eliminar"
+                                      };
+                              res.render('proveedor/externo', { verToask, proveedores, req ,layout: 'template'});
+                      break;
+                  }
+              }
+        
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : proveedor.js \n Error en el directorio: /externo \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+
     }
-    else
-        {
-            var verToask = {};
-            switch(req.query.a)
-            {
-                case 1:
-                case "1":
-                    verToask= {
-                        titulo : "Mensaje",
-                        body   : "Proveedor cargado correctamente.",
-                        tipo   : "Crear"
-                            };
-                    res.render('proveedor/externo', { verToask, proveedores, req ,layout: 'template'});
-                break;
-                case 2:
-                case "2":
-                        verToask= {
-                            titulo : "Mensaje",
-                            body   : "Proveedor actualizado correctamente.",
-                            tipo   : "Editar"
-                                };
-                        res.render('proveedor/externo', { verToask, proveedores, req ,layout: 'template'});
-                break;
-                case 3:
-                case "3":
-                        verToask= {
-                            titulo : "Mensaje",
-                            body   : "Proveedor eliminado correctamente.",
-                            tipo   : "Eliminar"
-                                };
-                        res.render('proveedor/externo', { verToask, proveedores, req ,layout: 'template'});
-                break;
-            }
-        }
-
+    
 });
 
 router.post('/editExterno', async (req,res) => {
-    const {  id, rut , nombre , razon_social,fono,mail,direccion} = req.body; //Obtener datos title,url,description
+
+
+    try {
+
+        const {  id, rut , nombre , razon_social,fono,mail,direccion} = req.body; //Obtener datos title,url,description
 
     const newProveedor  ={ //Se gurdaran en un nuevo objeto
         rut : rut,
@@ -74,11 +95,26 @@ router.post('/editExterno', async (req,res) => {
                 }
             }));
 
+        
+    } catch (error) {
+       
+        mensajeria.MensajerErrores("\n\n Archivo : proveedor.js \n Error en el directorio: /editExterno \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
+
+    }
 
 });
 
 router.post('/addExterno', async (req,res) => {
-    const {   rut , nombre , razon_social,fono,mail,direccion} = req.body; 
+
+    try {
+
+        const {   rut , nombre , razon_social,fono,mail,direccion} = req.body; 
 
     const newProveedor  ={ //Se gurdaran en un nuevo objeto
         rut : rut,
@@ -98,20 +134,51 @@ router.post('/addExterno', async (req,res) => {
             }
         }));
 
+        
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : proveedor.js \n Error en el directorio: /addExterno \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
+
+    }
 
 });
 
 router.get('/externo/edit/:id', async (req, res) => {
-    const { id } = req.params;
 
-    const proveedores = await pool.query("SELECT * FROM prov_externo ");
-    const proveedor =  await pool.query("SELECT * FROM prov_externo as t1 WHERE t1.id = ?", [id]);
-    res.render('proveedor/externo', { proveedores, proveedor: proveedor[0], req ,layout: 'template'});
+    try {
+
+        const { id } = req.params;
+
+        const proveedores = await pool.query("SELECT * FROM prov_externo ");
+        const proveedor =  await pool.query("SELECT * FROM prov_externo as t1 WHERE t1.id = ?", [id]);
+        res.render('proveedor/externo', { proveedores, proveedor: proveedor[0], req ,layout: 'template'});
+
+        
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : proveedor.js \n Error en el directorio: /externo/edit/:id \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
+
+    }
     
 });
 
 router.get('/externo/delete/:id', async (req, res) => {
-    const { id } = req.params;
+
+    try {
+
+        const { id } = req.params;
     await pool.query('DELETE FROM prov_externo WHERE id = ?', [id]);
     //res.redirect('/proveedor/externo');
     res.redirect(   url.format({
@@ -120,6 +187,19 @@ router.get('/externo/delete/:id', async (req, res) => {
                 "a": 3
                 }
             }));
+
+        
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : proveedor.js \n Error en el directorio: /externo/delete/:id \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
+
+    }
 
 });
 

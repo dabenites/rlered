@@ -73,8 +73,26 @@ router.get('/', isLoggedIn, async (req, res) => {
       semanaAnterior : infoSemanaAnteriorer[0].horas
    }
    
+   // 
+   if (req.query.a === undefined)
+   {
+      res.render('dashboard/idi', { infoHoras, req ,layout: 'template'});
+   }
+   else  
+   {
+      var verToask = {};
 
-   res.render('dashboard/idi', { infoHoras, req ,layout: 'template'});
+      verToask= {
+         titulo : "Problema",
+         body   : "Se ha producido un error, ha sido sido reportado.",
+         tipo   : "Eliminar"
+             };
+
+             res.render('dashboard/idi', { verToask, req ,infoHoras, layout: 'template'});
+
+   }
+
+   
   
 });
 

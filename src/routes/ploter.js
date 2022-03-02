@@ -15,7 +15,8 @@ const mensajeria = require('../mensajeria/mail');
 
 router.get('/ploteo', isLoggedIn, async (req, res) => {
  
-    const ploteos_pendiente  =  await pool.query("SELECT t.*, t2.nombre AS nomPro,t3.Nombre AS nomIngr, t4.Nombre AS nomDes" +
+    try {
+        const ploteos_pendiente  =  await pool.query("SELECT t.*, t2.nombre AS nomPro,t3.Nombre AS nomIngr, t4.Nombre AS nomDes" +
                                                 "  FROM sol_ploteo as t  "+
                                                 " LEFT JOIN sys_usuario AS t4 ON t.id_destinatario = t4.idUsuario, "+
                                                 " pro_proyectos AS t2 , sys_usuario AS t3" +
@@ -112,14 +113,28 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
         
     }
 
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : ploter.js \n Error en el directorio: /ploteo \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
 
+
+    }
+
+    
     
 }); 
 
 router.post('/addSolicitud', isLoggedIn, async (req, res) => {
 
-                                                
-    // 15/11 Nuevo objeto
+                 
+    try {
+          // 15/11 Nuevo objeto
     //req.user.id
     const {idProyecto,idDestinatario,trabajo,impresion,series,ruta,otroarch,comentarios,escalas,ncopias,ncopiasCD,formapapel,formatoEntrega,fecheHora} = req.body; 
     var trabajosBD = "";
@@ -224,39 +239,61 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
          }
       }));
 
+    } catch (error) {
+        mensajeria.MensajerErrores("\n\n Archivo : ploter.js \n Error en el directorio: /addSolicitud \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+    }
 
+  
 }); 
-
 
 router.post('/cambiaEstado',express.json({type: '*/*'}), isLoggedIn, async (req, res) => {
 
-    //console.log(req.body[0].estado);
-    //res.send("mensaje");
-    //update solicitudes set estado = '$var', horat = '$hora' where id=$cod
+    
+    try {
 
-    switch(req.body[0].estado)
-    {
-        case 'Procesando':
-            const pro = await pool.query('UPDATE solicitudes set estado = ? WHERE id = ?', [req.body[0].estado,req.body[0].id]);
-            res.send("mensaje");
-        break;
-        case 'Terminado':
-            var hora = dateFormat(new Date(), "HH:MM");
-            var fecha = dateFormat(new Date(), "dd-mm-yyyy");
-            const ter = await pool.query('UPDATE solicitudes set estado = ? , horat = ? ,fechat = ? WHERE id = ?', [req.body[0].estado,hora,fecha,req.body[0].id]);
-            res.send("mensaje");
-        break;
+        switch(req.body[0].estado)
+        {
+            case 'Procesando':
+                const pro = await pool.query('UPDATE solicitudes set estado = ? WHERE id = ?', [req.body[0].estado,req.body[0].id]);
+                res.send("mensaje");
+            break;
+            case 'Terminado':
+                var hora = dateFormat(new Date(), "HH:MM");
+                var fecha = dateFormat(new Date(), "dd-mm-yyyy");
+                const ter = await pool.query('UPDATE solicitudes set estado = ? , horat = ? ,fechat = ? WHERE id = ?', [req.body[0].estado,hora,fecha,req.body[0].id]);
+                res.send("mensaje");
+            break;
+        }
+    
+        //res.location('http://demo.com');
+
+        
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : ploter.js \n Error en el directorio: /cambiaEstado \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
+
     }
 
-    //res.location('http://demo.com');
 
 
 }); 
 
-
 router.get('/buscarPro/:find', async (req, res) => {
-  
-    // BUSCAR DIRECTOR  
+
+    try {
+         // BUSCAR DIRECTOR  
     const nombre = req.query.term;
     const proyectos =  await pool.query("SELECT t1.id AS id, CONCAT(t1.year,'-',t1.code , ' : ' , t1.nombre) AS value " +
                                         " FROM pro_proyectos as t1 WHERE t1.nombre LIKE '%"+nombre+"%' OR CONCAT(t1.year,'-',t1.code) LIKE '%"+nombre+"%' LIMIT 100");
@@ -264,24 +301,54 @@ router.get('/buscarPro/:find', async (req, res) => {
                                         
     res.setHeader('Content-Type', 'application/json');
     res.json(proyectos);
+    } catch (error) {
+       
+        mensajeria.MensajerErrores("\n\n Archivo : ploter.js \n Error en el directorio: /buscarPro/:find \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
+
+    }
+  
+   
   
   });
 
-  router.get('/buscarDesti/:find', async (req, res) => {
+router.get('/buscarDesti/:find', async (req, res) => {
   
-    // BUSCAR DIRECTOR  
+    try {
+        // BUSCAR DIRECTOR  
     const nombre = req.query.term;
     const destinarios =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 WHERE t1.Nombre LIKE '%"+nombre+"%' AND t1.id_estado = 1");
     
  
     res.setHeader('Content-Type', 'application/json');
     res.json(destinarios);
+
+    } catch (error) {
+       
+        mensajeria.MensajerErrores("\n\n Archivo : ploter.js \n Error en el directorio: /buscarDesti/:find \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
+
+    }
+
+    
   
   });
 
-  router.get('/ploteo/cambiaEstadoProceso/:id', async (req, res) => {
+router.get('/ploteo/cambiaEstadoProceso/:id', async (req, res) => {
 
-    const { id } = req.params;
+    try {
+
+        const { id } = req.params;
 
     var fechaActual = dateFormat(new Date(), "dd-mm-yyyy HH:MM");
     
@@ -295,12 +362,26 @@ router.get('/buscarPro/:find', async (req, res) => {
          }
       }));
 
+        
+    } catch (error) {
+      
+        mensajeria.MensajerErrores("\n\n Archivo : ploter.js \n Error en el directorio: /buscarDesti/:find \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
+
+    }
 
   });
 
-  router.get('/ploteo/cambiaEstadoTerminado/:id', async (req, res) => {
+router.get('/ploteo/cambiaEstadoTerminado/:id', async (req, res) => {
 
-    const { id } = req.params;
+    try {
+
+        const { id } = req.params;
     
     var fechaActual = dateFormat(new Date(), "dd-mm-yyyy HH:MM");
 
@@ -348,11 +429,18 @@ router.get('/buscarPro/:find', async (req, res) => {
          }
       }));
 
+        
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : ploter.js \n Error en el directorio: /ploteo/cambiaEstadoTerminado/:id \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                })); 
+
+    }
   });
-
-
-
-
-
 
 module.exports = router;

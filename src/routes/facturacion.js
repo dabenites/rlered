@@ -5,12 +5,13 @@ const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
 var dateFormat = require('dateformat');
 
+const mensajeria = require('../mensajeria/mail');
+
+
 router.post('/ingresoTrackingFactura', isLoggedIn, async (req, res) => {
 
-
-    
-
-    const { estado ,id}    = req.body;    
+    try {
+        const { estado ,id}    = req.body;    
     //console.log(req.body);
     switch(estado)
     {
@@ -151,6 +152,19 @@ router.post('/ingresoTrackingFactura', isLoggedIn, async (req, res) => {
     res.render('facturacion/facturas', {facturacion , estados, req ,layout: 'template', helpers : {
         if_equal : isEqualHelperHandlerbar
     }});
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : facturacion.js \n Error en el directorio: /ingresoTrackingFactura \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+
+    }
+
+    
     
 
 
@@ -159,7 +173,8 @@ router.post('/ingresoTrackingFactura', isLoggedIn, async (req, res) => {
 
 router.get('/facturas', isLoggedIn, async (req, res) => {
 
-    // buscar el listado de todas las facturas.
+    try {
+        // buscar el listado de todas las facturas.
 
     const estados =  await pool.query("SELECT * FROM fact_estados as t1 UNION SELECT '%', 'Todos' ,'color' FROM fact_estados WHERE id = 0");
     const facturacion =  await pool.query("SELECT " +
@@ -208,12 +223,27 @@ router.get('/facturas', isLoggedIn, async (req, res) => {
         if_equal : isEqualHelperHandlerbar
     }});
 
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : facturacion.js \n Error en el directorio: /facturas \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+
+    }
+
+    
 
 });
 
 router.post('/facturas', isLoggedIn, async (req, res) => {
 
-    // buscar el listado de todas las facturas.
+    try {
+        
+        // buscar el listado de todas las facturas.
     const { estado } = req.body; 
     //console.log(estado);
 
@@ -263,13 +293,23 @@ router.post('/facturas', isLoggedIn, async (req, res) => {
         if_equal : isEqualHelperHandlerbar
     }});
 
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : facturacion.js \n Error en el directorio: /facturas \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+    }
 
 });
 
 router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
 
-    
-    const { idFacturacion } = req.params;
+    try {
+        const { idFacturacion } = req.params;
 
     // HISTORIAL DE LA FACTURACION 
     const historial =  await pool.query( " SELECT  " +
@@ -327,9 +367,17 @@ router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
     res.render('facturacion/editar', { factura:factura[0],proyecto:proyecto[0],historial,req ,layout: 'template', helpers : {
         if_equal : isEqualHelperHandlerbar
     }});
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : facturacion.js \n Error en el directorio: /facturas/edit/:idFacturacion \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
 
-
-
+    }
 });
 
 module.exports = router;

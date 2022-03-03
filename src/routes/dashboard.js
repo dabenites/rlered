@@ -7,6 +7,10 @@ var dateFormat = require('dateformat');
 const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
 
+
+var url = require('url');
+
+
 router.get('/', isLoggedIn, async (req, res) => {
 
    // Buscar la información 

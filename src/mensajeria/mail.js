@@ -284,6 +284,8 @@ module.exports.EnvioMailHorasIngresoFinanzas =  async function (objeto) {
          const generico = "Estimado/a:\n" +
                           " \t Solicitud de horas extras en el proyecto "+ objeto.proyecto +", ingresado por "+ objeto.solicitante+" \n" +
                           " Comentario : "+objeto.comentario +" \n"+
+                          " asignadas : "+objeto.realizada +" \n"+
+                          " Nº HH : "+objeto.numhh +" \n"+
                           " Saludos, \n"+
                           " RLE - Planner";
   
@@ -542,8 +544,8 @@ module.exports.MensajerErrores =  async function (objeto) {
   
          const mailOptions = {
              from : "RLE - Planner <planner@renelagos.com>",
-             to : "dbenites@renelagos.com",
-             subject : "RLE - Planner - ALertas.",
+             to : "soporteplanner@renelagos.com",
+             subject : "RLE - Planner - Alertas.",
              text : objeto
          };
   

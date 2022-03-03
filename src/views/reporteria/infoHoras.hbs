@@ -24,30 +24,63 @@
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            <table class="table table-hover" class="table table-hover" id="tablaProveedores" class="display">
-                <thead>
-                    <tr>
-                        <th>Colaborador</th>
-                        <th>Centro Costo</th>
-                        <th>Categoria</th>
-                        <th>Jefe Directo</th>
-                        <th>Horas Bitácora</th>
-                        <th>Horas Extras</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each informacion}}
-                    <tr>
-                        <td>{{Nombre}}</td>
-                        <td>{{centroCosto}}</td>
-                        <td>{{categoria}}</td>
-                        <td>{{lider}}</td>
-                        <td>{{horas}}</td>
-                        <td>{{horaextras}}</td>
-                    </tr>
-                    {{/each}}
-                </tbody>
-            </table>
+
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="horas-tab" data-toggle="tab" href="#horas" role="tab" aria-controls="horas" aria-selected="true">Horas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="proyectos-tab" data-toggle="tab" href="#proyectos" role="tab" aria-controls="proyectos" aria-selected="false">Horas Detalle</a>
+                </li>
+           </ul>
+           <div class="tab-content">
+               <div class="tab-pane active" id="horas" role="tabpanel" aria-labelledby="horas-tab">
+                   <div class="form-group row">&nbsp;</div>
+                    <table class="table table-hover" class="table table-hover" id="tablaProveedores" class="display">
+                        <thead>
+                            <tr>
+                                <th>Colaborador</th>
+                                <th>Centro Costo</th>
+                                <th>Categoria</th>
+                                <th>Jefe Directo</th>
+                                <th>Horas Bitácora</th>
+                                <th>Horas Extras</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each informacion}}
+                            <tr>
+                                <td>{{Nombre}}</td>
+                                <td>{{centroCosto}}</td>
+                                <td>{{categoria}}</td>
+                                <td>{{lider}}</td>
+                                <td>{{horas}}</td>
+                                <td>{{horaextras}}</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+               </div>
+               <div class="tab-pane" id="proyectos" role="tabpanel" aria-labelledby="proyectos-tab">
+                    <div class="form-group row">&nbsp;</div>
+                    <table class="table table-hover" class="table table-hover" id="tablaProyecto" class="display">
+                        <thead>
+                            <tr>
+                                <th>Proyecto</th>
+                                <th>Horas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each horasProyecto}}
+                            <tr>
+                                <td>{{nombre}}</td>
+                                <td>{{horas}}</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+               </div>
+           </div>
         </div>
     </div>
 </div>
@@ -86,6 +119,33 @@
           }
         }
       });
+
+      $('#tablaProyecto').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        }
+      });
+
 
 </script>
 

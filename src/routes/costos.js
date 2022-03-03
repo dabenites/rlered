@@ -15,117 +15,133 @@ const { isEmptyObject } = require('jquery');
 
 const mensajeria = require('../mensajeria/mail');
 
+const ftp = require("basic-ftp")
+
+async function cargarArchivoFTPbyArchivo(archivo, name) {
+    let numeroAsignado;
+    const client = new ftp.Client();
+    client.ftp.verbose = true;
+    try {
+        await client.access({
+            host: "190.196.223.100",
+            user: "planner",
+            password: "rLPlaner15",
+            secure: false
+        });
+
+        await client.cd("Costo Usuario/");
+        let numCarpetaActual = await (await client.list()).length;
+
+        //console.log(numCarpetaActual);
+
+        let nuevaCarpeta = numCarpetaActual + 1;
+        numeroAsignado = nuevaCarpeta;
+        await client.ensureDir(nuevaCarpeta.toString());
+        await client.uploadFrom(archivo, name);
+    }
+    catch(err) {
+        console.log(err);
+    }
+    client.close();
+   
+    executeLogic(archivo, name);
+}
+
+function  executeLogic(archivo, name)
+{
+    var workbook = new Excel.Workbook(); 
+    const lectura = [];
+    var idLogDetalle = 0 ;
+
+    workbook.xlsx.readFile(archivo)
+        .then(function() {
+            var worksheet = workbook.getWorksheet(1);
+            worksheet.eachRow({ includeEmpty: true }, async function(row, rowNumber) {
+            
+            if (rowNumber == 2)
+            {
+                lectura["ano"] = row.values[3];
+            }
+            if (rowNumber == 3)
+            {
+                lectura["mes"] = row.values[3];
+            }
+            if (rowNumber > 5 )
+            {
+                if (lectura["informacion"] === undefined)
+                {
+                    lectura["informacion"]  = [];
+                }
+
+                if (rowNumber >= 6 )
+                {
+                    // Cargar el log de carga de la información
+                    if (rowNumber == 6)
+                    {
+                        unLogIngreso = {
+                            id_user : 0,
+                            fecha : new Date(),
+                            annio : lectura["ano"] ,
+                            mes : lectura["mes"]
+
+                        };
+                      //  const idLogIngreso = await pool.query('INSERT INTO sys_usuario_costo_ingreso set ?', [unLogIngreso]);
+                      
+                      //  idLogDetalle = idLogIngreso.insertId;
+                      idLogDetalle = 1;
+                    }
+                    
+
+
+                    const existeCosto =  await pool.query("SELECT * FROM sys_usuario_costo AS t1 WHERE t1.annio = "+ lectura["ano"] +" AND t1.mes = "+lectura["mes"]+" AND t1.idUsuario = "+row.values[2]+"");
+                    const unCosto ={ 
+                        annio :  lectura["ano"],
+                        mes   :  lectura["mes"],
+                        idUsuario :  row.values[2] ,
+                        costo : row.values[7]
+                       }; 
+                       
+                    const unCostoLog ={ 
+                        id_costo_ingreso : idLogDetalle,
+                        annio :  lectura["ano"],
+                        mes   :  lectura["mes"],
+                        idUsuario :  row.values[2] ,
+                        costo : row.values[7]
+                       };
+
+                    var tieneResitros = false;        
+                    existeCosto.forEach(function(elemento, indice, array) {
+                        tieneResitros = true;
+                    });
+                    
+                    if(tieneResitros)
+                    {
+                     //   const result = await pool.query("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
+                     //   const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
+                    }
+                    else
+                    {
+                     //   const result = await pool.query('INSERT INTO sys_usuario_costo set ?', [unCosto]);
+                     //   const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
+                    }  
+                }          
+                //
+            }
+        });
+    });
+}
+
 router.post('/fileupload', async (req,res) => {
+    
    
     try {
+        //cargarArchivoFTPbyArchivo();
         var form = new formidable.IncomingForm();
-        const lectura = [];
         form.parse(req, function (err, fields, files) {
             var oldpath = files.filetoupload.path;
-            var newpath =  "../rlered/src/uploads/planillaCostos/"+ files.filetoupload.name;
-            rutaArchivoCargado = newpath;
-    
-            if (fs.existsSync(oldpath)) {
-                if (fs.existsSync("../rlered/src/uploads/planillaCostos/")) {
-                    fs.rename(oldpath, newpath, function (err) {
-                        if (err) throw err;
-                        var workbook = new Excel.Workbook(); 
-                        var idLogDetalle = 0 ;
-                        workbook.xlsx.readFile(newpath)
-                            .then(function() {
-                                var worksheet = workbook.getWorksheet(1);
-                                    worksheet.eachRow({ includeEmpty: true }, async function(row, rowNumber) {
-                                    
-                                    if (rowNumber == 2)
-                                    {
-                                        lectura["ano"] = row.values[3];
-                                    }
-                                    if (rowNumber == 3)
-                                    {
-                                        lectura["mes"] = row.values[3];
-                                    }
-                                    if (rowNumber > 5 )
-                                    {
-                                        if (lectura["informacion"] === undefined)
-                                        {
-                                            lectura["informacion"]  = [];
-                                        }
-            
-                                        if (rowNumber >= 6 )
-                                        {
-                                            // Cargar el log de carga de la información
-                                            if (rowNumber == 6)
-                                            {
-                                                unLogIngreso = {
-                                                    id_user : req.user.idUsuario,
-                                                    fecha : new Date(),
-                                                    annio : lectura["ano"] ,
-                                                    mes : lectura["mes"]
-            
-                                                };
-                                                const idLogIngreso = await pool.query('INSERT INTO sys_usuario_costo_ingreso set ?', [unLogIngreso]);
-                                                idLogDetalle = idLogIngreso.insertId;
-                                            }
-                                            
-            
-            
-                                            const existeCosto =  await pool.query("SELECT * FROM sys_usuario_costo AS t1 WHERE t1.annio = "+ lectura["ano"] +" AND t1.mes = "+lectura["mes"]+" AND t1.idUsuario = "+row.values[2]+"");
-                                            const unCosto ={ 
-                                                annio :  lectura["ano"],
-                                                mes   :  lectura["mes"],
-                                                idUsuario :  row.values[2] ,
-                                                costo : row.values[7]
-                                               }; 
-                                               
-                                            const unCostoLog ={ 
-                                                id_costo_ingreso : idLogDetalle,
-                                                annio :  lectura["ano"],
-                                                mes   :  lectura["mes"],
-                                                idUsuario :  row.values[2] ,
-                                                costo : row.values[7]
-                                               };
-            
-                                            var tieneResitros = false;        
-                                            existeCosto.forEach(function(elemento, indice, array) {
-                                                tieneResitros = true;
-                                            });
-                                            
-                                            if(tieneResitros)
-                                            {
-                                                const result = await pool.query("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
-                                                const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
-                                            }
-                                            else
-                                            {
-                                                const result = await pool.query('INSERT INTO sys_usuario_costo set ?', [unCosto]);
-                                                const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
-                                            }  
-                                        }          
-                                        //
-                                    }
-                                });
-                            });
-                      });
-                }
-                else
-                {
-                    mensajeria.MensajerErrores("Ingreso Costo externo \n Error al mover el archivo fisico subido al servidor pero no se mueve a la carpeta de destino");    
-                }
-            }
-            else    
-            {
-                // mandar un aviso que no encuentra el path. fisico para subir el archivo. 
-                mensajeria.MensajerErrores("Ingreso Costo externo \n No se encuentra el path fisico en el servido de Heroku");
-            }
-        })
-    
-       // res.redirect("../costos/usuario",);
-       res.redirect(   url.format({
-        pathname:"../costos/usuario",
-        query: {
-           "a": 1
-         }
-      }));
+            var name = files.filetoupload.name;
+            cargarArchivoFTPbyArchivo(oldpath,name);
+        });
         
     } catch (error) {
         mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /fileupload \n" + error + "\n Generado por : " + req.user.login);
@@ -425,6 +441,8 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
                                                 "t1.id_estado = 1");
     // Revisar la Query de los costos.
     
+    //conectarFTP();
+    // mostrar function para ver si me conecto al FTP 
     
     if (mensaje !== -1)
     { 
@@ -450,6 +468,24 @@ router.get('/usuario', isLoggedIn, async (req, res) => {
                 }));
     }
 }); 
+
+async function conectarFTP() {
+    const client = new ftp.Client()
+    client.ftp.verbose = true
+    try {
+        await client.access({
+            host: "190.196.223.100",
+            user: "planner",
+            password: "rLPlaner15",
+            secure: false
+        })
+        await client.uploadFrom("export.xlsx", "export.xlsx");
+    }
+    catch(err) {
+        console.log(err);
+    }
+    client.close()
+}
 
 router.get('/eproyectos', isLoggedIn, async (req, res) => {
 

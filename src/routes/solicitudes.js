@@ -1905,7 +1905,19 @@ router.post('/uhorasextras', async (req,res) => {
         solicitante : infoAsignada[0].Nombre
       };
 
+      const mailAprobadoAsignada = {
+        to : infoAsignada[0].Email,
+        comentario : comentario,
+        estado : "Aprobado",
+        numhh : infoSolicitud[0].numhh,
+        proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
+        solicitante : infoAsignada[0].Nombre
+      };
+
+
       mensajeria.EnvioMailHorasRespuesta(mailAprobado);
+      mensajeria.EnvioMailHorasRespuestaAsignado(mailAprobadoAsignada);
+      
       break;
     case 2:
     case "2":

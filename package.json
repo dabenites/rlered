@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/dabenites/rlered#readme",
   "dependencies": {
+    "basic-ftp": "^4.6.6",
     "bcryptjs": "^2.4.3",
     "bootstrap": "^5.1.1",
     "colors": "^1.4.0",

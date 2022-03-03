@@ -511,7 +511,7 @@ router.post('/buscarHoras',isLoggedIn,  async (req, res) => {
                                 " AND  " +
                                                 " t1.id_estado = 1 " +
                                 " ORDER BY categoria ASC, Nombre ASC ";
-
+                
                 break; // Usuarios por centro de costo 
           case 3:
           case '3':
@@ -545,7 +545,7 @@ router.post('/buscarHoras',isLoggedIn,  async (req, res) => {
         let informacion = [];
 
         let inf =  await pool.query(consulta);
-
+        let lstUser = "";
         for (const e of inf) {
                 let consulta2 = " SELECT  " +
                                                 " IF(	SUM( TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600) IS null , 0 ,SUM( TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600))  AS horas " +
@@ -555,6 +555,7 @@ router.post('/buscarHoras',isLoggedIn,  async (req, res) => {
                                                     "    t1.id_session = "+e.idUsuario+" "+
                                         " AND  " +
                                                   "      t1.ini_time BETWEEN '"+req.body.fecha_inicio+"' AND '"+ req.body.fecha_termino +"' " ;
+                
                 let consulta3 = "SELECT " +
                                         " if (SUM(t.numhh) IS NULL , 0 ,SUM(t.numhh))  AS cantidad " +
                                 "  FROM " +
@@ -566,7 +567,8 @@ router.post('/buscarHoras',isLoggedIn,  async (req, res) => {
                                 " AND  " +
                                         " t.fecha_solicitante BETWEEN  '"+req.body.fecha_inicio+"' AND '"+ req.body.fecha_termino +"'";
 
-                //console.log(consulta3);
+                
+                lstUser += e.idUsuario+",";
 
                 let horasBita =  await pool.query(consulta2);                                  
                 let horasBitaExtra =  await pool.query(consulta3); 
@@ -580,8 +582,33 @@ router.post('/buscarHoras',isLoggedIn,  async (req, res) => {
                                 horaextras : horasBitaExtra[0].cantidad
                 });
               }
+        //167,214,96,3,5,17,32,75,53,106,126,122,108,100,175,130,
+        lstUser = lstUser.substring(0, lstUser.length - 1);
+        
+        let sqlProyecto = " SELECT   "+
+                                      "  IF(SUM( TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600) IS null , 0 ,SUM( TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600))  AS horas,"+
+                                      "  t2.nombre "+
+                                      "  FROM   "+
+                                      "  bita_horas AS t1 "+
+                                      "  LEFT JOIN pro_proyectos AS t2 ON t1.id_project = t2.id  "+
+                                      "  WHERE "+
+                                      "  t1.id_session in ( "+lstUser+" ) AND  t1.ini_time BETWEEN  '"+req.body.fecha_inicio+"'  AND '"+ req.body.fecha_termino +"' AND t1.id_project != -1"+
+                                      "  GROUP BY t1.id_project" +
+                                      "  UNION "+
+                                      "  SELECT  "+
+                                      "  IF(SUM( TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600) IS null , 0 ,SUM( TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600))  AS horas," +
+                                      "  t1.title " +
+                                      "  FROM   "+
+                                      "  bita_horas AS t1 "+
+                                      "  WHERE     "+ 
+                                      "  t1.id_session in ( "+lstUser+") "+
+                                      "  AND t1.ini_time BETWEEN  '"+req.body.fecha_inicio+"'  AND '"+ req.body.fecha_termino +"'"+
+                                      "  AND t1.id_project = -1 "+
+                                      "  ORDER BY horas DESC" ;
 
-        res.render('reporteria/infoHoras', {  informacion, parametros,  req , layout: 'template'});
+        let horasProyecto =  await pool.query(sqlProyecto);   
+
+        res.render('reporteria/infoHoras', {  informacion, parametros,horasProyecto , req , layout: 'template'});
 
 
         } catch (error) {

@@ -60,7 +60,7 @@ router.get('/externo', isLoggedIn, async (req, res) => {
     } catch (error) {
         
         mensajeria.MensajerErrores("\n\n Archivo : proveedor.js \n Error en el directorio: /externo \n" + error + "\n Generado por : " + req.user.login);
-        res.redirect(   url.format({
+        res.redirect(url.format({
             pathname:'/dashboard',
                     query: {
                     "a": 1

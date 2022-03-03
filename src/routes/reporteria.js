@@ -6,6 +6,7 @@ const { isEmptyObject } = require('jquery');
 
 const mensajeria = require('../mensajeria/mail');
 
+var url = require('url');
 
 router.get('/proyectos',isLoggedIn,  async (req, res) => {
     

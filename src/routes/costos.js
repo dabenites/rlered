@@ -17,7 +17,7 @@ const mensajeria = require('../mensajeria/mail');
 
 const ftp = require("basic-ftp")
 
-async function cargarArchivoFTPbyArchivo(archivo, name) {
+async function cargarArchivoFTPbyArchivo(archivo, name,req) {
     let numeroAsignado;
     const client = new ftp.Client();
     client.ftp.verbose = true;
@@ -44,11 +44,13 @@ async function cargarArchivoFTPbyArchivo(archivo, name) {
     }
     client.close();
    
-    executeLogic(archivo, name);
+    executeLogic(archivo, name,numeroAsignado,req);
 }
 
-function  executeLogic(archivo, name)
+function  executeLogic(archivo, name,numeroAsignado,req)
 {
+
+   // console.log(numeroAsignado);
     var workbook = new Excel.Workbook(); 
     const lectura = [];
     var idLogDetalle = 0 ;
@@ -79,16 +81,17 @@ function  executeLogic(archivo, name)
                     if (rowNumber == 6)
                     {
                         unLogIngreso = {
-                            id_user : 0,
+                            id_user : req.user.idUsuario,
                             fecha : new Date(),
                             annio : lectura["ano"] ,
-                            mes : lectura["mes"]
+                            mes : lectura["mes"],
+                            nomCarpeta : numeroAsignado,
+                            nomArchivo : name
+
 
                         };
-                      //  const idLogIngreso = await pool.query('INSERT INTO sys_usuario_costo_ingreso set ?', [unLogIngreso]);
-                      
-                      //  idLogDetalle = idLogIngreso.insertId;
-                      idLogDetalle = 1;
+                       const idLogIngreso = await pool.query('INSERT INTO sys_usuario_costo_ingreso set ?', [unLogIngreso]);
+                       idLogDetalle = idLogIngreso.insertId;
                     }
                     
 
@@ -116,13 +119,13 @@ function  executeLogic(archivo, name)
                     
                     if(tieneResitros)
                     {
-                     //   const result = await pool.query("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
-                     //   const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
+                        const result = await pool.query("UPDATE sys_usuario_costo set costo = '"+row.values[7]+"' WHERE annio = '"+lectura["ano"]+"' AND  mes = '"+lectura["mes"]+"' AND idUsuario = "+row.values[2]+" ");
+                        const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
                     }
                     else
                     {
-                     //   const result = await pool.query('INSERT INTO sys_usuario_costo set ?', [unCosto]);
-                     //   const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
+                        const result = await pool.query('INSERT INTO sys_usuario_costo set ?', [unCosto]);
+                        const result2 = await pool.query('INSERT INTO sys_usuario_costo_ingreso_detalle set ?', [unCostoLog]);
                     }  
                 }          
                 //
@@ -140,8 +143,16 @@ router.post('/fileupload', async (req,res) => {
         form.parse(req, function (err, fields, files) {
             var oldpath = files.filetoupload.path;
             var name = files.filetoupload.name;
-            cargarArchivoFTPbyArchivo(oldpath,name);
+            cargarArchivoFTPbyArchivo(oldpath,name,req);
         });
+
+        res.redirect(   url.format({
+            pathname:"../costos/usuario",
+            query: {
+               "a": 1
+             }
+          }));
+          
         
     } catch (error) {
         mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /fileupload \n" + error + "\n Generado por : " + req.user.login);

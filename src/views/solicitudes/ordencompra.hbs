@@ -52,27 +52,47 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
 
-<div class="col-md-6">
+<div class="col-md-12">
     <div class="x_panel">
         <div class="x_title">
             <h2>Ingresar Orden de Compra</h2>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            <form id="ingresoOC" name="ingresoOC" data-parsley-validate class="form-horizontal form-label-left" action="/solicitudes/addOC" method="POST">
 
-            
-            <div class="form-group row">
-                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Emisor:</b></label>
-                    <div class="col-md-6 col-sm-6">
-                        <select class="select2_single form-control" tabindex="1" name="emisor" id="emisor" onchange="cargaEmisorOC(this.value);">
-                            <option value="">Seleccione</option>
-                            {{#each empresas}}
-                                <option value="{{id}}">{{razonsocial}}</option>
-                            {{/each}}
-                    </select>
-                </div>
-            </div>
+            <ul class="nav nav-tabs justify-content-end bar_tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="ingreso-tab" data-toggle="tab" href="#ingreso" role="tab"
+                        aria-controls="ingreso" aria-selected="true">Ingresar OC</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="listado-tab" data-toggle="tab" href="#listado" role="tab"
+                        aria-controls="listado" aria-selected="false">Listado Ingresados</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="ingreso" role="tabpanel" aria-labelledby="ingreso-tab">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <form id="ingresoOC" name="ingresoOC" data-parsley-validate class="form-horizontal form-label-left" action="/solicitudes/addOC" method="POST">
+                        
+                         <div class="form-group row">
+                             <label class="col-form-label col-md-1 col-sm-1 "></label>
+                             <label class="col-form-label col-md-6 col-sm-6 "><p class="fs-5"><u><strong>Configuración General</strong></u></p>
+                             </label>
+                         </div>
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Emisor:</b></label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <select class="select2_single form-control" tabindex="1" name="emisor" id="emisor" onchange="cargaEmisorOC(this.value);">
+                                            <option value="">Seleccione</option>
+                                                {{#each empresas}}
+                                                    <option value="{{id}}">{{razonsocial}}</option>
+                                                {{/each}}
+                                        </select>
+                                    </div>
+                            </div>
             <div class="form-group row" style="visibility: hidden; display:none;">
                 <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Razon Social:</b></label>
                     <div class="col-md-6 col-sm-6">
@@ -126,6 +146,23 @@
                 </div>
             </div>
             <div class="form-group row">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Quien Recepciona:</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <select class="select2_single form-control" tabindex="1" name="id_recepcionador" id="id_recepcionador">
+                            <option value="">Seleccione</option>
+                            {{#each recepcionador}}
+                                <option value="{{idUsuario}}">{{Nombre}}</option>
+                            {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row" >
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Nº Días Pago:</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <input type="text" id="numdias" name="numdias"  class="form-control">
+                    </div>
+            </div>
+            <div class="form-group row">
                 <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Director:</b></label>
                     <div class="col-md-6 col-sm-6">
                         <select class="select2_single form-control" tabindex="1" name="id_director" id="id_director">
@@ -172,54 +209,11 @@
              <div class="form-group row" >
                 <div class="col-md-9 col-sm-9"></div>
                 <div class="col-md-1 col-sm-1">
-                    <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#requerimiento">Agregar</button>
+                    
                 </div>
              </div>
-            
-             {{#if requerimientos }}
-            <div id="tablaInformacion">
-               <table class="table table-hover" id="tableRequerimiento">
-                    <thead>
-                        <tr>
-                            <th>Cantidad</th>
-                            <th>Descripción</th>
-                            <th>Precio Unitario</th>
-                            <th>Moneda</th>
-                            <th>Monto</th>
-                            <th>Monto en $</th>
-                            <th> </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{#each requerimientos}}
-                             <tr>
-                                <td>{{cantidad}}</td>
-                                <td>{{descripcion}}</td>
-                                <td>{{precio_unitario}}</td>
-                                <td>{{mon}}</td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="EliminarRegistro({{id}});">Eliminar</button>
-                                </td>
-                            </tr>
-                        {{/each}}
-                        <tfoot>
-                            <th style="border-bottom-width: 0px;">
-                                <td style="border-bottom-width: 0px;"></td>
-                                <td style="border-bottom-width: 0px;">
-                                    <button type="button" class="btn btn-success btn-sm" onclick="ingresarOC();">Ingresar</button>
-                                </td>
-                            </th>
-                            
-                        </tfoot>
-                    </tbody>
-                </table>
-            </div>
-             {{/if}}          
- 
             <div class="modal fade" id="requerimiento" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-dialog modal-centered-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLongTitle">Requerimiento</h5>
@@ -249,7 +243,7 @@
                             <div class="form-group row">
                                 <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Moneda</b></label>
                                     <div class="col-md-8 col-sm-8">
-                                       <select class="select2_single form-control" tabindex="1" name="id_moneda" id="id_moneda">
+                                       <select class="select2_single form-control" tabindex="1" name="id_moneda" id="id_moneda" onchange="cargaTipoCambio(this.value);">
                                             <option value="">Seleccione</option>
                                             {{#each monedas}}
                                                 <option value="{{id_moneda}}">{{descripcion}} </option>
@@ -270,19 +264,138 @@
                     </div>
                 </div>
             </div>
-            </form>
-        </div>
-    </div>
-</div>
-<div class="col-md-6">
-    <div class="x_panel">
-		<div class="x_title">
-               <h2>Listado </h2> 
-		    <div class="clearfix"></div>
-		</div>
+            
+                    </div>
+                    <div class="col-md-6">
+                        <div id="tablaInformacion">
+                            <table class="table table-hover" id="tableRequerimiento">
+                                <thead>
+                                    <tr>
+                                        <th>Cant.</th>
+                                        <th>Descripción</th>
+                                        <th>Precio Unitario</th>
+                                        <th>Moneda</th>
+                                        <th>Monto</th>
+                                        <th>Monto en $</th>
+                                        <th> <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#requerimiento">+</button> </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each requerimientos}}
+                                        <tr>
+                                            <td>{{cantidad}}</td>
+                                            <td>{{descripcion}}</td>
+                                            <td>{{precio_unitario}}</td>
+                                            <td>{{mon}}</td>
+                                            <td>{{monto}}</td>
+                                            <td>$ {{montopeso}}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="EliminarRegistro({{id}});">-</button>
+                                            </td>
+                                        </tr>
+                                    {{/each}}
+                                    <tfoot>
+                                        <th style="border-bottom-width: 0px;">
+                                            <td style="border-bottom-width: 0px;"></td>
+                                            <td style="border-bottom-width: 0px;" colspan="3">
+                                            <!--  <button type="button" class="btn btn-success btn-sm" onclick="ingresarOC();">Ingresar Orden de Compra</button> -->
+                                            </td>
+                                        </th>
+                                        
+                                    </tfoot>
+                                </tbody>
+                            </table>
+            </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-success btn-sm" onclick="ingresarOC();">Ingresar Orden de Compra</button>
+                        </div>
+                        <div class="col-md-4"></div>
+                    </div>
+                    </form>
+                </div>        
+                </div>
+                <div class="tab-pane fade" id="listado" role="tabpanel" aria-labelledby="listado-tab">
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h2>Listado Ingresados </h2> 
+                                <div class="clearfix"></div>
+                            </div>
         <div class="x_content">
-                
+            <table class="table table-hover" id="tablaOrden">
+                        <thead>
+                            <tr>
+                                <th>Emisor</th>
+                                <th>Tipo</th>
+                                <th>Solicitante</th>
+                                <th>Fecha Ingreso</th>
+                                <th>Fecha Aprobación</th>
+                                <th>Folio</th>
+                                <th>Centro Costo</th>
+                                <th>Proyecto</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                   <tbody>
+                       {{#each ordenCompra}}
+                             <tr>
+                                <td>{{razonsocial}}</td>
+                                <td>{{tipo}}</td>
+                                <td>{{solicitante}}</td>
+                                <td>{{fechaIngreso}}</td>
+                                <td>{{fechaAProbacion}}</td>
+                                <td>{{folio}}</td>
+                                <td>{{centroCosto}}</td>
+                                <td>{{year}}-{{code}} : {{proyecto}}</td>
+                                <td>{{estado}}</td>
+                                <td>
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="verDetalle({{id}},1)">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+
+                                         {{#if (if_equal 2 id_estado) }}
+                                         <button type="button" class="btn btn-secondary btn-sm">
+                                             <a href="/solicitudes/createPDF/{{id}}" style="color: white;" target="_blank">
+                                             <i class="fa fa-print">
+                                             </i>
+                                             </a>
+                                         </button>
+                                         {{/if}}
+                                    </div>
+                                </td>
+                            </tr>
+                        {{/each}}
+                   </tbody>
+            </table> 
+            <div class="modal fade bs-example-modal-lg" id="verDetalle" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Información</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="detalleOrdenCompra">
+
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            
+                         </div>
+                    </div>
+                </div>
+            </div>
         </div>  
+    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -296,7 +409,58 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+{{#if verToask }}
+<!--INFORMACIÓN-->
+<script>
+    if ("{{verToask.tipo}}" == "Editar") {
+        toastr.warning('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Crear") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Eliminar") {
+        toastr.error('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
 
+</script>
+{{/if}}
+
+
+<script>
+ $('#tablaOrden').DataTable({
+     "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        },
+        "scrolly" : "50vh",
+        "scrollCollapse" : true
+      });
+</script>
 
 <script>
     function cargaEmisorOC(valor)
@@ -310,8 +474,7 @@
                                     data : "id="+valor,
                                     success : function (resultado) 
                                         { 
-                                            // $("#idTarea").html(resultado);
-                                            //alert("Buscar informacion");
+                                            
                                             $("#razonsocial").val(resultado.razonsocial);
                                             $("#rut").val(resultado.rut);
                                         } 
@@ -344,9 +507,9 @@
                 break;
                 case 3:
                 case "3":
-                    $("#rnombrepro").html("<b>Razon Social</b>");
-                    $("#razonsocialProv").css("visibility", "hidden");
-                    $("#razonsocialProv").hide();
+                    $("#rnombrepro").html("<b>Contacto</b>");
+                    $("#razonsocialProv").css("visibility", "visible");
+                    $("#razonsocialProv").show();
                 break;
             }
 
@@ -447,18 +610,30 @@
             tipocambio
         };
         
+        if (moneda != "")
+        {
+            $.ajax({
+                        type: 'post',
+                        url: '/solicitudes/ordecompradetalle',
+                        data: informacion,
+                        dataType: 'text'
+                        })
+                        .done(function (data) {
 
-        $.ajax({
-              type: 'post',
-              url: '/solicitudes/ordecompradetalle',
-              data: informacion,
-              dataType: 'text'
-               })
-              .done(function (data) {
-                $('#tablaInformacion').html(data);
-              });
+                            // cargar la informacion de la tabla 
+                                $('#tablaInformacion').html(data);
+                            // dejar todas las columnas en blanco 
+                            $("#cantidad").val("");
+                            $("#descripcion").val("");
+                            $("#punitario").val("");
+                            $("#id_moneda").val("");
+                            $("#tipocambio").val("");
+
+                        });
+        }
+        // mostrar mensaje que tiene que repletar la moneda.
      
-     $('#requerimiento').modal('toggle'); //Me muestra el formulario si esta oculto
+           // $('#requerimiento').modal('toggle'); //Me muestra el formulario si esta oculto
 
         
 
@@ -489,8 +664,10 @@
         let id_solicitante     = $("#id_solicitante").val();
         let id_director        = $("#id_director").val();
         let id_centro_costo    = $("#id_centro_costo").val();
-        let id_proyecto         = $("#id_proyecto").val();
-        let id_etapa            = $("#id_etapa").val();
+        let id_proyecto        = $("#id_proyecto").val();
+        let id_etapa           = $("#id_etapa").val();
+        let id_recepcionador   = $("#id_recepcionador").val();
+        let numdias             = $("#numdias").val();
         let razonsocialpro      = $("#razonsocialpro").val();
         //__________________________________________________
 
@@ -517,7 +694,7 @@
 
         //  validar centro de costo 
         if (id_centro_costo == 2 || id_centro_costo == 3 || id_centro_costo == 4 || 
-            id_centro_costo == 5 || id_centro_costo == 6 || id_centro_costo == 8)
+            id_centro_costo == 5 || id_centro_costo == 7 || id_centro_costo == 8)
         {
             if (id_proyecto == "" || id_etapa == "")
             {
@@ -540,6 +717,39 @@
         };
 
          $("#ingresoOC").submit();
+
+    }
+
+    function verDetalle(idIngresada,estado)
+    {
+        
+         let informacion = {  id :  idIngresada , estado};
+
+         $.ajax({
+              type: 'post',
+              url: '/solicitudes/verDetalleOrdenCompra',
+              data: informacion,
+              dataType: 'text'
+               })
+              .done(function (data) {
+                $('#detalleOrdenCompra').html(data);
+              });
+
+    }
+
+    function cargaTipoCambio(id)
+    {
+        switch(id)
+        {
+            case 1:
+            case "1":
+             $("#tipocambio").val("1");
+            break;
+            default:
+            $("#tipocambio").val("");
+            break;
+        }
+
 
     }
 </script>

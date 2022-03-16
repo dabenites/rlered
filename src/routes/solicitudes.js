@@ -9,6 +9,17 @@ const { isLoggedIn } = require('../lib/auth');
 const mensajeria = require('../mensajeria/mail');
 const { Console, count } = require('console');
 
+
+var pdf = require("pdf-creator-node");
+var fs = require("fs");
+
+const ftp = require("basic-ftp");
+
+
+const pdfService = require('../servicios/pdfOC');
+
+
+
 // Permisos 
 router.get('/permisos', isLoggedIn, async (req, res) => {
 
@@ -53,7 +64,6 @@ router.get('/permisos', isLoggedIn, async (req, res) => {
             })); 
   }
 }); 
-
 
 // INgreso de permisos.
 router.post('/IngresoPermiso', isLoggedIn, async (req, res) => {
@@ -199,10 +209,6 @@ router.post('/IngresoPermiso', isLoggedIn, async (req, res) => {
   }
  
 }); 
-
-
-
-
 
 // vacaciones 
 router.get('/vacaciones', isLoggedIn, async (req, res) => {
@@ -1966,7 +1972,6 @@ router.post('/uhorasextras', async (req,res) => {
 
 });
 
-
 // ORDEN COMPRA 
 
 router.get('/ordencompra', async (req,res) => {
@@ -1976,8 +1981,26 @@ router.get('/ordencompra', async (req,res) => {
      // empresas 
   const empresas = await pool.query('SELECT * FROM sys_empresa'); 
 
-  const solicitantes = await pool.query('SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1 ORDER BY t1.Nombre ASC'); 
-  const directores = await pool.query('SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1 AND t1.idCategoria IN (25,26,27,34,38,39,41,42,43,47,48,50,52,54) ORDER BY t1.Nombre ASC'); 
+  const solicitantes = await pool.query('SELECT t2.* FROM orden_compra_tipo_lista_user AS t1,' +
+                                        ' sys_usuario AS t2 ' +
+                                        ' WHERE  ' +
+                                        '  t1.id_oc_tipo_lista = 1 ' +
+                                        ' AND 	' +
+                                            ' t1.id_user = t2.idUsuario'); 
+
+  const directores = await pool.query('SELECT t2.* FROM orden_compra_tipo_lista_user AS t1,' +
+                                      ' sys_usuario AS t2 ' +
+                                      ' WHERE  ' +
+                                      '  t1.id_oc_tipo_lista = 2 ' +
+                                      ' AND 	' +
+                                          ' t1.id_user = t2.idUsuario'); 
+
+  const recepcionador = await pool.query('SELECT t2.* FROM orden_compra_tipo_lista_user AS t1,' +
+                                        ' sys_usuario AS t2 ' +
+                                        ' WHERE  ' +
+                                        '  t1.id_oc_tipo_lista = 2 ' +
+                                        ' AND 	' +
+                                            ' t1.id_user = t2.idUsuario'); 
 
   const centroCostos = await pool.query('SELECT * FROM centro_costo'); 
   const proyectos = await pool.query('SELECT * FROM pro_proyectos'); 
@@ -1986,15 +2009,79 @@ router.get('/ordencompra', async (req,res) => {
 
 
   // preguntar si existen requerimientos para esta persona que esta logeada.
-  const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 WHERE t1.id_ingreso = ? AND t1.id_solicitud = 0 AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
+  const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon, ' +
+                                          " FORMAT((t1.cantidad * t1.precio_unitario ),2,'de_DE') AS monto, " +
+                                          " FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') AS montopeso " +
+                                           ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 '+
+                                           ' WHERE t1.id_ingreso = ? AND t1.id_solicitud = 0 AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
+
+
+  const ordenCompra = await pool.query(" SELECT t1.id,t1.folio,t1.id_estado, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
+                                           " , t8.nombre AS proyecto,t9.descripcion as estado , t8.year,t8.code," +
+                                           " DATE_FORMAT(t1.fecha , '%Y-%m-%d %H:%i') as fechaIngreso, " +
+                                           " DATE_FORMAT(t1.fecha_aprobacion , '%Y-%m-%d %H:%i') as fechaAProbacion, " +
+                                           " DATE_FORMAT(t1.fecha_recepcion , '%Y-%m-%d %H:%i') as fechaRecepcion " +
+                                           " FROM orden_compra as t1  " +
+                                           " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
+                                           " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
+                                           " LEFT JOIN sys_usuario AS t4 ON t1.id_solicitante = t4.idUsuario "+
+                                           " LEFT JOIN sys_usuario AS t5 ON t1.id_recepcionador = t5.idUsuario "+
+                                           " LEFT JOIN sys_usuario AS t6 ON t1.id_director = t6.idUsuario " +
+                                           " LEFT JOIN centro_costo AS t7 ON t1.id_centro_costo = t7.id " +
+                                           " LEFT JOIN pro_proyectos AS t8 ON t1.id_proyecto = t8.id " +
+                                           " LEFT JOIN orden_compra_estado as t9 ON t1.id_estado = t9.id " +
+                                           " WHERE t1.id_estado IN(1,2,3,4,5)"); 
+
+  const verToask = {
+        titulo : "Mensaje",
+        body   : "Solicitud de Orden de Compra, ingresada correctamente",
+        tipo   : "Crear"
+        };
+
+  const isEqualHelperHandlerbar = function(a, b, opts) {
+          if (a == b) {
+              return true
+          } else { 
+              return false
+          } 
+      };
 
   if (requerimientos.length > 0)
   {
-    res.render('solicitudes/ordencompra', { req ,empresas,directores,centroCostos, solicitantes,etapas, monedas, proyectos,requerimientos, layout: 'template'});
+    if (req.query.a !== undefined)
+    {
+      
+      res.render('solicitudes/ordencompra', { verToask, req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, 
+        proyectos,requerimientos,ordenCompra, layout: 'template', helpers : {
+          if_equal : isEqualHelperHandlerbar
+      }});
+    }
+    else
+    {
+      res.render('solicitudes/ordencompra', { req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,requerimientos,ordenCompra, 
+        layout: 'template', helpers : {
+          if_equal : isEqualHelperHandlerbar
+      }});
+    }
+    
   }
   else
   {
-    res.render('solicitudes/ordencompra', { req ,empresas,directores,centroCostos, solicitantes,etapas, monedas, proyectos, layout: 'template'});
+    if (req.query.a !== undefined)
+    {
+      res.render('solicitudes/ordencompra', { verToask, req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,
+        ordenCompra, layout: 'template', helpers : {
+          if_equal : isEqualHelperHandlerbar
+      }});  
+    }
+    else
+    {
+      res.render('solicitudes/ordencompra', { req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,ordenCompra,
+         layout: 'template', helpers : {
+          if_equal : isEqualHelperHandlerbar
+      }});
+    }
+    
   }
 
 
@@ -2055,6 +2142,9 @@ router.post('/buscaProveedor', isLoggedIn, async (req, res) => {
     break;
     case "2":
       opciones = await pool.query('SELECT t1.id, t1.razon_social as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
+    break;
+    case "3":
+      opciones = await pool.query('SELECT t1.id , t1.name AS descripcion FROM contacto AS t1'); 
     break;
   }
   
@@ -2156,9 +2246,11 @@ router.post('/ordecompradetalle', isLoggedIn, async (req, res) => {
 
   // buscar toda la informacion relacionada a la persona que esta ignresando los requerimientos de la OC
 
-  const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 WHERE t1.id_ingreso = ? AND t1.id_solicitud = 0 AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
-
-
+  const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon, '+
+                                          " FORMAT((t1.cantidad * t1.precio_unitario ),2,'de_DE') AS monto, " +
+                                          " FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') AS montopeso " +
+                                          ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 ' +
+                                          ' WHERE t1.id_ingreso = ? AND t1.id_solicitud = 0 AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
 
   res.render('solicitudes/ordencompradetalle', { requerimientos,layout: 'blanco'});
 
@@ -2178,7 +2270,6 @@ router.post('/ordecompradetalle', isLoggedIn, async (req, res) => {
 });
 
 //ordecompradetalleEliminar
-
 
 router.post('/ordecompradetalleEliminar', isLoggedIn, async (req, res) => {
 
@@ -2211,44 +2302,104 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
 
   try {
     
-    const {id_tipo_proveedor,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro} = req.body
-  
-  const oc  ={ //Se gurdaran en un nuevo objeto
+    const {id_tipo_proveedor,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias} = req.body
+    let oc = {};
 
-    id_tipo : id_tipo_proveedor,
-    id_proveedor: razonsocialpro,
-    id_solicitante :  id_solicitante,
-    id_director : id_director,
-    id_centro_costo : id_centro_costo,
-    id_ingreso: req.user.idUsuario,
-    id_proyecto: id_proyecto,
-    id_etapa: id_etapa,
-    fecha : new Date()
-  };
+    // Preguntar por el numero de folio.
+    let fechaActual = new Date();
+    let annio = fechaActual.getFullYear();
+    let mes   = fechaActual.getMonth() + 1;
+
+
+    let infoGetFolio = await pool.query(" SELECT " +
+                                            " if(COUNT(t1.id) = 0 , 1 , MAX(t1.num) + 1) AS num " +
+                                          " FROM  " +
+                                              " orden_compra_folio AS t1 " +
+                                          " WHERE " +
+                                              " t1.year = ? " +
+                                          " AND  " +
+                                              " t1.mes = ?", [annio,mes]);
+
+    let numFormateado = '';
+    let mesFormateado = '';
+    if (infoGetFolio[0].num < 10)
+    {
+      numFormateado = '00'+infoGetFolio[0].num;
+    }
+    else if (infoGetFolio[0].num >= 10 && infoGetFolio[0].num < 100) 
+    {
+      numFormateado = '0'+infoGetFolio[0].num;
+    }
+    else
+    {
+      numFormateado = infoGetFolio[0].num;
+    }
+    if (mes < 10)
+    {
+      mesFormateado = '0'+ mes;
+    }
+    else
+    {
+      mesFormateado = mes;
+    }
+
+    let folio = {
+      year : annio,
+      mes : mes,
+      num : infoGetFolio[0].num,
+      id_solicitante : id_solicitante,
+      folio : numFormateado+'-'+annio+'-'+mesFormateado,
+      fecha : new Date() 
+    };
+
+    const ingresoSolFolio = await pool.query('INSERT INTO orden_compra_folio  set ? ', [folio]);
+
+    
+
+
+    
+    if (id_proyecto == '')
+    {
+      oc  ={ //Se gurdaran en un nuevo objeto
+
+        id_tipo : id_tipo_proveedor,
+        id_proveedor: emisor,
+        id_solicitante :  id_solicitante,
+        id_director : id_director,
+        id_centro_costo : id_centro_costo,
+        id_ingreso: req.user.idUsuario,
+        fecha : new Date(),
+        id_recepcionador : id_recepcionador,
+        id_estado : 1,
+        numdiapago: numdias,
+        folio : numFormateado+'-'+annio+'-'+mesFormateado
+      };
+    }
+    else
+    {
+      oc  ={ //Se gurdaran en un nuevo objeto
+
+        id_tipo : id_tipo_proveedor,
+        id_proveedor: emisor,
+        id_solicitante :  id_solicitante,
+        id_director : id_director,
+        id_centro_costo : id_centro_costo,
+        id_ingreso: req.user.idUsuario,
+        id_proyecto: id_proyecto,
+        id_etapa: id_etapa,
+        fecha : new Date(),
+        id_recepcionador : id_recepcionador,
+        id_estado : 1,
+        numdiapago: numdias,
+        folio : numFormateado+'-'+annio+'-'+mesFormateado
+      };
+    }
+
+  //console.log(oc);
 
   const ingresoOC = await pool.query('INSERT INTO orden_compra  set ? ', [oc]);
 
   const result = pool.query("UPDATE orden_compra_requerimiento set id_solicitud = ? WHERE id_solicitud = 0 AND id_ingreso = ?", [ingresoOC.insertId,req.user.idUsuario]);
-
-  /*
-  emisor: '1',
-  razonsocial: 'Rene Lagos y Asociados Ingenieros civiles SpA ',
-  rut: '78956640-2',
-  id_tipo_proveedor: '1',
-  razonsocialpro: '4',
-  rutproveedor: '0',
-  rutproidproveedorveedor: '',
-  id_solicitante: '73',
-  id_director: '15',
-  id_centro_costo: '2',
-  id_proyecto: '5',
-  id_etapa: '3',
-  cantidad: '',
-  descripcion: '',
-  punitario: '',
-  id_moneda: '',
-  tipocambio: ''
-*/
   res.redirect(   url.format({
     pathname:'/solicitudes/ordencompra',
     query: {
@@ -2267,6 +2418,321 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
             })); 
 
   }
+});
+
+
+// aordencompra
+router.get('/aordencompra', async (req,res) => {
+
+  try {
+    
+    // buscar las solicitudes que estan en un estado para ser aprobadas. 
+
+    //aordencompra
+    // Busco todas las ordenes de compra en estado 1 
+
+    const ordenCompra = await pool.query(" SELECT t1.id,t1.folio, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
+                                         " , t8.nombre AS proyecto, t8.year,t8.code,t1.folio, DATE_FORMAT(t1.fecha , '%Y-%m-%d %H:%i') as fechaIngreso " +
+                                         " FROM orden_compra as t1  " +
+                                         " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
+                                         " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
+                                         " LEFT JOIN sys_usuario AS t4 ON t1.id_solicitante = t4.idUsuario "+
+                                         " LEFT JOIN sys_usuario AS t5 ON t1.id_recepcionador = t5.idUsuario "+
+                                         " LEFT JOIN sys_usuario AS t6 ON t1.id_director = t6.idUsuario " +
+                                         " LEFT JOIN centro_costo AS t7 ON t1.id_centro_costo = t7.id " +
+                                         " LEFT JOIN pro_proyectos AS t8 ON t1.id_proyecto = t8.id " +
+                                         " WHERE t1.id_estado = 1 AND t1.recepcionado = 'N'"); 
+
+   // console.log(ordenCompra);
+    const verToask = {
+      titulo : "Mensaje",
+      body   : "Solicitud de Orden de Compra, cambio de estado correctamente",
+      tipo   : "Crear"
+      };
+
+const isEqualHelperHandlerbar = function(a, b, opts) {
+        if (a == b) {
+            return true
+        } else { 
+            return false
+        } 
+    };
+
+    if (req.query.a !== undefined)
+    {
+      console.log("mensake");
+      res.render('solicitudes/aordencompra', { verToask, req , ordenCompra, layout: 'template', helpers : {
+        if_equal : isEqualHelperHandlerbar
+    }});
+    }
+    else
+    {
+      res.render('solicitudes/aordencompra', { req , ordenCompra, layout: 'template'});
+    }
+    
+
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : solicitudes.js \n Error en el directorio: /aordencompra \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+}); 
+
+//rordencompra
+
+// aordencompra
+router.get('/rordencompra', async (req,res) => {
+
+  try {
+    
+    // buscar las solicitudes que estan en un estado para ser aprobadas. 
+
+    //aordencompra
+    // Busco todas las ordenes de compra en estado 1 
+
+    const ordenCompra = await pool.query(" SELECT t1.id,t1.folio, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
+                                         " , t8.nombre AS proyecto, t8.year,t8.code,t1.folio, DATE_FORMAT(t1.fecha_aprobacion , '%Y-%m-%d %H:%i') as fechaAprobacion" +
+                                         " FROM orden_compra as t1  " +
+                                         " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
+                                         " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
+                                         " LEFT JOIN sys_usuario AS t4 ON t1.id_solicitante = t4.idUsuario "+
+                                         " LEFT JOIN sys_usuario AS t5 ON t1.id_recepcionador = t5.idUsuario "+
+                                         " LEFT JOIN sys_usuario AS t6 ON t1.id_director = t6.idUsuario " +
+                                         " LEFT JOIN centro_costo AS t7 ON t1.id_centro_costo = t7.id " +
+                                         " LEFT JOIN pro_proyectos AS t8 ON t1.id_proyecto = t8.id " +
+                                         " WHERE t1.id_estado = 2 AND t1.recepcionado = 'N'"); 
+
+    //console.log(ordenCompra);
+
+    const verToask = {
+      titulo : "Mensaje",
+      body   : "Solicitud de Orden de Compra, cambio de estado correctamente",
+      tipo   : "Crear"
+      };
+
+const isEqualHelperHandlerbar = function(a, b, opts) {
+        if (a == b) {
+            return true
+        } else { 
+            return false
+        } 
+    };
+
+    if (req.query.a !== undefined)
+    {
+      res.render('solicitudes/rordencompra', { verToask, req , ordenCompra, layout: 'template', helpers : {
+        if_equal : isEqualHelperHandlerbar
+      }});
+    }
+    else
+    {
+      res.render('solicitudes/rordencompra', { req , ordenCompra, layout: 'template'});
+    }
+    
+
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : solicitudes.js \n Error en el directorio: /aordencompra \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+}); 
+
+//verDetalleOrdenCompra
+router.post('/verDetalleOrdenCompra', async (req,res) => {
+
+  try {
+    
+    const { id , estado} = req.body;
+    
+    const ordenCompra = await pool.query(" SELECT t1.id, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
+    " , t8.nombre AS proyecto,t8.year, t8.code, t1.numdiapago,t9.descripcion as estado,t1.folio, " +
+    " if (t3.id = 1 , 'Nombre', " +
+    " if (t3.id = 2 , 'Razon Social', " +
+    " if (t3.id = 3 , 'Empresa',0))) AS nombreProv,"  +
+    " if (t3.id = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_proveedor), " +
+    " if (t3.id = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_proveedor), " +
+    " if (t3.id = 3 , (SELECT tx3.name FROM contacto AS tx3 WHERE tx3.id = t1.id_proveedor),0))) AS nomPro " +
+    " FROM orden_compra as t1  " +
+    " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
+    " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
+    " LEFT JOIN sys_usuario AS t4 ON t1.id_solicitante = t4.idUsuario "+
+    " LEFT JOIN sys_usuario AS t5 ON t1.id_recepcionador = t5.idUsuario "+
+    " LEFT JOIN sys_usuario AS t6 ON t1.id_director = t6.idUsuario " +
+    " LEFT JOIN centro_costo AS t7 ON t1.id_centro_costo = t7.id " +
+    " LEFT JOIN pro_proyectos AS t8 ON t1.id_proyecto = t8.id " +
+    " LEFT JOIN orden_compra_estado as t9 ON t1.id_estado = t9.id " +
+    " WHERE t1.id_estado = 1 AND t1.id = ? ", [id]); 
+
+      // preguntar si existen requerimientos para esta persona que esta logeada.
+  const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon, ' +
+  " FORMAT((t1.cantidad * t1.precio_unitario ),2,'de_DE') AS monto, " +
+  " FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),2,'de_DE') AS montopeso " +
+   ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 '+
+   ' WHERE t1.id_solicitud = ? AND t1.id_moneda = t2.id_moneda',[id]); 
+
+   if (estado == 2)
+   {
+      res.render('solicitudes/oc', { cambio:{}, requerimientos, ordenCompra:ordenCompra[0], layout: 'blanco'});
+
+   }
+   else
+   {
+      res.render('solicitudes/oc', {  requerimientos, ordenCompra:ordenCompra[0], layout: 'blanco'});
+   }
+
+    
+
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : solicitudes.js \n Error en el directorio: /aordencompra \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+}); 
+
+//verDetalleOrdenCompraRecepcion
+router.post('/verDetalleOrdenCompraRecepcion', async (req,res) => {
+
+  try {
+    
+    const { id , estado} = req.body;
+    
+    const ordenCompra = await pool.query(" SELECT t1.id, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
+    " , t8.nombre AS proyecto,t8.year, t8.code, t1.numdiapago,t9.descripcion as estado,t1.folio, " +
+    " if (t3.id = 1 , 'Nombre', " +
+    " if (t3.id = 2 , 'Razon Social', " +
+    " if (t3.id = 3 , 'Empresa',0))) AS nombreProv,"  +
+    " if (t3.id = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_proveedor), " +
+    " if (t3.id = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_proveedor), " +
+    " if (t3.id = 3 , (SELECT tx3.name FROM contacto AS tx3 WHERE tx3.id = t1.id_proveedor),0))) AS nomPro " +
+    " FROM orden_compra as t1  " +
+    " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
+    " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
+    " LEFT JOIN sys_usuario AS t4 ON t1.id_solicitante = t4.idUsuario "+
+    " LEFT JOIN sys_usuario AS t5 ON t1.id_recepcionador = t5.idUsuario "+
+    " LEFT JOIN sys_usuario AS t6 ON t1.id_director = t6.idUsuario " +
+    " LEFT JOIN centro_costo AS t7 ON t1.id_centro_costo = t7.id " +
+    " LEFT JOIN pro_proyectos AS t8 ON t1.id_proyecto = t8.id " +
+    " LEFT JOIN orden_compra_estado as t9 ON t1.id_estado = t9.id " +
+    " WHERE t1.id_estado = 2 AND t1.id = ? ", [id]); 
+
+      // preguntar si existen requerimientos para esta persona que esta logeada.
+  const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon, ' +
+  " FORMAT((t1.cantidad * t1.precio_unitario ),2,'de_DE') AS monto, " +
+  " FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),2,'de_DE') AS montopeso " +
+   ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 '+
+   ' WHERE t1.id_solicitud = ? AND t1.id_moneda = t2.id_moneda',[id]); 
+
+   if (estado == 2)
+   {
+      res.render('solicitudes/ocRecepcion', { cambio:{}, requerimientos, ordenCompra:ordenCompra[0], layout: 'blanco'});
+
+   }
+   else
+   {
+      res.render('solicitudes/ocRecepcion', {  requerimientos, ordenCompra:ordenCompra[0], layout: 'blanco'});
+   }
+
+    
+
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : solicitudes.js \n Error en el directorio: /verDetalleOrdenCompraRecepcion \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+});
+
+//ocCambioEstado
+router.post('/ocCambioEstado', async (req,res) => {
+
+  try {
+    
+    const { estado , comentario,id} = req.body;
+    
+    const result2 = await pool.query("UPDATE orden_compra set comentario_aprobacion = ?, id_estado = ?, fecha_aprobacion = ? WHERE  id = ? ",[comentario,estado,new Date(),id ]);
+    
+
+    // enviar un mensaje que la orden de compra ya puede ser revisada. 
+
+    res.sendStatus(200);
+
+
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : solicitudes.js \n Error en el directorio: /ocCambioEstado \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+}); 
+
+//ocCambioEstadoRecepcion
+router.post('/ocCambioEstadoRecepcion', async (req,res) => {
+
+  try {
+    
+    const { estado , comentario,id} = req.body;
+    
+    const result2 = await pool.query("UPDATE orden_compra set comentario_recepcion = ?, recepcionado = ?, fecha_recepcion = ?, id_estado = 3 WHERE  id = ? ",[comentario,"Y",new Date(),id ]);
+    
+
+    // enviar un mensaje que la orden de compra ya puede ser revisada. 
+
+    res.sendStatus(200);
+
+
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : solicitudes.js \n Error en el directorio: /ocCambioEstado \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+  }
+}); 
+
+
+router.get('/createPDF/:id', async (req,res) => {
+
+  const { id } = req.params;
+
+  //console.log(id);
+
+  const stream = res.writeHead(200, {
+    'Content-Type': 'application/pdf',
+    'Content-Disposition': `attachment;filename=invoice.pdf`,
+  });
+
+  pdfService.buildPDF(
+    (chunk) => stream.write(chunk),
+    () => stream.end()
+  );
+
+
 });
 
 module.exports = router;

@@ -1,0 +1,120 @@
+
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+
+<div class="form-group row" style="margin-bottom: 1px;">
+    <label class="col-form-label col-md-2 label-align" for="proyecto"> <b>Proyecto:</b></label>
+    <label class="col-form-label col-md-5"> {{ordenCompra.year}}-{{ordenCompra.code}} : {{ordenCompra.proyecto}}</label>
+
+    <label class="col-form-label col-md-2 label-align" for="pago"> <b>Folio:</b></label>
+    <label class="col-form-label col-md-2 "> {{ordenCompra.folio}}</label>
+
+</div>
+<div class="form-group row" style="margin-bottom: 1px;">
+    <label class="col-form-label col-md-2 label-align" for="Emisor"> <b>Emisor:</b></label>
+    <label class="col-form-label col-md-5 "> {{ordenCompra.razonsocial}}</label> 
+
+    <label class="col-form-label col-md-2 label-align" for="pago"> <b>Forma de Pago:</b></label>
+    <label class="col-form-label col-md-2 "> {{ordenCompra.numdiapago}}</label>
+
+</div>
+<div class="form-group row" style="margin-bottom: 1px;">
+    <label class="col-form-label col-md-2 label-align" for="Tipo"> <b>Tipo:</b></label>
+    <label class="col-form-label col-md-5 "> {{ordenCompra.tipo}}</label> 
+
+    <label class="col-form-label col-md-2 label-align" for="Solicitante"> <b>Solicitante:</b></label>
+    <label class="col-form-label col-md-2 "> {{ordenCompra.solicitante}}</label>
+    
+</div>
+<div class="form-group row" style="margin-bottom: 1px;">
+    <label class="col-form-label col-md-2 label-align" for="Nombre"> <b>{{ordenCompra.nombreProv}}:</b></label>
+    <label class="col-form-label col-md-5 "> {{ordenCompra.nomPro}}</label>
+
+   <label class="col-form-label col-md-2 label-align" for="Recepciona"> <b>Recepciona:</b></label>
+    <label class="col-form-label col-md-2 "> {{ordenCompra.recepcionador}}</label>
+
+</div>
+
+<div class="form-group row" style="margin-bottom: 1px;">
+    <label class="col-form-label col-md-2 col-sm-5 label-align" for="centroCosto"> <b>Centro Costo:</b></label>
+    <label class="col-form-label col-md-5 "> {{ordenCompra.centroCosto}}</label>
+
+     <label class="col-form-label col-md-2 label-align" for="Recepciona"> <b>Director:</b></label>
+    <label class="col-form-label col-md-2"> {{ordenCompra.director}}</label>
+
+</div>
+
+    <table class="table table-hover" id="tableRequerimiento">
+                    <thead>
+                        <tr>
+                            <th>Cantidad</th>
+                            <th>Descripción</th>
+                            <th>Precio Unitario</th>
+                            <th>Moneda</th>
+                            <th>Monto</th>
+                            <th>Monto en $</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each requerimientos}}
+                             <tr>
+                                <td>{{cantidad}}</td>
+                                <td>{{descripcion}}</td>
+                                <td>{{precio_unitario}}</td>
+                                <td>{{mon}}</td>
+                                <td>{{monto}}</td>
+                                <td>{{montopeso}}</td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+    </table>
+
+{{#if cambio }}
+<br>
+<div class="alert alert-dark" role="alert">
+    <div class="container">
+         <div class="row">
+             <div class="col-12">
+                    <label for="exampleFormControlTextarea1" class="form-label"> <b>Comentario Recepcion</b></label>
+                    <textarea class="form-control" id="comentario" name="comentario" rows="3"></textarea>
+                    <input type="hidden" name="id" id="id" value="{{ordenCompra.id}}">
+             </div>
+         </div>
+    </div>
+    <div class="row">
+        &nbsp;
+    </div>
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-4">
+            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                    <button type="button" class="btn btn-success" onclick="Recepcionar();">Recepcionar</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function Recepcionar(estado)
+    {
+         let comentario  = $("#comentario").val();
+         let id          = $("#id").val();
+
+         let informacion = { estado, comentario ,id};
+         
+         $.ajax({
+              type: 'post',
+              url: '/solicitudes/ocCambioEstadoRecepcion',
+              data: informacion,
+              dataType: 'text'
+               })
+              .done(function (data) {
+                if (data)
+                {
+                    $(location).attr('href','/solicitudes/rordencompra?a=1');
+                }
+              });
+    }
+</script>
+{{/if}}

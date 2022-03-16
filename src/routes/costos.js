@@ -15,7 +15,7 @@ const { isEmptyObject } = require('jquery');
 
 const mensajeria = require('../mensajeria/mail');
 
-const ftp = require("basic-ftp")
+const ftp = require("basic-ftp");
 
 async function cargarArchivoFTPbyArchivo(archivo, name,req) {
     let numeroAsignado;

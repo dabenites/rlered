@@ -26,14 +26,13 @@ router.get('/permisos', isLoggedIn, async (req, res) => {
   try {
     // buscar los datos del usuario en las variables req
  
-  //console.log("permisos de usuario");
   const usuarios = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.id_estado = 1 ORDER BY t1.nombre ASC");
 
 
   //res.render('solicitudes/permisos', { req ,usuarios,res,layout: 'template'});
 
   var mensaje = -1;
-    //console.log(req.query);
+
     if (req.query.a !== undefined)
     {
         mensaje = req.query.a;
@@ -262,7 +261,6 @@ router.post('/getDias', async (req,res) => {
 
   try {
     //res.json(req.body);
-  //console.log(req.user);
 
   // ir a preguntar a la base de datoscuantos dias tiene solicitado el usuario.
   const numeroDias = await pool.query('SELECT COUNT(t.id) as ndias FROM sol_selec_dias AS t WHERE t.idUsuario = '+req.user.idUsuario+' AND t.idEstado = 1'); 
@@ -287,7 +285,6 @@ router.post('/getDiasEs', async (req,res) => {
   try {
 
     //res.json(req.body);
-  //console.log(req.user);
 
   // ir a preguntar a la base de datoscuantos dias tiene solicitado el usuario.
 
@@ -2010,17 +2007,25 @@ router.get('/ordencompra', async (req,res) => {
 
   // preguntar si existen requerimientos para esta persona que esta logeada.
   const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon, ' +
-                                          " FORMAT((t1.cantidad * t1.precio_unitario ),2,'de_DE') AS monto, " +
-                                          " FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') AS montopeso " +
+                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'), "+
+                                          " if (t1.id_moneda = 4 ,FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * "+
+                                                        " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE') ,0)) AS monto , " +
+                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') , " +
+                                                        " if (t1.id_moneda = 4 , FORMAT( " +
+                                                                        " (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * " +
+                                                                         " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) * " +
+                                                                         " cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) " +
+                                                                        "),0,'de_DE') ,0)) AS montopeso " +
                                            ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 '+
                                            ' WHERE t1.id_ingreso = ? AND t1.id_solicitud = 0 AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
 
-
+  
   const ordenCompra = await pool.query(" SELECT t1.id,t1.folio,t1.id_estado, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
                                            " , t8.nombre AS proyecto,t9.descripcion as estado , t8.year,t8.code," +
                                            " DATE_FORMAT(t1.fecha , '%Y-%m-%d %H:%i') as fechaIngreso, " +
                                            " DATE_FORMAT(t1.fecha_aprobacion , '%Y-%m-%d %H:%i') as fechaAProbacion, " +
-                                           " DATE_FORMAT(t1.fecha_recepcion , '%Y-%m-%d %H:%i') as fechaRecepcion " +
+                                           " DATE_FORMAT(t1.fecha_recepcion , '%Y-%m-%d %H:%i') as fechaRecepcion, " +
+                                           " t1.recepcionado_finanza " +
                                            " FROM orden_compra as t1  " +
                                            " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
                                            " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
@@ -2144,7 +2149,7 @@ router.post('/buscaProveedor', isLoggedIn, async (req, res) => {
       opciones = await pool.query('SELECT t1.id, t1.razon_social as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
     break;
     case "3":
-      opciones = await pool.query('SELECT t1.id , t1.name AS descripcion FROM contacto AS t1'); 
+      opciones = await pool.query('SELECT t1.id , t1.razon_social AS descripcion FROM orden_compra_proveedor AS t1'); 
     break;
   }
   
@@ -2305,6 +2310,9 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
     const {id_tipo_proveedor,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias} = req.body
     let oc = {};
 
+   // console.log(req.body);
+    //return false;
+
     // Preguntar por el numero de folio.
     let fechaActual = new Date();
     let annio = fechaActual.getFullYear();
@@ -2364,6 +2372,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
 
         id_tipo : id_tipo_proveedor,
         id_proveedor: emisor,
+        id_razonsocialpro : razonsocialpro,
         id_solicitante :  id_solicitante,
         id_director : id_director,
         id_centro_costo : id_centro_costo,
@@ -2381,6 +2390,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
 
         id_tipo : id_tipo_proveedor,
         id_proveedor: emisor,
+        id_razonsocialpro : razonsocialpro,
         id_solicitante :  id_solicitante,
         id_director : id_director,
         id_centro_costo : id_centro_costo,
@@ -2559,9 +2569,9 @@ router.post('/verDetalleOrdenCompra', async (req,res) => {
     " if (t3.id = 1 , 'Nombre', " +
     " if (t3.id = 2 , 'Razon Social', " +
     " if (t3.id = 3 , 'Empresa',0))) AS nombreProv,"  +
-    " if (t3.id = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_proveedor), " +
-    " if (t3.id = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_proveedor), " +
-    " if (t3.id = 3 , (SELECT tx3.name FROM contacto AS tx3 WHERE tx3.id = t1.id_proveedor),0))) AS nomPro " +
+    " if (t3.id = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
+    " if (t3.id = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
+    " if (t3.id = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro " +
     " FROM orden_compra as t1  " +
     " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
     " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
@@ -2573,12 +2583,20 @@ router.post('/verDetalleOrdenCompra', async (req,res) => {
     " LEFT JOIN orden_compra_estado as t9 ON t1.id_estado = t9.id " +
     " WHERE t1.id_estado = 1 AND t1.id = ? ", [id]); 
 
+    
       // preguntar si existen requerimientos para esta persona que esta logeada.
   const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon, ' +
-  " FORMAT((t1.cantidad * t1.precio_unitario ),2,'de_DE') AS monto, " +
-  " FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),2,'de_DE') AS montopeso " +
-   ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 '+
-   ' WHERE t1.id_solicitud = ? AND t1.id_moneda = t2.id_moneda',[id]); 
+                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'), "+
+                                          " if (t1.id_moneda = 4 ,FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * "+
+                                                                        " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE') ,0)) AS monto , " +
+                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') , " +
+                                          " if (t1.id_moneda = 4 , FORMAT( " +
+                                                                        " (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * " +
+                                                                         " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) * " +
+                                                                         " cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) " +
+                                                                        "),0,'de_DE') ,0)) AS montopeso " +
+                                          ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 '+
+                                          ' WHERE t1.id_solicitud = ? AND t1.id_moneda = t2.id_moneda',[id]); 
 
    if (estado == 2)
    {
@@ -2616,9 +2634,9 @@ router.post('/verDetalleOrdenCompraRecepcion', async (req,res) => {
     " if (t3.id = 1 , 'Nombre', " +
     " if (t3.id = 2 , 'Razon Social', " +
     " if (t3.id = 3 , 'Empresa',0))) AS nombreProv,"  +
-    " if (t3.id = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_proveedor), " +
-    " if (t3.id = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_proveedor), " +
-    " if (t3.id = 3 , (SELECT tx3.name FROM contacto AS tx3 WHERE tx3.id = t1.id_proveedor),0))) AS nomPro " +
+    " if (t3.id = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
+    " if (t3.id = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
+    " if (t3.id = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro " +
     " FROM orden_compra as t1  " +
     " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
     " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
@@ -2632,8 +2650,15 @@ router.post('/verDetalleOrdenCompraRecepcion', async (req,res) => {
 
       // preguntar si existen requerimientos para esta persona que esta logeada.
   const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon, ' +
-  " FORMAT((t1.cantidad * t1.precio_unitario ),2,'de_DE') AS monto, " +
-  " FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),2,'de_DE') AS montopeso " +
+  " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'), "+
+                                          " if (t1.id_moneda = 4 ,FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * "+
+                                                                        " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE') ,0)) AS monto , " +
+                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') , " +
+                                          " if (t1.id_moneda = 4 , FORMAT( " +
+                                                                        " (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * " +
+                                                                         " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) * " +
+                                                                         " cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) " +
+                                                                        "),0,'de_DE') ,0)) AS montopeso " +
    ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 '+
    ' WHERE t1.id_solicitud = ? AND t1.id_moneda = t2.id_moneda',[id]); 
 
@@ -2720,18 +2745,73 @@ router.get('/createPDF/:id', async (req,res) => {
 
   const { id } = req.params;
 
-  //console.log(id);
+  // buscar la informacion de la OC
+  const oc = await pool.query('SELECT  ' +
+                              " t1b.Nombre as nomSolicitante ," + 
+                              " t1c.Nombre as nomRecepcionador ," +  
+                              " t1c.Telefono as telRecepcionador ," + 
+                              "t1a.rut as rutEmpresa,"+
+                              "t1a.razonsocial as razonSocialEmpresa," +
+                              "t1a.direccion as direccion," +
+                              "t1a.fono as fonoEmpresa, " +
+                              " DATE_FORMAT(t1.fecha , '%Y-%m-%d') AS fecha, " +
+                              " t1.folio, " +
+                              " t1.id_solicitante, " +
+                              " t1.numdiapago, " +
+                              " t2.centroCosto, " +
+                              " if (t1.id_tipo = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro, " +
+                              " if (t1.id_tipo = 1 , (SELECT tx.direccion FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 2 , (SELECT tx2.direccion FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 3 , (SELECT tx3.direccion FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS dirPro, " +
+                              " if (t1.id_tipo = 1 , (SELECT tx.rut FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 2 , (SELECT tx2.rut FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 3 , (SELECT tx3.rut FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS rutPro " +
+                              ' FROM orden_compra as t1' +
+                              ' LEFT JOIN sys_empresa as t1a ON t1.id_proveedor = t1a.id ' +
+                              ' LEFT JOIN sys_usuario as t1b ON t1.id_solicitante = t1b.idUsuario ' +
+                              ' LEFT JOIN sys_usuario as t1c ON t1.id_recepcionador = t1c.idUsuario, ' +
+                              ' centro_costo as t2 ' +
+                              ' WHERE t1.id = ? ' +
+                              ' AND t1.id_centro_costo = t2.id',[id]); 
 
+  const requerimientos = await pool.query(" SELECT *, " + 
+  " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'), "+
+                                          " if (t1.id_moneda = 4 ,FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * "+
+                                                                        " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE') ,0)) AS monto , " +
+                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') , " +
+                                          " if (t1.id_moneda = 4 , FORMAT( " +
+                                                                        " (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * " +
+                                                                         " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) * " +
+                                                                         " cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) " +
+                                                                        "),0,'de_DE') ,0)) AS montopeso " +
+                                        " FROM orden_compra_requerimiento as t1 WHERE t1.id_solicitud = ?",[id] );
+  
   const stream = res.writeHead(200, {
     'Content-Type': 'application/pdf',
-    'Content-Disposition': `attachment;filename=invoice.pdf`,
+    'Content-Disposition': `attachment;filename=`+oc[0].folio+`.pdf`,
   });
 
   pdfService.buildPDF(
     (chunk) => stream.write(chunk),
-    () => stream.end()
+    () => stream.end(),
+    oc[0],
+    requerimientos
   );
 
+
+});
+
+//terminoOC 
+router.post('/terminoOC', async (req,res) => {
+
+  const { id_finanza, comentario_finanza, num_documento} = req.body;
+
+  const result = await pool.query("UPDATE orden_compra set  recepcionado_finanza = 'Y' , num_documento = ?, fecha_finanza = ?, comentario_finanza = ? WHERE id = ? ", [num_documento, new Date(), comentario_finanza , id_finanza]);
+  //console.log(req.body);
+
+  res.sendStatus(200);
 
 });
 

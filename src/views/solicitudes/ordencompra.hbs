@@ -353,18 +353,37 @@
                                 <td>{{estado}}</td>
                                 <td>
                                     <div class="btn-group" role="group" aria-label="Basic example">
-                                        <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="verDetalle({{id}},1)">
-                                            <i class="fa fa-search"></i>
-                                        </button>
-
-                                         {{#if (if_equal 2 id_estado) }}
+                                        {{#if (if_equal 1 id_estado) }}
+                                            <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="verDetalle({{id}},1)">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        {{/if}}
+                                        {{#if (if_equal 2 id_estado) }}
                                          <button type="button" class="btn btn-secondary btn-sm">
                                              <a href="/solicitudes/createPDF/{{id}}" style="color: white;" target="_blank">
                                              <i class="fa fa-print">
                                              </i>
                                              </a>
                                          </button>
-                                         {{/if}}
+                                        {{/if}}
+                                        {{#if (if_equal 3 id_estado) }}
+                                         <button type="button" class="btn btn-success btn-sm">
+                                             <a href="/solicitudes/createPDF/{{id}}" style="color: white;" target="_blank">
+                                             <i class="fa fa-print">
+                                             </i>
+                                             </a>
+                                         </button> 
+                                         
+                                            {{#if (if_equal "N" recepcionado_finanza) }}
+                                            
+                                                <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-m" onclick="cargaFinanza({{id}})">
+                                                    <a style="color: white;">
+                                                    <i class="fa fa-clipboard">
+                                                    </i>
+                                                    </a>
+                                                </button>
+                                            {{/if}}
+                                        {{/if}}
                                     </div>
                                 </td>
                             </tr>
@@ -387,6 +406,37 @@
                         </div>
                         <div class="modal-footer">
                             
+                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade bs-example-modal-m" id="verDetalle" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Finanzas </h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group row" style="margin-bottom: 1px;">
+                                <label class="col-form-label col-md-2 label-align" for="Tipo"> <b>Nº Documento:</b></label>
+                                <div class="col-md-6 col-sm-6">
+                                    <input type="text" name="num_documento" id="num_documento" class="form-control">
+                                </div> 
+                            </div>
+                            <div class="form-group row" style="margin-bottom: 1px;">
+                                <label class="col-form-label col-md-2 label-align" for="Tipo"> <b>Comentario:</b></label>
+                                <div class="col-md-6 col-sm-6">
+                                <textarea class="form-control" id="comentario_finanza" name="comentario_finanza" rows="3"></textarea>
+                                
+                                <input type="hidden" name="id_finanza" id="id_finanza" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success" onclick="TerminarOC()">Terminar</button>
                          </div>
                     </div>
                 </div>
@@ -463,6 +513,36 @@
 </script>
 
 <script>
+
+    function TerminarOC()
+    {
+        let id_finanza        = $("#id_finanza").val();
+        let comentario_finanza     = $("#comentario_finanza").val();
+        let num_documento  = $("#num_documento").val();
+
+
+        let informacion = {
+            id_finanza ,
+            comentario_finanza,
+            num_documento
+        };
+        
+        $.ajax({
+                        type: 'post',
+                        url: '/solicitudes/terminoOC',
+                        data: informacion,
+                        dataType: 'text'
+                        })
+                        .done(function (data) {
+                            $(location).attr('href','/solicitudes/ordencompra?a=2');
+                        });
+
+    }
+    function cargaFinanza(id)
+    {
+        $("#id_finanza").val(id);
+
+    }
     function cargaEmisorOC(valor)
     {
         if (valor !== "")
@@ -678,7 +758,7 @@
             
             if (razonsocialpro == "")
             {
-                console.log("tipo razonsocialpro");
+                //console.log("tipo razonsocialpro");
                 return false;
             }
         }

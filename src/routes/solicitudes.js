@@ -1988,7 +1988,7 @@ router.get('/ordencompra', async (req,res) => {
   const directores = await pool.query('SELECT t2.* FROM orden_compra_tipo_lista_user AS t1,' +
                                       ' sys_usuario AS t2 ' +
                                       ' WHERE  ' +
-                                      '  t1.id_oc_tipo_lista = 2 ' +
+                                      '  t1.id_oc_tipo_lista = 3 ' +
                                       ' AND 	' +
                                           ' t1.id_user = t2.idUsuario'); 
 
@@ -2310,7 +2310,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
     const {id_tipo_proveedor,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias} = req.body
     let oc = {};
 
-   // console.log(req.body);
+    console.log(req.body);
     //return false;
 
     // Preguntar por el numero de folio.

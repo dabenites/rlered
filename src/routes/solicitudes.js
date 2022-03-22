@@ -2017,7 +2017,7 @@ router.get('/ordencompra', async (req,res) => {
                                                                          " cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) " +
                                                                         "),0,'de_DE') ,0)) AS montopeso " +
                                            ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 '+
-                                           ' WHERE t1.id_ingreso = ? AND t1.id_solicitud = 0 AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
+                                           ' WHERE t1.id_ingreso = ? AND (t1.id_solicitud = 0 OR t1.id_solicitud is null) AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
 
   
   const ordenCompra = await pool.query(" SELECT t1.id,t1.folio,t1.id_estado, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
@@ -2310,7 +2310,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
     const {id_tipo_proveedor,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias} = req.body
     let oc = {};
 
-    console.log(req.body);
+   // console.log(req.body);
     //return false;
 
     // Preguntar por el numero de folio.
@@ -2409,7 +2409,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
 
   const ingresoOC = await pool.query('INSERT INTO orden_compra  set ? ', [oc]);
 
-  const result = pool.query("UPDATE orden_compra_requerimiento set id_solicitud = ? WHERE id_solicitud = 0 AND id_ingreso = ?", [ingresoOC.insertId,req.user.idUsuario]);
+  const result = pool.query("UPDATE orden_compra_requerimiento set id_solicitud = ? WHERE (id_solicitud = 0 OR id_solicitud is null) AND id_ingreso = ?", [ingresoOC.insertId,req.user.idUsuario]);
   res.redirect(   url.format({
     pathname:'/solicitudes/ordencompra',
     query: {

@@ -1,0 +1,342 @@
+            <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Emisor:</b></label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <select class="select2_single form-control" tabindex="1" name="emisor2" id="emisor2" >
+                                            <option value="">Seleccione</option>
+                                                {{#each empresas}}
+                                                    {{#if (if_equal id ../oc.id_proveedor) }}
+                                                        <option value="{{id}}" selected>{{razonsocial}}</option>
+                                                    {{else}}
+                                                        <option value="{{id}}">{{razonsocial}}</option>
+                                                    {{/if}}
+                                                {{/each}}
+                                        </select>
+                                    </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Tipo"><b>Tipo :</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <select class="select2_single form-control" tabindex="1" name="id_tipo_proveedor2" id="id_tipo_proveedor2" onchange="cargaTipoProveedor(this.value);">
+                            <option value="">Seleccione</option>
+                            {{#each tipo}}
+                                {{#if (if_equal id ../oc.id_tipo) }}
+                                    <option value="{{id}}" selected>{{descripcion}}</option>
+                                {{else}}
+                                    <option value="{{id}}">{{descripcion}}</option>
+                                {{/if}}
+                            {{/each}}
+                        </select>
+                    </div>
+            </div>
+            <div class="form-group row" id="razonsocialProv">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="rnombrepro" id="rnombrepro"><b>{{oc.nomTipo}}</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <select class="select2_single form-control" tabindex="1" name="razonsocialpro2" id="razonsocialpro2">
+                                <option value=""> Seleccione </option>
+                                    {{#each opciones}}
+                                        {{#if (if_equal id ../oc.id_razonsocialpro) }}
+                                            <option value="{{id}}" selected> {{descripcion}}</option>
+                                        {{else}}
+                                            <option value="{{id}}"> {{descripcion}}</option>
+                                        {{/if}}
+                                    {{/each}}
+                        </select>
+                    </div>
+            </div>
+            <div class="form-group row" style="visibility: hidden; display:none;">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Rut:</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <input type="text" id="rutproveedor" name="rutproveedor"  class="form-control" readonly>
+                        <input type="hidden" id="idproveedor" name="rutproidproveedorveedor"  class="form-control">
+                    </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Solicitante:</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <select class="select2_single form-control" tabindex="1" name="id_solicitante2" id="id_solicitante2">
+                            <option value="">Seleccione</option>
+                            {{#each solicitantes}}
+                                {{#if (if_equal idUsuario ../oc.id_solicitante) }}
+                                            <option value="{{idUsuario}}" selected> {{Nombre}}</option>
+                                        {{else}}
+                                            <option value="{{idUsuario}}"> {{Nombre}}</option>
+                                {{/if}}
+                            {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Quien Recepciona:</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <select class="select2_single form-control" tabindex="1" name="id_recepcionador2" id="id_recepcionador2">
+                            <option value="">Seleccione</option>
+                            {{#each recepcionador}}
+                                {{#if (if_equal idUsuario ../oc.id_recepcionador) }}
+                                            <option value="{{idUsuario}}" selected> {{Nombre}}</option>
+                                        {{else}}
+                                            <option value="{{idUsuario}}"> {{Nombre}}</option>
+                                {{/if}}
+                            {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row" >
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Nº Días Pago:</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <input type="text" id="numdias2" name="numdias2"  class="form-control" value="{{oc.numdiapago}}">
+                    </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Director:</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <select class="select2_single form-control" tabindex="1" name="id_director2" id="id_director2">
+                            <option value="0">Seleccione</option>
+                            {{#each directores}}
+                               {{#if (if_equal idUsuario ../oc.id_director) }}
+                                            <option value="{{idUsuario}}" selected> {{Nombre}}</option>
+                                        {{else}}
+                                            <option value="{{idUsuario}}"> {{Nombre}}</option>
+                                {{/if}}
+                            {{/each}}
+                    </select>
+                </div>
+            </div>
+             <div class="form-group row">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Centro Costo:</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <select class="select2_single form-control" tabindex="1" name="id_centro_costo2" id="id_centro_costo2" onchange="cargaAreaNegocio(this.value);">
+                            <option value="">Seleccione</option>
+                            {{#each centroCostos}}
+                                {{#if (if_equal id ../oc.id_centro_costo) }}
+                                    <option value="{{id}}" selected> {{centroCosto}}</option>
+                                {{else}}
+                                    <option value="{{id}}"> {{centroCosto}}</option>
+                                {{/if}}
+                            {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row" id="areanegocio1">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Proyecto</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <select class="select2_single form-control" tabindex="1" name="id_proyecto2" id="id_proyecto2">
+                            <option value="">Seleccione</option>
+                            {{#each proyectos}}
+                                {{#if (if_equal id ../oc.id_proyecto) }}
+                                    <option value="{{id}}" selected> {{year}}-{{code}} : {{nombre}}</option>
+                                {{else}}
+                                    <option value="{{id}}"> {{year}}-{{code}} : {{nombre}}</option>
+                                {{/if}}
+                            {{/each}}
+                         </select>
+                </div>
+            </div>
+            <div class="form-group row" id="areanegocio2">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Etapa</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <select class="select2_single form-control" tabindex="1" name="id_etapa2" id="id_etapa2">
+                            <option value="">Seleccione</option>
+                            {{#each etapas}}
+                                {{#if (if_equal id ../oc.id_etapa) }}
+                                    <option value="{{id}}" selected>{{descripcion}}</option>
+                                {{else}}
+                                    <option value="{{id}}">{{descripcion}}</option>
+                                {{/if}}
+                            {{/each}}
+                        </select>
+                </div>
+            </div>
+
+ <div id="tablaInformacion">
+            <table class="table table-hover" id="tableRequerimiento">
+                                <thead>
+                                    <tr>
+                                        <th>Cant.</th>
+                                        <th>Descripción</th>
+                                        <th>Precio Unitario</th>
+                                        <th>Moneda</th>
+                                        <th>Monto</th>
+                                        <th>Monto en $</th>
+                                        <th> <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#requerimientoEdit">+</button> </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each requerimientos}}
+                                        <tr>
+                                            <td>{{cantidad}}</td>
+                                            <td>{{descripcion}}</td>
+                                            <td>{{precio_unitario}}</td>
+                                            <td>{{mon}}</td>
+                                            <td>{{monto}}</td>
+                                            <td>$ {{montopeso}}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="EliminarRegistroDetalle({{id}},{{../oc.id}});">-</button>
+                                            </td>
+                                        </tr>
+                                    {{/each}}
+                                    <tfoot>
+                                        <th style="border-bottom-width: 0px;">
+                                            <td style="border-bottom-width: 0px;"></td>
+                                            <td style="border-bottom-width: 0px;" colspan="3">
+                                              <button type="button" class="btn btn-success btn-sm" onclick="editarOCIngresada({{oc.id}});">Editar OC</button>
+                                            </td>
+                                        </th>
+                                        
+                                    </tfoot>
+                                </tbody>
+                            </table>
+</div>
+           <div class="modal fade" id="requerimientoEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-centered-lg4" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Requerimiento</h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Cantidad</b></label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input type="text" id="cantidad2" name="cantidad2"  class="form-control">
+                                    </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Descripción</b></label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <textarea id="descripcion2" name="descripcion2"  class="form-control"></textarea>
+                                    </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Precio Unitario</b></label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input type="text" id="punitario2" name="punitario2"  class="form-control">
+                                    </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Moneda</b></label>
+                                    <div class="col-md-8 col-sm-8">
+                                       <select class="select2_single form-control" tabindex="1" name="id_moneda2" id="id_moneda2" onchange="cargaTipoCambio(this.value);">
+                                            <option value="">Seleccione</option>
+                                            {{#each monedas}}
+                                                <option value="{{id_moneda}}">{{descripcion}} </option>
+                                            {{/each}}
+                                        </select>
+                                    </div>
+                            </div>
+                             <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Tipo Cambio</b></label>
+                                    <div class="col-md-8 col-sm-8">
+                                        <input type="text" id="tipocambio2" name="tipocambio2"  class="form-control">
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success" onclick="cargaDetalleOC({{oc.id}})">Ingresar</button>
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+<script>
+    $( "#requerimiento" ).click(function() {
+            $('#verDetalleEditar').modal('hide');
+    });
+
+    function cargaDetalleOC( id_solicitud)
+    {
+        // 
+        
+        let cantidad        = $("#cantidad2").val();
+        let descripcion     = $("#descripcion2").val();
+        let precioUnitario  = $("#punitario2").val();
+        let moneda          = $("#id_moneda2").val();
+        let tipocambio      = $("#tipocambio2").val();
+
+        let informacion = {
+            cantidad ,
+            descripcion,
+            precioUnitario,
+            moneda,
+            tipocambio,
+            id_solicitud
+        };
+
+
+        if (moneda != "")
+        {
+            $.ajax({
+                        type: 'post',
+                        url: '/solicitudes/ordecompradetalleEditar',
+                        data: informacion,
+                        dataType: 'text'
+                        })
+                        .done(function (data) {
+                            $('#tablaInformacion').html(data);
+                            $("#cantidad2").val("");
+                            $("#descripcion2").val("");
+                            $("#punitario2").val("");
+                            $("#id_moneda2").val("");
+                            $("#tipocambio2").val("");
+                            EditarOC(id_solicitud);
+                        });
+        }
+
+
+    }
+
+    function EliminarRegistroDetalle(id, id_solicitante)
+    {
+
+        let informacion = {
+            id
+        };
+
+
+       
+            $.ajax({
+                        type: 'post',
+                        url: '/solicitudes/ordecompradetalleEliminarEditar',
+                        data: informacion,
+                        dataType: 'text'
+                        })
+                        .done(function (data) {
+                            $('#tablaInformacion').html(data); 
+                             EditarOC(id_solicitante);
+                        });
+      
+
+    }
+
+
+    function editarOCIngresada(id)
+    {
+         let emisor         = $("#emisor2").val();
+         let tipo_proveedor = $("#id_tipo_proveedor2").val();
+         let contacto       = $("#razonsocialpro2").val();
+         let solicitante    = $("#id_solicitante2").val();
+         let recepcionador  = $("#id_recepcionador2").val();
+
+         let numpago        = $("#numdias2").val();
+         let director       = $("#id_director2").val();
+         let centrocosto    = $("#id_centro_costo2").val();
+         let proyecto       = $("#id_proyecto2").val();
+         let etapa          = $("#id_etapa2").val();
+
+
+
+        let informacion = {emisor,tipo_proveedor,contacto,solicitante,recepcionador,numpago,director,centrocosto,proyecto,etapa,id};
+
+        //console.log(informacion);
+
+         $.ajax({
+                    type: 'post',
+                    url: '/solicitudes/editarOCIngresada',
+                    data: informacion,
+                    dataType: 'text'
+                })
+                .done(function (data) {
+                    $(location).attr('href','/solicitudes/ordencompra?a=3');
+                });
+                        
+    }
+
+</script>

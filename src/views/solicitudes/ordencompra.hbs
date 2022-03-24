@@ -357,7 +357,66 @@
                                             <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="verDetalle({{id}},1)">
                                                 <i class="fa fa-search"></i>
                                             </button>
+                                            <!-- SOLO EN ESTE ESTADO SE PUEDE EDITAR -->
+                                            <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg3" onclick="EditarOC({{id}})">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+
+                                             <div class="modal fade bs-example-modal-lg3" id="verDetalleEditar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLongTitle">Editar</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div id="formEditOC">
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                         {{/if}}
+
+                                        {{#if (if_equal "Y" aprobacionSolicitante) }}
+                                            
+                                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg2" onclick="verDetalleAprob({{id}},1)">
+                                                    <a style="color: white;">
+                                                    <i class="fa fa-check">
+                                                    </i>
+                                                    </a>
+                                                </button>
+                                                <div class="modal fade bs-example-modal-lg2" id="verDetalleAprob" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLongTitle">Información</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div id="detalleOrdenCompraAprob">
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-success btn-sm" onclick="AprobarSolicitante({{id}});">
+                                                                        Aprobar
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                        {{/if}}
+
                                         {{#if (if_equal 2 id_estado) }}
                                          <button type="button" class="btn btn-secondary btn-sm">
                                              <a href="/solicitudes/createPDF/{{id}}" style="color: white;" target="_blank">
@@ -513,6 +572,39 @@
 </script>
 
 <script>
+
+    function EditarOC (id)
+    {
+
+    let informacion = { id };
+
+         $.ajax({
+                    async: false,
+                    type : 'POST', 
+                    url	 : "/solicitudes/editarOC", 
+                    data : informacion,
+                    success : function (resultado) 
+                        { 
+                            $("#formEditOC").html(resultado);
+                        } 
+                });
+    }
+
+    function AprobarSolicitante(id)
+    {
+        let informacion = { id };
+
+         $.ajax({
+                        type: 'post',
+                        url: '/solicitudes/aprobSolicitanteOC',
+                        data: informacion,
+                        dataType: 'text'
+                })
+            .done(function (data) {
+                            $(location).attr('href','/solicitudes/ordencompra?a=3');
+                        });
+
+    }
 
     function TerminarOC()
     {
@@ -800,6 +892,24 @@
 
     }
 
+    function verDetalleAprob(idIngresada, estado)
+    {
+
+         let informacion = {  id :  idIngresada , estado};
+
+         $.ajax({
+              type: 'post',
+              url: '/solicitudes/verDetalleOrdenCompra',
+              data: informacion,
+              dataType: 'text'
+               })
+              .done(function (data) {
+                $('#detalleOrdenCompraAprob').html(data);
+              });
+
+
+
+    }
     function verDetalle(idIngresada,estado)
     {
         

@@ -257,7 +257,7 @@ router.get('/vacacionesrle', isLoggedIn, async (req, res) => {
 }); 
 
 
-router.post('/getDias', async (req,res) => {
+router.post('/getDias', isLoggedIn , async (req,res) => {
 
   try {
     //res.json(req.body);
@@ -280,7 +280,7 @@ router.post('/getDias', async (req,res) => {
   
 });
 
-router.post('/getDiasEs', async (req,res) => {
+router.post('/getDiasEs',isLoggedIn,  async (req,res) => {
 
   try {
 
@@ -310,7 +310,7 @@ res.render('solicitudes/dias', { req ,informacionDias, layout: 'blanco'});
 //getDiasEs
 //getDiasIngresados
 
-router.post('/getDiasIngresados', async (req,res) => {
+router.post('/getDiasIngresados', isLoggedIn, async (req,res) => {
 
   try {
     const dias = await pool.query("SELECT DATE_FORMAT(t.fecha , '%Y-%m-%d') AS fecha, t.id FROM sol_selec_dias AS t WHERE t.idUsuario = " + req.user.idUsuario + " AND t.idEstado = 1 ORDER BY fecha ASC"); 
@@ -335,7 +335,7 @@ router.post('/getDiasIngresados', async (req,res) => {
 
 });
 
-router.post('/getPermisosSolicitados', async (req,res) => {
+router.post('/getPermisosSolicitados',isLoggedIn,  async (req,res) => {
 
   try {
     const permisos = await pool.query(" SELECT " +
@@ -362,7 +362,7 @@ router.post('/getPermisosSolicitados', async (req,res) => {
   //res.send("asd");
 });
 
-router.get('/getPermisos', async (req,res) => {
+router.get('/getPermisos',isLoggedIn,  async (req,res) => {
   
   try {
     
@@ -429,7 +429,7 @@ router.get('/getPermisos', async (req,res) => {
 
 });
 
-router.get('/eventos', async (req,res) => {
+router.get('/eventos', isLoggedIn, async (req,res) => {
 
   try {
     
@@ -487,7 +487,7 @@ router.get('/eventos', async (req,res) => {
  
 }); 
 
-router.get('/vacacionesDiaRle', async (req,res) => {
+router.get('/vacacionesDiaRle',isLoggedIn,  async (req,res) => {
 
   try {
     
@@ -637,7 +637,7 @@ router.post('/eliminarDia', express.json({type: '/'}), async (req,res) => {
 
 });
 
-router.post('/AddIngreso', async (req,res) => {
+router.post('/AddIngreso',isLoggedIn,  async (req,res) => {
 
   try {
     var idUsuario =  req.user.idUsuario;
@@ -796,7 +796,7 @@ router.post('/AddIngreso', async (req,res) => {
 
 });
 
-router.get('/apermisos', async (req,res) => {
+router.get('/apermisos', isLoggedIn, async (req,res) => {
 
   try {
     
@@ -849,7 +849,7 @@ router.get('/apermisos', async (req,res) => {
  
 }); 
 
-router.get('/solicitudes/revisar/:id', async (req, res) => {
+router.get('/solicitudes/revisar/:id',isLoggedIn, async (req, res) => {
 
   try {
     const { id } = req.params;
@@ -927,7 +927,7 @@ router.get('/solicitudes/revisar/:id', async (req, res) => {
   }
 }); 
 
-router.post('/updatePermisos', async (req,res) => {
+router.post('/updatePermisos',isLoggedIn, async (req,res) => {
 
   try {
     switch(req.body.estado)
@@ -1043,7 +1043,7 @@ res.render('proyecto/avacaciones', {historial:req,historialVacaiones, soliVacaci
   }
 });
 
-router.get('/avacaciones/revisar/:id', async (req, res) => {
+router.get('/avacaciones/revisar/:id', isLoggedIn, async (req, res) => {
 
   try {
      //console.log(req.body);
@@ -1151,7 +1151,7 @@ switch(selecciona[0].idEstado)
 
 });
 
-router.post('/updateVacaciones', async (req,res) => {
+router.post('/updateVacaciones', isLoggedIn, async (req,res) => {
 
   try {
      //console.log(req.body);
@@ -1534,7 +1534,7 @@ router.get('/missolicitudes/:id', isLoggedIn, async (req, res) => {
  });
 //
 
-router.post('/anular', async (req,res) => {
+router.post('/anular',isLoggedIn, async (req,res) => {
 
   try {
     const {comentario,id,idEstado} = req.body
@@ -1630,7 +1630,7 @@ router.get('/horaextras', isLoggedIn, async (req, res) => {
  });
  
 
- router.get('/buscarPro/:find', async (req, res) => {
+ router.get('/buscarPro/:find', isLoggedIn, async (req, res) => {
 
   try {
 
@@ -1656,7 +1656,7 @@ router.get('/horaextras', isLoggedIn, async (req, res) => {
 
 });
 
-router.get('/buscarSol/:find', async (req, res) => {
+router.get('/buscarSol/:find', isLoggedIn, async (req, res) => {
 
 
   try {
@@ -1683,7 +1683,7 @@ router.get('/buscarSol/:find', async (req, res) => {
 });
 
 //addHorasExtras
-router.post('/addHorasExtras', async (req,res) => {
+router.post('/addHorasExtras', isLoggedIn, async (req,res) => {
 
 
   try {
@@ -1779,7 +1779,7 @@ router.post('/addHorasExtras', async (req,res) => {
 // ahorasExtras
 
 //Cannot GET /solicitudes/ahorasExtras
-router.get('/ahorasExtras', async (req, res) => {
+router.get('/ahorasExtras', isLoggedIn, async (req, res) => {
 
 
   try {
@@ -1818,7 +1818,7 @@ router.get('/ahorasExtras', async (req, res) => {
 
 });
 //Cannot GET /solicitudes/ahorasExtras
-router.get('/horaextra/:id', async (req, res) => {
+router.get('/horaextra/:id', isLoggedIn, async (req, res) => {
 
   try {
     
@@ -1865,7 +1865,7 @@ router.get('/horaextra/:id', async (req, res) => {
 
 //___________________
 //addHorasExtras
-router.post('/uhorasextras', async (req,res) => {
+router.post('/uhorasextras', isLoggedIn, async (req,res) => {
 
 
   try {
@@ -1971,7 +1971,7 @@ router.post('/uhorasextras', async (req,res) => {
 
 // ORDEN COMPRA 
 
-router.get('/ordencompra', async (req,res) => {
+router.get('/ordencompra', isLoggedIn, async (req,res) => {
 
   try {
     
@@ -2245,9 +2245,6 @@ router.post('/editarOC', isLoggedIn, async (req, res) => {
 });
 
 //ordecompradetalleEditar 
-
-
-
 
 router.post('/buscaEmpresa', isLoggedIn, async (req, res) => {
 
@@ -2655,7 +2652,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
 
 
 // aordencompra
-router.get('/aordencompra', async (req,res) => {
+router.get('/aordencompra',isLoggedIn,  async (req,res) => {
 
   try {
     
@@ -2719,7 +2716,7 @@ const isEqualHelperHandlerbar = function(a, b, opts) {
 //rordencompra
 
 // aordencompra
-router.get('/rordencompra', async (req,res) => {
+router.get('/rordencompra', isLoggedIn, async (req,res) => {
 
   try {
     
@@ -2781,7 +2778,7 @@ const isEqualHelperHandlerbar = function(a, b, opts) {
 }); 
 
 //verDetalleOrdenCompra
-router.post('/verDetalleOrdenCompra', async (req,res) => {
+router.post('/verDetalleOrdenCompra',isLoggedIn, async (req,res) => {
 
   try {
     
@@ -2846,7 +2843,7 @@ router.post('/verDetalleOrdenCompra', async (req,res) => {
 }); 
 
 //verDetalleOrdenCompraRecepcion
-router.post('/verDetalleOrdenCompraRecepcion', async (req,res) => {
+router.post('/verDetalleOrdenCompraRecepcion', isLoggedIn, async (req,res) => {
 
   try {
     
@@ -2910,7 +2907,7 @@ router.post('/verDetalleOrdenCompraRecepcion', async (req,res) => {
 });
 
 //ocCambioEstado
-router.post('/ocCambioEstado', async (req,res) => {
+router.post('/ocCambioEstado', isLoggedIn, async (req,res) => {
 
   try {
     
@@ -2937,7 +2934,7 @@ router.post('/ocCambioEstado', async (req,res) => {
 }); 
 
 //ocCambioEstadoRecepcion
-router.post('/ocCambioEstadoRecepcion', async (req,res) => {
+router.post('/ocCambioEstadoRecepcion',isLoggedIn, async (req,res) => {
 
   try {
     
@@ -2964,7 +2961,7 @@ router.post('/ocCambioEstadoRecepcion', async (req,res) => {
 }); 
 
 
-router.get('/createPDF/:id', async (req,res) => {
+router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
 
   const { id } = req.params;
 
@@ -3027,7 +3024,7 @@ router.get('/createPDF/:id', async (req,res) => {
 });
 
 //terminoOC 
-router.post('/terminoOC', async (req,res) => {
+router.post('/terminoOC',isLoggedIn, async (req,res) => {
 
   const { id_finanza, comentario_finanza, num_documento} = req.body;
 
@@ -3040,7 +3037,7 @@ router.post('/terminoOC', async (req,res) => {
 
 
 //editarOCIngresada
-router.post('/editarOCIngresada', async (req,res) => {
+router.post('/editarOCIngresada',isLoggedIn, async (req,res) => {
 
   const {emisor,  tipo_proveedor,  contacto,  solicitante,  recepcionador,  numpago,  director,  centrocosto,  proyecto,  etapa, id} = req.body;
   

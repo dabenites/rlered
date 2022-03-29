@@ -17,6 +17,8 @@ var url = require('url');
 
 const mensajeria = require('../mensajeria/mail');
 
+var Excel = require('exceljs');
+
 //AGREGAR UN PROYECTO
 
 router.get('/iproyecto', isLoggedIn, async (req, res) => {
@@ -50,7 +52,7 @@ router.get('/iproyecto', isLoggedIn, async (req, res) => {
 });
 
 
-router.post('/addProyecto', async (req, res) => {
+router.post('/addProyecto', isLoggedIn, async (req, res) => {
 
   try {
     const { nombre, year,code, id_Tipo,id_Estado, id_complejidad, SuperficiePPTO, SuperficieAPC, id_Pais, Ciudad,
@@ -200,7 +202,7 @@ try {
 
 
 
-router.get('/buscador/edit/:id', async (req, res) => {
+router.get('/buscador/edit/:id', isLoggedIn, async (req, res) => {
 
   try {
     
@@ -231,7 +233,7 @@ router.get('/buscador/edit/:id', async (req, res) => {
 
 
 
-router.post('/editBusca', async (req, res) => {
+router.post('/editBusca', isLoggedIn, async (req, res) => {
 
   try {
     const { id,nombre, year,code, id_Tipo,id_Estado, id_complejidad, SuperficiePPTO, SuperficieAPC, id_Pais, Ciudad,
@@ -289,7 +291,7 @@ router.post('/editBusca', async (req, res) => {
 });
 
 
-router.post('/edit', async (req, res) => {
+router.post('/edit', isLoggedIn, async (req, res) => {
 
   try {
     const { id,nombre, year,code, id_Tipo,id_Estado, id_complejidad, SuperficiePPTO, SuperficieAPC, id_Pais, Ciudad,
@@ -358,7 +360,7 @@ router.post('/edit', async (req, res) => {
 
 
 
-router.get('/buscador/delete/:id', async (req, res) => {
+router.get('/buscador/delete/:id', isLoggedIn, async (req, res) => {
 
   try {
     const { id } = req.params;
@@ -383,7 +385,7 @@ router.get('/buscador/delete/:id', async (req, res) => {
 
 
 // addPro
-router.get('/addPro', async (req, res) => {
+router.get('/addPro', isLoggedIn, async (req, res) => {
 
   try {
     const tipo = await pool.query("SELECT * FROM proyecto_tipo");
@@ -409,7 +411,7 @@ router.get('/addPro', async (req, res) => {
 
 
 // listado
-router.get('/listado', async (req, res) => {
+router.get('/listado',isLoggedIn, async (req, res) => {
   try {
 
       // Filtrar segun la categoria de la persona. 
@@ -521,7 +523,7 @@ router.get('/listado', async (req, res) => {
 });
 //buscarPais
 
-router.get('/facturar/:id', async (req, res) => {
+router.get('/facturar/:id', isLoggedIn, async (req, res) => {
 
   try {
     const { id } = req.params;
@@ -607,7 +609,7 @@ else
   
 });
 
-router.get('/editar/:id', async (req, res) => {
+router.get('/editar/:id', isLoggedIn, async (req, res) => {
 
   try {
     const { id } = req.params;
@@ -716,7 +718,7 @@ router.get('/editar/:id', async (req, res) => {
 
 });
 
-router.get('/buscarDirector/:find', async (req, res) => {
+router.get('/buscarDirector/:find', isLoggedIn, async (req, res) => {
 
   try {
 
@@ -744,7 +746,7 @@ router.get('/buscarDirector/:find', async (req, res) => {
   }
 });
 
-router.get('/buscarIngRev/:find', async (req, res) => {
+router.get('/buscarIngRev/:find', isLoggedIn, async (req, res) => {
   
   try {
 
@@ -775,7 +777,7 @@ router.get('/buscarIngRev/:find', async (req, res) => {
 
 });
 
-router.get('/buscarCoord/:find', async (req, res) => {
+router.get('/buscarCoord/:find', isLoggedIn, async (req, res) => {
   
   try {
   // BUSCAR DIRECTOR  
@@ -803,7 +805,7 @@ router.get('/buscarCoord/:find', async (req, res) => {
 
 });
 
-router.get('/buscarCoordPe/:find', async (req, res) => {
+router.get('/buscarCoordPe/:find',isLoggedIn,  async (req, res) => {
   
   try {
     // BUSCAR DIRECTOR  
@@ -832,7 +834,7 @@ router.get('/buscarCoordPe/:find', async (req, res) => {
   
 });
 
-router.get('/buscarProA/:find', async (req, res) => {
+router.get('/buscarProA/:find', isLoggedIn, async (req, res) => {
   
   try {
     // BUSCAR DIRECTOR  
@@ -865,7 +867,7 @@ router.get('/buscarProA/:find', async (req, res) => {
 
 });
 
-router.get('/buscarProAPe/:find', async (req, res) => {
+router.get('/buscarProAPe/:find', isLoggedIn, async (req, res) => {
   
   try {
      // BUSCAR DIRECTOR  
@@ -899,7 +901,7 @@ router.get('/buscarProAPe/:find', async (req, res) => {
 
 });
 
-router.get('/buscarJefe/:find', async (req, res) => {
+router.get('/buscarJefe/:find',isLoggedIn, async (req, res) => {
   
   try {
 
@@ -928,7 +930,7 @@ router.get('/buscarJefe/:find', async (req, res) => {
 
 });
 
-router.get('/buscarMandante/:find', async (req, res) => {
+router.get('/buscarMandante/:find', isLoggedIn, async (req, res) => {
   
   try {
     // BUSCAR DIRECTOR  
@@ -954,7 +956,7 @@ router.get('/buscarMandante/:find', async (req, res) => {
 
 });
 
-router.get('/buscarMandante/:find', async (req, res) => {
+router.get('/buscarMandante/:find', isLoggedIn, async (req, res) => {
   
   try {
     // BUSCAR DIRECTOR  
@@ -978,7 +980,7 @@ router.get('/buscarMandante/:find', async (req, res) => {
 
 });
 
-router.get('/buscarCliente/:find', async (req, res) => {
+router.get('/buscarCliente/:find', isLoggedIn, async (req, res) => {
   
   try {
 
@@ -1005,7 +1007,7 @@ router.get('/buscarCliente/:find', async (req, res) => {
 
 });
 
-router.get('/buscarArquitecto/:find', async (req, res) => {
+router.get('/buscarArquitecto/:find', isLoggedIn, async (req, res) => {
   
 
   try {
@@ -1032,7 +1034,7 @@ router.get('/buscarArquitecto/:find', async (req, res) => {
 
 });
 
-router.get('/buscarRevisor/:find', async (req, res) => {
+router.get('/buscarRevisor/:find',isLoggedIn, async (req, res) => {
   
 
   try {
@@ -1061,7 +1063,7 @@ router.get('/buscarRevisor/:find', async (req, res) => {
 });
 
 //cargarFactura
-router.post('/cargarFactura', async (req, res) => {
+router.post('/cargarFactura',isLoggedIn,  async (req, res) => {
 
   try {
     const {numPpto,monto,porc_presupuesto,esroc,numroc,fecha_cobro,comentario,tipoCobro,tipoMoneda,id_proyecto} = req.body;
@@ -1153,7 +1155,7 @@ res.redirect('/proyecto/facturar/'+id_proyecto);
 // CARGAR PROYECTO 20/10/2021
 //cargarProyecto
 //router.post()
-router.post('/cargarProyecto', async (req, res) => {
+router.post('/cargarProyecto',isLoggedIn,  async (req, res) => {
 
   try {
     const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
@@ -1292,7 +1294,7 @@ router.post('/cargarProyecto', async (req, res) => {
 });
 
 
-router.post('/ActualizarProyecto', async (req, res) => {
+router.post('/ActualizarProyecto',isLoggedIn, async (req, res) => {
 
   try {
     const { year,code, nombre,id_tipo_proyecto,id_servicio,id_Estado,valor_x_m2,valor_proyecto,superficie_pre,id_director,id_jefe,
@@ -1439,7 +1441,7 @@ router.post('/buscarPais', isLoggedIn, async (req, res) => {
   }
 });
 
-router.get('/equipo/:id', async (req, res) => {
+router.get('/equipo/:id', isLoggedIn, async (req, res) => {
 
   try {
     const { id } = req.params;
@@ -1498,7 +1500,7 @@ router.get('/equipo/:id', async (req, res) => {
 
 });
 
-router.get('/equipo/delete/:id', async (req, res) => {
+router.get('/equipo/delete/:id', isLoggedIn, async (req, res) => {
 
   try {
     
@@ -1529,7 +1531,7 @@ router.get('/equipo/delete/:id', async (req, res) => {
   }
 });
 
-router.get('/equipo/add/:idUsuario/:id', async (req, res) => {
+router.get('/equipo/add/:idUsuario/:id',isLoggedIn,  async (req, res) => {
 
   try {
     const { id,idUsuario } = req.params;
@@ -2133,5 +2135,6 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
   
     
   });
+
 
 module.exports = router;

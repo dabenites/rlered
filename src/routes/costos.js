@@ -134,7 +134,7 @@ function  executeLogic(archivo, name,numeroAsignado,req)
     });
 }
 
-router.post('/fileupload', async (req,res) => {
+router.post('/fileupload',isLoggedIn, async (req,res) => {
     
    
     try {
@@ -261,7 +261,7 @@ router.get('/historial', isLoggedIn, async (req, res) => {
 
 }); 
 
-router.get('/historial/:id', async (req, res) => {
+router.get('/historial/:id',isLoggedIn, async (req, res) => {
 
     try {
         const { id } = req.params;
@@ -571,7 +571,7 @@ router.get('/aproyectos', isLoggedIn, async (req, res) => {
 
 });
 
-router.get('/costoexterno/revisar/:id', async (req, res) => {
+router.get('/costoexterno/revisar/:id', isLoggedIn, async (req, res) => {
 
     try {
         const { id } = req.params;

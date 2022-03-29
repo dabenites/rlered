@@ -78,7 +78,7 @@ router.get('/pais', isLoggedIn, async (req, res) => {
     
 });
 
-router.post('/addPais', async (req,res) => {
+router.post('/addPais',isLoggedIn, async (req,res) => {
     try{
 
     const { name } = req.body; //Obtener datos title,url,description
@@ -109,7 +109,7 @@ router.post('/addPais', async (req,res) => {
     }
 });
 
-router.post('/editPais', async (req,res) => {
+router.post('/editPais',isLoggedIn, async (req,res) => {
 
     try{
         const {  id, name } = req.body; //Obtener datos title,url,description
@@ -140,7 +140,7 @@ router.post('/editPais', async (req,res) => {
     }
 });
 
-router.get('/pais/edit/:id', async (req, res) => {
+router.get('/pais/edit/:id',isLoggedIn, async (req, res) => {
 
     try{
         const { id } = req.params;
@@ -160,7 +160,7 @@ router.get('/pais/edit/:id', async (req, res) => {
     }
 });
 
-router.get('/pais/delete/:id', async (req, res) => {
+router.get('/pais/delete/:id',isLoggedIn, async (req, res) => {
     try{
         const { id } = req.params;
         const nombre = await pool.query('SELECT pais FROM pais WHERE id = ?', [id]);
@@ -242,7 +242,7 @@ router.get('/areanegocio', isLoggedIn, async (req, res) => {
 
 });
 
-router.post('/eddAreaNeogcio', async (req,res) => {
+router.post('/eddAreaNeogcio',isLoggedIn, async (req,res) => {
     try{
         const {   name } = req.body;//Obtener datos title,url,description
 
@@ -348,7 +348,7 @@ router.get('/categoria', isLoggedIn, async (req, res) => {
 
 });
 
-router.get('/categoria/edit/:id', async (req, res) => {
+router.get('/categoria/edit/:id',isLoggedIn, async (req, res) => {
 
     try{
         const { id } = req.params;
@@ -382,7 +382,7 @@ router.get('/categoria/edit/:id', async (req, res) => {
     
 });
 
-router.post('/editCategoria', async (req,res) => {
+router.post('/editCategoria',isLoggedIn, async (req,res) => {
     try{
         const {  id, name , idCentroCosto , valorhh} = req.body; //Obtener datos title,url,description
 
@@ -414,7 +414,7 @@ router.post('/editCategoria', async (req,res) => {
 
 });
 
-router.post('/eddCategoria', async (req,res) => {
+router.post('/eddCategoria',isLoggedIn, async (req,res) => {
     try{
         const {  id, name , idCentroCosto , valorhh} = req.body;//Obtener datos title,url,description
 
@@ -446,7 +446,7 @@ router.post('/eddCategoria', async (req,res) => {
 
 })
 
-router.get('/categoria/delete/:id', async (req, res) => {
+router.get('/categoria/delete/:id',isLoggedIn, async (req, res) => {
     try{
         const { id } = req.params;
 
@@ -492,7 +492,7 @@ router.get('/centrocosto', isLoggedIn, async (req, res) => {
     
 });
 
-router.post('/addCentroCosto', async (req,res) => {
+router.post('/addCentroCosto',isLoggedIn, async (req,res) => {
 
     try{
         const { name, idAreaNegocio} = req.body; //Obtener datos title,url,description
@@ -528,7 +528,7 @@ router.post('/addCentroCosto', async (req,res) => {
     }
 });
 
-router.get('/centrocosto/edit/:id', async (req, res) => {
+router.get('/centrocosto/edit/:id',isLoggedIn, async (req, res) => {
 
     try{
         const { id } = req.params;
@@ -562,7 +562,7 @@ router.get('/centrocosto/edit/:id', async (req, res) => {
     
 });
 
-router.post('/editCentroCosto', async (req,res) => {
+router.post('/editCentroCosto',isLoggedIn, async (req,res) => {
     try{
         const {  id, name , idAreaNegocio} = req.body; //Obtener datos title,url,description
 
@@ -598,7 +598,7 @@ router.post('/editCentroCosto', async (req,res) => {
   
 });
 
-router.get('/centrocosto/delete/:id', async (req, res) => {
+router.get('/centrocosto/delete/:id',isLoggedIn, async (req, res) => {
     try{
         const { id } = req.params;
 
@@ -697,7 +697,7 @@ router.get('/tipoProyecto', isLoggedIn, async (req, res) => {
 });
 
 /* AGREGAR PROYECTO FUNCIONA*/
-router.post('/addTipoProyecto', async (req,res) => {
+router.post('/addTipoProyecto',isLoggedIn, async (req,res) => {
     try{
         const { id, descripcion } = req.body; //Obtener datos title,url,description
 
@@ -728,7 +728,7 @@ router.post('/addTipoProyecto', async (req,res) => {
     }
 });
 
-router.get('/tipoProyecto/edit/:id', async (req, res) => {
+router.get('/tipoProyecto/edit/:id',isLoggedIn, async (req, res) => {
 
     try{
         const { id } = req.params;
@@ -748,7 +748,7 @@ router.get('/tipoProyecto/edit/:id', async (req, res) => {
     
 });
 
-router.post('/editTipoProyecto', async (req,res) => {
+router.post('/editTipoProyecto',isLoggedIn, async (req,res) => {
     try{
         const {  id, descripcion } = req.body; //Obtener datos id, descripcion
 
@@ -779,7 +779,7 @@ router.post('/editTipoProyecto', async (req,res) => {
 
 });
 
-router.get('/tipoProyecto/delete/:id', async (req, res) => {
+router.get('/tipoProyecto/delete/:id',isLoggedIn,  async (req, res) => {
     try{
         const { id } = req.params;
 
@@ -814,7 +814,7 @@ router.get('/tipoProyecto/delete/:id', async (req, res) => {
 
 /// TIPO SERVICIO 
 
-router.get('/tipoServicio/', async (req, res) => {
+router.get('/tipoServicio/',isLoggedIn, async (req, res) => {
     try{
     
     
@@ -875,7 +875,7 @@ router.get('/tipoServicio/', async (req, res) => {
     }
 });
 
-router.post('/addTipoServicio', async (req,res) => {
+router.post('/addTipoServicio',isLoggedIn, async (req,res) => {
     try{
         const { descripcion } = req.body; //Obtener datos title,url,description
     
@@ -904,7 +904,7 @@ router.post('/addTipoServicio', async (req,res) => {
     }
 });
 
-router.get('/tipoServicio/delete/:id', async (req, res) => {
+router.get('/tipoServicio/delete/:id',isLoggedIn, async (req, res) => {
     try{
         const { id } = req.params;
     const descripcion = await pool.query('SELECT descripcion FROM proyecto_servicio WHERE id = ?', [id]);
@@ -933,7 +933,7 @@ router.get('/tipoServicio/delete/:id', async (req, res) => {
 
 });
 
-router.get('/tipoServicio/edit/:id', async (req, res) => {
+router.get('/tipoServicio/edit/:id',isLoggedIn, async (req, res) => {
     try{
         const { id } = req.params;
 
@@ -958,7 +958,7 @@ router.get('/tipoServicio/edit/:id', async (req, res) => {
     
 });
 
-router.post('/editTipoServicio', async (req,res) => {
+router.post('/editTipoServicio',isLoggedIn, async (req,res) => {
     try{
         const {  id, descripcion } = req.body; //Obtener datos title,url,description
 
@@ -990,7 +990,7 @@ router.post('/editTipoServicio', async (req,res) => {
 
 
 /// MONEDAS 
-router.get('/monedas/', async (req, res) => {
+router.get('/monedas/',isLoggedIn, async (req, res) => {
     try{
         const monedas = await pool.query("SELECT * FROM moneda_tipo as t1 WHERE t1.factura= 'Y' ORDER BY t1.descripcion");
 
@@ -1048,7 +1048,7 @@ router.get('/monedas/', async (req, res) => {
     }
 });
 
-router.post('/addMoneda', async (req,res) => {
+router.post('/addMoneda',isLoggedIn, async (req,res) => {
     try {
         const { descripcion, simbolo } = req.body; //Obtener datos title,url,description
  
@@ -1082,7 +1082,7 @@ router.post('/addMoneda', async (req,res) => {
 
 });
 
-router.get('/monedas/delete/:id_moneda', async (req, res) => {
+router.get('/monedas/delete/:id_moneda',isLoggedIn, async (req, res) => {
     try {
         const { id_moneda } = req.params;
         const descripcion = await pool.query('SELECT descripcion FROM moneda_tipo WHERE id_moneda = ?', [id_moneda]);
@@ -1107,7 +1107,7 @@ router.get('/monedas/delete/:id_moneda', async (req, res) => {
     }
 });
 
-router.get('/monedas/edit/:id_moneda', async (req, res) => {
+router.get('/monedas/edit/:id_moneda',isLoggedIn, async (req, res) => {
     try {
     
         const { id_moneda } = req.params;
@@ -1132,7 +1132,7 @@ router.get('/monedas/edit/:id_moneda', async (req, res) => {
     
 });
 
-router.post('/editMoneda', async (req,res) => {
+router.post('/editMoneda',isLoggedIn, async (req,res) => {
     try {
         const {  id, descripcion , simbolo} = req.body; //Obtener datos title,url,description
 
@@ -1236,7 +1236,7 @@ router.get('/usuario/crear/', isLoggedIn, async (req, res) => {
     
 });
 
-router.post('/editarUsuarios', async (req, res) => {
+router.post('/editarUsuarios', isLoggedIn, async (req, res) => {
     try{
         const { idUsuario,Nombre,Email,Telefono,login,idCategoria,idSucursal,titulo,idEstado } = req.body;
 
@@ -1281,7 +1281,7 @@ router.post('/editarUsuarios', async (req, res) => {
 
 });
 
-router.post('/addUsuario', async (req, res) => {
+router.post('/addUsuario',isLoggedIn, async (req, res) => {
 
     try {
         const { Nombre,Email,Telefono,login,idCategoria,idSucursal, titulo } = req.body;
@@ -1333,7 +1333,7 @@ router.post('/addUsuario', async (req, res) => {
     } 
  });
 
-router.get('/usuario/delete/:id', async (req, res) => {
+router.get('/usuario/delete/:id', isLoggedIn, async (req, res) => {
     try {
         const { id } = req.params;
     
@@ -1368,7 +1368,7 @@ router.get('/usuario/delete/:id', async (req, res) => {
     
 });
 
-router.get('/usuario/permisos/:id', async (req, res) => {
+router.get('/usuario/permisos/:id',isLoggedIn, async (req, res) => {
     try {
         const { id } = req.params;
         const usuario = await pool.query('SELECT * FROM sys_usuario WHERE idUsuario = ?', [id]);
@@ -1425,7 +1425,7 @@ router.get('/usuario/permisos/:id', async (req, res) => {
     }
 });
 
-router.get('/usuario/pwd/:id', async (req, res) => {
+router.get('/usuario/pwd/:id', isLoggedIn, async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -1462,7 +1462,7 @@ router.get('/usuario/pwd/:id', async (req, res) => {
 
 });
 
-router.post('/usuario/permisos', async (req,res) => {
+router.post('/usuario/permisos', isLoggedIn, async (req,res) => {
     
     try {
         //console.log(res.json(req.body));
@@ -1874,7 +1874,7 @@ router.get('/sucursal', isLoggedIn, async (req, res) => {
     
 }); 
 
-router.post('/addSucursal', async (req,res) => {
+router.post('/addSucursal',isLoggedIn, async (req,res) => {
     try {
         const {  id_pais, direccion , fono } = req.body;//Obtener datos title,url,description
 
@@ -1919,7 +1919,7 @@ router.post('/addSucursal', async (req,res) => {
     }
 });
 
-router.get('/sucursal/edit/:id', async (req, res) => {
+router.get('/sucursal/edit/:id',isLoggedIn, async (req, res) => {
     try {
         const { id } = req.params;
         const paises = await pool.query("SELECT * FROM pais ORDER By pais ASC");
@@ -1949,7 +1949,7 @@ router.get('/sucursal/edit/:id', async (req, res) => {
     
 });
 
-router.post('/editSucursal', async (req,res) => {
+router.post('/editSucursal', isLoggedIn, async (req,res) => {
     try {
         const {  id, id_pais , direccion , fono} = req.body; //Obtener datos title,url,description
 
@@ -1985,7 +1985,7 @@ router.post('/editSucursal', async (req,res) => {
 
 });
 
-router.get('/sucursal/delete/:id', async (req, res) => {
+router.get('/sucursal/delete/:id',isLoggedIn, async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -2019,7 +2019,7 @@ router.get('/sucursal/delete/:id', async (req, res) => {
     }
 });
 
-router.post('/ajax-validarNombreCentroCosto', async (req,res) => {
+router.post('/ajax-validarNombreCentroCosto',isLoggedIn, async (req,res) => {
     
     try {
         const nombreACargar = req.body.name;
@@ -2041,7 +2041,7 @@ router.post('/ajax-validarNombreCentroCosto', async (req,res) => {
     
 });
 
-router.post('/ajax-validarNombreLogin', async (req,res) => {
+router.post('/ajax-validarNombreLogin',isLoggedIn, async (req,res) => {
     
     try {
         const nombreACargar = req.body.login;
@@ -2076,7 +2076,7 @@ router.post('/ajax-validarNombreLogin', async (req,res) => {
     }
 });
 
-router.post('/ajax-validarNombrePais', async (req,res) => {
+router.post('/ajax-validarNombrePais', isLoggedIn, async (req,res) => {
 
     try {
         const nombreACargar = req.body.name;
@@ -2098,7 +2098,7 @@ router.post('/ajax-validarNombrePais', async (req,res) => {
 
 //ajax-validarNombreTipoProyecto
 
-router.post('/ajax-validarNombreTipoProyecto', async (req,res) => {
+router.post('/ajax-validarNombreTipoProyecto',isLoggedIn, async (req,res) => {
     try {
         const nombreACargar = req.body.descripcion;
 
@@ -2118,7 +2118,7 @@ router.post('/ajax-validarNombreTipoProyecto', async (req,res) => {
     
 })
 
-router.post('/ajax-validarNombreCategoria', async (req,res) => {
+router.post('/ajax-validarNombreCategoria',isLoggedIn, async (req,res) => {
     
     try {
         const nombreACargar = req.body.name;
@@ -2164,7 +2164,7 @@ function esNumero (dato){
 }
 
 //
-router.get('/equipoTrabajo', async (req, res) => {
+router.get('/equipoTrabajo',isLoggedIn, async (req, res) => {
 
     try {
             const equipos_proyecto = await pool.query(" SELECT t1.id , t1a.Nombre AS nomLider, t1b.Nombre AS nomCol FROM sys_usuario_equipo as t1 " +
@@ -2218,7 +2218,7 @@ router.get('/equipoTrabajo', async (req, res) => {
 });
 
 
-router.get('/equipoTrabajo/delete/:id', async (req, res) => {
+router.get('/equipoTrabajo/delete/:id', isLoggedIn, async (req, res) => {
 
     try {
         const { id } = req.params;
@@ -2242,7 +2242,7 @@ router.get('/equipoTrabajo/delete/:id', async (req, res) => {
     }
 });
 
-router.get('/buscarDesti/:find', async (req, res) => {
+router.get('/buscarDesti/:find', isLoggedIn, async (req, res) => {
   
     try {
     // BUSCAR DIRECTOR  
@@ -2267,7 +2267,7 @@ router.get('/buscarDesti/:find', async (req, res) => {
 
 
   // /mantenedores/equipoTrabajo/asociar
-  router.post('/equipoTrabajo/asociar/', async (req,res) => {
+  router.post('/equipoTrabajo/asociar/',isLoggedIn,  async (req,res) => {
 
     try {
         const {idColaborador} = req.body;

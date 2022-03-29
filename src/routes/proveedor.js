@@ -71,7 +71,7 @@ router.get('/externo', isLoggedIn, async (req, res) => {
     
 });
 
-router.post('/editExterno', async (req,res) => {
+router.post('/editExterno', isLoggedIn, async (req,res) => {
 
 
     try {
@@ -110,7 +110,7 @@ router.post('/editExterno', async (req,res) => {
 
 });
 
-router.post('/addExterno', async (req,res) => {
+router.post('/addExterno', isLoggedIn, async (req,res) => {
 
     try {
 
@@ -149,7 +149,7 @@ router.post('/addExterno', async (req,res) => {
 
 });
 
-router.get('/externo/edit/:id', async (req, res) => {
+router.get('/externo/edit/:id', isLoggedIn, async (req, res) => {
 
     try {
 
@@ -174,7 +174,7 @@ router.get('/externo/edit/:id', async (req, res) => {
     
 });
 
-router.get('/externo/delete/:id', async (req, res) => {
+router.get('/externo/delete/:id', isLoggedIn , async (req, res) => {
 
     try {
 

@@ -8,6 +8,8 @@ const mensajeria = require('../mensajeria/mail');
 
 var url = require('url');
 
+var Excel = require('exceljs');
+
 router.get('/proyectos',isLoggedIn,  async (req, res) => {
     
         try {
@@ -463,6 +465,7 @@ router.post('/buscarHoras',isLoggedIn,  async (req, res) => {
 
         try {
                 
+        let objeto = req.body;
                 
         let consulta = "";
         let parametros = {
@@ -609,7 +612,9 @@ router.post('/buscarHoras',isLoggedIn,  async (req, res) => {
 
         let horasProyecto =  await pool.query(sqlProyecto);   
 
-        res.render('reporteria/infoHoras', {  informacion, parametros,horasProyecto , req , layout: 'template'});
+        //console.log(objeto);
+
+        res.render('reporteria/infoHoras', {  objeto , informacion, parametros, horasProyecto , req , layout: 'template'});
 
 
         } catch (error) {
@@ -625,6 +630,42 @@ router.post('/buscarHoras',isLoggedIn,  async (req, res) => {
     
     
     });
+  
+router.get('/exportExcelHoras', isLoggedIn, function (req, res) {
+
+        try {
+
+                console.log(req.body);
+
+          res.writeHead(200, {
+            'Content-Disposition': 'attachment; filename="file.xlsx"',
+            'Transfer-Encoding': 'chunked',
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          });
     
+          var workbook = new Excel.stream.xlsx.WorkbookWriter({ stream: res })
+          var worksheet = workbook.addWorksheet('some-worksheet')
+          worksheet.addRow(['foo', 'bar']).commit();
+          worksheet.commit();
+          workbook.commit();
+      
+          
+        } catch (error) 
+        {
+          
+          mensajeria.MensajerErrores("\n\n Archivo : reporteria.js \n Error en el directorio: /exportExcel \n" + error + "\n Generado por : " + req.user.login);
+          res.redirect(   url.format({
+              pathname:'/dashboard',
+                      query: {
+                      "a": 1
+                      }
+                  })); 
+      
+        }
+      
+        
+          
+        });
+
 
 module.exports = router;

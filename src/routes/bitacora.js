@@ -556,7 +556,7 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
     }
 });
 
-router.get('/getBitacora', async (req,res) => {
+router.get('/getBitacora', isLoggedIn, async (req,res) => {
 
     try {
           const horas = await pool.query(" SELECT t.id_bitacora_time,  DATE_FORMAT(t.ini_time,'%Y-%m-%d %H:%i') AS ini_time,   " +

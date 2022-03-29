@@ -341,7 +341,7 @@ module.exports.EnvioMailHorasRespuesta =  async function (objeto) {
   
   }
 
-  module.exports.EnvioMailHorasRespuestaAsignado =  async function (objeto) {
+module.exports.EnvioMailHorasRespuestaAsignado =  async function (objeto) {
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
   

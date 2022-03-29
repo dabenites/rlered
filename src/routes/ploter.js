@@ -290,7 +290,7 @@ router.post('/cambiaEstado',express.json({type: '*/*'}), isLoggedIn, async (req,
 
 }); 
 
-router.get('/buscarPro/:find', async (req, res) => {
+router.get('/buscarPro/:find', isLoggedIn, async (req, res) => {
 
     try {
          // BUSCAR DIRECTOR  
@@ -317,7 +317,7 @@ router.get('/buscarPro/:find', async (req, res) => {
   
   });
 
-router.get('/buscarDesti/:find', async (req, res) => {
+router.get('/buscarDesti/:find', isLoggedIn, async (req, res) => {
   
     try {
         // BUSCAR DIRECTOR  
@@ -344,7 +344,7 @@ router.get('/buscarDesti/:find', async (req, res) => {
   
   });
 
-router.get('/ploteo/cambiaEstadoProceso/:id', async (req, res) => {
+router.get('/ploteo/cambiaEstadoProceso/:id',isLoggedIn, async (req, res) => {
 
     try {
 
@@ -377,7 +377,7 @@ router.get('/ploteo/cambiaEstadoProceso/:id', async (req, res) => {
 
   });
 
-router.get('/ploteo/cambiaEstadoTerminado/:id', async (req, res) => {
+router.get('/ploteo/cambiaEstadoTerminado/:id',isLoggedIn,  async (req, res) => {
 
     try {
 

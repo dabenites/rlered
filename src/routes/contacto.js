@@ -160,7 +160,7 @@ router.get('/listadov', isLoggedIn, async (req, res) => {
     }
 }); 
 
-router.post('/ajaxNombre', async (req,res) => {
+router.post('/ajaxNombre', isLoggedIn,async (req,res) => {
     
     try {
          //console.log(req.body['NombreContacto']);
@@ -198,7 +198,7 @@ router.post('/ajaxNombre', async (req,res) => {
     
 });
 
-router.post('/bFormIngreso', async (req,res) => {
+router.post('/bFormIngreso', isLoggedIn, async (req,res) => {
     
     try {
         const nombre = req.body['iNombreContacto'];
@@ -224,7 +224,7 @@ router.post('/bFormIngreso', async (req,res) => {
 });
 
 //uptContacto
-router.post('/uptContacto', async (req,res) => {
+router.post('/uptContacto',isLoggedIn , async (req,res) => {
 
     try {
         const nombre = req.body['iNombreContacto'];
@@ -272,7 +272,7 @@ router.post('/uptContacto', async (req,res) => {
 
 });
 
-router.post('/addContacto', async (req,res) => {
+router.post('/addContacto',isLoggedIn,  async (req,res) => {
     
    try {
     const nombre = req.body['nombre'];
@@ -318,7 +318,7 @@ router.post('/addContacto', async (req,res) => {
 });
 
 // /contacto/delete/2475
-router.get('/contacto/delete/:id', async (req, res) => {
+router.get('/contacto/delete/:id',isLoggedIn,  async (req, res) => {
 
     try {
         const { id } = req.params;
@@ -348,7 +348,7 @@ router.get('/contacto/delete/:id', async (req, res) => {
     
 });
 
-router.get('/contacto/editar/:id', async (req, res) => {
+router.get('/contacto/editar/:id', isLoggedIn, async (req, res) => {
 
     try {
         const { id } = req.params;

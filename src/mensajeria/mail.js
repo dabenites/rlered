@@ -407,6 +407,8 @@ module.exports.EnvioMailIngresoFactura =  async function (objeto) {
   
          const generico = "Estimado/a:\n" +
                           " \t Solicitud de facturación "+ objeto.proyecto +", ingresado por "+ objeto.solicitante+" \n" +
+                          " Moneda : "+objeto.nomMoneda +" \n"+
+                          " Monto : "+objeto.monto +" \n"+
                           " Comentario : "+objeto.comentario +" \n"+
                           " Director Proyecto : "+objeto.director +" \n"+
                           " Saludos, \n"+
@@ -543,7 +545,9 @@ module.exports.EnviaAvisoTerminoPloteo =  async function (objeto) {
                       });
   
          const generico = "Estimado/a:\n" +
-                          " \t Solicitud de ploteo fue terminada, favor revisar. \n" +
+                          " \t Solicitud de ploteo fue terminada.\n" +
+                          " Proyecto : " + objeto.proyecto + "\n" +
+                          " favor revisar. \n" +
                           " Saludos, \n"+
                           " RLE - Planner";
   

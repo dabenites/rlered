@@ -204,13 +204,24 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
 
     const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.id =  ? ",[idProyecto]);
     const infoDestinatario = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [idDestinatario]);
+    
+    let NombreDestinatario = "";
+
+    if (infoDestinatario == 0)
+    {
+        NombreDestinatario = "No ingresado";
+    }
+    else
+    {
+        NombreDestinatario = infoDestinatario[0].Nombre;
+    }
 
     const mailPloter = {
         to : "documentos@renelagos.com",
         id_proyecto : idProyecto,
         id_ingreso : req.user.idUsuario,
         id_destinatario : idDestinatario,
-        destinario : infoDestinatario[0].Nombre,
+        destinario : NombreDestinatario,
         id_estado : 1,
         trabajo : trabajosBD,
         impresion : impresionBD,
@@ -392,31 +403,48 @@ router.get('/ploteo/cambiaEstadoTerminado/:id',isLoggedIn,  async (req, res) => 
 
     const inforPloteo = await pool.query('SELECT * FROM sol_ploteo AS t1 WHERE  t1.id = ?',[id]);
 
+    // Traer informacion dle proyecto que se realizo el trabajo 
+
+    const infoProyecto  = await pool.query('SELECT * FROM pro_proyectos AS t1 WHERE  t1.id = ?',[inforPloteo[0].id_proyecto]);
+    
+
+
+
     if (inforPloteo[0].id_ingreso == inforPloteo[0].id_destinatario )
     {
         const infoIngresa = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [inforPloteo[0].id_destinatario]);
 
         const mailTerminoIgual = {
-            to : infoIngresa[0].Email
+            to : infoIngresa[0].Email,
+            proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre
           };
 
         mensajeria.EnviaAvisoTerminoPloteo(mailTerminoIgual);
     }
     else
     {
-        const infoIngresa1 = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [inforPloteo[0].id_destinatario]);
-        const infoIngresa2 = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [inforPloteo[0].id_ingreso]);
-
-        const mailTerminoIgual1 = {
-            to : infoIngresa1[0].Email
-          };
+        
+        const infoIngresa2 = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [inforPloteo[0].id_ingreso]);      
 
         const mailTerminoIgual2 = {
-            to : infoIngresa2[0].Email
+            to : infoIngresa2[0].Email,
+            proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre
           };
 
-          mensajeria.EnviaAvisoTerminoPloteo(mailTerminoIgual1);
-          mensajeria.EnviaAvisoTerminoPloteo(mailTerminoIgual2);
+        mensajeria.EnviaAvisoTerminoPloteo(mailTerminoIgual2);
+
+        if (inforPloteo[0].id_destinatario != 0)
+        {
+            const infoIngresa1 = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [inforPloteo[0].id_destinatario]);
+
+            const mailTerminoIgual1 = {
+                to : infoIngresa1[0].Email,
+                proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre
+              };
+
+            mensajeria.EnviaAvisoTerminoPloteo(mailTerminoIgual1);
+
+        }
 
     }
 

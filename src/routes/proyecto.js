@@ -1086,18 +1086,25 @@ router.post('/cargarFactura',isLoggedIn,  async (req, res) => {
     roc: numroc,
     comentarios :comentario };
 
-    /*
-    const cst = {
-      consulta : newFactura
-    };
+  
+    let nomMoneda = "";
+    switch(tipoMoneda)
+    {
+      case 1:
+      case "1":
+        nomMoneda = "Pesos";
+      break;
+      case 2:
+      case "2":
+        nomMoneda = "Dolar";
+      break;
+      case 4:
+      case "4":
+        nomMoneda = "UF";
+      break;
+    }
 
-    const sql = " INSERT INTO fact_facturas (fecha_solicitud,id_proyecto,id_tipo_moneda,id_estado,id_tipo_cobro,num_ppto,monto_a_facturar,porc_ppto, " + 
-                " id_solicitante,fecha_cobro,es_roc,roc,comentarios) values " +
-                " ('"+fecha_ingreso+"','"+id_proyecto+"', '"+tipoMoneda+"',0, '"+tipoCobro+"' , '"+numPpto+"' , '"+monto+"' , '"+porc_presupuesto+"', '"+req.user.idUsuario+"' , '"+fecha_cobro+"' , '"+esroc+"' , '"+numroc+"' , '"+comentario+"' )";
 
-                console.log(sql);
-    mensajeria.MensajerErrores(sql)
-    */
     const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.id =  ? ",[id_proyecto]);
     // agregar el director de proyecto.
     
@@ -1108,7 +1115,9 @@ router.post('/cargarFactura',isLoggedIn,  async (req, res) => {
       comentario : comentario,
       proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
       solicitante : req.user.Nombre,
-      director : infoDirector[0].nom
+      director : infoDirector[0].nom,
+      nomMoneda : nomMoneda,
+      monto : monto
     };
 
     const mailAvisoClaudio = {
@@ -1116,14 +1125,18 @@ router.post('/cargarFactura',isLoggedIn,  async (req, res) => {
       comentario : comentario,
       proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
       solicitante : req.user.Nombre,
-      director : infoDirector[0].nom
+      director : infoDirector[0].nom,
+      nomMoneda : nomMoneda,
+      monto : monto
     };
     const mailAvisoMario = {
       to : 'mcastillo@renelagos.com',
       comentario : comentario,
       proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
       solicitante : req.user.Nombre,
-      director : infoDirector[0].nom
+      director : infoDirector[0].nom,
+      nomMoneda : nomMoneda,
+      monto : monto
     };
 
  // Descomentar una vez terminaada las pruebas para el ingreso de facturaciones.    

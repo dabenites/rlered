@@ -35,17 +35,25 @@
            </ul>
            <div class="tab-content">
                <div class="tab-pane active" id="horas" role="tabpanel" aria-labelledby="horas-tab">
-                   
-                       <div class="btn-group" role="group" aria-label="Basic example">
-                            <!-- <button type="button" class="btn btn-secondary btn-sm" ><a type="button" onclick="exportaExcel();" target="_blank" style="color: white;"> Exportar <i class="fa fa-file-excel-o"></i></a></button> -->
-                            <form id="exportar" action="/reporteria/exportExcelHoras" method="GET"> 
-                                <input type="hidden" name="stipoOpcion" value="{{objeto.stipoOpcion}}">
-                                <input type="hidden" name="opcion" value="{{objeto.opcion}}">
-                                <input type="hidden" name="fecha_inicio" value="{{objeto.fecha_inicio}}">
-                                <input type="hidden" name="fecha_termino" value="{{objeto.fecha_termino}}">
-                                <button type="submit" class="btn btn-secondary btn-sm" > Exportar </button> 
-                            </form>
+                        <div class="row">
+                                <div class="col-10">
+
+                                </div>
+                                <div class="col-2">
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                            <!-- <button type="button" class="btn btn-secondary btn-sm" ><a type="button" onclick="exportaExcel();" target="_blank" style="color: white;"> Exportar <i class="fa fa-file-excel-o"></i></a></button> -->
+                                            <form id="exportar" action="/reporteria/exportExcelHoras" method="POST"> 
+                                                <input type="hidden" name="stipoOpcion" value="{{objeto.stipoOpcion}}">
+                                                <input type="hidden" name="opcion" value="{{objeto.opcion}}">
+                                                <input type="hidden" name="fecha_inicio" value="{{objeto.fecha_inicio}}">
+                                                <input type="hidden" name="fecha_termino" value="{{objeto.fecha_termino}}">
+                                                <button type="submit" class="btn btn-secondary btn-sm" style="margin-top: 15px;"> <i class="fa fa-file-excel-o"></i> Exportar </button> 
+                                            </form>
+                                    </div>
+                                </div>
+
                         </div>
+                       
                    
                     <table class="table table-hover" class="table table-hover" id="tablaProveedores" class="display">
                         <thead>

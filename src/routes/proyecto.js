@@ -17,7 +17,7 @@ var url = require('url');
 
 const mensajeria = require('../mensajeria/mail');
 
-var Excel = require('exceljs');
+//var Excel = require('exceljs');
 
 //AGREGAR UN PROYECTO
 

@@ -2022,6 +2022,10 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
   
   const ordenCompra = await pool.query(" SELECT t1.id,t1.folio,t1.id_estado, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
                                            " , t8.nombre AS proyecto,t9.descripcion as estado , t8.year,t8.code," +
+                                           " if (t1.id_tipo = 3 ,  " +
+                                           " (SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro) "+
+                                           "  , (SELECT t9b.nombre FROM prov_externo AS t9b WHERE t9b.id = t1.id_razonsocialpro) " +
+                                           " ) AS nomProoveedor, " +
                                            " DATE_FORMAT(t1.fecha , '%Y-%m-%d %H:%i') as fechaIngreso, " +
                                            " DATE_FORMAT(t1.fecha_aprobacion , '%Y-%m-%d %H:%i') as fechaAProbacion, " +
                                            " DATE_FORMAT(t1.fecha_recepcion , '%Y-%m-%d %H:%i') as fechaRecepcion, " +
@@ -2039,7 +2043,8 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
                                            " LEFT JOIN orden_compra_estado as t9 ON t1.id_estado = t9.id " +
                                            " WHERE t1.id_estado IN(1,2,3,4,5)", [req.user.idUsuario]); 
 
-   
+ 
+
   let verToask = {
         titulo : "Mensaje",
         body   : "Solicitud de Orden de Compra, ingresada correctamente",
@@ -2195,15 +2200,16 @@ router.post('/editarOC', isLoggedIn, async (req, res) => {
 
     
     let opciones;
+    
   switch(oc[0].id_tipo)
   {
     case "1":
     case 1:
-      opciones = await pool.query('SELECT t1.id, t1.nombre as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
+      opciones = await pool.query('SELECT t1.id, t1.nombre as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[oc[0].id_tipo]); 
     break;
     case "2":
     case 2:
-      opciones = await pool.query('SELECT t1.id, t1.razon_social as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
+      opciones = await pool.query('SELECT t1.id, t1.razon_social as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[oc[0].id_tipo]); 
     break;
     case "3":
     case 3:

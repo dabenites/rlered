@@ -159,7 +159,7 @@
             <div class="form-group row" >
                 <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Nº Días Pago:</b></label>
                     <div class="col-md-6 col-sm-6">
-                        <input type="text" id="numdias" name="numdias"  class="form-control">
+                        <input type="number" id="numdias" name="numdias"  class="form-control">
                     </div>
             </div>
             <div class="form-group row">
@@ -268,7 +268,7 @@
                     </div>
                     <div class="col-md-6">
                         <div id="tablaInformacion">
-                            <table class="table table-hover" id="tableRequerimiento">
+                            <table class="table table-hover" id="tableRequerimiento" name="tableRequerimiento">
                                 <thead>
                                     <tr>
                                         <th>Cant.</th>
@@ -330,6 +330,7 @@
                                 <th>Emisor</th>
                                 <th>Tipo</th>
                                 <th>Solicitante</th>
+                                <th>Proovedor</th>
                                 <th>Fecha Ingreso</th>
                                 <th>Fecha Aprobación</th>
                                 <th>Folio</th>
@@ -345,6 +346,7 @@
                                 <td>{{razonsocial}}</td>
                                 <td>{{tipo}}</td>
                                 <td>{{solicitante}}</td>
+                                <td>{{nomProoveedor}}</td>
                                 <td>{{fechaIngreso}}</td>
                                 <td>{{fechaAProbacion}}</td>
                                 <td>{{folio}}</td>
@@ -843,6 +845,16 @@
         let razonsocialpro      = $("#razonsocialpro").val();
         //__________________________________________________
 
+         let filas = $("#tableRequerimiento").find('tbody tr').length;
+
+
+        if (filas == 0)
+        {
+            alert("Ingresar los requerimientos para generar una OC");
+             return false;
+        }
+
+
         // 1 y 2 proveedores interno o externo 
         if (id_tipo_proveedor == 1 || id_tipo_proveedor == 2)
         {
@@ -860,7 +872,7 @@
         }
         else
         {
-            console.log("tipo proveedor");
+            //console.log("tipo proveedor");
             return false;
         }
 
@@ -870,7 +882,7 @@
         {
             if (id_proyecto == "" || id_etapa == "")
             {
-                console.log("centro costo");
+                //console.log("centro costo");
                 return false;
             }
         }

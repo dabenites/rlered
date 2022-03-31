@@ -27,7 +27,7 @@ function  buildPDF(dataCallback, endCallback, oc, requerimientos) {
 
   // Primer Bloque
   doc.fontSize(tletra).text("Fecha de emisión" , 50, 100); doc.fontSize(tletra).text(":"  , puntoPrimer, 100); doc.fontSize(tletra).text(oc.fecha  , puntoPrimer + 10, 100);
-  doc.fontSize(tletra).text("Proyecto"         , 50, 110); doc.fontSize(tletra).text(":"  , puntoPrimer, 110);
+  doc.fontSize(tletra).text("Proyecto"         , 50, 110); doc.fontSize(tletra).text(":"  , puntoPrimer, 110); doc.fontSize(tletra).text(oc.year + "-" + oc.code + " : " + oc.nomProyecto  , puntoPrimer + 10, 110);
   doc.fontSize(tletra).text("Centro de Costo"  , 50, 120); doc.fontSize(tletra).text(":"  , puntoPrimer, 120); doc.fontSize(tletra).text(oc.centroCosto  , puntoPrimer + 10, 120);
 
   doc.fontSize(tletra).text("N°"               , 400, 100); doc.fontSize(tletra).text(":"  , puntoSegundo, 100); doc.fontSize(tletra).text(oc.folio  , puntoSegundo + 10, 100);
@@ -116,7 +116,7 @@ function  buildPDF(dataCallback, endCallback, oc, requerimientos) {
       //console.log(element);
         sTable.push(element.cantidad);
         sTable.push(element.descripcion);
-        precio += Number(element.montopeso) ;
+        precio += element.montopeso ;
         sTable.push(element.precio_unitario);
         sTable.push("$ " + element.montopeso);
         simbolo = "$ ";
@@ -157,17 +157,17 @@ doc.table( table, {
   let valorTotal;
  if (esUF)
  {
-
    valorIVA = Math.round(Number(precio.toString().replace('.','')) * 1.19 - Number(precio.toString().replace('.','')));
    
    valorTotal = Number(precio.toString().replace('.',''))  + valorIVA;
 
-    doc.fontSize(tletra - 1 ).text( simbolo + precio ,465,valor_y ); 
+    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio.toString().replace('.','')) ,465,valor_y ); 
     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorIVA) ,465,valor_y  + 10 ); 
     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorTotal) ,465,valor_y  + 20 );
  }
  else
  {
+   
    valorIVA = precio * 1.19 - precio;
    valorTotal = precio + valorIVA;
 

@@ -2668,7 +2668,11 @@ router.get('/aordencompra',isLoggedIn,  async (req,res) => {
     // Busco todas las ordenes de compra en estado 1 
 
     const ordenCompra = await pool.query(" SELECT t1.id,t1.folio, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
-                                         " , t8.nombre AS proyecto, t8.year,t8.code,t1.folio, DATE_FORMAT(t1.fecha , '%Y-%m-%d %H:%i') as fechaIngreso " +
+                                         " , t8.nombre AS proyecto, t8.year,t8.code,t1.folio, DATE_FORMAT(t1.fecha , '%Y-%m-%d %H:%i') as fechaIngreso, " +
+                                         " if (t1.id_tipo = 3 ,  " +
+                                         " (SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro) "+
+                                         "  , (SELECT t9b.nombre FROM prov_externo AS t9b WHERE t9b.id = t1.id_razonsocialpro) " +
+                                         " ) AS nomProoveedor " +
                                          " FROM orden_compra as t1  " +
                                          " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
                                          " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
@@ -2732,7 +2736,11 @@ router.get('/rordencompra', isLoggedIn, async (req,res) => {
     // Busco todas las ordenes de compra en estado 1 
 
     const ordenCompra = await pool.query(" SELECT t1.id,t1.folio, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
-                                         " , t8.nombre AS proyecto, t8.year,t8.code,t1.folio, DATE_FORMAT(t1.fecha_aprobacion , '%Y-%m-%d %H:%i') as fechaAprobacion" +
+                                         " , t8.nombre AS proyecto, t8.year,t8.code,t1.folio, DATE_FORMAT(t1.fecha_aprobacion , '%Y-%m-%d %H:%i') as fechaAprobacion," +
+                                         " if (t1.id_tipo = 3 ,  " +
+                                         " (SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro) "+
+                                         "  , (SELECT t9b.nombre FROM prov_externo AS t9b WHERE t9b.id = t1.id_razonsocialpro) " +
+                                         " ) AS nomProoveedor " +
                                          " FROM orden_compra as t1  " +
                                          " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
                                          " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
@@ -2977,6 +2985,9 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
                               " t1c.Nombre as nomRecepcionador ," +  
                               " t1c.Telefono as telRecepcionador ," + 
                               "t1a.rut as rutEmpresa,"+
+                              "t1d.year,"+
+                              "t1d.code," +
+                              "t1d.nombre as nomProyecto," +
                               "t1a.razonsocial as razonSocialEmpresa," +
                               "t1a.direccion as direccion," +
                               "t1a.fono as fonoEmpresa, " +
@@ -2997,7 +3008,8 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
                               ' FROM orden_compra as t1' +
                               ' LEFT JOIN sys_empresa as t1a ON t1.id_proveedor = t1a.id ' +
                               ' LEFT JOIN sys_usuario as t1b ON t1.id_solicitante = t1b.idUsuario ' +
-                              ' LEFT JOIN sys_usuario as t1c ON t1.id_recepcionador = t1c.idUsuario, ' +
+                              ' LEFT JOIN sys_usuario as t1c ON t1.id_recepcionador = t1c.idUsuario ' +
+                              ' LEFT JOIN pro_proyectos as t1d ON t1.id_proyecto = t1d.id, ' +
                               ' centro_costo as t2 ' +
                               ' WHERE t1.id = ? ' +
                               ' AND t1.id_centro_costo = t2.id',[id]); 

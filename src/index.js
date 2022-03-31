@@ -30,15 +30,19 @@ app.engine('.hbs', exphbs({
 }))
 app.set('view engine', '.hbs');
 
-//console.log(__dirname);
-//console.log(process.cwd());
+// console.log(__dirname);
+// console.log(process.cwd());
 // Middlewares
+
 app.use(session({
   secret: 'faztmysqlnodemysql',
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   store: new MySQLStore(database)
 }));
+
+// console.log(session());
+
 app.use(flash());
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));

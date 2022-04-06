@@ -1,4 +1,26 @@
 
+  <head>
+    <style>
+        .close {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+        }
+        .close:not(:disabled):not(.disabled) {
+            cursor: pointer;
+        }
+        button.close {
+            padding: 0;
+            background-color: transparent;
+            border: 0;
+            -webkit-appearance: none;
+        }
+    </style>
+</head>
 <div class="col-md-6 col-sm-6  ">
     <div class="x_panel">
         <div class="x_title">
@@ -33,8 +55,34 @@
     <div class="x_panel">
         <div class="x_title">
             <h2>Información Facturación
-                <small style="align-content: flex-end;">Estado : <b> {{factura.descripcion}}</b> </small>
+                <small style="align-content: flex-end;">Estado : <b> {{factura.descripcion}}</b>              
+                </small>
             </h2>
+              {{#if (if_equal 54 req.user.idCategoria) }}
+                    <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg3" style="float: right;" onclick="CargaFacturaEdit({{factura.id_facturacion}});">
+                                                <i class="fa fa-edit"></i>
+                    </button>
+                    <div class="modal fade bs-example-modal-lg3" id="verDetalleEditar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">Editar</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                </div>
+                                <div class="modal-body">
+                                     <div id="formEditFacturacion">
+
+                                      </div>
+                                </div>
+                                <div class="modal-footer">
+                                                                
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+              {{/if}}
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -43,7 +91,7 @@
                 <input type="hidden" id="id" name="id" value="{{factura.id_facturacion}}">
                 <div class="form-group row">
                     <label for="staticEmail" class="col-sm-2 col-form-label">Solicitado</label>
-                        <div class="col-sm-4"><input type="text" readonly class="form-control-plaintext" value="{{factura.id_solicitante}}"></div>
+                        <div class="col-sm-4"><input type="text" readonly class="form-control-plaintext" value="{{factura.Nombre}}"></div>
                     <label for="staticEmail" class="col-sm-3 col-form-label">Fecha inicio cobro</label>
                         <div class="col-sm-3"><input type="text" readonly class="form-control-plaintext" value="{{factura.fecha_cobro}}"></div>
                 </div>
@@ -110,21 +158,13 @@
                    {{#if (if_equal factura.id_estado 2) }}
                     <div class="form-group row">
                             <label for="staticEmail" class="col-sm-1 col-form-label">Empresa</label>
-                            <div class="col-sm-1"><input type="text" readonly class="form-control-plaintext" value="rut"></div>
-                            <label for="staticEmail" class="col-sm-3 col-form-label">
-                                <!-- Nº Factura 
-                                <input type="text" readonly class="form-control-plaintext" value="{{factura.num_factura}}">
-                                -->
-                                <div class="form-group row">
-                                    <label for="staticEmail" class="col-sm-6 col-form-label">Nº Factura </label>
-                                     <div class="col-sm-6"><input type="text" readonly class="form-control-plaintext" value="{{factura.num_factura}}"></div>
-                                </div>
-
-                            </label>
-                            <label for="staticEmail" class="col-sm-2 col-form-label">Fecha Emision </label>
+                            <div class="col-sm-2"><input type="text" readonly class="form-control-plaintext" value="{{factura.rutEmpresa}}"></div>
+                            <label for="staticEmail" class="col-sm-1 col-form-label"> Nº Factura</label>
+                            <div class="col-sm-2"><input type="text" readonly class="form-control-plaintext" value="{{factura.num_factura}}"></div>
+                            <label for="staticEmail" class="col-sm-1 col-form-label">Fecha Emision </label>
                             <div class="col-sm-2"><input type="text" readonly class="form-control-plaintext" value="{{factura.fecha_factura}}"></div>
                             <label for="staticEmail" class="col-sm-1 col-form-label">Valor UF </label>
-                            <div class="col-sm-1"><input type="text" readonly class="form-control-plaintext" value="{{factura.uf_dia}}"></div>
+                            <div class="col-sm-2"><input type="text" readonly class="form-control-plaintext" value="{{factura.uf_dia}}"></div>
                     </div>
                     <div class="form-group row">
                         <div class="x_title">
@@ -202,6 +242,22 @@
 
 <script>
  // cargar la funcion que nos permita pasar la informacion en un objeto.
+
+ function CargaFacturaEdit( idFactura)
+ {
+    //$("#formEditFacturacion").html(idFactura);
+
+    $.ajax({
+                                    async: false,
+                                    type : 'POST', 
+                                    url	 : "/facturacion/editarFacturaTemplate", 
+                                    data : "id="+idFactura,
+                                    success : function (resultado) 
+                                        { 
+                                            $("#formEditFacturacion").html(resultado);
+                                        } 
+                                });
+ }
 function cargaTrackingFacura ( idEstado)
 {
     // 

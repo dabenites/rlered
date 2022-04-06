@@ -353,7 +353,13 @@ router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
                                                 " t2.id_proyecto = t3.id " );
 
     // factura 
-    const factura = await pool.query( " SELECT *,t1.id as id_facturacion FROM fact_facturas AS t1, fact_estados AS t2 WHERE t1.id = "+idFacturacion+" AND t1.id_estado = t2.id");
+    const factura = await pool.query( " SELECT t1.*,t2.*,t1z.Nombre, " +
+                                      " t1.id as id_facturacion, " +
+                                      " t1z2.rut as rutEmpresa"+
+                                      " FROM fact_facturas AS t1 " +
+                                      " LEFT JOIN sys_usuario as t1z on t1.id_solicitante = t1z.idUsuario   " +
+                                      " LEFT JOIN sys_empresa as t1z2 on t1.id_empresa = t1z2.id ,  " +
+                                      " fact_estados AS t2 WHERE t1.id = "+idFacturacion+" AND t1.id_estado = t2.id");
 
     const isEqualHelperHandlerbar = function(a, b, opts) {
         // console.log(a + "----" + b);
@@ -364,6 +370,8 @@ router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
          } 
      };
 
+
+    //console.log( req.user);
 
     res.render('facturacion/editar', { factura:factura[0],proyecto:proyecto[0],historial,req ,layout: 'template', helpers : {
         if_equal : isEqualHelperHandlerbar
@@ -381,4 +389,28 @@ router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
     }
 });
 
+
+router.post('/editarFacturaTemplate', isLoggedIn, async (req, res) => {
+
+    try {
+
+        const { id} = req.body;
+
+        res.render('facturacion/editarFactura', { layout: 'blanco'});
+
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : facturacion.js \n Error en el directorio: /editarFacturaTemplate \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+
+    }
+});
+
+
+//editarFacturaTemplate
 module.exports = router;

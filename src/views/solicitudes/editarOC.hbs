@@ -14,6 +14,21 @@
                                     </div>
             </div>
             <div class="form-group row">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Incluye IVA:</b></label>
+                <div class="col-md-6 col-sm-6">
+                    <select class="select2_single form-control" tabindex="1" name="incluyeIVA" id="incluyeIVA" >
+                                            <option value="">Seleccione</option>
+                                                {{#each opcionesIVA}}
+                                                    {{#if (if_equal id ../oc.conIVA) }}
+                                                        <option value="{{id}}" selected>{{descripcion}}</option>
+                                                    {{else}}
+                                                        <option value="{{id}}">{{descripcion}}</option>
+                                                    {{/if}}
+                                                {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
                 <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Tipo"><b>Tipo :</b></label>
                     <div class="col-md-6 col-sm-6">
                         <select class="select2_single form-control" tabindex="1" name="id_tipo_proveedor2" id="id_tipo_proveedor2" onchange="cargaTipoProveedor(this.value);">
@@ -178,7 +193,7 @@
                                         <th style="border-bottom-width: 0px;">
                                             <td style="border-bottom-width: 0px;"></td>
                                             <td style="border-bottom-width: 0px;" colspan="3">
-                                              <button type="button" class="btn btn-success btn-sm" onclick="editarOCIngresada({{oc.id}});">Editar OC</button>
+                                              <button type="button" class="btn btn-success btn-sm" onclick="editarOCIngresada({{oc.id}});">Guardar OC</button>
                                             </td>
                                         </th>
                                         
@@ -321,9 +336,11 @@
          let proyecto       = $("#id_proyecto2").val();
          let etapa          = $("#id_etapa2").val();
 
+         let incluyeIVA     = $("#incluyeIVA").val();
 
 
-        let informacion = {emisor,tipo_proveedor,contacto,solicitante,recepcionador,numpago,director,centrocosto,proyecto,etapa,id};
+
+        let informacion = {emisor,tipo_proveedor,contacto,solicitante,recepcionador,numpago,director,centrocosto,proyecto,etapa,id,incluyeIVA};
 
         //console.log(informacion);
 

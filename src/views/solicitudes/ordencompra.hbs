@@ -82,6 +82,15 @@
                              <label class="col-form-label col-md-6 col-sm-6 "><p class="fs-5"><u><strong>Configuración General</strong></u></p>
                              </label>
                          </div>
+                             <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Folio Referencia:</b></label>
+                                    <div class="col-md-4 col-sm-4">
+                                         <input type="text" id="folioNum" name="folioNum"  class="form-control">
+                                    </div>
+                                    <div class="col-md-4 col-sm-4">
+                                        <button type="button" class="btn btn-success" onclick="CargarInformacionFolio();">Cargar </button>
+                                    </div>
+                            </div>
                             <div class="form-group row">
                                 <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Emisor:</b></label>
                                     <div class="col-md-6 col-sm-6">
@@ -90,6 +99,16 @@
                                                 {{#each empresas}}
                                                     <option value="{{id}}">{{razonsocial}}</option>
                                                 {{/each}}
+                                        </select>
+                                    </div>
+                            </div>
+                             <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Incluye IVA:</b></label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <select class="select2_single form-control" tabindex="1" name="incluyeIVA" id="incluyeIVA">
+                                            <option value="">Seleccione</option>
+                                            <option value="Y">SI</option>
+                                            <option value="N">NO</option>
                                         </select>
                                     </div>
                             </div>
@@ -124,7 +143,7 @@
                         </select>
                     </div>
                     <div class="col-md-1 col-sm-1">
-                        <button type="button" class="btn btn-success btn-sm"><a type="button" style="color: white;">+</a></button>
+                      <!--   <button type="button" class="btn btn-success btn-sm"><a type="button" style="color: white;">+</a></button> -->
                     </div>
             </div>
             <div class="form-group row" style="visibility: hidden; display:none;">
@@ -235,7 +254,7 @@
                                     </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Precio Unitario</b></label>
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Precio Unitario (Monto Neto)</b></label>
                                     <div class="col-md-8 col-sm-8">
                                         <input type="text" id="punitario" name="punitario"  class="form-control">
                                     </div>
@@ -364,7 +383,7 @@
                                                 <i class="fa fa-edit"></i>
                                             </button>
 
-                                             <div class="modal fade bs-example-modal-lg3" id="verDetalleEditar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal fade bs-example-modal-lg3" id="verDetalleEditar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                                     <div class="modal-dialog modal-lg" role="document">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
@@ -383,7 +402,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                            </div>
 
                                         {{/if}}
 
@@ -575,6 +594,42 @@
 
 <script>
 
+    function CargarInformacionFolio()
+    {
+        let folioNum = $("#folioNum").val();
+        let informacion = { folioNum };
+
+        $.ajax({
+                    async: false,
+                    type : 'POST', 
+                    url	 : "/solicitudes/buscarFolio", 
+                    data : informacion,
+                    success : function (resultado) 
+                        { 
+                           if (typeof resultado === 'object' && resultado !== null)
+                           {
+                             $("#emisor").val(resultado.id_proveedor);
+                             $("#id_tipo_proveedor").val(resultado.id_tipo);
+                             cargaTipoProveedor(resultado.id_tipo);
+                             $("#razonsocialpro").val(resultado.id_razonsocialpro);
+
+                             $("#id_solicitante").val(resultado.id_solicitante);
+                             $("#id_recepcionador").val(resultado.id_recepcionador);
+                             $("#numdias").val(resultado.numdiapago);
+
+                             $("#id_director").val(resultado.id_director);
+                             $("#id_centro_costo").val(resultado.id_centro_costo);
+                             
+                             $("#id_proyecto").val(resultado.id_proyecto);
+                             $("#id_etapa").val(resultado.id_etapa);
+                             $("#incluyeIVA").val(resultado.conIVA);
+
+                             
+                           }
+                        } 
+                });
+
+    }
     function EditarOC (id)
     {
 
@@ -675,7 +730,7 @@
                 break;
                 case 2:
                 case "2":
-                    $("#rnombrepro").html("<b>Razon Social</b>");
+                    $("#rnombrepro").html("<b>Nombre/ Razon Social</b>");
                     $("#razonsocialProv").css("visibility", "visible");
                     $("#razonsocialProv").show();
                 break;
@@ -843,6 +898,7 @@
         let id_recepcionador   = $("#id_recepcionador").val();
         let numdias             = $("#numdias").val();
         let razonsocialpro      = $("#razonsocialpro").val();
+        let conIVA              = $("#incluyeIVA").val();
         //__________________________________________________
 
          let filas = $("#tableRequerimiento").find('tbody tr').length;
@@ -854,6 +910,11 @@
              return false;
         }
 
+        if (id_centro_costo == "")
+        {
+            alert("Ingresar Centro Costo.");
+             return false;
+        }
 
         // 1 y 2 proveedores interno o externo 
         if (id_tipo_proveedor == 1 || id_tipo_proveedor == 2)
@@ -897,7 +958,8 @@
             id_centro_costo,
             razonsocialpro : razonsocialpro,
             id_proyecto : id_proyecto,
-            id_etapa : id_etapa
+            id_etapa : id_etapa,
+            conIVA
         };
 
          $("#ingresoOC").submit();

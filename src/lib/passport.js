@@ -48,7 +48,8 @@ passport.deserializeUser(async (id, done) => {
                                   ' AND ' +
                                           ' t3.idModulo = t1.idModulo' + 
                                   ' AND ' +
-                                          ' t3.idUsuario = ?',[id]);
+                                          ' t3.idUsuario = ? ' +
+                                  ' ORDER BY t2.indice ASC, t1.indice ASC ' ,[id]);
 
   const modulosHTML = {};
   modulos.forEach(function(elemento, indice, array) {

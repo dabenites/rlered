@@ -2,6 +2,8 @@
 const PDFDocument = require("pdfkit-table"); 
 const path    = require('path');
 
+const fs = require('fs');
+
 
 function  buildPDF(dataCallback, endCallback, oc, requerimientos) {
   const doc = new PDFDocument({ bufferPages: true, font: 'Times-Roman' });
@@ -31,7 +33,7 @@ function  buildPDF(dataCallback, endCallback, oc, requerimientos) {
   doc.fontSize(tletra).text("Centro de Costo"  , 50, 120); doc.fontSize(tletra).text(":"  , puntoPrimer, 120); doc.fontSize(tletra).text(oc.centroCosto  , puntoPrimer + 10, 120);
 
   doc.fontSize(tletra).text("N°"               , 400, 100); doc.fontSize(tletra).text(":"  , puntoSegundo, 100); doc.fontSize(tletra).text(oc.folio  , puntoSegundo + 10, 100);
-  doc.fontSize(tletra).text("Forma de Pago"    , 400, 110); doc.fontSize(tletra).text(":"  , puntoSegundo, 110); doc.fontSize(tletra).text(oc.numdiapago + " días"  , puntoSegundo + 10, 110);
+  doc.fontSize(tletra).text("Forma de Pago"    , 400, 120); doc.fontSize(tletra).text(":"  , puntoSegundo, 120); doc.fontSize(tletra).text(oc.numdiapago + " días"  , puntoSegundo + 10, 120);
   
   // Segundo bloque
   doc.fontSize(tletra).text("Nombre"            , 50, 140); doc.fontSize(tletra).text(":"  , puntoPrimer, 140); doc.fontSize(tletra).text(oc.nomPro  , puntoPrimer + 10, 140); 
@@ -75,23 +77,25 @@ function  buildPDF(dataCallback, endCallback, oc, requerimientos) {
   
 
   
+if (fs.existsSync(__dirname+"/"+""+oc.id_solicitante+".png")) 
+{
   doc.image(__dirname+"/"+""+oc.id_solicitante+".png", 10,610, {scale: 0.3});
 
   doc.polygon([100, 685], [240, 685]);
   doc.stroke();
   doc.fontSize(tletra).text("Solicitante"  , 140, 692);
   doc.fontSize(tletra).text(oc.nomSolicitante , 130, 702);
-
-
+}
+  
+if (fs.existsSync(__dirname+"/"+"114.png"))
+{
   doc.image(__dirname+"/"+"114.png", 300,610, {scale: 0.3});
   doc.polygon([380, 685], [520, 685]);
   doc.stroke();
   doc.fontSize(tletra).text("Aprobador"  , 420, 692);
   doc.fontSize(tletra).text("Claudio Gahona", 410, 702);
-
-
-
-    
+}
+   
   // Bloque dinamico con la informacion de la tabla 
   //let oTable = ["1.68", "1", "Informe Modelación", "$31,579.53", "$53.054"];
   let oTable = [];
@@ -155,25 +159,45 @@ doc.table( table, {
   let valor_y = doc.y;
   let valorIVA;
   let valorTotal;
+
+  //console.log(oc);
+
  if (esUF)
  {
-   valorIVA = Math.round(Number(precio.toString().replace('.','')) * 1.19 - Number(precio.toString().replace('.','')));
+   if (oc.conIVA == "Y")
+   {
+    valorIVA = Math.round(Number(precio.toString().replace('.','')) * 1.19 - Number(precio.toString().replace('.','')));
    
-   valorTotal = Number(precio.toString().replace('.',''))  + valorIVA;
-
-    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio.toString().replace('.','')) ,465,valor_y ); 
-    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorIVA) ,465,valor_y  + 10 ); 
-    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorTotal) ,465,valor_y  + 20 );
+    valorTotal = Number(precio.toString().replace('.',''))  + valorIVA;
+ 
+     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio.toString().replace('.','')) ,465,valor_y ); 
+     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorIVA) ,465,valor_y  + 10 ); 
+     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorTotal) ,465,valor_y  + 20 );
+   }
+   else
+   {
+    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio.toString().replace('.','')) ,465,valor_y );
+    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio.toString().replace('.','')) ,465,valor_y  + 10 ); 
+   }
  }
  else
  {
+  if (oc.conIVA == "Y")
+  {
+    valorIVA = precio * 1.19 - precio;
+    valorTotal = precio + valorIVA;
+ 
+     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y ); 
+     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorIVA) ,465,valor_y  + 10 ); 
+     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorTotal) ,465,valor_y  + 20 );
+  }
+  else
+  {
+     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y ); 
+     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y  + 10 ); 
+  }
    
-   valorIVA = precio * 1.19 - precio;
-   valorTotal = precio + valorIVA;
-
-    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y ); 
-    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorIVA) ,465,valor_y  + 10 ); 
-    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorTotal) ,465,valor_y  + 20 );
+   
  }
 
   
@@ -184,9 +208,19 @@ doc.table( table, {
     doc.fontSize(tletra - 1 ).text( simbolo + tipoCambio ,210,valor_y  + 10 ); 
     doc.font('Times-Bold').fontSize(tletra - 1 ).text("Tipo de Cambio :"       ,0,valor_y + 10 , {width: 200,align:'right'});
   }
-  doc.font('Times-Bold').fontSize(tletra - 1 ).text("NETO :"       ,0,valor_y , {width: 455,align:'right'});
-  doc.font('Times-Bold').fontSize(tletra - 1 ).text("19% I.V.A. :" ,0,valor_y + 10 , {width: 455,align:'right'});
-  doc.font('Times-Bold').fontSize(tletra - 1 ).text("TOTAL :"      ,0,valor_y + 20 , {width: 455,align:'right'});
+
+  if (oc.conIVA == "Y")
+  {
+    doc.font('Times-Bold').fontSize(tletra - 1 ).text("NETO :"       ,0,valor_y , {width: 455,align:'right'});
+    doc.font('Times-Bold').fontSize(tletra - 1 ).text("19% I.V.A. :" ,0,valor_y + 10 , {width: 455,align:'right'});
+    doc.font('Times-Bold').fontSize(tletra - 1 ).text("TOTAL :"      ,0,valor_y + 20 , {width: 455,align:'right'});
+  }
+  else
+  {
+    doc.font('Times-Bold').fontSize(tletra - 1 ).text("NETO :"       ,0,valor_y , {width: 455,align:'right'});
+    doc.font('Times-Bold').fontSize(tletra - 1 ).text("TOTAL :" ,0,valor_y + 10 , {width: 455,align:'right'});
+  }
+  
 
 
   doc.end();

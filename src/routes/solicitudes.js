@@ -1917,8 +1917,17 @@ router.post('/uhorasextras', isLoggedIn, async (req,res) => {
         solicitante : infoAsignada[0].Nombre
       };
 
+      const mailMarianella = {
+        to : "personal@renelagos.com",
+        comentario : comentario,
+        estado : "Aprobado",
+        proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
+        solicitante : infoAsignada[0].Nombre
+      };
 
+      
       mensajeria.EnvioMailHorasRespuesta(mailAprobado);
+      mensajeria.EnvioMailHorasRespuesta(mailMarianella);
       mensajeria.EnvioMailHorasRespuestaAsignado(mailAprobadoAsignada);
       
       break;
@@ -2231,8 +2240,13 @@ router.post('/editarOC', isLoggedIn, async (req, res) => {
                                           ' WHERE t1.id_solicitud = ?  AND t1.id_moneda = t2.id_moneda',[id]); 
 
 
+  let opcionesIVA = [];
+  opcionesIVA.push({id:"Y",descripcion:"SI"});
+  opcionesIVA.push({id:"N",descripcion:"NO"});
 
-    res.render('solicitudes/editarOC', {oc:oc[0],requerimientos, opciones, tipo, solicitantes, directores, recepcionador,centroCostos,proyectos, empresas,etapas,monedas, req , layout: 'blanco', helpers : {
+  console.log(oc[0]);
+
+    res.render('solicitudes/editarOC', {oc:oc[0],requerimientos, opciones,opcionesIVA, tipo, solicitantes, directores, recepcionador,centroCostos,proyectos, empresas,etapas,monedas, req , layout: 'blanco', helpers : {
         if_equal : isEqualHelperHandlerbar
     }});
 
@@ -2532,7 +2546,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
 
   try {
     
-    const {id_tipo_proveedor,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias} = req.body
+    const {incluyeIVA,id_tipo_proveedor,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias} = req.body
     let oc = {};
 
    // console.log(req.body);
@@ -2604,6 +2618,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
         fecha : new Date(),
         id_recepcionador : id_recepcionador,
         id_estado : 1,
+        conIVA:incluyeIVA,
         numdiapago: numdias,
         folio : numFormateado+'-'+annio,
         aprobacionSolicitante : aprobacionSolicitante
@@ -2625,13 +2640,14 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
         fecha : new Date(),
         id_recepcionador : id_recepcionador,
         id_estado : 1,
+        conIVA:incluyeIVA,
         numdiapago: numdias,
         folio : numFormateado+'-'+annio,
         aprobacionSolicitante : aprobacionSolicitante
       };
     }
 
-  //console.log(oc);
+ console.log(oc);
 
   const ingresoOC = await pool.query('INSERT INTO orden_compra  set ? ', [oc]);
 
@@ -2986,6 +3002,7 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
                               " t1c.Telefono as telRecepcionador ," + 
                               "t1a.rut as rutEmpresa,"+
                               "t1d.year,"+
+                              "t1.conIVA,"+
                               "t1d.code," +
                               "t1d.nombre as nomProyecto," +
                               "t1a.razonsocial as razonSocialEmpresa," +
@@ -3028,7 +3045,7 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
   
   const stream = res.writeHead(200, {
     'Content-Type': 'application/pdf',
-    'Content-Disposition': `attachment;filename=`+oc[0].folio+`.pdf`,
+    'Content-Disposition': `attachment;filename=ORDEN DE COMPRA Nº `+oc[0].folio+" " + oc[0].nomPro+`.pdf`,
   });
 
   pdfService.buildPDF(
@@ -3057,7 +3074,7 @@ router.post('/terminoOC',isLoggedIn, async (req,res) => {
 //editarOCIngresada
 router.post('/editarOCIngresada',isLoggedIn, async (req,res) => {
 
-  const {emisor,  tipo_proveedor,  contacto,  solicitante,  recepcionador,  numpago,  director,  centrocosto,  proyecto,  etapa, id} = req.body;
+  const {emisor,  tipo_proveedor,  contacto,  solicitante,  recepcionador,  numpago,  director,  centrocosto,  proyecto,  etapa, id,incluyeIVA} = req.body;
   
   const result = await pool.query("UPDATE orden_compra "+
                                   " set  id_tipo = ? , " +
@@ -3069,12 +3086,26 @@ router.post('/editarOCIngresada',isLoggedIn, async (req,res) => {
                                   " id_centro_costo = ?, " +
                                   " id_proyecto = ?, " +
                                   " id_etapa = ?, " + 
-                                  " numdiapago = ? " +
-                                   " WHERE id = ? ", [tipo_proveedor,emisor,contacto,solicitante,director,recepcionador,centrocosto,proyecto,etapa,numpago,id]);
+                                  " numdiapago = ?, " +
+                                  " conIVA = ? " +
+                                   " WHERE id = ? ", [tipo_proveedor,emisor,contacto,solicitante,director,recepcionador,centrocosto,proyecto,etapa,numpago,incluyeIVA,id]);
 
   res.sendStatus(200);
 
 });
+
+
+router.post('/buscarFolio',isLoggedIn, async (req,res) => {
+
+  const {folioNum } = req.body;
+  
+  const oc = await pool.query(" SELECT * from orden_compra as t1 WHERE t1.folio = ? ",[folioNum] );   
+
+  res.send(oc[0]);
+
+});
+
+
 
 
 module.exports = router;

@@ -2546,7 +2546,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
 
   try {
     
-    const {incluyeIVA,id_tipo_proveedor,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias} = req.body
+    const {incluyeIVA,id_tipo_proveedor,observaciones,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias} = req.body
     let oc = {};
 
    // console.log(req.body);
@@ -2621,7 +2621,8 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
         conIVA:incluyeIVA,
         numdiapago: numdias,
         folio : numFormateado+'-'+annio,
-        aprobacionSolicitante : aprobacionSolicitante
+        aprobacionSolicitante : aprobacionSolicitante,
+        observaciones: observaciones
       };
     }
     else
@@ -2643,11 +2644,12 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
         conIVA:incluyeIVA,
         numdiapago: numdias,
         folio : numFormateado+'-'+annio,
-        aprobacionSolicitante : aprobacionSolicitante
+        aprobacionSolicitante : aprobacionSolicitante,
+        observaciones: observaciones
       };
     }
 
- console.log(oc);
+ //console.log(oc);
 
   const ingresoOC = await pool.query('INSERT INTO orden_compra  set ? ', [oc]);
 
@@ -3074,7 +3076,8 @@ router.post('/terminoOC',isLoggedIn, async (req,res) => {
 //editarOCIngresada
 router.post('/editarOCIngresada',isLoggedIn, async (req,res) => {
 
-  const {emisor,  tipo_proveedor,  contacto,  solicitante,  recepcionador,  numpago,  director,  centrocosto,  proyecto,  etapa, id,incluyeIVA} = req.body;
+  const {emisor, observaciones, tipo_proveedor,  contacto,  solicitante,  recepcionador,  numpago,  director,  centrocosto,  proyecto,  etapa, id,incluyeIVA} = req.body;
+  
   
   const result = await pool.query("UPDATE orden_compra "+
                                   " set  id_tipo = ? , " +
@@ -3087,8 +3090,9 @@ router.post('/editarOCIngresada',isLoggedIn, async (req,res) => {
                                   " id_proyecto = ?, " +
                                   " id_etapa = ?, " + 
                                   " numdiapago = ?, " +
-                                  " conIVA = ? " +
-                                   " WHERE id = ? ", [tipo_proveedor,emisor,contacto,solicitante,director,recepcionador,centrocosto,proyecto,etapa,numpago,incluyeIVA,id]);
+                                  " conIVA = ?, " +
+                                  " observaciones = ? " +
+                                   " WHERE id = ? ", [tipo_proveedor,emisor,contacto,solicitante,director,recepcionador,centrocosto,proyecto,etapa,numpago,incluyeIVA,observaciones,id]);
 
   res.sendStatus(200);
 

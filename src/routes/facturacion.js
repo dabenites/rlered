@@ -394,9 +394,25 @@ router.post('/editarFacturaTemplate', isLoggedIn, async (req, res) => {
 
     try {
 
-        const { id} = req.body;
+        const { id } = req.body;
 
-        res.render('facturacion/editarFactura', { layout: 'blanco'});
+        const estados =  await pool.query("SELECT * FROM fact_estados as t1");
+        const empresas =  await pool.query("SELECT * FROM sys_empresa as t1");
+        const facturas =  await pool.query("SELECT * FROM fact_facturas as t1 WHERE t1.id = ?",[id]);
+
+        const isEqualHelperHandlerbar = function(a, b, opts) {
+            // console.log(a + "----" + b);
+             if (a == b) {
+                 return true
+             } else { 
+                 return false
+             } 
+         };
+
+
+        res.render('facturacion/editarFactura', { estados, empresas, factura:facturas[0], layout: 'blanco', helpers : {
+                    if_equal : isEqualHelperHandlerbar
+                }});
 
     } catch (error) {
         
@@ -412,5 +428,63 @@ router.post('/editarFacturaTemplate', isLoggedIn, async (req, res) => {
 });
 
 
+router.post('/editarFactura', isLoggedIn, async (req, res) => {
+
+    try {
+
+        const {id_factura,id_estado,id_estado_actual,id_empresa,fechaEmision,numFactura,valoruf,fechaPago,comentarioParaCobro,comentarioEnCobranza,id} = req.body;
+        var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
+
+        const tracking  ={ //Se gurdaran en un nuevo objeto
+            id_factura:id_factura,
+            id_usuario:req.user.idUsuario,
+            fecha_cambio:fecha_ingreso,
+            estado_inicial:id_estado_actual,
+            estado_final:id_estado,
+            empresa:id_empresa,
+            fecha_emision:fechaEmision,
+            num_factura:numFactura,
+            valor_uf:valoruf,
+            fecha_pago_factura : fechaPago,
+            comentario:comentarioParaCobro,
+            comentario_2:comentarioEnCobranza
+        };
+        //    
+        //console.log(req.body);
+        const result = await pool.query('INSERT INTO fact_facturas_tracking set ? ', [tracking]); // pasar a informacion 
+
+       // console.log(req.body );
+       
+       const result1 = await pool.query("UPDATE " +
+            " fact_facturas " +
+            " set id_estado = ? , " +
+            " id_empresa = ? , " + 
+            " num_factura = ? , " +
+            " uf_dia = ? , " +
+            " motivo_rechazo = ? , " +
+            " comentario_2 = ?,  " +
+            " fecha_factura = ?,  " +
+            " fecha_pago = ?  " +
+            " WHERE id = ? ",[id_estado,id_empresa,numFactura,valoruf,comentarioParaCobro,comentarioEnCobranza,fechaEmision,fechaPago,id]);
+       
+
+        res.sendStatus(200);
+       
+
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : facturacion.js \n Error en el directorio: /editarFactura \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+
+    }
+});
+
+
+//editarFactura
 //editarFacturaTemplate
 module.exports = router;

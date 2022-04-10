@@ -4,7 +4,11 @@
             <select class="select2_single form-control" tabindex="1" name="id_estado" id="id_estado">
                 <option value="">Seleccione</option>
                 {{#each estados}}
-                <option value="{{id}}">{{razonsocial}}</option>
+                    {{#if (if_equal id ../factura.id_estado) }}
+                        <option value="{{id}}" selected>{{descripcion}}</option>
+                    {{else}}
+                        <option value="{{id}}">{{descripcion}}</option>
+                    {{/if}}
                 {{/each}}
         </select>
     </div>
@@ -14,8 +18,12 @@
         <div class="col-md-6 col-sm-6">
             <select class="select2_single form-control" tabindex="2" name="id_empresa" id="id_empresa">
                 <option value="">Seleccione</option>
-                {{#each estados}}
-                <option value="{{id}}">{{razonsocial}}</option>
+                {{#each empresas}}
+                    {{#if (if_equal id ../factura.id_empresa) }}
+                        <option value="{{id}}" selected>{{razonsocial}}</option>
+                    {{else}}
+                        <option value="{{id}}">{{razonsocial}}</option>
+                    {{/if}}
                 {{/each}}
         </select>
     </div>
@@ -23,43 +31,81 @@
 <div class="form-group row">
     <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Nº Factura:</b></label>
         <div class="col-md-6 col-sm-6">
-             <input type="text" id="numFactura" name="numFactura"  class="form-control">
+             <input type="text" id="numFactura" name="numFactura"  class="form-control" value="{{factura.num_factura}}">
+             <input type="hidden" id="id_factura" name="id_factura" value="{{factura.id}}">
+             <input type="hidden" id="id_estado_actual" name="id_estado_actual" value="{{factura.id_estado}}">
+             <input type="hidden" id="id" name="id" value="{{factura.id}}">
         </div>
 </div>
 <div class="form-group row">
     <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Fecha Emision Factura:</b></label>
         <div class="col-md-6 col-sm-6">
-             <input type="date" id="fechaEmision" name="fechaEmision"  class="form-control">
+             <input type="date" id="fechaEmision" name="fechaEmision"  class="form-control" value="{{factura.fecha_factura}}">
         </div>
 </div>
 <div class="form-group row">
     <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Valor UF:</b></label>
         <div class="col-md-6 col-sm-6">
-             <input type="text" id="valoruf" name="valoruf"  class="form-control">
+             <input type="text" id="valoruf" name="valoruf"  class="form-control" value="{{factura.uf_dia}}">
         </div>
 </div>
 <div class="form-group row">
     <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Comentario Para Cobro:</b></label>
         <div class="col-md-6 col-sm-6">
-              <textarea class="form-control" id="comentarioParaCobro" name="comentarioParaCobro"></textarea>
+              <textarea class="form-control" id="comentarioParaCobro" name="comentarioParaCobro">{{factura.motivo_rechazo}}</textarea>
         </div>
 </div>
 <div class="form-group row">
     <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Fecha pago Factura:</b></label>
         <div class="col-md-6 col-sm-6">
-             <input type="date" id="fechaPago" name="fechaPago"  class="form-control">
+             <input type="date" id="fechaPago" name="fechaPago"  class="form-control" value="{{factura.fecha_pago}}">
         </div>
 </div>
 <div class="form-group row">
     <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Comentario En Cobranza:</b></label>
         <div class="col-md-6 col-sm-6">
-              <textarea class="form-control" id="comentarioEnCobranza" name="comentarioEnCobranza"></textarea>
+              <textarea class="form-control" id="comentarioEnCobranza" name="comentarioEnCobranza">{{factura.comentario_2}}</textarea>
         </div>
 </div>
 <div class="form-group row">
     <div class="col-sm-4">
     </div>
      <div class="col-sm-5">
-        <button type="button" class="btn btn-success">Actualizar</button>
+        <button type="button" class="btn btn-success" onclick="ActualizarFactura();">Actualizar</button>
    </div>
 </div>
+
+<script>
+    function ActualizarFactura ()
+    {
+        let id_estado            = $("#id_estado").val();
+        let id_empresa           = $("#id_empresa").val();
+        let numFactura           = $("#numFactura").val();
+        let fechaEmision         = $("#fechaEmision").val();
+        let valoruf              = $("#valoruf").val();
+        let comentarioParaCobro  = $("#comentarioParaCobro").val();
+        let fechaPago            = $("#fechaPago").val();
+        let comentarioEnCobranza = $("#comentarioEnCobranza").val();
+        let id_factura           = $("#id_factura").val(); 
+        let id_estado_actual     = $("#id_estado_actual").val();
+        let id                   = $("#id").val();
+        
+        
+
+       let informacion = {
+                            id, id_estado,id_empresa,numFactura,fechaEmision,valoruf,comentarioParaCobro,fechaPago,comentarioEnCobranza,id_factura,id_estado_actual
+                         };
+
+        $.ajax({
+                        type: 'post',
+                        url: '/facturacion/editarFactura',
+                        data: informacion,
+                        dataType: 'text'
+                        })
+                        .done(function (data) {
+                            $(location).attr('href','/facturacion/facturas/edit/'+id);
+                        });
+                        
+
+    }
+</script>

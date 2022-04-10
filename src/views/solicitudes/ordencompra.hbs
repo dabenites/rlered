@@ -181,6 +181,12 @@
                         <input type="number" id="numdias" name="numdias"  class="form-control">
                     </div>
             </div>
+            <div class="form-group row" >
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Observaciones:</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <textarea id="observaciones" name="observaciones"  class="form-control"></textarea>
+                    </div>
+            </div>
             <div class="form-group row">
                 <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Director:</b></label>
                     <div class="col-md-6 col-sm-6">
@@ -665,9 +671,9 @@
 
     function TerminarOC()
     {
-        let id_finanza        = $("#id_finanza").val();
-        let comentario_finanza     = $("#comentario_finanza").val();
-        let num_documento  = $("#num_documento").val();
+        let id_finanza          = $("#id_finanza").val();
+        let comentario_finanza  = $("#comentario_finanza").val();
+        let num_documento       = $("#num_documento").val();
 
 
         let informacion = {
@@ -899,6 +905,7 @@
         let numdias             = $("#numdias").val();
         let razonsocialpro      = $("#razonsocialpro").val();
         let conIVA              = $("#incluyeIVA").val();
+        let observaciones       = $("#observaciones").val();
         //__________________________________________________
 
          let filas = $("#tableRequerimiento").find('tbody tr').length;
@@ -959,7 +966,8 @@
             razonsocialpro : razonsocialpro,
             id_proyecto : id_proyecto,
             id_etapa : id_etapa,
-            conIVA
+            conIVA,
+            observaciones
         };
 
          $("#ingresoOC").submit();

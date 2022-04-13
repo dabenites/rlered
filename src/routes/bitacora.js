@@ -100,6 +100,9 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
     try {
         const { tipoP, fechaI,horaI,fechaT,horaT,esmoficacaciones,idProyecto,idEtapaProyecto,idTarea,descripcion,actividad,tipoIngreso} = req.body;  
 
+        let HORA_INICIAL = "08:30";
+        let HORA_FINAL   = "17:45";
+
         var divFechaI = fechaI.split("/", 3);
         var divFechaT = fechaT.split("/", 3);
      
@@ -130,8 +133,10 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
      
             if (start.toString() != fechaX.toString())
             {
-                 hi = "08:00";
-                 analisisHoraI = "08:00";
+                 //hi = "08:00";
+                 hi = HORA_INICIAL;
+                 //analisisHoraI = "08:00";
+                 analisisHoraI = HORA_INICIAL;
             }
             else
             {
@@ -140,8 +145,10 @@ router.post('/cargarHoras', isLoggedIn, async (req, res) => {
             }
             if (end.toString() != fechaX.toString())
             {
-                 hT = "18:30";
-                 analisisHoraFI = "18:30";
+                 //hT = "18:30";
+                 hT = HORA_FINAL;
+                 //analisisHoraFI = "18:30";
+                 analisisHoraFI = HORA_FINAL;
             }
             else
             {

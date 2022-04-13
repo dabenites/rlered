@@ -580,6 +580,10 @@ if (proyectos[0].id_tipo_servicio == 2)
   tipoCobro =  await pool.query("SELECT * FROM fact_tipo_cobro as t1 where t1.revision = 'Y'");
 
 }
+else if (proyectos[0].id_tipo_servicio == 3)
+{
+  tipoCobro =  await pool.query("SELECT * FROM fact_tipo_cobro as t1 where t1.coordinacion = 'Y'");
+}
 else
 {
   tipoCobro =  await pool.query("SELECT * FROM fact_tipo_cobro as t1 where t1.proyecto = 'Y'");
@@ -1062,6 +1066,39 @@ router.get('/buscarRevisor/:find',isLoggedIn, async (req, res) => {
 
 });
 
+router.get('/buscarJefeCoor/:find',isLoggedIn, async (req, res) => {
+  
+
+  try {
+
+    // BUSCAR DIRECTOR  
+    const nombre = req.query.term;
+    const jefes =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 " +
+                                    " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
+                                    " AND t1.id_estado = 1"+
+                                    " AND t1.idCategoria IN (41,44)");
+
+    res.setHeader('Content-Type', 'application/json');
+    res.json(jefes);
+
+    
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /buscarJefeCoor/:find \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+  
+
+});
+
+//buscarJefeCoor
+
 //cargarFactura
 router.post('/cargarFactura',isLoggedIn,  async (req, res) => {
 
@@ -1261,29 +1298,47 @@ router.post('/cargarProyecto',isLoggedIn,  async (req, res) => {
      const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.year = ? and t1.code = ? ",[year,code])
      
      const mail = {
+       nombre : infoProyecto[0].nombre,
        codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
        to : "documentos@renelagos.com",
        ingresado : infoIngresa[0].Nombre
      };
   
      const mailTI = {
+      nombre : infoProyecto[0].nombre,
       codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
       to : "computacion@renelagos.com",
       ingresado : infoIngresa[0].Nombre
-    };
-  
-    
+    };  
   
     const mailIngreso = {
+      nombre : infoProyecto[0].nombre,
       codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
       to : infoIngresa[0].Email
     };
+   
+  if (infoProyecto[0].id_jefe != 0)  
+  {
+    // Preguntar las personas que tiene a cargo este jefe de proyecto.
+    // sys_usuario_equipo
+    let equipoJefe = await pool.query('SELECT * FROM sys_usuario_equipo as t1 where t1.id_lider_equipo = ? ', [infoProyecto[0].id_jefe]);
+
+      equipoJefe.forEach( async(element)=>{
+
+      let equipoProyecto = {
+        id_usuario : element.id_colaborador,
+        id_proyecto : infoProyecto[0].id
+      }
+      
+      let registroProyecto = await pool.query('INSERT INTO pro_equipo set ?', [equipoProyecto]);
+
+    });
+    
+  }
   
-  
-  
-     mensajeria.EnvioMailCreacionProyectoDocumentos(mail);
-     mensajeria.EnvioMailCreacionProyectoTI(mailTI);
-     mensajeria.EnvioMailCreacion(mailIngreso);
+  mensajeria.EnvioMailCreacionProyectoDocumentos(mail);
+  mensajeria.EnvioMailCreacionProyectoTI(mailTI);
+  mensajeria.EnvioMailCreacion(mailIngreso);
   
    res.redirect(   url.format({
       pathname:"../proyecto/listado",
@@ -1291,6 +1346,7 @@ router.post('/cargarProyecto',isLoggedIn,  async (req, res) => {
          "a": 1
        }
     }));
+
   } catch (error) {
     mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /cargarProyecto \n" + error + "\n Generado por : " + req.user.login);
     res.redirect(   url.format({
@@ -1909,7 +1965,7 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
         if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
         if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
         if (num_pisos == 0 || num_pisos == ""){verificacion.NumPisos = num_pisos;}
-        if (num_subterraneo == 0 || num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+        if (num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
 
         if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
         if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
@@ -1924,7 +1980,7 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
           if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
           if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
           if (num_pisos == 0 || num_pisos == ""){verificacion.NumPisos = num_pisos;}
-          if (num_subterraneo == 0 || num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+          if (num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
   
           if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
           if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
@@ -1943,7 +1999,7 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
           if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
           if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
           if (num_pisos == 0 || num_pisos == ""){verificacion.NumPisos = num_pisos;}
-          if (num_subterraneo == 0 || num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+          if (num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
   
           if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
           if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
@@ -1962,6 +2018,87 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
         break;
       }
     break;
+
+    case 3:
+      switch(tipo_cobro)
+      {
+        case 1:
+          case "1":
+          case 2:
+          case "2":        
+          if (id_tipo_proyecto == 0 || id_tipo_proyecto == ""){verificacion.TipoProyecto = id_tipo_proyecto;}
+          if (id_estado == 0 || id_estado == ""){verificacion.Estado = id_estado;}
+          if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
+          //if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
+          //if (num_pisos == ""){verificacion.NumPisos = num_pisos;}
+          //if (num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+  
+          if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
+          if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
+          if (valor_proyecto == 0 || valor_proyecto == ""){verificacion.ValorProyecto = valor_proyecto;}
+          if (fecha_inicio == 0 || fecha_inicio == ""){verificacion.FechaInicio = fecha_inicio;}
+  
+          if (id_director == 0 || id_director == ""){verificacion.Director = id_director;}
+          if (id_jefe == 0 || id_jefe == ""){verificacion.Jefe = id_jefe;}
+          if (id_cliente == 0 || id_cliente == ""){verificacion.Cliente = id_cliente;}
+          if (id_arquitecto == 0 || id_arquitecto == ""){verificacion.Arquitecto = id_arquitecto;}
+          break;
+          case 3:
+          case "3":
+          case 4:
+          case "4":   
+          case 5:
+          case "5":
+          case 6:
+          case "6":
+            //console.log(infoProyecto);
+            if (id_tipo_proyecto == 0 || id_tipo_proyecto == ""){verificacion.TipoProyecto = id_tipo_proyecto;}
+            if (id_estado == 0 || id_estado == ""){verificacion.Estado = id_estado;}
+            if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
+            //if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
+            //if (num_pisos == 0 || num_pisos == ""){verificacion.NumPisos = num_pisos;}
+            //if (num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+    
+            if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
+            if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
+            if (valor_proyecto == 0 || valor_proyecto == ""){verificacion.ValorProyecto = valor_proyecto;}
+            if (fecha_inicio == 0 || fecha_inicio == ""){verificacion.FechaInicio = fecha_inicio;}
+    
+            if (id_director == 0 || id_director == ""){verificacion.Director = id_director;}
+            if (id_jefe == 0 || id_jefe == ""){verificacion.Jefe = id_jefe;}
+            if (id_cliente == 0 || id_cliente == ""){verificacion.Cliente = id_cliente;}
+            if (id_arquitecto == 0 || id_arquitecto == ""){verificacion.Arquitecto = id_arquitecto;}
+  
+            //if (id_revisor == 0 || id_revisor == ""){verificacion.Revisor = id_revisor;}
+            if (fecha_entrega == 0 || fecha_entrega == ""){verificacion.FechaAPC = fecha_entrega;}
+            if (fecha_termino == 0 || fecha_termino == ""){verificacion.FechaAPL = fecha_termino;}
+            if (superficie_apl == 0 || superficie_apl == ""){verificacion.SuperficieAPL = superficie_apl;}
+            //if (zona == 0 || zona == ""){verificacion.Zona = zona;}
+            //if (suelo == 0 || suelo == ""){verificacion.Suelo = suelo;}
+            //if (categoria == 0 || categoria == ""){verificacion.Categoria = categoria;}
+            //if (num_plano_estimado == 0 || num_plano_estimado == ""){verificacion.PlanoEstimado = num_plano_estimado;}
+  
+          break;   
+         case 7:
+         case "7":
+          if (id_pais == 0 || id_pais == ""){verificacion.Pais = id_pais;}
+          if (nombre == 0 || nombre == ""){verificacion.Nombre = nombre;}
+         break;
+
+         case 11:
+         case "11":
+         break;
+         case 12:
+         case "12":
+         break;
+         case 13:
+         case "13":
+         break;
+         case 14:
+         case "14":
+         break;
+      }
+    break;
     default:
       // tipo_cobro
       switch(tipo_cobro)
@@ -1975,7 +2112,7 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
         if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
         if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
         if (num_pisos == 0 || num_pisos == ""){verificacion.NumPisos = num_pisos;}
-        if (num_subterraneo == 0 || num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+        if (num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
 
         if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
         if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
@@ -2001,7 +2138,7 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
           if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
           if (id_complejidad == 0 || id_complejidad == ""){verificacion.Complejidad = id_complejidad;}
           if (num_pisos == 0 || num_pisos == ""){verificacion.NumPisos = num_pisos;}
-          if (num_subterraneo == 0 || num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
+          if (num_subterraneo == ""){verificacion.NumSubte = num_subterraneo;}
   
           if (id_tipo_moneda == 0 || id_tipo_moneda == ""){verificacion.TipoMoneda = id_tipo_moneda;}
           if (valor_metro_cuadrado == 0 || valor_metro_cuadrado == ""){verificacion.ValorMetroCuadrado = valor_metro_cuadrado;}
@@ -2123,7 +2260,7 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
       
 
     // colocar los nombres correctos. 
-    console.log(verificacion);
+    // console.log(verificacion);
       
     datos += "</ul>";
     if (error)

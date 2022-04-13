@@ -631,6 +631,64 @@ router.post('/buscarHoras',isLoggedIn,  async (req, res) => {
     
     });
   
+router.get('/maps',isLoggedIn,  async (req, res) => {
+
+
+        try {
+
+                res.render('reporteria/gmaps', {  req , layout: 'blanco'});
+              
+        } catch (error) {
+                mensajeria.MensajerErrores("\n\n Archivo : reporteria.js \n Error en el directorio: /maps \n" + error + "\n Generado por : " + req.user.login);
+                res.redirect(   url.format({
+                    pathname:'/dashboard',
+                            query: {
+                            "a": 1
+                            }
+                        }));   
+        }
+
+        
+});
+
+router.get('/proyectosMaps',isLoggedIn,  async (req, res) => {
+
+
+        try {
+                // buscar la informacion de los proyectos que tienen latitud y longitud. 
+                //let proyectos = "SELECT * FROM pro_proyectos AS t1 WHERE t1.latitud != '' AND t1.altitud != ''"
+                //let proyectos = await pool.query( "SELECT * FROM pro_proyectos AS t1 WHERE t1.latitud != '' AND t1.altitud != ''");
+                //res.json(eqfeed_callback("ddd"));
+
+                const responseData = eqfeed_callback({
+                        message:"Hello, GFG Learner",
+                      articleData:{
+                          articleName: "How to send JSON response from NodeJS",
+                          category:"NodeJS",
+                          status: "published"
+                      },
+                      endingMessage:"Visit Geeksforgeeks.org for more"
+                    });
+                      
+                    const jsonContent = JSON.stringify(responseData);
+
+                    res.end(jsonContent); 
+              
+        } catch (error) {
+             //   mensajeria.MensajerErrores("\n\n Archivo : reporteria.js \n Error en el directorio: /maps \n" + error + "\n Generado por : " + req.user.login);
+                res.redirect(   url.format({
+                    pathname:'/dashboard',
+                            query: {
+                            "a": 1
+                            }
+                        }));   
+        }
+
+        
+});
+
+//proyectosMaps
+
     /*
 router.post('/exportExcelHoras', isLoggedIn, async function (req, res) {
 

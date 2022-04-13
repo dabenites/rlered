@@ -93,9 +93,26 @@
             } );
 
             }
+            else if (tipo_servicio == 3)
+            {
+                // suprimir algunos datos. 
+                $("#erevisor").hide();
+                $("#ecategoria").hide();
+                $("#esuelo").hide();
+                $("#ezona").hide();
+                $("#eplanos").hide();
+
+                nuevoalias( "#jefe" ).autocomplete({
+                    source: "buscarJefeCoor/find=da",
+                    minLength: 2,
+                    select: function( event, ui ) {
+                        nuevoalias('#id_jefe').val(ui.item.id);
+                    }
+                    });
+            }
             else
             {
-                $("#settings-tab").html("Información APL");
+            $("#settings-tab").html("Información APL");
             $("#eplanos").show();
             $("#erevisor").show();
             $("#esuperficie").show();
@@ -389,7 +406,7 @@
                     <div class="form-group row">
                             <label class="col-form-label col-md-3 col-sm-3 label-align" for="Destinatario">Superficie Preliminar:</label>
                                 <div class="col-md-5 col-sm-5">
-                                    <input type="number" id="superficie_pre_r" name="superficie_pre_r" class="form-control" readonly="">
+                                    <input type="number" id="superficie_pre_r" name="superficie_pre_r" class="form-control" value="{{proyecto.superficie_pre}}" readonly="">
                                 </div>
                                 <label class="col-form-label col-md-2 col-sm-2" for="Destinatario"> m<sup>2</sup></label>
                     </div>
@@ -497,7 +514,7 @@
                         </div>
                         <div class="form-group row">
                              <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario" id="efechaEntregaApl">Fecha Entrega APL:</label>
-                                <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4">
                                     <input type="date" id="fecha_entrega" name="fecha_entrega"  class="form-control" value="{{proyecto.fecha_entrega}}">
                                 </div>
                         </div>
@@ -507,7 +524,7 @@
 				    <input type="number" id="superficie_apl" name="superficie_apl"  class="form-control" value="{{proyecto.superficie_apl}}">
 				</div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row" id="ezona">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Zona</label>
 				<div class="col-md-4 col-sm-4">
 				    <!-- <input type="text" id="zona" name="zona"  class="form-control" value="{{proyecto.zona}}"> -->
@@ -523,7 +540,7 @@
 					</select>
 				</div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row" id="esuelo">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Suelo</label>
 				<div class="col-md-4 col-sm-4">
 				    <!-- <input type="text" id="suelo" name="suelo"  class="form-control" value="{{proyecto.suelo}}"> -->
@@ -539,7 +556,7 @@
 					</select>
 				</div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row" id="ecategoria">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Categoria</label>
 				<div class="col-md-4 col-sm-4">
 				    <!-- input type="text" id="categoria" name="categoria"  class="form-control" value="{{proyecto.categoria}}"> -->
@@ -691,9 +708,16 @@ function cargaTab(tab)
         var superficie    = $( "#superficie_pre" ).val();
         var valor_pro    = $( "#valor_proyecto" ).val();
         
-          $( "#superficie_pre_r" ).val($("#superficie_pre" ).val());
+        let tipoServicio    = $( "#id_servicio" ).val();
+
+        $( "#superficie_pre_r" ).val($("#superficie_pre" ).val());
         //console.log("---->" + dato);
-       
+        
+        if (tipoServicio == 3)
+        {
+            $( "#superficie_apl" ).val($("#superficie_pre" ).val());
+        }
+
         if((valor_x_m2 !== null && valor_x_m2 !== '' )
             && (superficie !== null && superficie !== '' )
             && (valor_pro !== null && valor_pro !== '' ))

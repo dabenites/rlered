@@ -471,31 +471,31 @@
 
         <div class="form-group row" id="esuperficie">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Superficie APL</label>
-				<div class="col-md-7 col-sm-7">
+				<div class="col-md-2 col-sm-2">
 				    <input type="number" id="superficie_apl" name="superficie_apl"  class="form-control">
 				</div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row" id="ezona">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Zona</label>
-				<div class="col-md-7 col-sm-7">
+				<div class="col-md-2 col-sm-2">
 				   <!--  <input type="text" id="zona" name="zona"  class="form-control"> -->
                    <select class="select2_single form-control" tabindex="-1" name="zona" id="zona">
 						<option value="0">Ingrese una dirección</option>							
 					</select>
 				</div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row" id="esuelo">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Suelo</label>
-				<div class="col-md-7 col-sm-7">
+				<div class="col-md-2 col-sm-2">
 				    <!-- <input type="text" id="suelo" name="suelo"  class="form-control">-->
                     <select class="select2_single form-control" tabindex="-1" name="suelo" id="suelo">
 						<option value="0">Ingrese una dirección</option>							
 					</select>
 				</div>
         </div>
-        <div class="form-group row">
+        <div class="form-group row" id="ecategoria">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Categoria</label>
-				<div class="col-md-7 col-sm-7">
+				<div class="col-md-2 col-sm-2">
 				    <!--<input type="text" id="categoria" name="categoria"  class="form-control">-->
                     <select class="select2_single form-control" tabindex="-1" name="categoria" id="categoria">
 						<option value="0">Ingrese una dirección</option>							
@@ -504,7 +504,7 @@
         </div>
         <div class="form-group row" id="eplanos">
             <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Destinatario">Nº Planos Estimado</label>
-				<div class="col-md-7 col-sm-7">
+				<div class="col-md-2 col-sm-2">
 				    <input type="number" id="num_planos_estimado" name="num_planos_estimado"  class="form-control">
 				</div>
         </div>
@@ -582,7 +582,14 @@
         var superficie    = $( "#superficie_pre" ).val();
         var valor_pro    = $( "#valor_proyecto" ).val();
 
-         $( "#superficie_pre_r" ).val($("#superficie_pre" ).val());
+        let tipoServicio    = $( "#id_servicio" ).val();
+
+        $( "#superficie_pre_r" ).val($("#superficie_pre" ).val());
+
+        if (tipoServicio == 3)
+        {
+             $( "#superficie_apl" ).val($("#superficie_pre" ).val());
+        }
        
         if((valor_x_m2 !== null && valor_x_m2 !== '' )
             && (superficie !== null && superficie !== '' )
@@ -821,6 +828,12 @@ function cargaServicio(id_servicio)
     {
         if (id_servicio == 2) // coordinación cambiar los labels 
         {
+            
+            $("#ecategoria").show();
+            $("#esuelo").show();
+            $("#ezona").show();
+            $("#eplanos").show();
+
             $("#settings-tab").html("Entrega");
             $("#eplanos").hide();
             $("#erevisor").hide();
@@ -868,7 +881,7 @@ function cargaServicio(id_servicio)
                 }
                 }); 
 
-                 nuevoalias( "#jefe" ).autocomplete({
+                nuevoalias( "#jefe" ).autocomplete({
                 source: "buscarCoordPe/find=da",
                 minLength: 2,
                 select: function( event, ui ) {
@@ -900,8 +913,31 @@ function cargaServicio(id_servicio)
 
             
         }
+        // Cargar Opciones para Manuel para proyectos de coordinacion 
+        else if (id_servicio == 3)
+        {
+            // suprimir algunos datos. 
+            $("#erevisor").hide();
+            $("#ecategoria").hide();
+            $("#esuelo").hide();
+            $("#ezona").hide();
+            $("#eplanos").hide();
+
+            nuevoalias( "#jefe" ).autocomplete({
+                source: "buscarJefeCoor/find=da",
+                minLength: 2,
+                select: function( event, ui ) {
+                    nuevoalias('#id_jefe').val(ui.item.id);
+                }
+                });
+
+        }
         else
         {
+            $("#erevisor").show();
+            $("#ecategoria").show();
+            $("#esuelo").show();
+            $("#ezona").show();
             $("#settings-tab").html("Información APL");
             $("#eplanos").show();
             $("#erevisor").show();

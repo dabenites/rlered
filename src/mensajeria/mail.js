@@ -121,13 +121,19 @@ module.exports.EnvioMailSolicitudVacacionesNotificar =  async function (objeto) 
                       });
         
        
+        var infoDias = "";
+                      objeto.dias.forEach(element => {
+                                               infoDias += " " + element.fecha + ", es medio dia  " + element.medioDia + "\n";
+                                             });
 
          let generico = "Estimado/a:\n" +
                           " \t Se informa que " + objeto.solicitante + " ha solicitado Vacaciones. \n" +
                           " Comentario : " + objeto.comentario + "\n"+
                           " Dias : \n";
-                generico += " Saludos, \n"+
+            generico +=   infoDias;
+            generico +=   " Saludos, \n"+
                           " RLE - Planner";
+
   
          const mailOptions = {
              from : "RLE - Planner <planner@renelagos.com>",
@@ -642,5 +648,47 @@ module.exports.EnvioMailCambioEstadoVacaciones =  async function (objeto) {
   }
 
 
+  module.exports.NotificacionOCReparos =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+         const generico = "Estimado/a:\n" +
+                          " \t La solicitud de OC con Nº : " +objeto.folio +". tiene observaciones ingresadas por el aprobador. \n" +
+                          " Observaciones : " + objeto.comentario +"\n" +
+                          " Actualizar la OC para que sea aprobada. \n" +
+                          " Saludos, \n"+
+                          " RLE - Planner";
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : objeto.to,
+             subject : "RLE - Planner - Observaciones OC.",
+             text : generico
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
+
+//NotificacionOCReparos
 
 //main().catch(console.error);

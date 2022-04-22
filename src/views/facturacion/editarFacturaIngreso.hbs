@@ -1,0 +1,70 @@
+<div class="form-group row">
+    <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Nº Ppto.:</b></label>
+        <div class="col-md-6 col-sm-6">
+             <input type="text" id="numppto" name="numppto"  class="form-control" value="{{factura.num_ppto}}">
+        </div>
+</div>
+<div class="form-group row">
+    <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Monto:</b></label>
+        <div class="col-md-6 col-sm-6">
+             <input type="text" id="monto" name="monto"  class="form-control" value="{{factura.monto_a_facturar}}">
+             <input type="hidden" id="id_factura" name="id_factura" value="{{factura.id}}">
+             <input type="hidden" id="id_estado_actual" name="id_estado_actual" value="{{factura.id_estado}}">
+        </div>
+</div>
+<div class="form-group row">
+    <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>% Presupuesto:</b></label>
+        <div class="col-md-6 col-sm-6">
+             <input type="text" id="porcentajeppto" name="porcentajeppto"  class="form-control" value="{{factura.porc_ppto}}">
+        </div>
+</div>
+<div class="form-group row">
+    <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Roc Asociada:</b></label>
+        <div class="col-md-6 col-sm-6">
+             <input type="text" id="roc" name="roc"  class="form-control" value="{{factura.roc}}">
+        </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Comentario:</b></label>
+        <div class="col-md-6 col-sm-6">
+              <textarea class="form-control" id="comentario" name="comentario">{{factura.comentarios}}</textarea>
+        </div>
+</div>
+
+<div class="form-group row">
+    <div class="col-sm-4">
+    </div>
+     <div class="col-sm-5">
+        <button type="button" class="btn btn-success" onclick="ActualizarFactura();">Actualizar</button>
+   </div>
+</div>
+
+<script>
+    function ActualizarFactura ()
+    {
+        let monto                = $("#monto").val();
+        let porcentajeppto       = $("#porcentajeppto").val();
+        let roc                  = $("#roc").val();
+        let comentario           = $("#comentario").val();         
+        let id_factura           = $("#id_factura").val(); 
+        let id_estado_actual     = $("#id_estado_actual").val(); 
+        let numppto              = $("#numppto").val();
+
+       let informacion = {
+                            monto, porcentajeppto,roc,comentario,id_factura,numppto
+                         };
+
+        $.ajax({
+                        type: 'post',
+                        url: '/facturacion/editarFacturaIngreso',
+                        data: informacion,
+                        dataType: 'text'
+                        })
+                        .done(function (data) {
+                            $(location).attr('href','/facturacion/facturas/edit/'+id_factura);
+                        });
+                        
+
+    }
+</script>

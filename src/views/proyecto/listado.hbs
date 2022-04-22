@@ -44,14 +44,25 @@
                         <td>
 
                             <div class="btn-group" role="group" aria-label="Basic example">
-                                <button type="button" class="btn btn-secondary btn-sm"><a href="editar/{{id}}" style="color: #fff;">Editar</a></button>
-                                <button type="button" class="btn btn-secondary btn-sm"><a href="facturar/{{id}}" style="color: #fff;">Facturar</a></button>
-                                <button type="button" class="btn btn-secondary btn-sm"><a href="equipo/{{id}}" style="color: #fff;">Equipo</a></button>
+                                
+                                <button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Ver">
+                                    <a href="ver/{{id}}" style="color: #fff;"><i class="fa fa-eye"></i></a>
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Editar">
+                                    <a href="editar/{{id}}" style="color: #fff;"><i class="fa fa-edit"></i></a>
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Facturar">
+                                    <a href="facturar/{{id}}" style="color: #fff;"><i class="fa fa-usd" aria-hidden="true"></i></a>
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Equipo">
+                                    <a href="equipo/{{id}}" style="color: #fff;"><i class="fa fa-users"></i></a>
+                                </button>
                             </div>
 
                         </td>
                     </tr>
                     {{/each}}
+                </tbody>
             </table>
         </div>
     </div>

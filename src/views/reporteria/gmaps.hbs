@@ -5,65 +5,69 @@
     <style>
       /* Set the size of the div element that contains the map */
       #map {
-          height: 400px;
+          height: 800px;
           /* The height is 400 pixels */
           width: 100%;
           /* The width is the width of the web page */
         }
-    </style>
-    <script>
-    let map;
-
-function initMap() {
-  map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 2,
-    center: new google.maps.LatLng(2.8, -187.3),
-    mapTypeId: "terrain",
-  });
-
-  // Create a <script> tag and set the USGS URL as the source.
-  const script = document.createElement("script");
-
-  // Create a <script> tag and set the USGS URL as the source.
-  const script2 = document.createElement("script2");
-
-
-  // This example uses a local copy of the GeoJSON stored at
-  // http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojsonp
-  script.src = "/reporteria/proyectosMaps";
-
-  //script2.src = "/reporteria/proyectosMaps";
-
-  document.getElementsByTagName("head")[0].appendChild(script);
-
-   for (let i = 0; i < info.length; i++) {
-     if ( i == 5)
-     {
-       alert(info[i]);
-     }
-   }
-
-  
+       .pac-card {
+  background-color: #fff;
+  border: 0;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+  margin: 10px;
+  padding: 0 0.5em;
+  font: 400 18px Roboto, Arial, sans-serif;
+  overflow: hidden;
+  font-family: Roboto;
+  padding: 0;
 }
 
-// Loop through the results array and place a marker for each
-// set of coordinates.
-const eqfeed_callback = function (results) {
-  for (let i = 0; i < results.features.length; i++) {
-    const coords = results.features[i].geometry.coordinates;
-    const latLng = new google.maps.LatLng(coords[1], coords[0]);
+#pac-container {
+  padding-bottom: 12px;
+  margin-right: 12px;
+}
 
-    new google.maps.Marker({
-      position: latLng,
-      map: map,
-    });
-  }
-};
-    </script>
+.pac-controls {
+  display: inline-block;
+  padding: 5px 11px;
+}
+
+.pac-controls label {
+  font-family: Roboto;
+  font-size: 13px;
+  font-weight: 300;
+}
+
+#pac-input {
+  background-color: #fff;
+  font-family: Roboto;
+  font-size: 15px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 0 11px 0 13px;
+  text-overflow: ellipsis;
+  width: 400px;
+}
+
+#pac-input:focus {
+  border-color: #4d90fe;
+}
+
+    </style>
+      <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+      <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+      <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+      
+      <script src="/maps/maps.js"></script>
   </head>
   <body>
+    <inputid="pac-input" class="form-control" type="text" placeholder="Search Box"/>
+
     <div id="map"></div>
     <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ8ydxgmjej61U9Le6TETnHLvBoFNQ0Hc&callback=initMap&v=weekly" async></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ8ydxgmjej61U9Le6TETnHLvBoFNQ0Hc&callback=initMap&v=weekly&libraries=places" async></script>
   </body>
 </html>

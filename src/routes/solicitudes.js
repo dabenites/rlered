@@ -688,13 +688,14 @@ router.post('/AddIngreso',isLoggedIn,  async (req,res) => {
   
       idUsuario :  idUsuario,
       idAprobador: idAprobador,
-      idInformar : idInformar,
+      idInformar : 0,
       idTipoSolicitud : 1,
       fecha : fecha,
       comentario:comentario,
       idEstado: '2'
     }
     
+    console.log(vaca);
       //Guardar datos en la BD      
   
      const infoSolicitud = await pool.query('INSERT INTO sol_solicitud  set ? ', [vaca]);
@@ -756,7 +757,8 @@ router.post('/AddIngreso',isLoggedIn,  async (req,res) => {
           const mailN = {
             to : infoInformarN[0].Email,
             comentario : comentario,
-            solicitante : req.user.Nombre
+            solicitante : req.user.Nombre,
+            dias : infoDias
           }
       
           mensajeria.EnvioMailSolicitudVacacionesNotificar(mailN);
@@ -771,7 +773,8 @@ router.post('/AddIngreso',isLoggedIn,  async (req,res) => {
           const mail = {
             to : infoAprobador[0].Email,
             comentario : comentario,
-            solicitante : req.user.Nombre
+            solicitante : req.user.Nombre,
+            dias : infoDias
           }
       
           mensajeria.EnvioMailSolicitudVacacionesNotificar(mail);
@@ -1277,8 +1280,10 @@ router.get('/missolicitudes', isLoggedIn, async (req, res) => {
                                               " FROM sol_horaextra AS t1, sys_usuario AS t2, pro_proyectos AS t3, sol_estado AS t4 " +
                                               " WHERE " +
                                               " t1.idSolicitante = t2.idUsuario AND t1.idProyecto = t3.id "+
-                                              " AND t4.id = t1.idEstado"+
-                                              " AND 	t1.fecha_solicitante > DATE_SUB(NOW(),INTERVAL 1 YEAR)");
+                                              " AND t4.id = t1.idEstado "+
+                                              " AND t1.idIngreso = "+req.user.idUsuario+" "+
+                                              " AND 	t1.fecha_solicitante > DATE_SUB(NOW(),INTERVAL 1 YEAR)"+
+                                              " ORDER BY fecha DESC" );
 
 
   
@@ -1353,7 +1358,9 @@ try {
                                           " WHERE " +
                                           " t1.idSolicitante = t2.idUsuario AND t1.idProyecto = t3.id "+
                                           " AND t4.id = t1.idEstado"+
-                                          " AND 	t1.fecha_solicitante > DATE_SUB(NOW(),INTERVAL 1 YEAR)");
+                                          " AND t1.idIngreso = "+req.user.idUsuario+" "+
+                                          " AND 	t1.fecha_solicitante > DATE_SUB(NOW(),INTERVAL 1 YEAR)"+
+                                          " ORDER BY fecha DESC");
 
      const horasextra =  await pool.query("SELECT "+
                                                                                         " t2.Nombre , t1.numhh ," +
@@ -1585,16 +1592,17 @@ router.get('/horaextras', isLoggedIn, async (req, res) => {
   try {
 
     const horasExtras  =  await pool.query("SELECT " +
-    " t1.numhh,t1.comentario,t1.id, t2.Nombre AS nomSol,t3.nombre AS nomPro,t3.year,t3.code, t4.descripcion   " +
+    " t1.numhh,t1.comentario,t1.id, t2.Nombre AS nomSol,t3.nombre AS nomPro,t3.year,t3.code, t4.descripcion ,  " +
+    " DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha "+
     "  FROM sol_horaextra AS t1  "+
     "  LEFT JOIN sys_usuario AS t2 ON t1.idSolicitante = t2.idUsuario  "+
     "  LEFT JOIN pro_proyectos AS t3 ON t1.idProyecto = t3.id"+
     "  LEFT JOIN sol_estado AS t4 ON t1.idEstado = t4.id"+
     " WHERE "+
         " t1.idIngreso = "+req.user.idUsuario+"" +
-    " ORDER BY t1.id DESC"); 
+    " ORDER BY fecha DESC"); 
 
-    //res.render('solicitudes/horasextras', {  horasExtras,req ,layout: 'template'});
+     //res.render('solicitudes/horasextras', {  horasExtras,req ,layout: 'template'});
     var mensaje = -1;
     if (req.query.a !== undefined)
     {
@@ -2302,19 +2310,19 @@ router.post('/buscaProveedor', isLoggedIn, async (req, res) => {
   try {
     
     const { id} = req.body;
-  let opciones;
-  switch(id)
-  {
-    case "1":
-      opciones = await pool.query('SELECT t1.id, t1.nombre as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
-    break;
-    case "2":
-      opciones = await pool.query('SELECT t1.id, t1.razon_social as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
-    break;
-    case "3":
-      opciones = await pool.query('SELECT t1.id , t1.razon_social AS descripcion FROM orden_compra_proveedor AS t1'); 
-    break;
-  }
+    let opciones;
+    switch(id)
+    {
+      case "1":
+        opciones = await pool.query('SELECT t1.id, t1.nombre as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
+      break;
+      case "2":
+        opciones = await pool.query('SELECT t1.id, t1.razon_social as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
+      break;
+      case "3":
+        opciones = await pool.query('SELECT t1.id , t1.razon_social AS descripcion FROM orden_compra_proveedor AS t1'); 
+      break;
+    }
   
 
   
@@ -2701,7 +2709,8 @@ router.get('/aordencompra',isLoggedIn,  async (req,res) => {
                                          " LEFT JOIN pro_proyectos AS t8 ON t1.id_proyecto = t8.id " +
                                          " WHERE t1.id_estado = 1 AND t1.recepcionado = 'N' AND t1.aprobacionSolicitante = 'Y'"); 
 
-   // console.log(ordenCompra);
+    console.log(ordenCompra);
+
     const verToask = {
       titulo : "Mensaje",
       body   : "Solicitud de Orden de Compra, cambio de estado correctamente",
@@ -2945,7 +2954,27 @@ router.post('/ocCambioEstado', isLoggedIn, async (req,res) => {
     
     const { estado , comentario,id} = req.body;
     
-    const result2 = await pool.query("UPDATE orden_compra set comentario_aprobacion = ?, id_estado = ?, fecha_aprobacion = ? WHERE  id = ? ",[comentario,estado,new Date(),id ]);
+
+    if (estado == 0)
+    {
+      const oc = await pool.query("SELECT * FROM orden_compra as t1 WHERE t1.id = ?",[id]);
+      const infoIngreso = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [oc[0].id_ingreso]);
+
+      const mail = {
+        to : infoIngreso[0].Email,
+        comentario : comentario,
+        folio : oc[0].folio,
+      };
+
+
+      mensajeria.NotificacionOCReparos(mail);
+    }
+    else
+    {
+      const result2 = await pool.query("UPDATE orden_compra set comentario_aprobacion = ?, id_estado = ?, fecha_aprobacion = ? WHERE  id = ? ",[comentario,estado,new Date(),id ]);
+    }
+
+    
     
 
     // enviar un mensaje que la orden de compra ya puede ser revisada. 
@@ -3109,7 +3138,14 @@ router.post('/buscarFolio',isLoggedIn, async (req,res) => {
 
 });
 
+//multiselect
+router.get('/multiselect',isLoggedIn, async (req,res) => {
 
+  
+
+  res.render('solicitudes/multiselect', {  layout: 'blanco'});
+
+});
 
 
 module.exports = router;

@@ -12,7 +12,6 @@ const bodyParser = require('body-parser');
 
 const { database } = require('./keys');
 
-
 //Inicialización 
 const app = express();
 require('./lib/passport');
@@ -62,12 +61,19 @@ app.use((req, res, next) => {
 });
 
 //RUTAS Librerias externas dentro del codigo. 
-app.use('/bootstrap', express.static(path.join(process.cwd(), 'node_modules/bootstrap/dist/')))
-app.use('/buttons-bs', express.static(path.join(process.cwd(), 'node_modules/datatables.net-buttons-bs/')))
-app.use('/buttons-Fixers', express.static(path.join(process.cwd(), 'node_modules/datatables.net-fixedheader-bs/')))
-app.use('/buttons-Responsive', express.static(path.join(process.cwd(), 'node_modules/datatables.net-responsive-bs/')))
-app.use('/buttons-scroller', express.static(path.join(process.cwd(), 'node_modules/datatables.net-scroller-bs/')))
-app.use('/datatables-bootstrap', express.static(path.join(process.cwd(), 'node_modules/datatables.net-bs/')))
+app.use('/bootstrap', express.static(path.join(process.cwd(), 'node_modules/bootstrap/dist/')));
+app.use('/buttons-bs', express.static(path.join(process.cwd(), 'node_modules/datatables.net-buttons-bs/')));
+app.use('/buttons-Fixers', express.static(path.join(process.cwd(), 'node_modules/datatables.net-fixedheader-bs/')));
+app.use('/buttons-Responsive', express.static(path.join(process.cwd(), 'node_modules/datatables.net-responsive-bs/')));
+app.use('/buttons-scroller', express.static(path.join(process.cwd(), 'node_modules/datatables.net-scroller-bs/')));
+app.use('/datatables-bootstrap', express.static(path.join(process.cwd(), 'node_modules/datatables.net-bs/')));
+
+app.use('/markers', express.static(path.join(process.cwd(), 'node_modules/node-js-marker-clusterer/src/')));
+
+
+app.use('/maps', express.static(path.join(process.cwd(), 'src/servicios/')));
+app.use('/views', express.static(path.join(process.cwd(), 'src/views/')));
+
 
 // JS
 app.use('/jquery', express.static(path.join(process.cwd(), 'node_modules/jquery/dist/')))
@@ -97,6 +103,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Satart servidor 
 app.listen(app.get('port'), () => {
-  //console.log('Server on port', app.get('port'));
+  console.log('Server on port', app.get('port'));
 });
 

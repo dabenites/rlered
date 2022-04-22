@@ -371,7 +371,7 @@ router.get('/facturas/edit/:idFacturacion', isLoggedIn, async (req, res) => {
      };
 
 
-    //console.log( req.user);
+    //console.log( req.user.idUsuario);
 
     res.render('facturacion/editar', { factura:factura[0],proyecto:proyecto[0],historial,req ,layout: 'template', helpers : {
         if_equal : isEqualHelperHandlerbar
@@ -411,6 +411,43 @@ router.post('/editarFacturaTemplate', isLoggedIn, async (req, res) => {
 
 
         res.render('facturacion/editarFactura', { estados, empresas, factura:facturas[0], layout: 'blanco', helpers : {
+                    if_equal : isEqualHelperHandlerbar
+                }});
+
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : facturacion.js \n Error en el directorio: /editarFacturaTemplate \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+
+    }
+});
+
+router.post('/editarFacturaTemplateIngreso', isLoggedIn, async (req, res) => {
+
+    try {
+
+        const { id } = req.body;
+
+        const estados =  await pool.query("SELECT * FROM fact_estados as t1");
+        const empresas =  await pool.query("SELECT * FROM sys_empresa as t1");
+        const facturas =  await pool.query("SELECT * FROM fact_facturas as t1 WHERE t1.id = ?",[id]);
+
+        const isEqualHelperHandlerbar = function(a, b, opts) {
+            // console.log(a + "----" + b);
+             if (a == b) {
+                 return true
+             } else { 
+                 return false
+             } 
+         };
+
+
+        res.render('facturacion/editarFacturaIngreso', { estados, empresas, factura:facturas[0], layout: 'blanco', helpers : {
                     if_equal : isEqualHelperHandlerbar
                 }});
 
@@ -483,6 +520,49 @@ router.post('/editarFactura', isLoggedIn, async (req, res) => {
 
     }
 });
+
+router.post('/editarFacturaIngreso', isLoggedIn, async (req, res) => {
+
+    try {
+
+        const {monto,porcentajeppto,roc,comentario,id_factura,id_estado_actual, numppto} = req.body;
+
+        var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
+
+        let esroc = 0;
+        if (roc != "")
+        {
+            esroc = 1;
+        }
+      
+       const result1 = await pool.query("UPDATE " +
+            " fact_facturas " +
+            " set monto_a_facturar = ? , " +
+            " porc_ppto = ? , " + 
+            " comentarios = ? , " +
+            " es_roc = ? , " +
+            " roc = ?,  " +
+            " num_ppto = ?  " +
+            " WHERE id = ? ",[monto,porcentajeppto,comentario,esroc,roc,numppto,id_factura]);
+       
+
+        res.sendStatus(200);
+       
+
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : facturacion.js \n Error en el directorio: /editarFactura \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+
+    }
+});
+
+//editarFacturaIngreso
 
 
 //editarFactura

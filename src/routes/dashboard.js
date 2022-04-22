@@ -77,6 +77,7 @@ router.get('/', isLoggedIn, async (req, res) => {
       semanaAnterior : infoSemanaAnteriorer[0].horas
    }
    
+   //console.log(req);
    // 
    if (req.query.a === undefined)
    {

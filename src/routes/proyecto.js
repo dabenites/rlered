@@ -1,23 +1,18 @@
 const express = require('express');
-const { render } = require('timeago.js');
 const router = express.Router();
-const bodyParser = require('body-parser');
-var util = require("util");
 
 //importar una conexión a DB
 const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
-const { chdir } = require('process');
-const { Console } = require('console');
 
 var dateFormat = require('dateformat');
-const { isEmptyObject } = require('jquery');
+
 
 var url = require('url');
 
 const mensajeria = require('../mensajeria/mail');
 
-//var Excel = require('exceljs');
+
 
 //AGREGAR UN PROYECTO
 
@@ -635,7 +630,7 @@ router.get('/editar/:id', isLoggedIn, async (req, res) => {
   let proyectos;
   if (pre[0].id_tipo_servicio == 2)
   {
-    console.log("Buscar la informacion del ing revi");
+    //console.log("Buscar la informacion del ing revi");
     
     proyectos = await pool.query("SELECT * , t1.id as idPro, " +
     " t1.id_director AS idDir, " +
@@ -1096,6 +1091,7 @@ router.get('/buscarJefeCoor/:find',isLoggedIn, async (req, res) => {
   
 
 });
+
 
 //buscarJefeCoor
 
@@ -2286,5 +2282,99 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
     
   });
 
+
+  // Buscador de preyectos. 
+router.get('/ver/:id', isLoggedIn, async (req, res) => {
+
+  try {
+    
+      // buiscar la informacion de todos los jefes de proyectos y directores.
+      const { id } = req.params;
+
+      const pre =  await pool.query("SELECT * from pro_proyectos AS t1 WHERE t1.id = ? ", [id]);
+      let proyectos;
+      if (pre[0].id_tipo_servicio == 2)
+      {
+        //console.log("Buscar la informacion del ing revi");
+        
+        proyectos = await pool.query("SELECT * , t1.id as idPro, " +
+        " t1.id_director AS idDir, " +
+         " t1a.Nombre AS nomDir, " +
+         " t1.id_pais AS id_pais, " +
+         " t1.zona AS zona, " +
+         " t1.id_estado as id_estado,"+
+         " t1.suelo AS suelo, " +
+         " t1.categoria AS categoria, " +
+         " t1.id_jefe AS idJefe, t1b.Nombre AS nomJefe, " +
+         " t1.id_mandante AS idMan , t1c.name nomMan, " +
+         " t1.id_cliente AS idCli , t1d.Nombre as  nomCli, " +
+         " t1.id_arquitecto AS idArq , t1e.name nomArq, " +
+         " t1.id_revisor AS idRev , t1f.name nomRev, " +
+         " t1p.simbolo AS simbolo," +
+         " CONCAT(t1p.simbolo,' /', 'm <sup> 2</sup>')  AS sm2" +
+         " FROM pro_proyectos AS t1 " +
+         " LEFT JOIN sys_usuario AS t1a ON t1.id_director = t1a.idUsuario " +
+         " LEFT JOIN sys_usuario AS t1b ON t1.id_jefe = t1b.idUsuario " +
+         " LEFT JOIN contacto AS t1c ON t1.id_mandante = t1c.id " +
+         " LEFT JOIN sys_usuario AS t1d ON t1.id_cliente = t1d.idUsuario " +
+         " LEFT JOIN contacto AS t1e ON t1.id_arquitecto = t1e.id " +
+         " LEFT JOIN contacto AS t1f ON t1.id_revisor = t1f.id " +
+         " LEFT JOIN moneda_tipo AS t1p ON t1.id_tipo_moneda = t1p.id_moneda " +
+         " WHERE t1.id = ?",[id]);
+      }
+      else
+      {
+        proyectos = await pool.query("SELECT * , t1.id as idPro, " +
+        " t1.id_director AS idDir, " +
+         " t1a.Nombre AS nomDir, " +
+         " t1.id_pais AS id_pais, " +
+         " t1.zona AS zona, " +
+         " t1.id_estado as id_estado,"+
+         " t1.suelo AS suelo, " +
+         " t1.categoria AS categoria, " + 
+         " t1s.descripcion AS tipoServicio, " +
+         " t1pr.descripcion AS tipoProyecto, " +
+         " t1es.descripcion AS estadoProyecto, " + 
+         " t1mo.descripcion AS moneda, " +
+         " t1.id_jefe AS idJefe, t1b.Nombre AS nomJefe, " +
+         " t1.id_mandante AS idMan , t1c.name nomMan, " +
+         " t1.id_cliente AS idCli , t1d.name nomCli, " +
+         " t1.id_arquitecto AS idArq , t1e.name nomArq, " +
+         " t1.id_revisor AS idRev , t1f.name nomRev, " +
+         " t1p.simbolo AS simbolo," +
+         " CONCAT(t1p.simbolo,' /', 'm <sup> 2</sup>')  AS sm2" +
+         " FROM pro_proyectos AS t1 " +
+         " LEFT JOIN proyecto_servicio AS t1s ON t1.id_tipo_servicio = t1s.id " +
+         " LEFT JOIN proyecto_tipo AS t1pr ON t1.id_tipo_proyecto = t1pr.id " + 
+         " LEFT JOIN proyecto_estado AS t1es ON t1.id_estado = t1es.id " +
+         " LEFT JOIN moneda_tipo AS t1mo ON t1.id_tipo_moneda = t1mo.id_moneda " +
+         " LEFT JOIN sys_usuario AS t1a ON t1.id_director = t1a.idUsuario " +
+         " LEFT JOIN sys_usuario AS t1b ON t1.id_jefe = t1b.idUsuario " +
+         " LEFT JOIN contacto AS t1c ON t1.id_mandante = t1c.id " +
+         " LEFT JOIN contacto AS t1d ON t1.id_cliente = t1d.id " +
+         " LEFT JOIN contacto AS t1e ON t1.id_arquitecto = t1e.id " +
+         " LEFT JOIN contacto AS t1f ON t1.id_revisor = t1f.id " +
+         " LEFT JOIN moneda_tipo AS t1p ON t1.id_tipo_moneda = t1p.id_moneda " +
+         " WHERE t1.id = ?",[id]);
+    
+      }
+      
+
+      res.render('proyecto/ver', { req, proyectos:proyectos[0], layout: 'template' });
+
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : proyecto.js \n Error en el directorio: /cargarProyecto \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+
+
+});
 
 module.exports = router;

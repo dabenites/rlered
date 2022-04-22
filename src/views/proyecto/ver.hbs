@@ -1,0 +1,144 @@
+     <head>
+            <style>
+                /* Set the size of the div element that contains the map */
+                #map {
+                    height: 400px;
+                    /* The height is 400 pixels */
+                    width: 100%;
+                    /* The width is the width of the web page */
+                    }
+            </style>
+     </head>
+    <div class="x_panel">
+        <div class="x_title">
+             <ul class="nav navbar-right panel_toolbox">
+				<li><a onclick="window.history.go(-1); return false;"><i class="fa fa-arrow-circle-left"></i> Volver</a></li>
+			</ul>
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="row">
+                <p class="fs-5"><ins>Datos Generales</ins></p>
+                
+                <div class="col-md-6">
+                    <div class="form-group row" style="margin-bottom: 1px;">
+                        <div class="col-md-12">
+                            <label class="col-form-label col-md-2 label-align"	><b> Código:</b></label>
+                            <label class="col-form-label col-md-1">{{proyectos.year}}-{{proyectos.code}}</label>
+                            <label class="col-form-label col-md-2 label-align"	><b> Tipo Servicio </b></label>
+                            <label class="col-form-label col-md-2">{{proyectos.tipoServicio}}</label>
+                            <label class="col-form-label col-md-2 label-align"	><b> Tipo Proyecto </b></label>
+                            <label class="col-form-label col-md-1">{{proyectos.tipoProyecto}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom: 1px;">
+                        <div class="col-md-12">
+                            <label class="col-form-label col-md-2 label-align"	><b> Nombre:</b></label>
+                            <label class="col-form-label col-md-6">{{proyectos.nombre}}</label>
+                            <label class="col-form-label col-md-1 label-align"	><b> Estado:</b></label>
+                            <label class="col-form-label col-md-2">{{proyectos.estadoProyecto}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom: 1px;">
+                        <div class="col-md-12">
+                            <label class="col-form-label col-md-2 label-align"	><b> Dirección:</b></label>
+                            <label class="col-form-label col-md-9">{{proyectos.direccion}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom: 1px;">
+                        <div class="col-md-12">
+                            <label class="col-form-label col-md-2 label-align"	><b> Sup. Preliminar:</b></label>
+                            <label class="col-form-label col-md-2">{{proyectos.superficie_pre}} m<sup>2</sup></label>
+
+                            <label class="col-form-label col-md-1 label-align"	><b> Pisos</b></label>
+                            <label class="col-form-label col-md-2">{{proyectos.num_pisos}}</label>
+                            <label class="col-form-label col-md-2 label-align"	><b> Subterraneo</b></label>
+                            <label class="col-form-label col-md-1">{{proyectos.num_subterraneo}}</label>
+                        </div>
+                    </div>
+
+                   <p class="fs-5"><ins>Datos Financieros</ins></p>
+
+                    <div class="form-group row" style="margin-bottom: 1px;">
+                        <div class="col-md-12">
+                            <label class="col-form-label col-md-2 label-align"	><b> Moneda</b></label>
+                            <label class="col-form-label col-md-2">{{proyectos.moneda}}</label>
+                            <label class="col-form-label col-md-1 label-align"	><b> Valor x m2</b></label>
+                            <label class="col-form-label col-md-2">{{proyectos.valor_metro_cuadrado}}</label>
+                            <label class="col-form-label col-md-2 label-align"	><b> Valor Proyecto</b></label>
+                            <label class="col-form-label col-md-1">{{proyectos.valor_proyecto}}</label>
+                        </div>
+                    </div>
+
+                    <p class="fs-5"><ins>Equipo Proyecto</ins></p>
+
+                    <div class="form-group row" style="margin-bottom: 1px;">
+                        <div class="col-md-12">
+                            <label class="col-form-label col-md-2 label-align"	><b> Director:</b></label>
+                            <label class="col-form-label col-md-4">{{proyectos.nomDir}}</label>
+                            <label class="col-form-label col-md-2 label-align"	><b> Jefe:</b></label>
+                            <label class="col-form-label col-md-4">{{proyectos.nomJefe}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom: 1px;">
+                        <div class="col-md-12">
+                            <label class="col-form-label col-md-2 label-align"	><b> Cliente/Contacto:</b></label>
+                            <label class="col-form-label col-md-4">{{proyectos.nomCli}}</label>
+                            <label class="col-form-label col-md-2 label-align"	><b> Arquitecto:</b></label>
+                            <label class="col-form-label col-md-4">{{proyectos.nomArq}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom: 1px;">
+                        <div class="col-md-12">
+                            <label class="col-form-label col-md-2 label-align"	><b> Revisor:</b></label>
+                            <label class="col-form-label col-md-6">{{proyectos.nomRev}}</label> 
+                        </div>
+                    </div>
+
+                <p class="fs-5"><ins>Información APL</ins></p>
+                    <div class="form-group row" style="margin-bottom: 1px;">
+                        <div class="col-md-12">
+                            <label class="col-form-label col-md-2 label-align"	><b> Zona</b></label>
+                            <label class="col-form-label col-md-2">{{proyectos.zona}}</label>
+                            <label class="col-form-label col-md-1 label-align"	><b> Suelo</b></label>
+                            <label class="col-form-label col-md-2">{{proyectos.suelo}}</label>
+                            <label class="col-form-label col-md-2 label-align"	><b> Categoria</b></label>
+                            <label class="col-form-label col-md-1">{{proyectos.categoria}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom: 1px;">
+                        <div class="col-md-12">
+                            <label class="col-form-label col-md-2 label-align"	><b> Superficie APL</b></label>
+                            <label class="col-form-label col-md-2">{{proyectos.zosuperficie_aplna}}</label>
+                            <label class="col-form-label col-md-2 label-align"	><b> Nº Planos Estimado</b></label>
+                            <label class="col-form-label col-md-2">{{proyectos.num_plano_estimado}}</label>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    // Initialize and add the map
+function initMap() {
+  // The location of Uluru
+  const uluru = { lat: {{proyectos.latitud}}, lng: {{proyectos.altitud}} };
+  // The map, centered at Uluru
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 6,
+    center: uluru,
+  });
+  // The marker, positioned at Uluru
+  const marker = new google.maps.Marker({
+    position: uluru,
+    map: map,
+  });
+}
+
+window.initMap = initMap;
+</script>
+ <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ8ydxgmjej61U9Le6TETnHLvBoFNQ0Hc&callback=initMap&v=weekly&libraries=places" async></script>

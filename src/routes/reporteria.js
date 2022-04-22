@@ -636,7 +636,15 @@ router.get('/maps',isLoggedIn,  async (req, res) => {
 
         try {
 
-                res.render('reporteria/gmaps', {  req , layout: 'blanco'});
+                const proyectos = await pool.query(" SELECT * " +
+                                                   " FROM  " +
+                                                            " pro_proyectos AS t1 " +
+                                                   " WHERE  " +
+                                                            " t1.latitud != '' " +
+                                                   " AND  " +
+                                                            " t1.altitud != '' " );
+
+                res.render('reporteria/gmaps2', { proyectos, req , layout: 'template'});
               
         } catch (error) {
                 mensajeria.MensajerErrores("\n\n Archivo : reporteria.js \n Error en el directorio: /maps \n" + error + "\n Generado por : " + req.user.login);
@@ -655,27 +663,21 @@ router.get('/proyectosMaps',isLoggedIn,  async (req, res) => {
 
 
         try {
-                // buscar la informacion de los proyectos que tienen latitud y longitud. 
-                //let proyectos = "SELECT * FROM pro_proyectos AS t1 WHERE t1.latitud != '' AND t1.altitud != ''"
-                //let proyectos = await pool.query( "SELECT * FROM pro_proyectos AS t1 WHERE t1.latitud != '' AND t1.altitud != ''");
-                //res.json(eqfeed_callback("ddd"));
+                const proyectos = await pool.query(" SELECT * " +
+                                                   " FROM  " +
+                                                            " pro_proyectos AS t1 " +
+                                                   " WHERE  " +
+                                                            " t1.latitud != '' " +
+                                                   " AND  " +
+                                                            " t1.altitud != '' " );
 
-                const responseData = eqfeed_callback({
-                        message:"Hello, GFG Learner",
-                      articleData:{
-                          articleName: "How to send JSON response from NodeJS",
-                          category:"NodeJS",
-                          status: "published"
-                      },
-                      endingMessage:"Visit Geeksforgeeks.org for more"
-                    });
-                      
-                    const jsonContent = JSON.stringify(responseData);
 
-                    res.end(jsonContent); 
+
+                   res.json(proyectos);
               
         } catch (error) {
              //   mensajeria.MensajerErrores("\n\n Archivo : reporteria.js \n Error en el directorio: /maps \n" + error + "\n Generado por : " + req.user.login);
+             console.log(error);
                 res.redirect(   url.format({
                     pathname:'/dashboard',
                             query: {

@@ -358,13 +358,24 @@ button.close {
                <div id="dinamicoDias" name="dinamicoDias">
                   mostrar los dias dinamicamente 
                </div>
-               <div class="form-group row">
-                 <label for="staticEmail" class="col-sm-3 col-form-label">Informar :</label>
-                 <div class="col-sm-9">
-                    <select class=" form-control" name="idInformar" id="idInformar" multiple>
+              <div class="form-group row">
+                <label  class="col-form-label col-sm-3 ">Informar :</label>
+                  <div class="col-sm-6">
+                    <select class=" form-control" name="idxInformar" id="idxInformar" onchange="verificoCarga();">
+                       <option value="0" selected>Seleccionar</option>
                         {{#each usuarios}}
-                        <option value="{{idUsuario}}">{{Nombre}}</option>
+                          <option value="{{idUsuario}}">{{Nombre}}</option>
                         {{/each}}
+                    </select>
+                  </div>
+                  <div class="col-sm-3">
+                      <button type="button" class="btn btn-secondary" onclick="cargarUsuarioListado();"  id="btnAgregarELiminar" name="btnAgregarELiminar">Agregar</button>
+                  </div>
+             </div>
+               <div class="form-group row">
+                 <label for="staticEmail" class="col-sm-3 col-form-label">Listado :</label>
+                 <div class="col-sm-6">
+                    <select class=" form-control" name="idInformar" id="idInformar" multiple>
                     </select>
                  </div>
                </div>           
@@ -411,3 +422,56 @@ button.close {
 
   </div>
 </div>
+
+<script>
+  function verificoCarga()
+    {
+      let idxInformar        = $("#idxInformar").val();
+      if (idxInformar != 0)
+      {
+        let existe = false;
+         $("#idInformar option[value='"+idxInformar+"']").each(function() {
+         $("#btnAgregarELiminar").html('Eliminar');
+         existe = true;
+       });
+      
+          if (existe == false)
+          {
+            $("#btnAgregarELiminar").html('Agregar');
+          }
+      }
+    }
+
+  function cargarUsuarioListado()
+    {
+      // preguntar el idx que se esta cargandio
+
+      let idxInformar        = $("#idxInformar").val();
+      let idxInformarLabel   = $('#idxInformar option:selected').text();
+
+      let ingresado = false;
+     
+
+      if (idxInformar != 0)
+      {
+         $("#idInformar option[value='"+idxInformar+"']").each(function() {
+      $(this).remove();
+      ingresado = true;
+    });
+
+      if (ingresado == false)
+      {
+          $('#idInformar').append($('<option>', { 
+              value: idxInformar,
+              text : idxInformarLabel 
+          }));
+
+         $("#idInformar option[value='"+idxInformar+"']").attr("selected", true);
+
+      }
+          
+
+      }
+
+    }
+</script>

@@ -43,7 +43,7 @@ switch(server)
     case 2:
         HOST = "208.109.189.233";
         PASSWORD = " $rRPB231281$";
-        USER = "cpadmin_mysuser";
+        USER = "cpadmin";
     break;
 
 }

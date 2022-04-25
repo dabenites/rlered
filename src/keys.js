@@ -10,6 +10,7 @@ let SERVER_2 = "208.109.189.233"; // server GODADDY
 let HOST = "";
 let PASSWORD = "";
 let USER = "";
+let BD = "";
 
 let server = 0;
 
@@ -34,16 +35,19 @@ switch(server)
         HOST = "127.0.0.1";
         PASSWORD = "12.RL$";
         USER = "root";
+        BD = "rle_red";
     break;
     case 1:
         HOST = "18.228.215.203";
         PASSWORD = "NRle.2019$TI*.";
         USER = "root";
+        BD = "rle_red";
     break;
     case 2:
         HOST = "208.109.189.233";
         PASSWORD = " $rRPB231281$";
         USER = "cpadmin";
+        BD = "cpadmin_rle_red";
     break;
 
 }
@@ -57,7 +61,7 @@ module.exports ={
         user: USER,
         //password: 'NRle.2019$TI*.', /*contaseña*/
         password:PASSWORD,
-       database: 'rle_red' /*nombre de la db*/
+        database: 'rle_red' /*nombre de la db*/
     }
 
 

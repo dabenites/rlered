@@ -1600,8 +1600,18 @@ router.get('/horaextras', isLoggedIn, async (req, res) => {
     "  LEFT JOIN sol_estado AS t4 ON t1.idEstado = t4.id"+
     " WHERE "+
         " t1.idIngreso = "+req.user.idUsuario+"" +
-    " ORDER BY fecha DESC"); 
-
+    " ORDER BY id DESC"); 
+   
+    console.log("SELECT " +
+    " t1.numhh,t1.comentario,t1.id, t2.Nombre AS nomSol,t3.nombre AS nomPro,t3.year,t3.code, t4.descripcion ,  " +
+    " DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha "+
+    "  FROM sol_horaextra AS t1  "+
+    "  LEFT JOIN sys_usuario AS t2 ON t1.idSolicitante = t2.idUsuario  "+
+    "  LEFT JOIN pro_proyectos AS t3 ON t1.idProyecto = t3.id"+
+    "  LEFT JOIN sol_estado AS t4 ON t1.idEstado = t4.id"+
+    " WHERE "+
+        " t1.idIngreso = "+req.user.idUsuario+"" +
+    " ORDER BY id DESC");
      //res.render('solicitudes/horasextras', {  horasExtras,req ,layout: 'template'});
     var mensaje = -1;
     if (req.query.a !== undefined)
@@ -2058,9 +2068,10 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
                                            " LEFT JOIN centro_costo AS t7 ON t1.id_centro_costo = t7.id " +
                                            " LEFT JOIN pro_proyectos AS t8 ON t1.id_proyecto = t8.id " +
                                            " LEFT JOIN orden_compra_estado as t9 ON t1.id_estado = t9.id " +
-                                           " WHERE t1.id_estado IN(1,2,3,4,5)", [req.user.idUsuario]); 
+                                           " WHERE t1.id_estado IN(1,2,3,4,5) " + 
+                                           " ORDER BY t1.id DESC", [req.user.idUsuario]); 
 
- 
+  // console.log("OC");
 
   let verToask = {
         titulo : "Mensaje",
@@ -2147,6 +2158,28 @@ router.post('/aprobSolicitanteOC', isLoggedIn, async (req, res) => {
 
     // console.log( id );
     const result = pool.query("UPDATE orden_compra set aprobacionSolicitante = 'Y' WHERE  id = ?", [id]);
+
+
+    // buscar la informacion del ingreso. 
+    const oc = await pool.query(" SELECT * FROM orden_compra as t1 WHERE t1.id = ? ", [id]);
+    
+    const checkFirma = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', oc[0].id_ingreso);
+
+    const checkFirmaDatos = {
+      to : checkFirma[0].Email,
+      //to : "dbenites@renelagos.com",
+      folio : oc[0].folio
+    };
+
+    const checkClaudio = {
+      //to : checkFirma[0].Email,
+      //to : "dbenites@renelagos.com",cgahona@renelagos.com 
+      to : "cgahona@renelagos.com",
+      folio : oc[0].folio
+    };
+
+    mensajeria.NotificacionCheckFirmaAprobOC(checkFirmaDatos);
+    mensajeria.NotificacionOCClaudio(checkClaudio);
 
     res.sendStatus(200);
 
@@ -2607,6 +2640,29 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
     if (id_solicitante != req.user.idUsuario)
     {
       aprobacionSolicitante = "N";
+      // avisar que se ingreso una 
+
+      const checkFirma = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', id_solicitante);
+
+      const checkFirmaDatos = {
+        to : checkFirma[0].Email,
+        //to : "dbenites@renelagos.com",
+        comentario : observaciones,
+        folio : infoGetFolio[0].num
+      };
+
+      mensajeria.NotificacionCheckFirmaOC(checkFirmaDatos);
+    }
+    else
+    {
+      const checkClaudio = {
+        //to : checkFirma[0].Email,
+       // to : "dbenites@renelagos.com",
+       to : "cgahona@renelagos.com",
+        folio : oc[0].folio
+      };
+
+      mensajeria.NotificacionOCClaudio(checkClaudio);
     }
     
 

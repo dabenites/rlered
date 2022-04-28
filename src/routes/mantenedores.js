@@ -1312,9 +1312,19 @@ router.post('/addUsuario',isLoggedIn, async (req, res) => {
         " AND t1.id_estado = t4.id");
         //console.log(usuarios);
          
+        // agregar el usuario. a la tabla 
+
+        const prov = {
+            rut : "0",
+            nombre : Nombre,
+            fono : Telefono,
+            mail : Email,
+            id_tipo_proveedor : 1
+        };
      
-     
-        
+        const result3 = await pool.query('INSERT INTO prov_externo set ? ', [prov]);
+
+
         const verToask = {
             titulo : Nombre,
             body   : "Se ha creado correctamente",

@@ -648,7 +648,7 @@ module.exports.EnvioMailCambioEstadoVacaciones =  async function (objeto) {
   }
 
 
-  module.exports.NotificacionOCReparos =  async function (objeto) {
+module.exports.NotificacionOCReparos =  async function (objeto) {
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
   
@@ -689,6 +689,125 @@ module.exports.EnvioMailCambioEstadoVacaciones =  async function (objeto) {
   
   }
 
+
+module.exports.NotificacionCheckFirmaOC =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+         const generico = "Estimado/a:\n" +
+                          " \t La solicitud de OC con Nº : " +objeto.folio +". tiene que ser aprobada para continuar con el proceso. \n" +
+                          " Observaciones : " + objeto.comentario +"\n" +
+                          " Saludos, \n"+
+                          " RLE - Planner";
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : objeto.to,
+             subject : "RLE - Planner - Firma OC",
+             text : generico
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
+
+  module.exports.NotificacionCheckFirmaAprobOC =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+         const generico = "Estimado/a:\n" +
+                          " \t La solicitud de OC con Nº : " +objeto.folio +". ya fue aprobada la firma. \n" +
+                          " Saludos, \n"+
+                          " RLE - Planner";
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : objeto.to,
+             subject : "RLE - Planner - Firma OC",
+             text : generico
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
+
+
+  module.exports.NotificacionOCClaudio =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+         const generico = "Estimado/a:\n" +
+                          " \t La solicitud de OC con Nº : " +objeto.folio +". Esta disponible para ser aprobada. \n" +
+                          " Saludos, \n"+
+                          " RLE - Planner";
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : objeto.to,
+             subject : "RLE - Planner - Firma OC",
+             text : generico
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
 //NotificacionOCReparos
 
 //main().catch(console.error);

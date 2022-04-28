@@ -15,7 +15,7 @@ router.get('/externo', isLoggedIn, async (req, res) => {
 
     try {
 
-        const proveedores = await pool.query("SELECT * FROM prov_externo ");
+        const proveedores = await pool.query("SELECT * FROM prov_externo as t1 WHERE t1.id_tipo_proveedor = 2 ");
 
         // res.render('proveedor/externo', { proveedores, req ,layout: 'template'});
         if (req.query.a === undefined)
@@ -122,7 +122,8 @@ router.post('/addExterno', isLoggedIn, async (req,res) => {
         razon_social : razon_social,
         fono : fono,
         mail : mail,
-        direccion : direccion
+        direccion : direccion,
+        id_tipo_proveedor : 2
     };
     //Guardar datos en la BD     
     const result = await pool.query('INSERT INTO prov_externo set ?', [newProveedor]);//Inserción
@@ -155,7 +156,7 @@ router.get('/externo/edit/:id', isLoggedIn, async (req, res) => {
 
         const { id } = req.params;
 
-        const proveedores = await pool.query("SELECT * FROM prov_externo ");
+        const proveedores = await pool.query("SELECT * FROM prov_externo as t1 WHERE t1.id_tipo_proveedor = 2");
         const proveedor =  await pool.query("SELECT * FROM prov_externo as t1 WHERE t1.id = ?", [id]);
         res.render('proveedor/externo', { proveedores, proveedor: proveedor[0], req ,layout: 'template'});
 
@@ -179,14 +180,14 @@ router.get('/externo/delete/:id', isLoggedIn , async (req, res) => {
     try {
 
         const { id } = req.params;
-    await pool.query('DELETE FROM prov_externo WHERE id = ?', [id]);
-    //res.redirect('/proveedor/externo');
-    res.redirect(   url.format({
-        pathname:'/proveedor/externo',
-                query: {
-                "a": 3
-                }
-            }));
+        await pool.query('DELETE FROM prov_externo WHERE id = ?', [id]);
+        //res.redirect('/proveedor/externo');
+        res.redirect(   url.format({
+            pathname:'/proveedor/externo',
+                    query: {
+                    "a": 3
+                    }
+                }));
 
         
     } catch (error) {

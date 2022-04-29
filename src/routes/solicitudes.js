@@ -2047,7 +2047,7 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
                                            ' WHERE t1.id_ingreso = ? AND (t1.id_solicitud = 0 OR t1.id_solicitud is null) AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
 
   
-  const ordenCompra = await pool.query(" SELECT t1.id,t1.folio,t1.id_estado, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
+  const ordenCompra = await pool.query(" SELECT t1.id_solicitante, t1.id,t1.folio,t1.id_estado, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
                                            " , t8.nombre AS proyecto,t9.descripcion as estado , t8.year,t8.code," +
                                            " if (t1.id_tipo = 3 ,  " +
                                            " (SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro) "+

@@ -36,16 +36,24 @@ switch(server)
         //PASSWORD = "12.RL$";
         //USER = "root";
         //BD = "rle_red";
-        HOST = "18.228.215.203";
-        PASSWORD = "NRle.2019$TI*.";
-        USER = "root";
-        BD = "rle_red";
+        //HOST = "18.228.215.203";
+        //PASSWORD = "NRle.2019$TI*.";
+        //USER = "root";
+        //BD = "rle_red";
+        HOST = "208.109.189.233";
+        PASSWORD = " $rRPB231281$";
+        USER = "cpadmin";
+        BD = "cpadmin_rle_red";
     break;
     case 1:
-        HOST = "18.228.215.203";
-        PASSWORD = "NRle.2019$TI*.";
-        USER = "root";
-        BD = "rle_red";
+        //HOST = "18.228.215.203";
+        ///PASSWORD = "NRle.2019$TI*.";
+        //USER = "root";
+        //BD = "rle_red";
+        HOST = "208.109.189.233";
+        PASSWORD = " $rRPB231281$";
+        USER = "cpadmin";
+        BD = "cpadmin_rle_red";
     break;
     case 2:
         HOST = "208.109.189.233";

@@ -77,7 +77,7 @@ router.post('/eliminarHoras', isLoggedIn, async (req, res) => {
     try {
         const { idEliminar} = req.body;
 
-        const opciones = await pool.query("DELETE FROM `rle_red`.`bita_horas` WHERE `id_bitacora_time`= ? ", [idEliminar]);
+        const opciones = await pool.query("DELETE FROM `bita_horas` WHERE `id_bitacora_time`= ? ", [idEliminar]);
     
         res.redirect("../bitacora/ingresoHoras");    
     } catch (error) {

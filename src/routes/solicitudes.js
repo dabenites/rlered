@@ -2095,6 +2095,13 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
               return false
           } 
       };
+  const isDisintoHelperHandlerbar = function(a, b, opts) {
+        if (a == b) {
+            return false
+        } else { 
+            return true
+        } 
+    };
 
   if (requerimientos.length > 0)
   {
@@ -2102,14 +2109,14 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
     {
       res.render('solicitudes/ordencompra', { verToask, req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, 
         proyectos,requerimientos,ordenCompra, layout: 'template', helpers : {
-          if_equal : isEqualHelperHandlerbar
+          if_equal : isEqualHelperHandlerbar, if_distinto : isDisintoHelperHandlerbar
       }});
     }
     else
     {
       res.render('solicitudes/ordencompra', { req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,requerimientos,ordenCompra, 
         layout: 'template', helpers : {
-          if_equal : isEqualHelperHandlerbar
+          if_equal : isEqualHelperHandlerbar, if_distinto : isDisintoHelperHandlerbar
       }});
     }
     
@@ -2121,14 +2128,14 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
       
       res.render('solicitudes/ordencompra', { verToask, req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,
         ordenCompra, layout: 'template', helpers : {
-          if_equal : isEqualHelperHandlerbar
+          if_equal : isEqualHelperHandlerbar, if_distinto : isDisintoHelperHandlerbar
       }});  
     }
     else
     {
       res.render('solicitudes/ordencompra', { req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,ordenCompra,
          layout: 'template', helpers : {
-          if_equal : isEqualHelperHandlerbar
+          if_equal : isEqualHelperHandlerbar, if_distinto : isDisintoHelperHandlerbar
       }});
     }
     
@@ -2196,6 +2203,51 @@ router.post('/aprobSolicitanteOC', isLoggedIn, async (req, res) => {
 
   }
 });
+
+//rechazarOC
+router.post('/rechazarOC', isLoggedIn, async (req, res) => {
+
+  try {
+      // dejar en un estado rechazado
+      // enviar correo
+      // msotrar el listado con el aviso de carga.
+      const { rcid, rcrechazo ,rcfolio} = req.body;
+
+      const checkClaudio = {
+        to : "cgahona@renelagos.com",
+        folio : rcfolio,
+        rechazada : req.user.Nombre,
+        comentario : rcrechazo
+      };
+
+     mensajeria.NotificacionOCClaudioRechazada(checkClaudio);
+      
+     const result2 = await pool.query("UPDATE orden_compra set  id_estado = 4 WHERE  id = ? ",[rcid ]);
+
+     
+      res.redirect(   url.format({
+        pathname:'/solicitudes/ordencompra',
+        query: {
+           "a": 3
+         }
+      }));
+     
+
+    
+  } catch (error) {
+    
+    mensajeria.MensajerErrores("\n\n Archivo : solicitudes.js \n Error en el directorio: /rechazarOC \n" + error + "\n Generado por : " + req.user.login);
+    res.redirect(   url.format({
+        pathname:'/dashboard',
+                query: {
+                "a": 1
+                }
+            })); 
+
+  }
+});
+
+
 
 // editarOC
 

@@ -8,7 +8,7 @@ const mensajeria = require('../mensajeria/mail');
 
 var url = require('url');
 
-//var Excel = require('exceljs');
+var Excel = require('exceljs');
 
 router.get('/proyectos',isLoggedIn,  async (req, res) => {
     
@@ -691,7 +691,7 @@ router.get('/proyectosMaps',isLoggedIn,  async (req, res) => {
 
 //proyectosMaps
 
-    /*
+    
 router.post('/exportExcelHoras', isLoggedIn, async function (req, res) {
 
         try {
@@ -859,6 +859,6 @@ router.post('/exportExcelHoras', isLoggedIn, async function (req, res) {
         
           
         });
-*/
+
 
 module.exports = router;

@@ -2711,7 +2711,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
         //to : checkFirma[0].Email,
        // to : "dbenites@renelagos.com",
        to : "cgahona@renelagos.com",
-        folio : oc[0].folio
+       folio : numFormateado+'-'+annio
       };
 
       mensajeria.NotificacionOCClaudio(checkClaudio);

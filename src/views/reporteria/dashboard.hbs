@@ -68,195 +68,176 @@
                 <div class="tab-pane fade show active" id="resultados" role="tabpanel" aria-labelledby="resultados-tab">
                     &nbsp;
                      <div class="row">
-                                 <div class="col-4">
-                                     <div class="x_panel">
-                                        <div class="x_title">
-                                            <h2> <small> Antecedentes Generales </small></h2>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                        <div class="x_content">
+                                 <div class="col-3">
                                             <div class="row">
-                                                    <label class="col-form-label col-md-3 label-align" for="Estado"><b>Estado</b></label>
-                                                    <label class="col-form-label col-md-9 " for="nombre">{{proyecto.descripcion}}</label>
+                                                <label class="col-form-label col-md-3 label-align" for="Estado"><b>Estado</b></label>
+                                                <label class="col-form-label col-md-9 " for="nombre">{{proyecto.descripcion}}</label>
                                             </div>
                                             <div class="row">
-                                                    <label class="col-form-label col-md-3 label-align" for="porcAvance"><b>% Avance</b></label>
-                                                    <div class="col-9">##################</div>
-                                            </div>
-                                            <div class="row">
-                                                    <label class="col-form-label col-md-3 label-align" for="nombre"><b>Nombre</b></label>
-                                                    <label class="col-form-label col-md-9 " for="nombre">{{proyecto.nombre}}</label>
-                                            </div>
-                                            <div class="row">
-                                                    <label class="col-form-label col-md-3 label-align" for="codigo"><b>Código</b></label>
-                                                    <label class="col-form-label col-md-9 " for="nombre">{{proyecto.year}}-{{proyecto.code}}</label>
-                                            </div>
-                                            <div class="row">
-                                                    <label class="col-form-label col-md-3 label-align" for="cliente"><b>Cliente</b></label>
-                                                    <label class="col-form-label col-md-9 " for="nombre">{{proyecto.nomCliente}}</label>
-                                            </div>
-                                            <div class="row">
-                                                     <label class="col-form-label col-md-3 label-align" for="director"><b>Director</b></label> 
-                                                    <label class="col-form-label col-md-9 " for="nombre">{{proyecto.nomDire}}</label>
-                                            </div>
-                                            <div class="row">
-                                                    <label class="col-form-label col-md-3 label-align" for="jdp"><b>Jefe Proyecto</b></label>
-                                                    <label class="col-form-label col-md-9 " for="nombre">{{proyecto.nomJefe}}</label>
+                                                <label class="col-form-label col-md-3 label-align" for="cliente"><b>Cliente</b></label>
+                                                <label class="col-form-label col-md-9 " for="nombre">{{proyecto.nomCliente}}</label>
                                             </div>
                                             <div class="row">
                                                     <label class="col-form-label col-md-3 label-align" for="tipologia"><b>Tipología</b></label> 
                                                     <label class="col-form-label col-md-9 " for="nombre">{{proyecto.tipologia}}</label>
                                             </div>
-                                            <div class="row">
-                                                    <label class="col-form-label col-md-3 label-align" for="tipologia"><b>Superficie m<sup>2</sup></b></label>
-                                                    <label class="col-form-label col-md-9 " for="nombre">{{proyecto.superficie_pre}}</label>
-                                            </div>
-                                            <div class="row">
-                                                    <label class="col-form-label col-md-3 label-align" for="tarifa"><b>Tarifa UF/m<sup>2</sup></b></label>
-                                                    <label class="col-form-label col-md-9 " for="nombre">{{proyecto.valor_metro_cuadrado}}</label>
-                                            </div>
-                                            <div class="row">
-                                                    <label class="col-form-label col-md-3 label-align" for="numplanos"><b>Nº Planos</b></label>
-                                                    <label class="col-form-label col-md-9 " for="nombre">{{proyecto.num_plano_estimado}}</label>
-                                            </div>
-                                        </div>
-                                      </div>
                                  </div>
-                                 <div class="col-9">
-
+                                 <div class="col-3">
+                                     <div class="row">
+                                                <label class="col-form-label col-md-4 label-align" for="director"><b>Director</b></label> 
+                                                <label class="col-form-label col-md-8 " for="nombre">{{proyecto.nomDire}}</label>
+                                            </div>
+                                            <div class="row">
+                                                <label class="col-form-label col-md-4 label-align" for="jdp"><b>Jefe Proyecto</b></label>
+                                                <label class="col-form-label col-md-8 " for="nombre">{{proyecto.nomJefe}}</label>
+                                            </div>
+                                 </div>
+                                 <div class="col-3">
+                                    <div class="row">
+                                                    <label class="col-form-label col-md-4 label-align" for="tipologia"><b>Superficie m<sup>2</sup></b></label>
+                                                    <label class="col-form-label col-md-8 " for="nombre">{{proyecto.superficie_pre}}</label>
+                                            </div>
+                                            <div class="row">
+                                                    <label class="col-form-label col-md-4 label-align" for="tarifa"><b>Tarifa UF/m<sup>2</sup></b></label>
+                                                    <label class="col-form-label col-md-8 " for="nombre">{{proyecto.valor_metro_cuadrado}}</label>
+                                            </div>
+                                            <div class="row">
+                                                    <label class="col-form-label col-md-4 label-align" for="numplanos"><b>Nº Planos</b></label>
+                                                    <label class="col-form-label col-md-8 " for="nombre">{{proyecto.num_plano_estimado}}</label>
+                                            </div>
                                  </div>
                             </div>
                 </div>
                 <div class="tab-pane fade" id="cinterno" role="tabpanel" aria-labelledby="cinterno-tab">
                    &nbsp;
                    <div class="row">
-                       <div class="col-2">
-                           <table class="table" style="text-align: center;">
-											  <thead>
-												<tr>
-												  <th ></th>
-												  <th style="background-color: #ddd;">Horas Ingresadas</th>
-												</tr>
-											  </thead>
-											  <tbody>
-                                                  {{#each centro_costo}}
-                                                    <tr>
-                                                        <th style="background-color: #ddd;">{{centroCosto}}</th>
-                                                        <td>{{t}}</td>
-                                                    </tr>
-                                                    {{/each}}
-												<tr>
-												  <th style="background-color: #ddd;">Externo</th>
-												  <td>{{numHH}}</td>
-												</tr>
-												<tr>
-												  <th style="background-color: #ddd;">Totales</th>
-												  <td>{{varTotalProyecto}}</td>
-												</tr>
-											  </tbody>
-											</table>
-                       </div>
                        <div class="col-5">
-                            <table class="table table-hover" id="tablaCinternos">
-                                        <thead>
-                                            <tr>
-                                                <th>Colaborador</th>
-                                                <th>Nº HH</th>
-                                                <th>Nº HE</th>
-                                                <th>Costo</th>
-                                                <th>Total HH </th>
-                                                <th>% participación</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {{#each cinternos}}
-                                                <tr>
-                                                    <td>{{nombre}}</td>
-                                                    <td>{{numHH}}</td>
-                                                    <td>{{numHE}}</td>
-                                                    <td>{{costo}}</td>
-                                                    <td>{{t}}</td>
-                                                    <td>{{totalPro}}</td>
-                                                </tr>
-                                            {{/each}}
-                                        </tbody>
-                            </table>
+                           <table id="example" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Colaborador</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Nº Horas</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Nº Horas Extras</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Total Horas</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo (UF)</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">% Participación</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    {{#each colaboradores}}
+                                        <tr>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{nombre}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horas}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horasextras}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horastotal}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{valorUF}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{porcentaje}}</td>
+                                        </tr>
+                                    {{/each}}
+                                
+                                 </tbody>
+                           </table>
+                           <br>
+                            <table id="example2" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">HH</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Interno</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo(UF)</th>
+                                       <!--  <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Externo</th> -->
+                                       <!--  <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Totales</th> -->
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    {{#each colaboradoresCentroCosto}}
+                                        <tr>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{nombre}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horas}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horasCosto}}</td>
+                                            <!-- <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{externo}}</td> -->
+                                            <!-- <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{total}}</td> -->
+                                        </tr>
+                                    {{/each}}
+                                
+                                 </tbody>
+                           </table>
                        </div>
-                       <div class="col-5">
-                           <div class="chart-container">
-                            <canvas id="myChart"></canvas>
-                           </div>
-                           <div>
-                                {{#if mensaje }}
-                                    <!-- Button trigger modal -->
-                                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#exampleModalCenter">
-                                    ver Problemas
-                                    </button>
-
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLongTitle">Costo Mensual por cargar</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                          <table class="table table-hover" >
-                                                <thead>
-                                                    <tr>
-                                                        <th>Fecha</th>
-                                                        <th>Colaborador</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {{#each erroresCosto}}
-                                                        <tr>
-                                                            <td>{{annio}}-{{mes}}</td>
-                                                            <td>{{nombre}}</td>
-                                                        </tr>
-                                                    {{/each}}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        </div>
-                                    </div>
-                                    </div>
-                                {{/if}}
+                       <div class="col-7">
+                           <div class="row">
+                                <div class="chart-container">
+                                    <canvas id="myChart"></canvas>
                                 </div>
+                           </div>
+                           <div class="row">
+                               <div class="col-2">
+
+                               </div>
+                               <div class="col-4">
+                                    <div class="chart-container">
+                                        <canvas id="barChart"></canvas>
+                                    </div>
+                               </div>
+                               <div class="col-4">
+                                    <div class="chart-container">
+                                        <canvas id="barChart2"></canvas>
+                                    </div>
+                               </div>
+                                <div class="col-2">
+
+                               </div>
+                           </div>
                        </div>
                    </div>
                 </div>
                 <div class="tab-pane fade" id="cexterno" role="tabpanel" aria-labelledby="cexterno-tab">
                                         &nbsp;
-                    <table class="table table-hover" id="tablaCexternos">
+                    <div class="row">
+                            <div class="col-9">
+                                <table class="table table-striped table-bordered" id="tablaCexternos">
                                 <thead>
                                     <tr>
-                                        <th>Centro Costo</th>
-                                        <th>Moneda</th>
+                                        <th>Proveedor</th>
+                                        <th>Especialidad</th>
+                                        <th>Orden de Compra</th>
                                         <th>Descripción</th>
-                                        <th>Nº OC</th>
-                                        <th>Nº Horas</th>
-                                        <th>Costo</th>
-                                        <th>Total Proyecto</th>
+                                        <th>num HH</th>
+                                        <th>Costo ($)</th>
+                                        <th>Costo (UF)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {{#each cexternos}}
                                         <tr>
+                                            <td>{{nNombre}}</td>
                                             <td>{{ccosto}}</td>
-                                            <td>{{moneda}}</td>
-                                            <td>{{descripcion}}</td>
                                             <td>{{numoc}}</td>
+                                            <td>{{descripcion}}</td>
                                             <td>{{numhh}}</td>
                                             <td>{{costo}}</td>
                                             <td>{{totPro}}</td>
                                         </tr>
                                     {{/each}}
                                 </tbody>
-                            </table>
+                                </table>
+                            </div>
+                            <div class="col-3">
+                                 &nbsp;
+                                     <div class="row">
+                                         <div class="col-11">
+                                            <div class="chart-container">
+                                                <canvas id="barChart3"></canvas>
+                                            </div>
+                                         </div>
+                                     </div>
+                                     <div class="row">
+                                         <div class="col-11">
+                                            <div class="chart-container">
+                                                <canvas id="barChart4"></canvas>
+                                            </div>
+                                         </div>
+                                     </div>
+                            </div>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="facturacion" role="tabpanel" aria-labelledby="facturacion-tab">
                     &nbsp;
@@ -264,12 +245,14 @@
                                 <thead>
                                     <tr>
                                         <th>Solicitó</th>
-                                        <th>Monto Facturado</th>
-                                        <th>% PPto</th>
-                                        <th>Moneda</th>
-                                        <th>Es roc</th>
-                                        <th>Tipo Cobro</th>
-                                        <th>Fecha Pago</th>
+                                        <th>Monto (UF)</th>
+                                        <th>Valor (UF)</th>
+                                        <th>% Facturación</th>
+                                        <th>Hito</th>
+                                        <th>Nº Documento</th>
+                                        <th>Fecha Emisión</th>
+                                        <th>Fecha Deposito</th>
+                                        <th>Estado</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -277,11 +260,13 @@
                                         <tr>
                                             <td>{{Nombre}}</td>
                                             <td>{{monto_a_facturar}}</td>
+                                            <td>{{uf_valor}}</td>
                                             <td>{{porc_ppto}}</td>
-                                            <td>{{moneda}}</td>
-                                            <td>{{roc}}</td>
                                             <td>{{tipoCobro}}</td>
+                                            <td>{{num_factura}}</td>
+                                            <td>{{fecha_factura}}</td>
                                             <td>{{fecha_pago}}</td>
+                                            <td>{{estadoFac}}</td>
                                         </tr>
                                     {{/each}}
                                 </tbody>
@@ -301,10 +286,13 @@
  <script src="../../../template/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
 
 <script>
-      $('#tablaFacturas').DataTable({
-          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+     $('#example').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'>>" +
                 "<'row'<'col-sm-12'tr>>" +
-                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
+                columnDefs: [
+                        { className: 'text-center', targets: [0,1,2,3,4,5] },
+                    ],
         language: {
           "decimal": "",
           "emptyTable": "No hay información",
@@ -326,7 +314,62 @@
           }
         }
       });
-       $('#tablaCexternos').DataTable({
+     var dataTable2 = $('#example2').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
+        columnDefs: [
+                        { className: 'text-center', targets: [0,1,2] },
+                    ],
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        }
+      });
+
+      $('#tablaFacturas').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        }
+      });
+
+     var dataTable3 =  $('#tablaCexternos').DataTable({
           "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
@@ -380,46 +423,275 @@
 $(document).ready(function(){
     
     $.ajax({
-        url: "horas/1985",
+        url: "horas/{{proyecto.id}}",
         dataType: 'json',
         contentType: "application/json; charset=utf-8",
         method: "GET",
         success: function(data) {
-            var nombre = [];
-            var stock = [];
-            var color = ['rgba(239, 223, 0)', 'rgba(254, 80, 0)', 'rgba(218, 24, 132)', 'rgba(0, 119,200)', 'rgba(0, 159, 77)', 'rgba(0, 174, 255)', 'rgba(142, 192, 108)',];
-            //var bordercolor = ['rgba(255,99,132,1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'];
- 
+            let fechas = [];
+            let dataset = [];
+            let labelsCentros = [];
+            let labelsColor = [];
+            let coloresCentro = [];
+            let estado = false;
             for (var i in data) {
-                nombre.push(data[i].nombre);
-                stock.push(data[i].t);
-            }
- 
-            var chartdata = {
-                labels: nombre,
-                datasets: [{
-                    label: nombre,
-                    backgroundColor: color,
-                    borderColor: color,
-                    borderWidth: 2,
-                    hoverBackgroundColor: color,
-                   // hoverBorderColor: bordercolor,
-                    data: stock
-                }]
-            };
- 
-            var mostrar = $("#myChart");
- 
-            var grafico = new Chart(mostrar, {
-                type: 'doughnut',
-                data: chartdata,
-                options: {
-                    responsive: true
+                fechas.push(data[i].fecha);
+                for (var i2 in data[i].centro)
+                {
+                    let containsCentro = !!dataset.find(centro => {return centro.label === data[i].centro[i2].centro});
+                    if (containsCentro === false)
+                    {
+                        dataset.push({
+                            label : data[i].centro[i2].centro,
+                            borderWidth: 1,
+                            data : [],
+                            backgroundColor:data[i].centro[i2].color
+                        });
+                        labelsCentros.push(data[i].centro[i2].centro);
+                        labelsColor.push(data[i].centro[i2].color);
+
+                        
+                    }
                 }
-            });
+                if(estado === false)
+                        {
+                            coloresCentro = data[i].centroColores;
+                            estado = true;
+                        }
+
+            }
+
+            for (let c in dataset)
+            {
+                for (var i in data) {
+                    let valor = 0;
+                     for (var i2 in data[i].centro){
+                         let containsCentro = !!data[i].centro.find(centro => {return centro.centro === dataset[c].label});
+
+                          if (containsCentro === true)
+                          {
+                              let centro = data[i].centro.find(centro => {return centro.centro === dataset[c].label});
+                              valor = centro.horas;
+                          }
+                     }
+                    dataset[c].data.push(valor);
+                }
+            }
+             
+            //console.log(dataset);
+
+            var mostrar = $("#myChart");
+            var mostrar2 = $("#barChart");
+            var mostrar3 = $("#barChart2");
+
+            var mostrar4 = $("#barChart3");
+            var mostrar5 = $("#barChart4");
+ 
+                const chart = new Chart(mostrar, {
+                type: 'bar',
+                data: {
+                    labels: fechas,
+                    datasets: dataset
+                },
+                options: {
+                            plugins: {
+                            title: {
+                                display: true,
+                                text: 'Distribucion Esfuerzo Por Mes'
+                            },
+                            },
+                            responsive: true,
+                            scales: {
+                            x: {
+                                stacked: true,
+                            },
+                            y: {
+                                stacked: true
+                            }
+                            }
+                        }
+                });
+                       
+           let valoresHH = [];
+           let valoresHHCosto = [];
+
+            for (let centros in labelsCentros)
+            {
+                dataTable2.rows().iterator('row', function(context, index){
+                var node = $(this.row(index).node()); 
+                    //console.log(node.context.children[0].innerText);
+                    if (node.context.children[0].innerText != "TOTALES")
+                    {
+                       // console.log(labelsCentros[centros]);
+                       // console.log(node.context.children[0].innerText);
+                        if (labelsCentros[centros] == node.context.children[0].innerText)
+                        {
+                            valoresHH.push(node.context.children[1].innerText);
+                            valoresHHCosto.push(node.context.children[2].innerText);
+                        }
+                    }
+                });
+            }
+
+            var data = {
+                        labels: labelsCentros,
+                        datasets: [
+                            {
+                                fill: true,
+                                backgroundColor: labelsColor,
+                                data: valoresHH
+                            }
+                        ]
+                    };
+            var dataCosto = {
+                        labels: labelsCentros,
+                        datasets: [
+                            {
+                                fill: true,
+                                backgroundColor: labelsColor,
+                                data: valoresHHCosto
+                            }
+                        ]
+                    };
+
+            const chart2 = new Chart(mostrar2, {
+                type: 'pie',
+                data: data,
+                options: {
+                            plugins: {
+                            title: {
+                                display: true,
+                                text: 'Distribucion TIEMPO (HH)'
+                            },
+                            },
+                            responsive: true
+                        }
+                });
+
+            const chart3 = new Chart(mostrar3, {
+                type: 'pie',
+                data: dataCosto,
+                options: {
+                            plugins: {
+                            title: {
+                                display: true,
+                                text: 'Distribucion COSTOS (UF)'
+                            },
+                            },
+                            responsive: true
+                        }
+                });
+
+
+          //  console.log(labelsCentros);
+          // Recorrer la tabla de costos externos.
+
+          let cExternos= [];
+
+           dataTable3.rows().iterator('row', function(context, index){
+                var node = $(this.row(index).node());
+
+                const centroCostoExterno = !!cExternos.find(centro => {return centro.nombre === node.context.children[1].innerText });
+                if (centroCostoExterno === false)
+                {
+                    cExternos.push({
+                                        nombre :node.context.children[1].innerText ,
+                                        color : "",
+                                        horas : node.context.children[4].innerText,
+                                        costo : node.context.children[6].innerText
+                                });
+
+                    const centroCostoExternoValor = cExternos.find(centro => {return centro.nombre === node.context.children[1].innerText });
+                }
+                else
+                {
+                    const centroCostoExternoValor = cExternos.find(centro => {return centro.nombre === node.context.children[1].innerText });
+
+                    centroCostoExternoValor.horas =  parseFloat(centroCostoExternoValor.horas) +  parseFloat(node.context.children[4].innerText);
+                    centroCostoExternoValor.costo =  parseFloat(centroCostoExternoValor.costo) +  parseFloat(node.context.children[6].innerText);
+                }
+
+               // console.log(node.context.children[4].innerText);
+           });
+
+        //coloresCentro
+        let labelsCentrosExterno = [];
+        let labelsColorExterno = [];
+        let labelsHHExterno = [];
+        let labelsCostoExterno = [];
+
+         for (let centros in cExternos)
+         {
+             for (let centro in coloresCentro)
+             {
+                 if (cExternos[centros].nombre === coloresCentro[centro].centroCosto)
+                 {
+                    cExternos[centros].color =  coloresCentro[centro].color;
+
+                    
+                 }
+             }
+             labelsCentrosExterno.push(cExternos[centros].nombre );
+             labelsColorExterno.push(cExternos[centros].color );
+             labelsHHExterno.push(cExternos[centros].horas );
+             labelsCostoExterno.push(cExternos[centros].costo );
+         }
+
+         var dataCostoExternoHH = {
+                        labels: labelsCentrosExterno,
+                        datasets: [
+                            {
+                                fill: true,
+                                backgroundColor: labelsColorExterno,
+                                data: labelsHHExterno
+                            }
+                        ]
+                    };
+
+        var dataCostoExternoCosto = {
+                        labels: labelsCentrosExterno,
+                        datasets: [
+                            {
+                                fill: true,
+                                backgroundColor: labelsColorExterno,
+                                data: labelsCostoExterno
+                            }
+                        ]
+                    };
+
+
+           const chart4 = new Chart(mostrar4, {
+                type: 'pie',
+                data: dataCostoExternoHH,
+                options: {
+                            plugins: {
+                            title: {
+                                display: true,
+                                text: 'Distribucion HORAS (HH)'
+                            },
+                            },
+                            responsive: true
+                        }
+                });
+
+                const chart5 = new Chart(mostrar5, {
+                type: 'pie',
+                data: dataCostoExternoCosto,
+                options: {
+                            plugins: {
+                            title: {
+                                display: true,
+                                text: 'Distribucion COSTOS (UF)'
+                            },
+                            },
+                            responsive: true
+                        }
+                });
+
+
         },
         error: function(data) {
-            console.log(data);
+            
         }
     });
 });

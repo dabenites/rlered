@@ -89,11 +89,35 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
         try {
                
                 const { id } = req.params;
+
+
+                // valores de moneda de UF 
+                const valorUFMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
+
+                let valorUfMensual = []; // Ordenamiento por pesona. 
+
+                valorUFMes.forEach(
+                        element => {    
+                                       const containsFecha = !!valorUfMensual.find(fecha => {return fecha.fecha === element.fecha });
+
+                                        if (containsFecha === false)
+                                        {
+                                                valorUfMensual.push(
+                                                        { 
+                                                                fecha : element.fecha,
+                                                                valor : element.valor
+                                                        }
+                                                      );
+                                        }
+                                    }
+                       );
+
+                //console.log(valorUfMensual);                    
    
                 /// buscar la informacion del proyecto con el id que viene por la ruta GET
             
                 const proyecto = await pool.query("SELECT t1.year, t1.nombre, t1.code, t2.descripcion , t1a.name AS nomCliente,t1.valor_metro_cuadrado,t1.num_plano_estimado,"+
-                                                  " t1b.Nombre AS nomDire, t1c.Nombre AS nomJefe, t3.descripcion AS tipologia,t1.superficie_pre" +
+                                                  " t1b.Nombre AS nomDire, t1c.Nombre AS nomJefe, t3.descripcion AS tipologia,t1.superficie_pre,t1.id" +
                                                   " FROM pro_proyectos as t1 " +
                                                   " LEFT JOIN contacto AS t1a ON t1.id_cliente = t1a.id "+
                                                   " LEFT JOIN sys_usuario AS t1b ON t1.id_director = t1b.idUsuario" +
@@ -104,7 +128,17 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                   " AND t1.id_tipo_proyecto = t3.id", [id]);
             
             
-                const facturas = await pool.query("SELECT *, t5.descripcion AS tipoCobro, if(t1.es_roc = 1 ,'SI','No' ) as roc, t4.descripcion AS moneda " +
+                const facturas = await pool.query("SELECT *, t5.descripcion AS tipoCobro, if(t1.es_roc = 1 ,'SI','No' ) as roc, t4.descripcion AS moneda, t2.descripcion AS estadoFac,  " +
+                                                        " ( " +
+                                                        " SELECT format(t1a.valor,2, 'de_DE') " +
+                                                        " FROM " +
+                                                                " moneda_valor AS t1a " +
+                                                        " WHERE  " +
+                                                                " t1a.id_moneda = 4 " +
+                                                        " AND " +
+                                                                " t1a.fecha_valor = t1.fecha_factura " +
+                                                        " LIMIT 1 " +
+                                                        " ) AS 'uf_valor'" +
                                                     " FROM fact_facturas AS t1 " +
                                                     " LEFT JOIN sys_usuario AS t1a ON t1.id_solicitante = t1a.idUsuario,"+
                                                     " fact_estados AS t2, " +
@@ -115,13 +149,13 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                     " AND " +
                                                             " t1.id_proyecto = ? " +
                                                     " AND  " +
-                                                            " t1.id_estado = 3"+
+                                                            " t1.id_estado in (1,2,3) "+
                                                     " AND  " +
                                                             " t1.id_tipo_moneda = t4.id_moneda" +
                                                     " AND " +
                                                             "t1.id_tipo_cobro = t5.id",[id]);
-            
-            
+
+
                 const cexternos = await pool.query("SELECT " +
                                                             " t1.cc_a_pagar 	AS ccosto, " +
                                                             " t2.descripcion AS moneda, " +
@@ -129,161 +163,328 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                             " t1.num_occ AS numoc, "+
                                                             " t1.num_hh 		AS numhh, " +
                                                             " t1.costo 		AS costo, " +
-                                                            " 'valor Proyecto' AS totPro " +
+                                                            " t1a.nombre as nNombre, " +
+                                                            " FORMAT(costo / t1b.valor,2) AS totPro " +
                                                     " FROM " +
-                                                            " proyecto_costo_externo AS t1, " +
+                                                            " proyecto_costo_externo AS t1 " +
+                                                            " LEFT JOIN moneda_valor AS t1b ON DATE_FORMAT( t1.fecha_carga, '%Y-%m-%d') = t1b.fecha_valor AND t1b.id_moneda = 4  " +
+                                                            " LEFT JOIN proyecto_prov_externo as t1a ON t1.id_prob_externo = t1a.id_prov_externo  , " +
                                                             " moneda_tipo AS t2 " +
                                                     " WHERE  " +
                                                             " t1.id_proyecto = ? " +
                                                     " AND  " +
-                                                            "t1.id_moneda = t2.id_moneda",[id]);
+                                                            "t1.id_moneda = t2.id_moneda"+
+                                                    " UNION " +
+                                                    " SELECT  " +
+                                                            " t2.centroCosto AS ccosto,"+
+                                                            " t3a.descripcion AS moneda, " +
+                                                            " t3.descripcion AS descripcion,"+
+                                                            " t1.folio AS numoc,"+
+                                                            " t3.cantidad AS numhh,"+
+                                                            " if (t3.id_moneda = 4,FORMAT( t3.precio_unitario * t3.tipo_cambio,0,'de_DE'), 0) AS costo, "+
+                                                            " if (t1.id_tipo = 3 , 'Empresa' , (SELECT t1c.nombre FROM prov_externo AS t1c WHERE t1c.id = t1.id_razonsocialpro)) as nNombre , "+
+                                                            " if (t3.id_moneda = 4, t3.cantidad * t3.precio_unitario,0) AS totPro " +
+                                                     " FROM " +
+                                                            " orden_compra AS t1, " +
+                                                            " centro_costo AS t2, " +
+                                                            " orden_compra_requerimiento AS t3 " +
+                                                            " LEFT JOIN   moneda_tipo AS t3a ON t3.id_moneda = t3a.id_moneda " +
+                                                     " WHERE  " +
+                                                            " t1.id_proyecto = ? " +
+                                                     " AND  " +
+                                                            " t1.id_estado > 2 " +
+                                                     " AND  " +
+                                                            " t1.id_centro_costo = t2.id " +
+                                                      " AND  " +
+                                                            " t1.id = t3.id_solicitud  ",[id, id]);
+      
                     var numHH = 0;
-                     cexternos.forEach(element => {numHH = numHH + element.numhh; });
-            
-                 const numeroHoras = await pool.query("SELECT if (SUM(t1.nHH) / 6 +   SUM(t1.nHE) / 6 is NULL , 0 , SUM(t1.nHH) / 6 +   SUM(t1.nHE) / 6) as numHH FROM bitacora AS t1 WHERE t1.project = ?",[id]); 
-                 const cinternos = await pool.query("SELECT " +
-                                                            " t2.Nombre AS nombre, " +
-                                                            " t2.idUsuario AS idUsuario, " +
-                                                            " SUBSTRING(t1.date,1,7) AS fecha, " +
-                                                            " 'moneda' AS moneda, " +
-                                                            " 'valor' AS valorMonda, " +
-                                                            " SUM(t1.nHH) / 6 AS numHH, " +
-                                                            " SUM(t1.nHE) / 6 AS numHE, " +
-                                                            " (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) AS t, " +	 
-                                                            " 'total' AS total, " +
-                                                            " t2b.centroCosto AS centroCosto, " +
-                                                            " 'costo' AS costo, " +
-                                                            " 'Total Proyecto' AS totalPro " +
-                                                            " FROM  " +
-                                                            " bitacora AS t1, " +
-                                                            " sys_usuario AS t2 " +
-                                                                    " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
-                                                                    " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
-                                                            " WHERE  " +
-                                                            " t1.project = ? " +
-                                                            " AND  " +
-                                                            " t1.owner = t2.idUsuario " +
-                                                            " GROUP BY nombre " +
-                                                            " ORDER BY t DESC",[id]);
-            
-                    const detalleInterno = await pool.query("SELECT " +
-                                                            " t2.Nombre AS nombre, " +
-                                                            " t2.idUsuario AS idUsuario, " +
-                                                            " SUBSTRING(t1.date,1,7) AS fecha, " +
-                                                            " SUBSTRING(t1.date,1,4) AS annio, " +
-                                                            " SUBSTRING(t1.date,6,2) AS mes, " +
-                                                            " 'moneda' AS moneda, " +
-                                                            " 'valor' AS valorMonda, " +
-                                                            " SUM(t1.nHH) / 6 AS numHH, " +
-                                                            " SUM(t1.nHE) / 6 AS numHE, " +
-                                                            " (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) AS t, " +	 
-                                                            " 'total' AS total, " +
-                                                            " t2b.centroCosto AS centroCosto, " +
-                                                            " 'Total Proyecto' AS totalPro " +
-                                                            " FROM  " +
-                                                            " bitacora AS t1, " +
-                                                            " sys_usuario AS t2 " +
-                                                                    " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
-                                                                    " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
-                                                            " WHERE  " +
-                                                            " t1.project = ? " +
-                                                            " AND  " +
-                                                            " t1.owner = t2.idUsuario " +
-                                                            " GROUP BY fecha, nombre " +
-                                                            " ORDER BY t DESC",[id]);
-            
-                    const costoInterno = await pool.query("SELECT * FROM sys_usuario_costo AS t1");
-                    var costoMesUsuario = [];
-                    var erroresCosto = [];
-                    var mensaje = "";
-                    detalleInterno.forEach(
-                            element => {    
-                                            var query = {annio: element.annio, mes:  element.mes, idUsuario :element.idUsuario };
-                                            var result = costoInterno.filter(search, query);
-                                            costoMesUsuario.push(result);
-                                            //console.log(result);
-                                            if (result.length === 0)
-                                            {
-                                                    //console.log(element.annio + ":" + element.mes + " " + element.nombre);
-                                                    element.costo = 0;
-                                                    mensaje = "Exiten valores de usuario que no estan ingresados";
-                                                    erroresCosto.push(element);
-                                            }
-                                            else
-                                            {
-                                                    //console.log(element.annio + "///"+ element.mes + "///" + element.idUsuario + "///" + result[0].costo);
-                                                    element.costo = result[0].costo;
-                                            }
+                let centroCostoHH = [];
+                cexternos.forEach(element => {
+                                        numHH = numHH + element.numhh; 
+
+                                        const containsCentroCosto = !!centroCostoHH.find(centro => {return centro.nombre === element.ccosto });
+
+                                        if (containsCentroCosto === true)
+                                        {
+                                         const colCentroCosto = centroCostoHH.find(centro => {return centro.nombre === element.ccosto });
+                                         colCentroCosto.horas = colCentroCosto.horas + parseInt(element.numhh);
+                                         
                                         }
-                           );
-            
-                    //console.log(detalleInterno);
-                    var infoPersona = new Array();
-                    
-                    detalleInterno.forEach(
-                                            element => {    
-                                                    var query = { idUsuario :element.idUsuario };
-                                                    var result = infoPersona.filter(search, query);
-                                                            if (result.length === 0)
-                                                            {
-                                                                    infoPersona.push({ idUsuario :element.idUsuario, costo : Math.round(element.numHH  * element.costo + element.numHE  * element.costo *1.5)  });
-                                                            }
-                                                            else
-                                                            {
-                                                                    result[0].costo =  Math.round(result[0].costo) +  Math.round( element.numHH  * element.costo + element.numHE  * element.costo *1.5) ;
-                                                            }
+                                        else
+                                        {
+                                                centroCostoHH.push(
+                                                        { 
+                                                                nombre : element.ccosto,
+                                                                horas : parseInt(element.numhh)
                                                         }
-                                           );
-                    
-            
-                    const centro_costo = await pool.query("SELECT " +
-                                                            " t2.Nombre AS nombre, " +
-                                                            " SUBSTRING(t1.date,1,7) AS fecha, " +
-                                                            " 'moneda' AS moneda, " +
-                                                            " 'valor' AS valorMonda, " +
-                                                            " SUM(t1.nHH) / 6 AS numHH, " +
-                                                            " SUM(t1.nHE) / 6 AS numHE, " +
-                                                            " (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) AS t, " +	 
-                                                            " 'total' AS total, " +
-                                                            " t2b.centroCosto AS centroCosto, " +
-                                                            " 'Total Proyecto' AS totalPro " +
-                                                            " FROM  " +
-                                                            " bitacora AS t1, " +
-                                                            " sys_usuario AS t2 " +
-                                                                    " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
-                                                                    " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
-                                                            " WHERE  " +
-                                                            " t1.project = ? " +
-                                                            " AND  " +
-                                                            " t1.owner = t2.idUsuario " +
-                                                            " GROUP BY centroCosto " +
-                                                            " ORDER BY t DESC",[id]);
-            
-            
-                   var numHHCosto = 0;
-                            centro_costo.forEach(element => {numHHCosto = numHHCosto + element.t; });
-            
-            
-                   var  varTotalProyecto = numHHCosto + numHH;
-                   //console.log(infoPersona);
-                   cinternos.forEach(
-                    element => {    
-                                    var query = { idUsuario :element.idUsuario };
-                                    var result = infoPersona.filter(search, query);
-                                    element.costo =result[0].costo;
-                                    element.totalPro = Math.round( (element.t) / numeroHoras[0].numHH * 100, 2);
+                                                      );
+                                        }
+                                });
+                                
+                //console.log(centroCostoHH); 
+                 
+
+                 const centro_costo = await pool.query("SELECT " +
+                                                        " t2.Nombre AS nombre, " +
+                                                        " SUBSTRING(t1.date,1,7) AS fecha, " +
+                                                        " 'moneda' AS moneda, " +
+                                                        " 'valor' AS valorMonda, " +
+                                                        " SUM(t1.nHH) / 6 AS numHH, " +
+                                                        " SUM(t1.nHE) / 6 AS numHE, " +
+                                                        " (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) AS t, " +	 
+                                                        " 'total' AS total, " +
+                                                        " t2b.centroCosto AS centroCosto, " +
+                                                        " 'Total Proyecto' AS totalPro " +
+                                                        " FROM  " +
+                                                        " bitacora AS t1, " +
+                                                        " sys_usuario AS t2 " +
+                                                                " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
+                                                                " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
+                                                        " WHERE  " +
+                                                        " t1.project = ? " +
+                                                        " AND  " +
+                                                        " t1.owner = t2.idUsuario " +
+                                                        " GROUP BY centroCosto " +
+                                                        " ORDER BY t DESC",[id]);
+        var costoMesUsuario = [];
+        var erroresCosto = [];
+        var mensaje = "";
+        var varTotalProyecto = "";
+
+        const detalleInterno = await pool.query(" SELECT " +
+                                                " t2.Nombre AS nombre, " +
+                                                " t2.idUsuario AS idUsuario, " +
+                                                " SUBSTRING(t1.date,1,7) AS fecha, " +
+                                                " SUBSTRING(t1.date,1,4) AS annio, " +
+                                                " SUBSTRING(t1.date,6,2) AS mes, " +
+                                                " 'moneda' AS moneda, " +
+                                                " 'valor' AS valorMonda, " +
+                                                " SUM(t1.nHH) / 6 AS numHH, " +
+                                                " SUM(t1.nHE) / 6 AS numHE, " +
+                                                " (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) AS t, " +	 
+                                                " 'total' AS total, " +
+                                                " t2b.centroCosto AS centroCosto, " +
+                                                " 'Total Proyecto' AS totalPro, " +
+                                                " t2c.costo AS costoMes " +
+                                                " FROM  " +
+                                                " bitacora AS t1 " +
+                                                " LEFT JOIN sys_usuario_costo AS t2c ON t2c.idUsuario = t1.owner AND t2c.annio = SUBSTRING(t1.date,1,4) AND t2c.mes = SUBSTRING(t1.date,6,2),   "+
+                                                " sys_usuario AS t2 " +
+                                                        " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
+                                                        " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
+                                                " WHERE  " +
+                                                " t1.project = ? " +
+                                                " AND  " +
+                                                " t1.owner = t2.idUsuario " +
+                                                " GROUP BY fecha, nombre " +
+                                                " UNION " +
+                                                " SELECT  " +
+                                                              "  t2.Nombre AS nombre,"+
+                                                              " t2.idUsuario AS idUsuario,"+
+                                                              "  SUBSTRING(t1.ini_time,1,7) AS fecha,"+
+                                                              "  SUBSTRING(t1.ini_time,1,4) AS annio,"+
+                                                              "  SUBSTRING(t1.ini_time,6,2) AS mes,"+
+                                                              "  'moneda' AS moneda, "+
+                                                              "  'valor' AS valorMonda,"+
+                                                              "  SUM(TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600) AS numHH, "+
+                                                              "  0 as numHE, " +
+                                                              "  SUM(TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600) AS t, " +
+                                                              "  'total' AS total, " +
+                                                              "  t2b.centroCosto AS centroCosto, " +
+                                                              "  'Total Proyecto' AS totalPro, " +
+                                                              "  t2c.costo AS costoMes " +     
+                                                " FROM  " +
+                                                              "  bita_horas AS t1 " +
+                                                                        " LEFT JOIN sys_usuario_costo AS t2c ON t2c.idUsuario = t1.id_session AND t2c.annio = SUBSTRING(t1.ini_time,1,4) AND t2c.mes = SUBSTRING(t1.ini_time,6,2), " +
+                                                              " sys_usuario AS t2 " +
+                                                                        " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
+                                                                        " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
+                                                " WHERE  " +
+                                                              " t1.id_project = ? " +
+                                                " AND  " +
+                                                                " t1.id_session = t2.idUsuario " +
+                                                " GROUP BY fecha, nombre " +
+                                                " ORDER BY t DESC",[id,id]);
+
+        //console.log(detalleInterno);
+        
+        let colaboradores = []; // Ordenamiento por pesona. 
+        let colaboradoresCentroCosto = [];
+        let costoColaborador = [];                        
+        detalleInterno.forEach(
+                element => {  
+                                 
+                               if (element.costoMes === null) {
+                                let costoColaboradorUserValor = costoColaborador.find(user => {return user.nombre === element.nombre });
+                                element.costoMes = costoColaboradorUserValor.costo;
+                               }
+                               else
+                               {
+                                const costoColaboradorUser = !!costoColaborador.find(user => {return user.nombre === element.nombre });
+
+                                if (costoColaboradorUser === false)
+                                {
+                                        costoColaborador.push({
+                                                nombre :  element.nombre,
+                                                costo : element.costoMes
+                                        });
                                 }
-                   );
-                   //console.log(cinternos);
+                               }
+
+                               const containsUser = !!colaboradores.find(user => {return user.nombre === element.nombre });
+
+                               
+                               const containsValorUF = !!valorUfMensual.find(fecha => {return fecha.fecha === element.fecha });
+
+                               let valorDelMesUF = 0;
+
+                               if (containsValorUF === true)
+                               {
+                                const colUF = valorUfMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                valorDelMesUF = colUF.valor;
+                               }
+                               else
+                               {
+                                       // registrar el error del valor de la UF MES
+                               }
+
+
+                                if (containsUser === true)
+                                {
+                                        const col = colaboradores.find(user => {return user.nombre === element.nombre });
+                                        col.horas       =   col.horas + element.numHH;
+                                        col.horasextras =   col.horasextras + element.numHE;
+                                        col.horastotal  =   col.horastotal + element.t;
+                                        col.costoHHMes  =   col.costoHHMes + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5);
+                                        col.valorUF     =   col.valorUF + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF
+                                }
+                                else
+                                {
+                                    colaboradores.push(
+                                                        { 
+                                                                nombre : element.nombre,
+                                                                horas : element.numHH,
+                                                                horasextras : element.numHE,
+                                                                horastotal : element.t,
+                                                                costo : '',
+                                                                porcentaje : 0,
+                                                                costoHHMes : element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5,
+                                                                valorUF : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF
+                                                        }
+                                                      );
+                                }
+
+                                // analisis por centro de costo. 
+                                   const containsCentro = !!colaboradoresCentroCosto.find(centro => {return centro.nombre === element.centroCosto });
+                                   if (containsCentro === true)
+                                   {
+                                        const colCentro = colaboradoresCentroCosto.find(centro => {return centro.nombre === element.centroCosto });
+                                        colCentro.horas       =   colCentro.horas + element.t;
+                                        colCentro.horasCosto       =   colCentro.horasCosto + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF;
+                                        //console.log(colaboradoresCentroCosto);
+                                   }
+                                   else
+                                   {
+                                        colaboradoresCentroCosto.push(
+                                                { 
+                                                        nombre : element.centroCosto,
+                                                        horas : element.t,
+                                                        horasCosto : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF,
+                                                        externo : 0,
+                                                        total :0
+                                                }
+                                              );
+                                        //console.log(colaboradoresCentroCosto);
+                                   }
+
+                            }
+               );
+
+               
+
+               let horasTotal= 0;
+               colaboradores.forEach(element => {  
+                const col = colaboradores.find(user => {return user.nombre === element.nombre });
+                       horasTotal = horasTotal + col.horastotal;
+                });
+                
+                colaboradores.forEach(element => {  
+                        const col = colaboradores.find(user => {return user.nombre === element.nombre });
+                                col.porcentaje = parseFloat(  (col.horastotal /horasTotal)*100 ).toFixed(2);
+                                col.valorUF = parseFloat( col.valorUF ).toFixed(2);
+                                col.horas = parseFloat( col.horas ).toFixed(2);
+                                col.horastotal = parseFloat( col.horastotal ).toFixed(2);
+                                
+                        });
+
             
+            colaboradoresCentroCosto.forEach(
+                    element=> {
+                        const containsCentro = !!centroCostoHH.find(centro => {return centro.nombre === element.nombre });
+                         if (containsCentro === true)    
+                         {
+                                const centro = colaboradoresCentroCosto.find(centro => {return centro.nombre === element.nombre });   
+                                const centroExterno = centroCostoHH.find(centro => {return centro.nombre === element.nombre });
+                                centro.externo = centroExterno.horas;
+                         }
+                    }
+            );
+
+            centroCostoHH.forEach(
+                    element => {
+                        const containsCentro = !!colaboradoresCentroCosto.find(centro => {return centro.nombre === element.nombre });
+                        if (containsCentro === false) 
+                        {
+                                const centroCostoExterno = centroCostoHH.find(centro => {return centro.nombre === element.nombre });
+                               // colaboradoresCentroCosto.push({nombre : element.nombre,
+                               //         horas : 0,
+                               //         externo :centroCostoExterno.horas,
+                               //         total :0});    
+                        }
+                    }
+            );
             
+            let interna = 0;
+            let externa = 0;
+            let total = 0;
+            let costoUF = 0;
+            colaboradoresCentroCosto.forEach(
+                element => {
+                        const centro = colaboradoresCentroCosto.find(centro => {return centro.nombre === element.nombre });
+                        //console.log(centro);
+                        centro.total = centro.horas + centro.externo;
+                        interna = interna + centro.horas;
+                        externa = externa + centro.externo;
+                        total = total + centro.total;
+                        costoUF = costoUF + centro.horasCosto;
+                });
+                colaboradoresCentroCosto.push({nombre : 'TOTALES',
+                        horas : interna,
+                        externo :externa,
+                        total :total,
+                        horasCosto :costoUF
+                });
+
+        colaboradoresCentroCosto.forEach(element => {  
+                        //console.log(element);
+                        const col = colaboradoresCentroCosto.find(centro => {return centro.nombre === element.nombre });
+                        col.horas = parseFloat( col.horas ).toFixed(2);
+                        col.externo = parseFloat( col.externo ).toFixed(2);
+                        col.total = parseFloat( col.total ).toFixed(2);
+                        col.horasCosto = parseFloat( col.horasCosto ).toFixed(2);
+                        });
+
+       
+
+
             if (mensaje === "")
             {
-                    res.render('reporteria/dashboard', { erroresCosto, varTotalProyecto, numHH, centro_costo,cinternos, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template'});
+                    res.render('reporteria/dashboard', { colaboradoresCentroCosto, colaboradores, erroresCosto, varTotalProyecto, numHH, centro_costo, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template'});
             }
             else
             {
-                    res.render('reporteria/dashboard', { erroresCosto, mensaje, varTotalProyecto, numHH, centro_costo,cinternos, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template'});
+                    res.render('reporteria/dashboard', { colaboradoresCentroCosto, colaboradores, erroresCosto, mensaje, varTotalProyecto, numHH, centro_costo, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template'});
             }
     
             
@@ -312,69 +513,99 @@ router.get('/proyectos/horas/:id',isLoggedIn,  async (req, res) => {
         try {
                 const { id } = req.params;
 
-                const maximos = await pool.query("SELECT  " +
-                                                                " t1.owner " +
-                                                " FROM  bitacora AS t1 WHERE   t1.project = "+id+"    " +       
-                                                " GROUP BY t1.owner   " +
-                                                " ORDER BY (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) DESC " +
-                                                "LIMIT 6");
-        
-               var userMaximo = "";
-               maximos.forEach(element => {
-                                                  if (userMaximo === ''){userMaximo  =  element.owner; }
-                                                        else {userMaximo  = userMaximo + "," + element.owner;}
-                                                 }
-                                                );
+                
                
-                const cinternos = await pool.query("SELECT " +
-                                                        " t2.Nombre AS nombre, " +
-                                                        " SUBSTRING(t1.date,1,7) AS fecha, " +
-                                                        " 'moneda' AS moneda, " +
-                                                        " 'valor' AS valorMonda, " +
-                                                        " SUM(t1.nHH) / 6 AS numHH, " +
-                                                        " SUM(t1.nHE) / 6 AS numHE, " +
-                                                        " (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) AS t, " +	 
-                                                        " 'total' AS total, " +
-                                                        " t2b.centroCosto AS centroCosto, " +
-                                                        " 'Total Proyecto' AS totalPro " +
-                                                        " FROM  " +
-                                                        " bitacora AS t1, " +
-                                                        " sys_usuario AS t2 " +
-                                                                " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
-                                                                " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
-                                                        " WHERE  " +
-                                                        " t1.project = ? " +
-                                                        " AND  " +
-                                                        " t1.owner = t2.idUsuario " +
-                                                        " AND t1.owner IN ("+userMaximo+") " +
-                                                        " GROUP BY nombre " +
-                                                  "UNION " +
-                                                  "SELECT " +
-                                                        " 'Otros' AS nombre, " +
-                                                        " SUBSTRING(t1.date,1,7) AS fecha, " +
-                                                        " 'moneda' AS moneda, " +
-                                                        " 'valor' AS valorMonda, " +
-                                                        " SUM(t1.nHH) / 6 AS numHH, " +
-                                                        " SUM(t1.nHE) / 6 AS numHE, " +
-                                                        " (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) AS t, " +	 
-                                                        " 'total' AS total, " +
-                                                        " t2b.centroCosto AS centroCosto, " +
-                                                        " 'Total Proyecto' AS totalPro " +
-                                                        " FROM  " +
-                                                        " bitacora AS t1, " +
-                                                        " sys_usuario AS t2 " +
-                                                                " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
-                                                                " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
-                                                        " WHERE  " +
-                                                        " t1.project = ? " +
-                                                        " AND  " +
-                                                        " t1.owner = t2.idUsuario " +
-                                                        " AND t1.owner NOT IN ("+userMaximo+") " +                                              
-                                                        " GROUP BY t1.project " +
-                                                        " ORDER BY t DESC",[id,id]);
-        
-        
-        
+                const detalleInterno = await pool.query("SELECT " +
+                " SUBSTRING(t1.date,1,7) AS fecha, " +
+                " (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) AS t, " +	 
+                " t2b.centroCosto AS centroCosto, " +
+                " t2b.color AS color " +
+                " FROM  " +
+                " bitacora AS t1, " +
+                " sys_usuario AS t2 " +
+                        " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
+                        " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
+                " WHERE  " +
+                " t1.project = ? " +
+                " AND  " +
+                " t1.owner = t2.idUsuario " +
+                " GROUP BY fecha, centroCosto "+
+                " UNION " +
+                " SELECT " +
+                                " SUBSTRING(t1.ini_time,1,7) AS fecha,"+
+                                " SUM(TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600) AS t," +
+                                " t2b.centroCosto AS centroCosto, " +
+                                " t2b.color AS color" +       
+                " FROM  " +
+                        " bita_horas AS t1,"+
+                        " sys_usuario AS t2 "+
+                                " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id "+
+                                " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
+                " WHERE " +
+                        " t1.id_project = ? " +
+                " AND  " +
+                        " t1.id_session = t2.idUsuario " +
+                " GROUP BY fecha, centroCosto " +
+                " ORDER BY fecha ASC",[id,id]);
+                
+                /*const detalleInterno = await pool.query("SELECT " +
+                " SUBSTRING(t1.date,1,7) AS fecha, " +
+                " (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) AS t, " +	 
+                " t2b.centroCosto AS centroCosto, " +
+                " t2b.color AS color " +
+                " FROM  " +
+                " bitacora AS t1, " +
+                " sys_usuario AS t2 " +
+                        " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
+                        " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
+                " WHERE  " +
+                " t1.project = ? " +
+                " AND  " +
+                " t1.owner = t2.idUsuario " +
+                " GROUP BY fecha, centroCosto " +
+                " ORDER BY fecha ASC",[id]);*/
+
+
+                let informacion = [];
+                let cinternos= [];
+
+                const centrosCosto = await pool.query("  SELECT * FROM centro_costo");
+
+                detalleInterno.forEach(element => {
+                        const containsFecha = !!cinternos.find(fecha => {return fecha.fecha === element.fecha });
+
+                        if (containsFecha ===false)
+                        {
+                                cinternos.push({
+                                        fecha :element.fecha,
+                                        centro : [],
+                                        color : element.color,
+                                        centroColores : centrosCosto
+                                });
+                                
+                                let colCentroCosto = cinternos.find(fecha => {return fecha.fecha === element.fecha });
+                                colCentroCosto.centro.push({
+                                        centro : element.centroCosto,
+                                        horas : element.t,
+                                        color : element.color
+                                });
+
+                        }
+                        else
+                        {
+                                let colCentroCosto = cinternos.find(fecha => {return fecha.fecha === element.fecha });
+                                colCentroCosto.centro.push({
+                                        centro : element.centroCosto,
+                                        horas : element.t,
+                                        color : element.color
+                                }); 
+                        }
+                });
+
+                //informacion.push(cinternos);
+                
+                //console.log(cinternos);
+                       
                 res.send(JSON.stringify(cinternos)); 
         } catch (error) {
                 mensajeria.MensajerErrores("\n\n Archivo : reporteria.js \n Error en el directorio: /proyectos/horas/:id \n" + error + "\n Generado por : " + req.user.login);

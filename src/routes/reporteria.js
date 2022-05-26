@@ -9,6 +9,7 @@ const mensajeria = require('../mensajeria/mail');
 var url = require('url');
 
 var Excel = require('exceljs');
+const { parse } = require('path');
 
 router.get('/proyectos',isLoggedIn,  async (req, res) => {
     
@@ -90,6 +91,12 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                
                 const { id } = req.params;
 
+                const indicadoresAvancesUser = await pool.query("SELECT *, DATE_FORMAT( t1.fecha, '%Y-%m-%d') as fecha " +
+                                                                " FROM pro_proyecto_avance AS t1 " +
+                                                                " WHERE  " +
+                                                                " t1.id_proyecto = ? ", [id] );
+
+               // console.log(indicadoresAvancesUser);
 
                 // valores de moneda de UF 
                 const valorUFMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
@@ -117,14 +124,16 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                 /// buscar la informacion del proyecto con el id que viene por la ruta GET
             
                 const proyecto = await pool.query("SELECT t1.year, t1.nombre, t1.code, t2.descripcion , t1a.name AS nomCliente,t1.valor_metro_cuadrado,t1.num_plano_estimado,"+
-                                                  " t1b.Nombre AS nomDire, t1c.Nombre AS nomJefe, t3.descripcion AS tipologia,t1.superficie_pre,t1.id" +
+                                                  " t1b.Nombre AS nomDire, t1c.Nombre AS nomJefe, t3.descripcion AS tipologia,t1.superficie_pre,t1.id, t4.descripcion AS tipoServicio," +
+                                                  " t1.valor_proyecto, t3.porcentaje_costo, t3.limite_rojo, t3.limite_amarillo " +
                                                   " FROM pro_proyectos as t1 " +
                                                   " LEFT JOIN contacto AS t1a ON t1.id_cliente = t1a.id "+
                                                   " LEFT JOIN sys_usuario AS t1b ON t1.id_director = t1b.idUsuario" +
                                                   " LEFT JOIN sys_usuario AS t1c ON t1.id_jefe = t1c.idUsuario ,"+
-                                                  " proyecto_estado AS t2, proyecto_tipo AS t3  "+
+                                                  " proyecto_estado AS t2, proyecto_tipo AS t3 , proyecto_servicio as t4 "+
                                                   " WHERE t1.id = ?"+
                                                   " AND t1.id_estado = t2.id" +
+                                                  " AND t1.id_tipo_servicio = t4.id" +
                                                   " AND t1.id_tipo_proyecto = t3.id", [id]);
             
             
@@ -201,6 +210,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                     var numHH = 0;
                 let centroCostoHH = [];
                 cexternos.forEach(element => {
+                                        //console.log(element);
                                         numHH = numHH + element.numhh; 
 
                                         const containsCentroCosto = !!centroCostoHH.find(centro => {return centro.nombre === element.ccosto });
@@ -209,6 +219,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         {
                                          const colCentroCosto = centroCostoHH.find(centro => {return centro.nombre === element.ccosto });
                                          colCentroCosto.horas = colCentroCosto.horas + parseInt(element.numhh);
+                                         colCentroCosto.totPro = parseFloat( colCentroCosto.totPro) + parseFloat(element.totPro);
                                          
                                         }
                                         else
@@ -216,7 +227,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                 centroCostoHH.push(
                                                         { 
                                                                 nombre : element.ccosto,
-                                                                horas : parseInt(element.numhh)
+                                                                horas : parseInt(element.numhh),
+                                                                totPro : parseFloat(element.totPro)
                                                         }
                                                       );
                                         }
@@ -307,17 +319,48 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                 " GROUP BY fecha, nombre " +
                                                 " ORDER BY t DESC",[id,id]);
 
-        //console.log(detalleInterno);
+
+
+        let modificaciones = await pool.query("SELECT (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) AS horas " +
+                                " FROM  " +
+                                " bitacora AS t1 " +
+                                " WHERE  " +
+                                            "  t1.project = ? " +
+                                " AND  " +
+                                            "  t1.modificacion = 1 " +
+                                " UNION  " +
+                                " SELECT  " +
+                                             " SUM(TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600) AS horas " +
+                                " FROM " +
+                                          "   bita_horas AS t1 "+
+                                " WHERE  " +
+                                            "    t1.id_project = ? " +
+                                " AND  "+
+                                         "    t1.modificacion = 1 " +
+                                "GROUP BY t1.id_project",[id,id]);
         
+
         let colaboradores = []; // Ordenamiento por pesona. 
         let colaboradoresCentroCosto = [];
+        let colaboradoresCentroCostoGeneral = [];
         let costoColaborador = [];                        
         detalleInterno.forEach(
                 element => {  
-                                 
+                        //console.log(element);  
                                if (element.costoMes === null) {
                                 let costoColaboradorUserValor = costoColaborador.find(user => {return user.nombre === element.nombre });
-                                element.costoMes = costoColaboradorUserValor.costo;
+
+                                if (costoColaboradorUserValor !== undefined)
+                                {
+                                        element.costoMes = costoColaboradorUserValor.costo;
+                                }
+                                else
+                                {
+                                        // registrar este problema.
+                                        element.costoMes = 15000;
+
+                                }
+
                                }
                                else
                                {
@@ -382,7 +425,6 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         const colCentro = colaboradoresCentroCosto.find(centro => {return centro.nombre === element.centroCosto });
                                         colCentro.horas       =   colCentro.horas + element.t;
                                         colCentro.horasCosto       =   colCentro.horasCosto + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF;
-                                        //console.log(colaboradoresCentroCosto);
                                    }
                                    else
                                    {
@@ -395,13 +437,31 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                         total :0
                                                 }
                                               );
-                                        //console.log(colaboradoresCentroCosto);
+                                   }
+                                   const containsCentroGeneral = !!colaboradoresCentroCostoGeneral.find(centro => {return centro.nombre === element.centroCosto });
+                                   if (containsCentroGeneral === true)
+                                   {
+                                        const colCentroGeneral = colaboradoresCentroCostoGeneral.find(centro => {return centro.nombre === element.centroCosto });
+                                        colCentroGeneral.horas       =   colCentroGeneral.horas + element.t;
+                                        colCentroGeneral.horasCosto       =   colCentroGeneral.horasCosto + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF;
+                                   }
+                                   else
+                                   {
+                                        colaboradoresCentroCostoGeneral.push(
+                                                { 
+                                                        nombre : element.centroCosto,
+                                                        horas : element.t,
+                                                        horasCosto : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF,
+                                                        externo : 0,
+                                                        total :0
+                                                }
+                                              );
                                    }
 
                             }
                );
 
-               
+             //  console.log("STEP 2 ");        
 
                let horasTotal= 0;
                colaboradores.forEach(element => {  
@@ -431,24 +491,60 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                     }
             );
 
+            colaboradoresCentroCostoGeneral.forEach(
+                element=> {
+                    const containsCentro = !!centroCostoHH.find(centro => {return centro.nombre === element.nombre });
+                     if (containsCentro === true)    
+                     {
+                            const centro = colaboradoresCentroCostoGeneral.find(centro => {return centro.nombre === element.nombre });   
+                            const centroExterno = centroCostoHH.find(centro => {return centro.nombre === element.nombre });
+                            centro.externo = centroExterno.horas;
+                            centro.costoUFExterno = parseFloat(centroExterno.totPro).toFixed(2);
+                     }
+                }
+        );
+            // 
+
             centroCostoHH.forEach(
                     element => {
                         const containsCentro = !!colaboradoresCentroCosto.find(centro => {return centro.nombre === element.nombre });
                         if (containsCentro === false) 
                         {
                                 const centroCostoExterno = centroCostoHH.find(centro => {return centro.nombre === element.nombre });
-                               // colaboradoresCentroCosto.push({nombre : element.nombre,
-                               //         horas : 0,
-                               //         externo :centroCostoExterno.horas,
-                               //         total :0});    
                         }
                     }
             );
+
+            centroCostoHH.forEach(
+                    
+                element => {
+                     //   console.log(element);
+                    const containsCentro = !!colaboradoresCentroCostoGeneral.find(centro => {return centro.nombre === element.nombre });
+                    if (containsCentro === false) 
+                    {
+                            const centroCostoExterno = centroCostoHH.find(centro => {return centro.nombre === element.nombre });
+                            colaboradoresCentroCostoGeneral.push({nombre : element.nombre,
+                                    horas : 0,
+                                    externo :centroCostoExterno.horas,
+                                    costoUFExterno : parseFloat(centroCostoExterno.totPro).toFixed(2),
+                                    total :0});    
+                    }
+                }
+        );
+
             
             let interna = 0;
             let externa = 0;
             let total = 0;
             let costoUF = 0;
+
+            let internaGeneral = 0;
+            let externaGeneral = 0;
+            let totalGeneral = 0;
+            let costoUFGeneral = 0;
+            let costoUFExteroGeneral = 0;
+
+          
             colaboradoresCentroCosto.forEach(
                 element => {
                         const centro = colaboradoresCentroCosto.find(centro => {return centro.nombre === element.nombre });
@@ -459,12 +555,40 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         total = total + centro.total;
                         costoUF = costoUF + centro.horasCosto;
                 });
-                colaboradoresCentroCosto.push({nombre : 'TOTALES',
+
+           colaboradoresCentroCostoGeneral.forEach(
+                        element => {
+                                const centro = colaboradoresCentroCostoGeneral.find(centro => {return centro.nombre === element.nombre });
+                                //console.log(element);
+                                centro.total = centro.horas + centro.externo;
+                                internaGeneral = internaGeneral + centro.horas;
+                                externaGeneral = externaGeneral + centro.externo;
+                                totalGeneral = totalGeneral + centro.total;
+                                if (centro.horasCosto === undefined){costoUFGeneral = costoUFGeneral + 0;}
+                                else {costoUFGeneral = costoUFGeneral + centro.horasCosto;}
+                                
+                                if (centro.costoUFExterno === undefined){costoUFExteroGeneral = parseFloat(costoUFExteroGeneral) + 0;}
+                                else {costoUFExteroGeneral = parseFloat(costoUFExteroGeneral) + parseFloat(centro.costoUFExterno);}
+
+                                
+                        });
+
+
+            colaboradoresCentroCosto.push({nombre : 'TOTALES',
                         horas : interna,
                         externo :externa,
                         total :total,
                         horasCosto :costoUF
                 });
+
+            colaboradoresCentroCostoGeneral.push({nombre : 'TOTALES',
+                        horas : internaGeneral,
+                        externo :externaGeneral,
+                        total :totalGeneral,
+                        costoUFExterno : costoUFExteroGeneral,
+                        horasCosto :costoUFGeneral,
+                });
+
 
         colaboradoresCentroCosto.forEach(element => {  
                         //console.log(element);
@@ -475,16 +599,53 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         col.horasCosto = parseFloat( col.horasCosto ).toFixed(2);
                         });
 
-       
+        colaboradoresCentroCostoGeneral.forEach(element => {  
+                                
+                                const col = colaboradoresCentroCostoGeneral.find(centro => {return centro.nombre === element.nombre });
+                                col.horas = parseFloat( col.horas ).toFixed(2);
+                                col.externo = parseFloat( col.externo ).toFixed(2);
+                                col.total = parseFloat( col.total ).toFixed(2);
+                                
+                                if (col.horasCosto === undefined){ col.horasCosto = parseFloat( 0 ).toFixed(2);}
+                                else {col.horasCosto = parseFloat( col.horasCosto ).toFixed(2);}
 
+                                if (col.costoUFExterno === undefined){ col.costoUFExterno = parseFloat( 0 ).toFixed(2);}
+                                else {col.costoUFExterno = parseFloat( col.costoUFExterno ).toFixed(2);}
+                                
+                                let costoUfLinea = parseFloat(col.costoUFExterno) + parseFloat(col.horasCosto);
+                                col.costoTotal = parseFloat( costoUfLinea).toFixed(2);
+
+                               // console.log(element);
+
+                                });
+
+            let porcentaje = proyecto[0].porcentaje_costo / 100;
+            let costoEsperado = (parseFloat( proyecto[0].valor_proyecto) * porcentaje).toFixed(2);
+
+          
+            // facturas. 
+            let totalFacturado = 0;
+            let totalPagado = 0;
+            facturas.forEach(element => {  
+
+                totalFacturado = parseFloat(totalFacturado) + parseFloat( element.monto_a_facturar);
+
+                if (element.estadoFac === "Pagada")
+                {
+                        totalPagado = parseFloat(totalPagado) + parseFloat( element.monto_a_facturar);
+                }
+            });
+            
+            totalFacturado = parseFloat(totalFacturado).toFixed(2);
+            totalPagado = parseFloat(totalPagado).toFixed(2);
 
             if (mensaje === "")
             {
-                    res.render('reporteria/dashboard', { colaboradoresCentroCosto, colaboradores, erroresCosto, varTotalProyecto, numHH, centro_costo, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template'});
+                    res.render('reporteria/dashboard', {indicadoresAvancesUser, totalPagado, totalFacturado, modificaciones:modificaciones[0], costoEsperado,colaboradoresCentroCostoGeneral, colaboradoresCentroCosto, colaboradores, erroresCosto, varTotalProyecto, numHH, centro_costo, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template'});
             }
             else
             {
-                    res.render('reporteria/dashboard', { colaboradoresCentroCosto, colaboradores, erroresCosto, mensaje, varTotalProyecto, numHH, centro_costo, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template'});
+                    res.render('reporteria/dashboard', {indicadoresAvancesUser, totalPagado, totalFacturado, modificaciones:modificaciones[0], costoEsperado,colaboradoresCentroCosto, colaboradores, erroresCosto, mensaje, varTotalProyecto, numHH, centro_costo, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template'});
             }
     
             
@@ -920,7 +1081,43 @@ router.get('/proyectosMaps',isLoggedIn,  async (req, res) => {
         
 });
 
-//proyectosMaps
+//uptProyecto
+router.post('/uptProyecto', isLoggedIn, async function (req, res) {
+
+        let id = req.body["idProyecto"] ;
+
+        const result = await pool.query('UPDATE pro_proyectos set superficie_pre = ?, valor_metro_cuadrado = ? ,num_plano_estimado = ?  WHERE id = ? ', [req.body["uptSuperficie"],
+                                                                                                                                                        req.body["uptTarifa"],
+                                                                                                                                                        req.body["uptPlanos"],
+                                                                                                                                                        id]);
+        res.send("1");
+});
+
+router.post('/avance', isLoggedIn, async function (req, res) {
+
+   let avance = {
+                        id_usuario : req.user.idUsuario,
+                        id_proyecto : req.body["id"],
+                        porcentaje_avance : req.body["porcentaje"] ,
+                        observaciones : req.body["comentario"],
+                        fecha :  new Date(),
+                        superficie : req.body["superficie"],
+                        planos : req.body["planos"],
+                        venta: req.body["venta"],
+                        costo : req.body["costo"],
+                        margen_directo_uf :parseFloat( req.body["margenUF"]).toFixed(2),
+                        margen_directo_porcentaje : parseFloat(req.body["margenPor"]).toFixed(2),
+                        costoEstAvance : parseFloat(req.body["costoAvanceUF"]).toFixed(2),
+                        desvCosto : parseFloat(req.body["desvCostoAvanceUF"]).toFixed(2),
+                        porcDev : parseFloat(req.body["porcAvanceDesv"]).toFixed(2)
+                };
+
+
+    const idLogIngreso = await pool.query('INSERT INTO pro_proyecto_avance set ?', [avance]);
+
+    res.send("1");
+
+});
 
     
 router.post('/exportExcelHoras', isLoggedIn, async function (req, res) {

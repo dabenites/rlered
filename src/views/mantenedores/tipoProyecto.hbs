@@ -14,28 +14,37 @@
                 <thead>
                     <tr>
                         <th>Descripción</th>
+                        <th>% Costo</th>
+                        <th>Limite Rojo</th>
+                        <th>Limite Amarillo</th>
                         <th>Opciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{#if proyecto }}
-                    {{#each proyectos}}
-                    <tr>
-                        <td>{{descripcion}}</td>
-                        <td>
-                            <div class="btn-group" role="group" aria-label="Basic example">
-                                <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="../../tipoProyecto/edit/{{id}}" style="color: white;"> Editar </a></button>
-                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../tipoProyecto/delete/{{id}}" style="color: white;"
-                                onclick="return confirm('¿Esta seguro de borrar al proveedor {{descripcion}} ?')">Borrar</a></button>
-                            </div>
-                        </td>
-                    </tr>
-                    {{/each}}
+                        {{#each proyectos}}
+                        <tr>
+                            <td>{{descripcion}}</td>
+                            <td>{{porcentaje_costo}}</td>
+                            <td>{{limite_rojo}}</td>
+                            <td>{{limite_amarillo}}</td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="../../tipoProyecto/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                    <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../tipoProyecto/delete/{{id}}" style="color: white;"
+                                    onclick="return confirm('¿Esta seguro de borrar al proveedor {{descripcion}} ?')">Borrar</a></button>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
                     {{else}}
                         {{#if verToask }}
                                 {{#each proyectos}}
                                     <tr>
                                         <td>{{descripcion}}</td>
+                                        <td>{{porcentaje_costo}}</td>
+                                        <td>{{limite_rojo}}</td>
+                                        <td>{{limite_amarillo}}</td>
                                         <td>
                                             <div class="btn-group" role="group" aria-label="Basic example">
                                                 <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="../../mantenedores/tipoProyecto/edit/{{id}}" style="color: white;"> Editar </a></button>
@@ -49,6 +58,9 @@
                                 {{#each proyectos}}
                                     <tr>
                                         <td>{{descripcion}}</td>
+                                        <td>{{porcentaje_costo}}</td>
+                                        <td>{{limite_rojo}}</td>
+                                        <td>{{limite_amarillo}}</td>
                                         <td>
                                             <div class="btn-group" role="group" aria-label="Basic example">
                                                 <button type="button" class="btn btn-secondary btn-sm"><a type="button" href="tipoProyecto/edit/{{id}}" style="color: white;"> Editar </a></button>
@@ -91,8 +103,13 @@
                     <input type="text" id="id" class="form-control" value="{{proyecto.id}}" name="id" readonly />
                     {{/if}}
                     <label for="Descripción">Nombre tipo proyecto :</label>
-                    <input type="text" id="descripcion" class="form-control" value="{{proyecto.descripcion}}"
-                        name="descripcion" required />
+                    <input type="text" id="descripcion" class="form-control" value="{{proyecto.descripcion}}" name="descripcion" required />
+                    <label for="Descripción">% Costo:</label>
+                    <input type="text" id="porcentaje" class="form-control" value="{{proyecto.porcentaje_costo}}" name="porcentaje" required />
+                    <label for="Descripción">Limite Rojo:</label>
+                    <input type="text" id="limiteRojo" class="form-control" value="{{proyecto.limite_rojo}}" name="limiteRojo" required />
+                    <label for="Descripción">Limite Amarillo:</label>
+                    <input type="text" id="limiteAmarillo" class="form-control" value="{{proyecto.limite_amarillo}}" name="limiteAmarillo" required />
 
 
                     <br />

@@ -1,6 +1,90 @@
 <!doctype html>
 <html lang="en">
 <style>
+    .highcharts-figure .chart-container {
+  width: 300px; 
+  height: 200px;
+  float: left;
+}
+
+.highcharts-figure,
+.highcharts-data-table table {
+  margin: 0 auto;
+}
+
+.highcharts-data-table table {
+  font-family: Verdana, sans-serif;
+  border-collapse: collapse;
+  border: 1px solid #ebebeb;
+  margin: 10px auto;
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+.highcharts-data-table caption {
+  padding: 1em 0;
+  font-size: 1.2em;
+  color: #555;
+}
+
+.highcharts-data-table th {
+  font-weight: 600;
+  padding: 0.5em;
+}
+
+.highcharts-data-table td,
+.highcharts-data-table th,
+.highcharts-data-table caption {
+  padding: 0.5em;
+}
+
+.highcharts-data-table thead tr,
+.highcharts-data-table tr:nth-child(even) {
+  background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+  background: #f1f7ff;
+}
+
+@media (max-width: 600px) {
+  .highcharts-figure,
+  .highcharts-data-table table {
+    width: 100%;
+  }
+
+  .highcharts-figure .chart-container {
+    width: 300px;
+    float: none;
+    margin: 0 auto;
+  }
+}
+    .panel-primary {
+                        border-color: #000000;
+                    }
+
+    .panel {
+    margin-bottom: 20px;
+    background-color: #fff;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+    box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+}
+
+    .panel-primary>.panel-heading {
+    color: #fff;
+    background-color: #000000;
+    border-color: #000000;
+    }
+    .panel-heading {
+        padding: 10px 15px;
+        border-bottom: 1px solid transparent;
+        border-top-right-radius: 3px;
+        border-top-left-radius: 3px;
+    }
+
     .col-form-label {
     padding-top: calc(0.2rem + 1px);
     padding-bottom: calc(0.2rem + 1px);
@@ -31,13 +115,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap-theme.min.css"> -->
+    
     <!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/solid-gauge.js"> </script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
 
 
 </head>
@@ -47,6 +140,61 @@
         <div class="x_panel">
             <div class="x_title">
                 <h2>{{proyecto.year}}-{{proyecto.code}} : {{proyecto.nombre}}</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <a type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#ingresar"> <i class="fa fa-archive" aria-hidden="true"> Ingresar Avance Proyecto</i> </a> 
+
+                        <div class="modal fade" id="ingresar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h6 class="modal-title" id="exampleModalLongTitle">Ingresar % Avance</h6>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group row">
+                                            <label for="staticEmail" class="col-sm-2 col-form-label">Porcentaje</label>
+                                            <div class="col-sm-10">
+                                                <input type="text"  class="form-control" id="porcentajeAvances" name="porcentajeAvances" value="" onchange="cargaValoresAvance();">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="staticEmail" class="col-sm-2 col-form-label">Comentario</label>
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" id="comentario" name="comentario" rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                        <table id="exampleIndicadoresEconomicosAvance" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costos Estimados Según Avance [UF]</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                        <input type="text" readonly class="form-control" id="costoAvanceUF" name="costoAvanceUF" value="">
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Desviacion Costo [UF]</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                        <input type="text" readonly class="form-control" id="desvCostoAvanceUF" name="desvCostoAvanceUF" value="">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">% Desviación</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                        <input type="text" readonly class="form-control" id="porcAvanceDesv" name="porcAvanceDesv" value="">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                            <button class="btn btn-success btn-sm" onclick="cargarAvanceProyecto({{proyecto.id}});"> Ingresar </button>          
+                                    </div>
+                                </div>
+                             </div>
+                        </div>
+                    </ul>
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
@@ -67,46 +215,365 @@
                 <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="resultados" role="tabpanel" aria-labelledby="resultados-tab">
                     &nbsp;
-                     <div class="row">
-                                 <div class="col-3">
-                                            <div class="row">
-                                                <label class="col-form-label col-md-3 label-align" for="Estado"><b>Estado</b></label>
-                                                <label class="col-form-label col-md-9 " for="nombre">{{proyecto.descripcion}}</label>
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="panel  panel-primary">
+                                <div class="panel-heading"> <i class="fa fa-university" aria-hidden="true"> Datos Generales </i></div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                                <label class="col-form-label col-md-5 label-align" for="Estado">
+                                                    
+                                                        <b> Estado</b>
+                                                    
+                                                </label>
+                                                <label class="col-form-label col-md-7 " for="nombre">{{proyecto.descripcion}}</label>
+                                        </div>
+                                        <div class="row">
+                                                <label class="col-form-label col-md-5 label-align" for="cliente">
+                                                    
+                                                        <b> Cliente</b>
+                                                </label>
+                                                <label class="col-form-label col-md-7 " for="nombre">{{proyecto.nomCliente}}</label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="tipologia">
+                                                        
+                                                            <b> Tipología</b>
+                                                        </label> 
+                                                    <label class="col-form-label col-md-7 " for="nombre">{{proyecto.tipologia}}</label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="servicio">
+                                                         
+                                                             <b> Servicio</b>
+                                                         
+                                                         </label> 
+                                                    <label class="col-form-label col-md-7 " for="nombre">{{proyecto.tipoServicio}}</label>
+                                        </div>
+                                        <div class="row">
+                                                <label class="col-form-label col-md-5 label-align" for="director">
+                                                    
+                                                        <b> Director</b>
+                                                        </label> 
+                                                <label class="col-form-label col-md-7 " for="nombre">{{proyecto.nomDire}}</label>
                                             </div>
-                                            <div class="row">
-                                                <label class="col-form-label col-md-3 label-align" for="cliente"><b>Cliente</b></label>
-                                                <label class="col-form-label col-md-9 " for="nombre">{{proyecto.nomCliente}}</label>
-                                            </div>
-                                            <div class="row">
-                                                    <label class="col-form-label col-md-3 label-align" for="tipologia"><b>Tipología</b></label> 
-                                                    <label class="col-form-label col-md-9 " for="nombre">{{proyecto.tipologia}}</label>
-                                            </div>
-                                 </div>
-                                 <div class="col-3">
-                                     <div class="row">
-                                                <label class="col-form-label col-md-4 label-align" for="director"><b>Director</b></label> 
-                                                <label class="col-form-label col-md-8 " for="nombre">{{proyecto.nomDire}}</label>
-                                            </div>
-                                            <div class="row">
-                                                <label class="col-form-label col-md-4 label-align" for="jdp"><b>Jefe Proyecto</b></label>
-                                                <label class="col-form-label col-md-8 " for="nombre">{{proyecto.nomJefe}}</label>
-                                            </div>
-                                 </div>
-                                 <div class="col-3">
-                                    <div class="row">
-                                                    <label class="col-form-label col-md-4 label-align" for="tipologia"><b>Superficie m<sup>2</sup></b></label>
-                                                    <label class="col-form-label col-md-8 " for="nombre">{{proyecto.superficie_pre}}</label>
-                                            </div>
-                                            <div class="row">
-                                                    <label class="col-form-label col-md-4 label-align" for="tarifa"><b>Tarifa UF/m<sup>2</sup></b></label>
-                                                    <label class="col-form-label col-md-8 " for="nombre">{{proyecto.valor_metro_cuadrado}}</label>
-                                            </div>
-                                            <div class="row">
-                                                    <label class="col-form-label col-md-4 label-align" for="numplanos"><b>Nº Planos</b></label>
-                                                    <label class="col-form-label col-md-8 " for="nombre">{{proyecto.num_plano_estimado}}</label>
-                                            </div>
-                                 </div>
+                                        <div class="row">
+                                                <label class="col-form-label col-md-5 label-align" for="jdp">
+                                                    
+                                                        <b> Jefe Proyecto</b></label>
+                                                <label class="col-form-label col-md-7 " for="nombre">{{proyecto.nomJefe}}</label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="tipologia">
+                                                        
+                                                            <b> Superficie m<sup>2</sup></b>
+                                                    </label>
+                                                    <label class="col-form-label col-md-7 " for="superficie" id="superficie">{{proyecto.superficie_pre}}</label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="tarifa">
+                                                        
+                                                            <b> Tarifa UF/m<sup>2</sup></b>
+                                                            </label>
+                                                    <label class="col-form-label col-md-7 " for="nombre">{{proyecto.valor_metro_cuadrado}}</label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="numplanos">
+                                                        
+                                                            <b> Nº Planos</b>
+                                                            </label>
+                                                    <label class="col-form-label col-md-7 " for="planos" id="planos">{{proyecto.num_plano_estimado}}</label>
+                                        </div>
+                                        <div class="row">
+                                          <div class="col-3">
+
+                                          </div>
+                                          <div class="col-4">
+                                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#completar">Completar</button>
+                                                <div class="modal fade" id="completar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h6 class="modal-title" id="exampleModalLongTitle">Completar Campos</h6>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                            
+                                                            <table id="completar" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Superficie</td>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                                            <input type="text"  class="form-control" id="uptSuperficie" name="uptSuperficie" value="{{proyecto.superficie_pre}}">
+                                                                            </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Tarifa UF/m2</td>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                                            <input type="text"  class="form-control" id="uptTarifa" name="uptTarifa" value="{{proyecto.valor_metro_cuadrado}}">
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Nº Planos</td>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                                            <input type="text"  class="form-control" id="uptPlanos" name="uptPlanos" value="{{proyecto.num_plano_estimado}}">
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                    <button class="btn btn-success btn-sm" onclick="ActualizarProyecto({{proyecto.id}});"> Actualizar </button>          
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                          </div>
+                                          <div class="col-4">
+
+                                          </div>
+                                           
+                                        </div>
+                                    </div>
                             </div>
+                        </div>
+                        <div class="col-10">
+                            <div class="row">
+                                <div class="col-6">
+                                    <table id="example2a" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                        <thead>
+                                            <tr>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;"></th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Interno [hrs]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">C. Int. [UF]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Externo [hrs]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">C. Ext. [UF]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Totales [hrs]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Totales [UF]</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{#each colaboradoresCentroCostoGeneral}}
+                                             <tr>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{nombre}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horas}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horasCosto}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{externo}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{costoUFExterno}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{total}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{costoTotal}}</td>
+                                            </tr>
+                                             {{/each}}
+                                         </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                    <div class="col-6">
+                                            <div class="chart-container">
+                                                <canvas id="barChartA"></canvas>
+                                            </div>
+                                    </div>
+                                    <div class="col-6">
+                                            <div class="chart-container">
+                                                <canvas id="barChartB"></canvas>
+                                            </div>
+                                    </div>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="row">
+                        <div class="col-5">
+                            <div class="panel  panel-primary">
+                                <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true"> Indicadores de Productividad </i></div>
+                                <div class="panel-body">
+                                    <table id="exampleIndicadores" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                        <tbody>
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem; text-align: right;"> <b>Costo UF / m<sup>2</sup></b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="costo_m2"></td>
+
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Valor del Proyecto [UF]</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="valorProyecto">{{proyecto.valor_proyecto}}</td>
+
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Total Facturado [UF]</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="totalFacturado">{{totalFacturado}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Costo UF / plano</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="costo_plano"></td>
+                                                    <input type="hidden" value="" name="dato0" id="dato0">
+
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Adicionales [UF]</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="adicionalesProyecto"></td>
+
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Total Pagado [UF]</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="totalPagado">{{totalPagado}}</td>
+                                                </tr>
+                                                 <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Hrs Dib/ plano</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="hrsDibPlano"></td>
+
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Total Proyecto [UF]</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="totalProyecto"></td>
+
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Margen [UF] (Total Proyecto)</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="margenPro"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>m<sup>2</sup> / plano</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="m2_plano"></td>
+
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Costo Esperado [UF]</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="costoTotalEsp">{{costoEsperado}}</td>
+
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Margen [UF] (Facturado Pagado)</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="margenProFac"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"> <b>Nº Hrs Mod.</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{modificaciones.horas}}</td>
+
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Costo Total [UF]</b></td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="costoTotalPro"></td>
+
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 
+                         <div class="col-2">
+                            <div class="panel  panel-primary">
+                                <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true"> Indicadores Económicos </i></div>
+                                <div class="panel-body">
+                                    <table id="exampleIndicadoresEconomicos" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Valor del Proyecto [UF]</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="valorProyecto">{{proyecto.valor_proyecto}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Adicionales Proyecto [UF]</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="adicionalesProyecto"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Total Proyecto [UF]</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="totalProyecto"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo Esperado [UF]</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="costoTotalEsp">{{costoEsperado}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo Total [UF]</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="costoTotalPro"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-2">
+                            <div class="panel  panel-primary">
+                                <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true"> Indicadores Financieros </i></div>
+                                <div class="panel-body">
+                                    <table id="exampleIndicadoresFinancieros" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Total Facturado [UF]</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="totalFacturado">{{totalFacturado}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Total Pagado [UF]</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="totalPagado">{{totalPagado}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Margen [UF] (Total Proyecto)</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="margenPro"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Margen [UF] (Facturado Pagado)</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="margenProFac"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        -->
+                        <!-- 
+                        <div class="col-2">
+                            <div class="panel  panel-primary">
+                                <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true">  Indicadores </i></div>
+                                    <div class="panel-body">
+                                        <div class="progresss">
+                                            <div class="progress-bar bg-info" role="progressbar" style="width: 0%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" id="progressBar">
+                                                100% Recursos Utilizados
+                                            </div>
+                                        </div>
+                                         <div class="progresss">
+                                            <div class="progress-bar bg-secondary" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" id="progressBar2">
+                                                100% Margen Total Pagado
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                        -->
+                        <div class="col-4">
+                            <div class="panel  panel-primary">
+                                <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true">  Marcas de Avance </i></div>
+                                    <div class="panel-body">
+                                        <table id="exampleIndicadoresAvances" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Avance [%]</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Fecha</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Desviación Costo [UF]</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Desviación [%]</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">C. Estimado [UF]</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo Real [UF]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {{#each indicadoresAvancesUser}}
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{porcentaje_avance}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{fecha}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{desvCosto}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{porcDev}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{costoEstAvance}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{costo}}</td>
+                                                </tr>
+                                                 {{/each}}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <figure class="highcharts-figure">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div id="container-speed" class="chart-container"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div id="container-rpm" class="chart-container"></div>
+                                </div>
+                            </div>
+                            </figure>
+                        </div>
+                     </div>
                 </div>
                 <div class="tab-pane fade" id="cinterno" role="tabpanel" aria-labelledby="cinterno-tab">
                    &nbsp;
@@ -116,11 +583,11 @@
                                 <thead>
                                     <tr>
                                         <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Colaborador</th>
-                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Nº Horas</th>
-                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Nº Horas Extras</th>
-                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Total Horas</th>
-                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo (UF)</th>
-                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">% Participación</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Nº   [hrs]</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Nº Extras [hrs]</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Total    [hrs]</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo [UF]</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Participación    [%]</th>
                                     </tr>
                                 </thead>
                                  <tbody>
@@ -141,9 +608,9 @@
                             <table id="example2" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
                                 <thead>
                                     <tr>
-                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">HH</th>
-                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Interno</th>
-                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo(UF)</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;"></th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Interno [hrs]</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo [UF]</th>
                                        <!--  <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Externo</th> -->
                                        <!--  <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Totales</th> -->
                                     </tr>
@@ -200,9 +667,9 @@
                                         <th>Especialidad</th>
                                         <th>Orden de Compra</th>
                                         <th>Descripción</th>
-                                        <th>num HH</th>
-                                        <th>Costo ($)</th>
-                                        <th>Costo (UF)</th>
+                                        <th>Nº [hrs]</th>
+                                        <th>Costo [$]</th>
+                                        <th>Costo [UF]</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -241,17 +708,18 @@
                 </div>
                 <div class="tab-pane fade" id="facturacion" role="tabpanel" aria-labelledby="facturacion-tab">
                     &nbsp;
-                    <table class="table table-hover" id="tablaFacturas">
+                        <table class="table table-striped table-bordered" id="tablaFacturas">
                                 <thead>
                                     <tr>
                                         <th>Solicitó</th>
-                                        <th>Monto (UF)</th>
-                                        <th>Valor (UF)</th>
-                                        <th>% Facturación</th>
+                                        <th>Monto [UF]</th>
+                                        <th>Valor [UF]</th>
+                                        <th>Facturación [%]</th>
                                         <th>Hito</th>
                                         <th>Nº Documento</th>
                                         <th>Fecha Emisión</th>
-                                        <th>Fecha Deposito</th>
+                                        <th>Fecha Depósito</th>
+                                        <th>ROC</th>
                                         <th>Estado</th>
                                     </tr>
                                 </thead>
@@ -266,12 +734,13 @@
                                             <td>{{num_factura}}</td>
                                             <td>{{fecha_factura}}</td>
                                             <td>{{fecha_pago}}</td>
+                                            <td>{{roc}}</td>
                                             <td>{{estadoFac}}</td>
                                         </tr>
                                     {{/each}}
                                 </tbody>
-                            </table>
-                </div>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -286,6 +755,7 @@
  <script src="../../../template/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
 
 <script>
+    let valorPrimero = 0;
      $('#example').DataTable({
           "dom": "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'>>" +
                 "<'row'<'col-sm-12'tr>>" +
@@ -342,8 +812,36 @@
           }
         }
       });
+           var dataTable2a = $('#example2a').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
+        columnDefs: [
+                        { className: 'text-center', targets: [0,1,2,3,4,5,6] },
+                    ],
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        }
+      });
 
-      $('#tablaFacturas').DataTable({
+     var dataTableFact = $('#tablaFacturas').DataTable({
           "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
@@ -370,9 +868,12 @@
       });
 
      var dataTable3 =  $('#tablaCexternos').DataTable({
-          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+           "dom": "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'>>" +
                 "<'row'<'col-sm-12'tr>>" +
-                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
+                columnDefs: [
+                        { className: 'text-center', targets: [0,1,2,3,4,5,6] },
+                    ],
         language: {
           "decimal": "",
           "emptyTable": "No hay información",
@@ -421,7 +922,7 @@
       });
 
 $(document).ready(function(){
-    
+    let valorPrimero = 0;
     $.ajax({
         url: "horas/{{proyecto.id}}",
         dataType: 'json',
@@ -497,7 +998,7 @@ $(document).ready(function(){
                             plugins: {
                             title: {
                                 display: true,
-                                text: 'Distribucion Esfuerzo Por Mes'
+                                text: 'Distribución Esfuerzo Por Mes'
                             },
                             },
                             responsive: true,
@@ -561,7 +1062,7 @@ $(document).ready(function(){
                             plugins: {
                             title: {
                                 display: true,
-                                text: 'Distribucion TIEMPO (HH)'
+                                text: 'Distribución TIEMPO [hrs]'
                             },
                             },
                             responsive: true
@@ -575,7 +1076,7 @@ $(document).ready(function(){
                             plugins: {
                             title: {
                                 display: true,
-                                text: 'Distribucion COSTOS (UF)'
+                                text: 'Distribución COSTOS [UF]'
                             },
                             },
                             responsive: true
@@ -613,6 +1114,20 @@ $(document).ready(function(){
 
                // console.log(node.context.children[4].innerText);
            });
+
+        let RocFacturado = 0;
+        dataTableFact.rows().iterator('row', function(context, index){
+                var node = $(this.row(index).node());
+                  if (node.context.children[8].innerText === "SI" && node.context.children[9].innerText === "Pagada")
+                  {
+                    RocFacturado = parseFloat( RocFacturado) + parseFloat( node.context.children[1].innerText);
+                  }
+
+                });
+
+        $("#adicionalesProyecto").html( parseFloat(RocFacturado).toFixed(2));
+
+
 
         //coloresCentro
         let labelsCentrosExterno = [];
@@ -667,7 +1182,7 @@ $(document).ready(function(){
                             plugins: {
                             title: {
                                 display: true,
-                                text: 'Distribucion HORAS (HH)'
+                                text: 'Distribución HORAS [hrs]'
                             },
                             },
                             responsive: true
@@ -681,20 +1196,408 @@ $(document).ready(function(){
                             plugins: {
                             title: {
                                 display: true,
-                                text: 'Distribucion COSTOS (UF)'
+                                text: 'Distribución COSTOS [UF]'
                             },
                             },
                             responsive: true
                         }
                 });
 
+            var mostrarA = $("#barChartA");
+            var mostrarB = $("#barChartB");
+
+           let valoresHHTotal = [];
+           let valoresHHCostoTotal = [];
+           let labelsCentrosTotal = [];
+           let labelsColorTotal = [];
+
+           dataTable2a.rows().iterator('row', function(context, index){
+                var node = $(this.row(index).node()); 
+                    
+                    if (node.context.children[0].innerText != "TOTALES")
+                    {
+                        labelsCentrosTotal.push(node.context.children[0].innerText);
+                        const centroColor = coloresCentro.find(centro => {return centro.centroCosto === node.context.children[0].innerText });
+
+                        labelsColorTotal.push(centroColor.color)
+                    }
+                });
+                
+            //console.log(coloresCentro);
+            let totalUF =0;
+            let totalUFDib =0;
+            let totalHrsDib =0;
+            for (let centros in labelsCentrosTotal)
+            {
+                dataTable2a.rows().iterator('row', function(context, index){
+                var node = $(this.row(index).node()); 
+                    
+                    if (node.context.children[0].innerText != "TOTALES")
+                    {
+                        if (labelsCentrosTotal[centros] == node.context.children[0].innerText)
+                        {
+                            valoresHHTotal.push(node.context.children[5].innerText);
+                            valoresHHCostoTotal.push(node.context.children[6].innerText);
+                        }
+
+                        if ( node.context.children[0].innerText === "DIBUJO")
+                        {
+                            totalUFDib = node.context.children[6].innerText;
+                            totalHrsDib = node.context.children[5].innerText;
+                        }
+                    }
+                    else
+                    {
+                        totalUF = node.context.children[6].innerText;
+                    }
+                    
+                });
+            }
+
+
+            // mostrar informacion. 
+            let valorSuperficie     = parseFloat($("#superficie").text());
+            let valorNumPlanos      = parseFloat($("#planos").text()); 
+            let valorDelProyecto    = parseFloat($("#valorProyecto").text());
+            let valorCostoEsperado  = parseFloat($("#costoTotalEsp").text());
+            
+
+            $("#costo_m2").html( parseFloat( totalUF / valorSuperficie).toFixed(2));
+            $("#costo_plano").html( parseFloat( totalUF / valorNumPlanos).toFixed(2));
+            $("#m2_plano").html( parseFloat( valorSuperficie / valorNumPlanos).toFixed(2));
+
+            //console.log(totalHrsDib);
+
+            $("#hrsDibPlano").html( parseFloat( totalHrsDib / valorNumPlanos).toFixed(2));
+
+
+            $("#costoTotalPro").html(totalUF); 
+
+            $("#totalProyecto").html( parseFloat( valorDelProyecto + RocFacturado).toFixed(2));
+
+            let totalProyectoRoc = valorDelProyecto + RocFacturado;
+
+            let margenPro = parseFloat(totalProyectoRoc - totalUF).toFixed(2);
+
+            let formulaRecUtilizado = parseFloat(totalUF * 100 / valorCostoEsperado).toFixed(2); 
+            
+            let totalFacturaPagada = $("#totalPagado").text();
+
+            $("#margenProFac").html(parseFloat(totalFacturaPagada - totalUF).toFixed(2) );
+             if (formulaRecUtilizado > 100)
+            {
+                 $('#progressBar').css('width', "100%");
+                $("#progressBar").removeClass("bg-info");
+                $("#progressBar").addClass("bg-danger");
+            }
+            else if (formulaRecUtilizado < 75)
+            {
+                 $('#progressBar').css('width', formulaRecUtilizado + "%");
+                $("#progressBar").removeClass("bg-info");
+                $("#progressBar").addClass("bg-success");
+            }
+            else if (formulaRecUtilizado >= 75 && formulaRecUtilizado <= 100)
+            {
+                 $('#progressBar').css('width', formulaRecUtilizado + "%");
+                $("#progressBar").removeClass("bg-info");
+                $("#progressBar").addClass("bg-warning");
+            }
+
+
+           
+            $('#progressBar').html(formulaRecUtilizado + "% del Costo Esperado");
+            $("#dato0").val(formulaRecUtilizado);
+
+            valorPrimero = formulaRecUtilizado;
+
+            let margenFacturado = parseFloat( 100 - ((totalUF * 100 ) / totalFacturaPagada)).toFixed(2);
+
+            if (margenFacturado >= 75){ $("#progressBar2").removeClass("bg-info"); $("#progressBar2").addClass("bg-success");}
+            else if (margenFacturado < 75 && margenFacturado >= 65) { $("#progressBar2").removeClass("bg-info"); $("#progressBar2").addClass("bg-warning");}
+            else {$("#progressBar2").removeClass("bg-info"); $("#progressBar2").addClass("bg-danger");}
+            
+            $('#progressBar2').html(margenFacturado + "% Margen Total Pagado");
+
+
+            if (margenPro < 0)
+            {
+                // pintar rojo 
+                $("#margenPro").css("color","red");
+            }
+            else
+            {
+                // pintar verde
+                 $("#margenPro").css("color","green");
+            }
+            $("#margenPro").html(margenPro);
+
+            alert(formulaRecUtilizado);
+
+            var dataTotal = {
+                        labels: labelsCentrosTotal,
+                        datasets: [
+                            {
+                                fill: true,
+                                backgroundColor: labelsColorTotal,
+                                data: valoresHHTotal
+                            }
+                        ]
+                    };
+            var dataCostoTotal = {
+                        labels: labelsCentrosTotal,
+                        datasets: [
+                            {
+                                fill: true,
+                                backgroundColor: labelsColorTotal,
+                                data: valoresHHCostoTotal
+                            }
+                        ]
+                    };
+
+
+            const chartA = new Chart(mostrarA, {
+                type: 'pie',
+                data: dataTotal,
+                options: {
+                            plugins: {
+                            title: {
+                                display: true,
+                                text: 'Distribución HORAS (Hrs)'
+                            },
+                            },
+                            responsive: true
+                        }
+                });
+
+           const chartB = new Chart(mostrarB, {
+                type: 'pie',
+                data: dataCostoTotal,
+                options: {
+                            plugins: {
+                            title: {
+                                display: true,
+                                text: 'Distribución COSTO (UF)'
+                            },
+                            },
+                            responsive: true
+                        }
+                });
+
+                var gaugeOptions = {
+                                    chart: {
+                                        type: 'solidgauge'
+                                    },
+
+                                    title: null,
+
+                                    pane: {
+                                        center: ['50%', '85%'],
+                                        size: '140%',
+                                        startAngle: -90,
+                                        endAngle: 90,
+                                        background: {
+                                        backgroundColor:
+                                            Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+                                        innerRadius: '60%',
+                                        outerRadius: '100%',
+                                        shape: 'arc'
+                                        }
+                                    },
+
+                                    exporting: {
+                                        enabled: false
+                                    },
+
+                                    tooltip: {
+                                        enabled: false
+                                    },
+
+                                    // the value axis
+                                    yAxis: {
+                                        stops: [
+                                        [0.1, '#55BF3B'], // green
+                                        [0.5, '#DDDF0D'], // yellow
+                                        [0.9, '#DF5353'] // red
+                                        ],
+                                        lineWidth: 0,
+                                        tickWidth: 0,
+                                        minorTickInterval: null,
+                                        tickAmount: 2,
+                                        title: {
+                                        y: -70
+                                        },
+                                        labels: {
+                                        y: 16
+                                        }
+                                    },
+
+                                    plotOptions: {
+                                        solidgauge: {
+                                        dataLabels: {
+                                            y: 5,
+                                            borderWidth: 0,
+                                            useHTML: true
+                                        }
+                                        }
+                                    }
+                                    };
+
+            
+// The speed gauge
+var chartSpeed = Highcharts.chart('container-speed', Highcharts.merge(gaugeOptions, {
+  yAxis: {
+    min: 0,
+    max: 100,
+    title: {
+      text: 'Uso Costos Esperados'
+    }
+  },
+
+  credits: {
+    enabled: false
+  },
+
+  series: [{
+    name: 'Speed',
+    data: [parseInt(formulaRecUtilizado)],
+    dataLabels: {
+      format:
+        '<div style="text-align:center">' +
+        '<span style="font-size:25px">{y}</span><span style="font-size:13px;opacity:0.4"> %</span><br/>' +
+        '<span style="font-size:12px;opacity:0.4"></span>' +
+        '</div>'
+    }
+  }]
+
+}));
+
+// The RPM gauge
+var chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions, {
+  yAxis: {
+    min: 0,
+    max: 100,
+    title: {
+      text: 'Margen (Pagado)'
+    }
+  },
+
+  series: [{
+    name: 'Margen',
+    data: [1],
+    dataLabels: {
+      format:
+        '<div style="text-align:center">' +
+        '<span style="font-size:25px">{y:.1f}</span><br/>' +
+        '</div>'
+    }
+  }]
+
+}));
+
 
         },
         error: function(data) {
             
         }
+    
+        // termina ajax
     });
+
+    $(".highcharts-credits").html("");
+
+
+//
+
 });
+
+function ActualizarProyecto(idProyecto)
+{
+    let uptSuperficie   = parseFloat($("#uptSuperficie").val());
+    let uptTarifa       = parseFloat($("#uptTarifa").val());
+    let uptPlanos       = parseFloat($("#uptPlanos").val());
+
+    let infomacion = {
+        idProyecto,
+        uptSuperficie,
+        uptTarifa,
+        uptPlanos    };
+
+
+$.ajax({
+				async: false,
+				type : 'POST', 
+				url	 : "/reporteria/uptProyecto", 
+				data : infomacion,
+					success : function (resultado) 
+						{ 
+                            toastr.success('Datos Proyectos Actualizados.', 'Información', {
+                                    "progressBar": true
+                                });
+                            location.reload();
+						} 
+				});
+
+
+}
+function cargarAvanceProyecto(idProyecto)
+    {
+        let valorSuperficie     = parseFloat($("#superficie").text());
+        let valorNumPlanos      = parseFloat($("#planos").text()); 
+        let valorDelProyecto    = parseFloat($("#valorProyecto").text()); 
+        let costoActualProye    = parseFloat($("#costoTotalPro").text());
+
+        let costoAvanceUF       = parseFloat($("#costoAvanceUF").val());
+        let desvCostoAvanceUF   = parseFloat($("#desvCostoAvanceUF").val());
+        let porcAvanceDesv      = parseFloat($("#porcAvanceDesv").val());
+        
+        let margenUF = valorDelProyecto - costoActualProye;
+        let margenPor = ((valorDelProyecto - costoActualProye)/valorDelProyecto) * 100;
+
+        let informacion = {
+                                id : idProyecto,
+                                porcentaje : $("#porcentajeAvances").val(),
+                                comentario : $("#comentario").val(),
+                                superficie : valorSuperficie,
+                                planos : valorNumPlanos,
+                                venta : valorDelProyecto,
+                                costo : costoActualProye,
+                                margenUF : margenUF.toFixed(2),
+                                margenPor : margenPor.toFixed(1),
+                                costoAvanceUF,
+                                desvCostoAvanceUF,
+                                porcAvanceDesv
+                            };
+
+        $.ajax({
+				async: false,
+				type : 'POST', 
+				url	 : "/reporteria/avance", 
+				data : informacion,
+					success : function (resultado) 
+						{ 
+                            toastr.success('Porcentaje de avance ingresado correctamente.', 'Información', {
+                                    "progressBar": true
+                                });
+                            location.reload();
+						} 
+				});
+    }
+
+function cargaValoresAvance()
+{
+    let porcentajeAvance =  $("#porcentajeAvances").val() ;
+    let valorCostoEsperado  = parseFloat($("#costoTotalEsp").text());
+    let valorCostoActual  = parseFloat($("#costoTotalPro").text());
+
+    let CostoEstimadoAvance = parseFloat( valorCostoEsperado * porcentajeAvance / 100).toFixed(2);
+    let desviacionCosto = parseFloat(CostoEstimadoAvance - valorCostoActual).toFixed(2);
+    let porcentaje = parseFloat(desviacionCosto / CostoEstimadoAvance * 100).toFixed(2);
+
+    $("#costoAvanceUF").val(CostoEstimadoAvance) ;
+    $("#desvCostoAvanceUF").val(desviacionCosto) ;
+    $("#porcAvanceDesv").val(porcentaje) ;
+
+}
 
 </script>
 

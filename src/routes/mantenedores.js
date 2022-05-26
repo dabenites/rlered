@@ -641,7 +641,7 @@ router.get('/centrocosto/delete/:id',isLoggedIn, async (req, res) => {
 router.get('/tipoProyecto', isLoggedIn, async (req, res) => {
     try{
         const proyectos = await pool.query('SELECT * FROM proyecto_tipo as t1 ORDER BY t1.descripcion ASC');
-    
+       // console.log(proyectos);
 
         if (req.query.a === undefined)
         {
@@ -699,11 +699,14 @@ router.get('/tipoProyecto', isLoggedIn, async (req, res) => {
 /* AGREGAR PROYECTO FUNCIONA*/
 router.post('/addTipoProyecto',isLoggedIn, async (req,res) => {
     try{
-        const { id, descripcion } = req.body; //Obtener datos title,url,description
+        const { id, descripcion , porcentaje,limiteRojo,limiteAmarillo } = req.body; //Obtener datos title,url,description
 
         const newProyecto  ={ //Se gurdaran en un nuevo objeto
             id: id,
-            descripcion : descripcion 
+            descripcion : descripcion ,
+            porcentaje_costo : porcentaje,
+            limite_rojo : limiteRojo,
+            limite_amarillo : limiteAmarillo
         };
     
         //Guardar datos en la BD     
@@ -750,10 +753,14 @@ router.get('/tipoProyecto/edit/:id',isLoggedIn, async (req, res) => {
 
 router.post('/editTipoProyecto',isLoggedIn, async (req,res) => {
     try{
-        const {  id, descripcion } = req.body; //Obtener datos id, descripcion
+        const {  id, descripcion, porcentaje,limiteRojo,limiteAmarillo } = req.body; //Obtener datos id, descripcion
 
         const newProyecto  ={ //Se gurdaran en un nuevo objeto
-            descripcion : descripcion 
+            descripcion : descripcion,
+            porcentaje_costo : porcentaje,
+            limite_rojo : limiteRojo,
+            limite_amarillo : limiteAmarillo
+
         };
         //Guardar datos en la BD     
         await pool.query('UPDATE proyecto_tipo set ? WHERE id = ?', [newProyecto, id]);

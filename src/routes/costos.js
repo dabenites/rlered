@@ -87,9 +87,8 @@ function  executeLogic(archivo, name,numeroAsignado,req)
                             mes : lectura["mes"],
                             nomCarpeta : numeroAsignado,
                             nomArchivo : name
+                                    };
 
-
-                        };
                        const idLogIngreso = await pool.query('INSERT INTO sys_usuario_costo_ingreso set ?', [unLogIngreso]);
                        idLogDetalle = idLogIngreso.insertId;
                     }

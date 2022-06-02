@@ -88,7 +88,8 @@
         <div class="col-4"></div>
         <div class="col-4">
             <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                    <button type="button" class="btn btn-success" onclick="Recepcionar();">Recepcionar</button>
+                <button type="button" class="btn btn-danger" onclick="Rechazar();">Rechazar</button>
+                <button type="button" class="btn btn-success" onclick="Recepcionar();">Recepcionar</button>
             </div>
         </div>
 
@@ -96,6 +97,29 @@
 </div>
 
 <script>
+    function Rechazar()
+    {
+
+         let comentario  = $("#comentario").val();
+         let id_finanza   = $("#id").val();
+
+        let informacion = {
+                                comentario ,
+                                id_finanza
+                            };
+        
+        $.ajax({
+                        type: 'post',
+                        url: '/solicitudes/terminoOCRechazo',
+                        data: informacion,
+                        dataType: 'text'
+                        })
+                        .done(function (data) {
+                            $(location).attr('href','/solicitudes/ordencompra?a=3');
+                        });
+
+
+    }
     function Recepcionar(estado)
     {
          let comentario  = $("#comentario").val();

@@ -462,13 +462,14 @@
                                          </button> 
                                          
                                             {{#if (if_equal "N" recepcionado_finanza) }}
-                                            
-                                                <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-m" onclick="cargaFinanza({{id}})">
-                                                    <a style="color: white;">
-                                                    <i class="fa fa-clipboard">
-                                                    </i>
-                                                    </a>
-                                                </button>
+                                                {{#if (if_equal "Y" ../UserFinanzas) }}
+                                                    <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-m" onclick="cargaFinanza({{id}})">
+                                                        <a style="color: white;">
+                                                        <i class="fa fa-clipboard">
+                                                        </i>
+                                                        </a>
+                                                    </button>
+                                                 {{/if}}
                                             {{/if}}
                                         {{/if}}
                                         <!-- PODER BORRAR -->
@@ -572,6 +573,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
+                           
+                            <button type="button" class="btn btn-danger" onclick="TerminarOCRechazo()">Rechazar</button>
                             <button type="button" class="btn btn-success" onclick="TerminarOC()">Terminar</button>
                          </div>
                     </div>
@@ -650,6 +653,16 @@
 
 <script>
 
+    function eliminarOC2(id, folio, nomProveedor)
+    {
+        $("#rcid").val(id); 
+        $("#rcfolio").val(folio); 
+        $("#rcproveedor").val(nomProveedor); 
+
+         document.getElementById("rechazarOC").submit();
+
+
+    }
     function eliminarOC()
     {
         document.getElementById("rechazarOC").submit();
@@ -732,6 +745,30 @@
 
     }
 
+    function TerminarOCRechazo()
+    {
+        let id_finanza          = $("#id_finanza").val();
+        let comentario_finanza  = $("#comentario_finanza").val();
+        let num_documento       = $("#num_documento").val();
+
+
+        let informacion = {
+                                id_finanza ,
+                                comentario_finanza,
+                                num_documento
+                            };
+        
+        $.ajax({
+                        type: 'post',
+                        url: '/solicitudes/terminoOCRechazo',
+                        data: informacion,
+                        dataType: 'text'
+                        })
+                        .done(function (data) {
+                            $(location).attr('href','/solicitudes/ordencompra?a=3');
+                        });
+    }
+
     function TerminarOC()
     {
         let id_finanza          = $("#id_finanza").val();
@@ -756,11 +793,13 @@
                         });
 
     }
+
     function cargaFinanza(id)
     {
         $("#id_finanza").val(id);
 
     }
+
     function cargaEmisorOC(valor)
     {
         if (valor !== "")

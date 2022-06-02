@@ -1141,16 +1141,19 @@ router.post('/cargarFactura',isLoggedIn,  async (req, res) => {
     const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.id =  ? ",[id_proyecto]);
     // agregar el director de proyecto.
     
-    const infoDirector = await pool.query("SELECT if(COUNT(t1.idUsuario)=0,'N/A',t1.Nombre) AS  nom FROM sys_usuario as t1 where t1.idUsuario =  "+[infoProyecto[0].id_director]+" ");
+    const infoDirector = await pool.query("SELECT if(COUNT(t1.idUsuario)=0,'N/A',t1.Nombre) AS  nom , t1.Email  FROM sys_usuario as t1 where t1.idUsuario =  "+[infoProyecto[0].id_director]+" ");
 
     const facturacion = {
       to : 'contabilidad@renelagos.com',
       comentario : comentario,
       proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
       solicitante : req.user.Nombre,
+      mailsolicitante : infoDirector[0].Email,
       director : infoDirector[0].nom,
       nomMoneda : nomMoneda,
-      monto : monto
+      monto : monto,
+      mailopt1 : 'cgahona@renelagos.com',
+      mailopt2 : 'mcastillo@renelagos.com'
     };
 
     const mailAvisoClaudio = {
@@ -1174,8 +1177,8 @@ router.post('/cargarFactura',isLoggedIn,  async (req, res) => {
 
  // Descomentar una vez terminaada las pruebas para el ingreso de facturaciones.    
   mensajeria.EnvioMailIngresoFactura(facturacion); 
-  mensajeria.EnvioMailIngresoFactura(mailAvisoClaudio); 
-  mensajeria.EnvioMailIngresoFactura(mailAvisoMario); 
+ // mensajeria.EnvioMailIngresoFactura(mailAvisoClaudio); 
+ // mensajeria.EnvioMailIngresoFactura(mailAvisoMario); 
 
 const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]); 
 
@@ -1290,27 +1293,33 @@ router.post('/cargarProyecto',isLoggedIn,  async (req, res) => {
      // buscar la informacion del proyecto 
      const infoIngresa = await pool.query('SELECT * FROM sys_usuario as t1 where t1.idUsuario = ? ', [req.user.idUsuario]);
   
-  
-     const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.year = ? and t1.code = ? ",[year,code])
+     const infoProyecto = await pool.query("SELECT t1.*, t2.descripcion AS servicio "+
+                                          " FROM pro_proyectos as t1 , "  +
+                                          " proyecto_servicio AS t2 " +
+                                          " where t1.year = ? and t1.code = ? " + 
+                                          " AND t1.id_tipo_servicio = t2.id ",[year,code]);
      
      const mail = {
        nombre : infoProyecto[0].nombre,
        codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
        to : "documentos@renelagos.com",
-       ingresado : infoIngresa[0].Nombre
+       ingresado : infoIngresa[0].Nombre,
+       servicio : infoProyecto[0].servicio
      };
   
      const mailTI = {
       nombre : infoProyecto[0].nombre,
       codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
       to : "computacion@renelagos.com",
-      ingresado : infoIngresa[0].Nombre
+      ingresado : infoIngresa[0].Nombre,
+      servicio : infoProyecto[0].servicio
     };  
   
     const mailIngreso = {
       nombre : infoProyecto[0].nombre,
       codigo : infoProyecto[0].year + "-" +  infoProyecto[0].code,
-      to : infoIngresa[0].Email
+      to : infoIngresa[0].Email,
+      servicio : infoProyecto[0].servicio
     };
    
   if (infoProyecto[0].id_jefe != 0)  
@@ -2297,7 +2306,10 @@ router.get('/ver/:id', isLoggedIn, async (req, res) => {
       {
         //console.log("Buscar la informacion del ing revi");
         
-        proyectos = await pool.query("SELECT * , t1.id as idPro, " +
+        proyectos = await pool.query("SELECT *, t1.id as idPro, " +
+        " t1s.descripcion AS tipoServicio, " +
+        " t1pr.descripcion AS tipoProyecto, " +
+        " t1es.descripcion AS estadoProyecto, " + 
         " t1.id_director AS idDir, " +
          " t1a.Nombre AS nomDir, " +
          " t1.id_pais AS id_pais, " +
@@ -2313,6 +2325,9 @@ router.get('/ver/:id', isLoggedIn, async (req, res) => {
          " t1p.simbolo AS simbolo," +
          " CONCAT(t1p.simbolo,' /', 'm <sup> 2</sup>')  AS sm2" +
          " FROM pro_proyectos AS t1 " +
+         " LEFT JOIN proyecto_servicio AS t1s ON t1.id_tipo_servicio = t1s.id " +
+         " LEFT JOIN proyecto_tipo AS t1pr ON t1.id_tipo_proyecto = t1pr.id " + 
+         " LEFT JOIN proyecto_estado AS t1es ON t1.id_estado = t1es.id " +
          " LEFT JOIN sys_usuario AS t1a ON t1.id_director = t1a.idUsuario " +
          " LEFT JOIN sys_usuario AS t1b ON t1.id_jefe = t1b.idUsuario " +
          " LEFT JOIN contacto AS t1c ON t1.id_mandante = t1c.id " +
@@ -2324,7 +2339,7 @@ router.get('/ver/:id', isLoggedIn, async (req, res) => {
       }
       else
       {
-        proyectos = await pool.query("SELECT * , t1.id as idPro, " +
+        proyectos = await pool.query("SELECT t1.id as idPro, " +
         " t1.id_director AS idDir, " +
          " t1a.Nombre AS nomDir, " +
          " t1.id_pais AS id_pais, " +
@@ -2359,6 +2374,8 @@ router.get('/ver/:id', isLoggedIn, async (req, res) => {
     
       }
       
+      //console.log(proyectos[0]);
+
 
       res.render('proyecto/ver', { req, proyectos:proyectos[0], layout: 'template' });
 

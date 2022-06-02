@@ -173,6 +173,7 @@ module.exports.EnvioMailCreacionProyectoDocumentos =  async function (objeto) {
                           " \t Se informa que se ha generado un proyecto nuevo en planner. \n" +
                           " Nombre : "+objeto.nombre +" \n"+
                           " Codigo : "+objeto.codigo +" \n"+
+                          " Servicio : "+objeto.servicio +" \n"+
                           " Ingresado por : "+ objeto.ingresado +" \n"+
                           " Saludos, \n"+
                           " RLE - Planner";
@@ -211,6 +212,7 @@ accessToken : accessToken,
 const generico = "Estimado/a:\n" +
 " \t Ha generado un proyecto, Se ha informado a TI y Documentos para crear los permisos y carpetas correspondientes a las carpetas. Proyecto con código : \n" +
 ""+objeto.codigo +" \n"+
+" Servicio : "+objeto.servicio +" \n"+
 " Saludos, \n"+
 " RLE - Planner";
 
@@ -251,6 +253,7 @@ module.exports.EnvioMailCreacionProyectoTI =  async function (objeto) {
                           " \t Se informa que se ha generado un proyecto nuevo en planner. \n" +
                           " Nombre : "+objeto.nombre +" \n"+
                           " Codigo : "+objeto.codigo +" \n"+
+                          " Servicio : "+objeto.servicio +" \n"+
                           " Ingresado por : "+ objeto.ingresado +" \n"+
                           " Saludos, \n"+
                           " RLE - Planner";
@@ -425,6 +428,7 @@ module.exports.EnvioMailIngresoFactura =  async function (objeto) {
          const mailOptions = {
              from : "RLE - Planner <planner@renelagos.com>",
              to : objeto.to,
+             cc : objeto.mailopt1+","+objeto.mailopt2+","+objeto.mailsolicitante,
              subject : "RLE - Planner - Ingreso Facturación.",
              text : generico
          };

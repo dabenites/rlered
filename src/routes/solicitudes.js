@@ -2071,7 +2071,22 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
                                            " WHERE t1.id_estado IN(1,2,3,4,5) " + 
                                            " ORDER BY t1.id DESC", [req.user.idUsuario]); 
 
-  // console.log("OC");
+    // buscar el listado de las personas vigentes para poder terminar una OC por parte de finanzas.
+    const listadoFinanzas = await pool.query(" SELECT * FROM orden_compra_aprob_finanzas");
+
+    let UserFinanzas = "N";
+
+    listadoFinanzas.forEach(element =>{
+          if (element.id_finanzas === req.user.idUsuario)
+          {
+            UserFinanzas = "Y";
+          }
+        });
+
+
+
+
+
 
   let verToask = {
         titulo : "Mensaje",
@@ -2107,14 +2122,14 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
   {
     if (req.query.a !== undefined)
     {
-      res.render('solicitudes/ordencompra', { verToask, req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, 
+      res.render('solicitudes/ordencompra', { UserFinanzas, verToask, req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, 
         proyectos,requerimientos,ordenCompra, layout: 'template', helpers : {
           if_equal : isEqualHelperHandlerbar, if_distinto : isDisintoHelperHandlerbar
       }});
     }
     else
     {
-      res.render('solicitudes/ordencompra', { req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,requerimientos,ordenCompra, 
+      res.render('solicitudes/ordencompra', { UserFinanzas, req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,requerimientos,ordenCompra, 
         layout: 'template', helpers : {
           if_equal : isEqualHelperHandlerbar, if_distinto : isDisintoHelperHandlerbar
       }});
@@ -2126,14 +2141,14 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
     if (req.query.a !== undefined)
     {
       
-      res.render('solicitudes/ordencompra', { verToask, req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,
+      res.render('solicitudes/ordencompra', {UserFinanzas, verToask, req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,
         ordenCompra, layout: 'template', helpers : {
           if_equal : isEqualHelperHandlerbar, if_distinto : isDisintoHelperHandlerbar
       }});  
     }
     else
     {
-      res.render('solicitudes/ordencompra', { req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,ordenCompra,
+      res.render('solicitudes/ordencompra', { UserFinanzas, req ,empresas,recepcionador,directores,centroCostos, solicitantes,etapas, monedas, proyectos,ordenCompra,
          layout: 'template', helpers : {
           if_equal : isEqualHelperHandlerbar, if_distinto : isDisintoHelperHandlerbar
       }});
@@ -3208,6 +3223,18 @@ router.post('/terminoOC',isLoggedIn, async (req,res) => {
   res.sendStatus(200);
 
 });
+
+router.post('/terminoOCRechazo',isLoggedIn, async (req,res) => {
+
+  const { id_finanza, comentario_finanza, num_documento} = req.body;
+
+  const result = await pool.query("UPDATE orden_compra set  id_estado = 4  WHERE id = ? ", [id_finanza]);
+  //console.log(req.body);
+
+  res.sendStatus(200);
+
+});
+
 
 
 //editarOCIngresada

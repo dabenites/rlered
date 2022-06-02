@@ -756,7 +756,7 @@
 
 <script>
     let valorPrimero = 0;
-     $('#example').DataTable({
+    var dataTable0 = $('#example').DataTable({
           "dom": "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'>>" +
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
@@ -1019,16 +1019,23 @@ $(document).ready(function(){
             for (let centros in labelsCentros)
             {
                 dataTable2.rows().iterator('row', function(context, index){
-                var node = $(this.row(index).node()); 
-                    //console.log(node.context.children[0].innerText);
+                    var node = $(this.row(index).node()); 
+                    
                     if (node.context.children[0].innerText != "TOTALES")
                     {
-                       // console.log(labelsCentros[centros]);
-                       // console.log(node.context.children[0].innerText);
                         if (labelsCentros[centros] == node.context.children[0].innerText)
                         {
-                            valoresHH.push(node.context.children[1].innerText);
-                            valoresHHCosto.push(node.context.children[2].innerText);
+                            let auxHH = node.context.children[1].innerText;
+                                auxHH = auxHH.replace(".","");
+                                auxHH = auxHH.replace(",",".");
+                                
+                            valoresHH.push(auxHH);
+
+                            let auxCosto = node.context.children[2].innerText;
+                                auxCosto = auxCosto.replace(".","");
+                                auxCosto = auxCosto.replace(",",".");
+
+                            valoresHHCosto.push(auxCosto);
                         }
                     }
                 });
@@ -1232,23 +1239,31 @@ $(document).ready(function(){
                 dataTable2a.rows().iterator('row', function(context, index){
                 var node = $(this.row(index).node()); 
                     
+                    let auxHHTotal = node.context.children[5].innerText;
+                                auxHHTotal = auxHHTotal.replace(".","");
+                                auxHHTotal = auxHHTotal.replace(",",".");
+
+                    let auxHHCostoTotal = node.context.children[6].innerText;
+                                auxHHCostoTotal = auxHHCostoTotal.replace(".","");
+                                auxHHCostoTotal = auxHHCostoTotal.replace(",",".");
+
                     if (node.context.children[0].innerText != "TOTALES")
                     {
                         if (labelsCentrosTotal[centros] == node.context.children[0].innerText)
                         {
-                            valoresHHTotal.push(node.context.children[5].innerText);
-                            valoresHHCostoTotal.push(node.context.children[6].innerText);
+                            valoresHHTotal.push(auxHHTotal);
+                            valoresHHCostoTotal.push(auxHHCostoTotal);
                         }
 
                         if ( node.context.children[0].innerText === "DIBUJO")
                         {
-                            totalUFDib = node.context.children[6].innerText;
-                            totalHrsDib = node.context.children[5].innerText;
+                            totalUFDib = auxHHCostoTotal;
+                            totalHrsDib = auxHHTotal
                         }
                     }
                     else
                     {
-                        totalUF = node.context.children[6].innerText;
+                        totalUF = auxHHCostoTotal;
                     }
                     
                 });
@@ -1280,6 +1295,7 @@ $(document).ready(function(){
             let margenPro = parseFloat(totalProyectoRoc - totalUF).toFixed(2);
 
             let formulaRecUtilizado = parseFloat(totalUF * 100 / valorCostoEsperado).toFixed(2); 
+            let formulaMargenFacturada = 0; 
             
             let totalFacturaPagada = $("#totalPagado").text();
 
@@ -1310,7 +1326,10 @@ $(document).ready(function(){
 
             valorPrimero = formulaRecUtilizado;
 
+
             let margenFacturado = parseFloat( 100 - ((totalUF * 100 ) / totalFacturaPagada)).toFixed(2);
+
+            
 
             if (margenFacturado >= 75){ $("#progressBar2").removeClass("bg-info"); $("#progressBar2").addClass("bg-success");}
             else if (margenFacturado < 75 && margenFacturado >= 65) { $("#progressBar2").removeClass("bg-info"); $("#progressBar2").addClass("bg-warning");}
@@ -1329,9 +1348,9 @@ $(document).ready(function(){
                 // pintar verde
                  $("#margenPro").css("color","green");
             }
+
             $("#margenPro").html(margenPro);
 
-            alert(formulaRecUtilizado);
 
             var dataTotal = {
                         labels: labelsCentrosTotal,
@@ -1389,7 +1408,6 @@ $(document).ready(function(){
                                     },
 
                                     title: null,
-
                                     pane: {
                                         center: ['50%', '85%'],
                                         size: '140%',
@@ -1442,6 +1460,65 @@ $(document).ready(function(){
                                     }
                                     };
 
+    var gaugeOptions2 = {
+                                    chart: {
+                                        type: 'solidgauge'
+                                    },
+
+                                    title: null,
+                                    pane: {
+                                        center: ['50%', '85%'],
+                                        size: '140%',
+                                        startAngle: -90,
+                                        endAngle: 90,
+                                        background: {
+                                        backgroundColor:
+                                            Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+                                        innerRadius: '60%',
+                                        outerRadius: '100%',
+                                        shape: 'arc'
+                                        }
+                                    },
+
+                                    exporting: {
+                                        enabled: false
+                                    },
+
+                                    tooltip: {
+                                        enabled: false
+                                    },
+
+                                    // the value axis
+                                    yAxis: {
+                                        stops: [
+                                        [0, '#DF5353'],     // green 55BF3B
+                                        [0.5, '#DDDF0D'],   // yellow DDDF0D
+                                        [0.75, '#55BF3B']   // red DF5353
+                                        ],
+                                        lineWidth: 0,
+                                        tickWidth: 0,
+                                        minorTickInterval: null,
+                                        tickAmount: 2,
+                                        title: {
+                                        y: -70
+                                        },
+                                        labels: {
+                                        y: 16
+                                        }
+                                    },
+
+                                    plotOptions: {
+                                        solidgauge: {
+                                        dataLabels: {
+                                            y: 5,
+                                            borderWidth: 0,
+                                            useHTML: true
+                                        }
+                                        }
+                                    }
+                                    };
+
+
             
 // The speed gauge
 var chartSpeed = Highcharts.chart('container-speed', Highcharts.merge(gaugeOptions, {
@@ -1472,7 +1549,7 @@ var chartSpeed = Highcharts.chart('container-speed', Highcharts.merge(gaugeOptio
 }));
 
 // The RPM gauge
-var chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions, {
+var chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions2, {
   yAxis: {
     min: 0,
     max: 100,
@@ -1483,11 +1560,11 @@ var chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions, 
 
   series: [{
     name: 'Margen',
-    data: [1],
+    data: [parseFloat(margenFacturado)],
     dataLabels: {
       format:
         '<div style="text-align:center">' +
-        '<span style="font-size:25px">{y:.1f}</span><br/>' +
+        '<span style="font-size:25px">{y:.1f}</span></span><span style="font-size:13px;opacity:0.4"> %</span><br/>' +
         '</div>'
     }
   }]
@@ -1507,6 +1584,48 @@ var chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions, 
 
 
 //
+// Tabular la información 
+
+ dataTable2.rows().iterator('row', function(context, index){
+                    var node = $(this.row(index).node()); 
+                    
+                    //const num = parseFloat(node.context.children[1].innerText).toFixed(2);
+                    //const num2 = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(num);                    
+                    node.context.children[1].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[1].innerText );   
+                    node.context.children[2].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[2].innerText );
+
+                });
+
+dataTable0.rows().iterator('row', function(context, index){
+                    var node = $(this.row(index).node()); 
+                    
+                    //const num = parseFloat(node.context.children[1].innerText).toFixed(2);
+                    //const num2 = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(num);                    
+                    node.context.children[1].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[1].innerText );   
+                    node.context.children[2].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[2].innerText );
+                    node.context.children[3].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[3].innerText );
+                    node.context.children[4].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[4].innerText );
+                    node.context.children[5].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[5].innerText );
+
+
+                });
+
+dataTable2a.rows().iterator('row', function(context, index){
+                    var node = $(this.row(index).node()); 
+                    
+                    //const num = parseFloat(node.context.children[1].innerText).toFixed(2);
+                    //const num2 = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(num);                    
+                    node.context.children[1].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[1].innerText );   
+                    node.context.children[2].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[2].innerText );
+                    node.context.children[3].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[3].innerText );
+                    node.context.children[4].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[4].innerText );
+                    node.context.children[5].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[5].innerText );
+                    node.context.children[6].innerText = new Intl.NumberFormat('de-DE').format(node.context.children[6].innerText );
+
+
+                });
+
+
 
 });
 

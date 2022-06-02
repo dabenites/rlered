@@ -171,7 +171,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                             " t1.def_trabajo AS descripcion, " +
                                                             " t1.num_occ AS numoc, "+
                                                             " t1.num_hh 		AS numhh, " +
-                                                            " t1.costo 		AS costo, " +
+                                                            " FORMAT(t1.costo,0,'de_DE') AS costo, " +
                                                             " t1a.nombre as nNombre, " +
                                                             " FORMAT(costo / t1b.valor,2) AS totPro " +
                                                     " FROM " +
@@ -207,7 +207,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                       " AND  " +
                                                             " t1.id = t3.id_solicitud  ",[id, id]);
       
-                    var numHH = 0;
+
+                var numHH = 0;
                 let centroCostoHH = [];
                 cexternos.forEach(element => {
                                         //console.log(element);
@@ -473,7 +474,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         const col = colaboradores.find(user => {return user.nombre === element.nombre });
                                 col.porcentaje = parseFloat(  (col.horastotal /horasTotal)*100 ).toFixed(2);
                                 col.valorUF = parseFloat( col.valorUF ).toFixed(2);
-                                col.horas = parseFloat( col.horas ).toFixed(2);
+                                col.horas = parseFloat(col.horas ).toFixed(2);
                                 col.horastotal = parseFloat( col.horastotal ).toFixed(2);
                                 
                         });
@@ -487,6 +488,9 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                 const centro = colaboradoresCentroCosto.find(centro => {return centro.nombre === element.nombre });   
                                 const centroExterno = centroCostoHH.find(centro => {return centro.nombre === element.nombre });
                                 centro.externo = centroExterno.horas;
+                                centro.horasFormat = new Intl.NumberFormat('de-DE').format(centro.horas);
+                                
+
                          }
                     }
             );
@@ -576,6 +580,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
             colaboradoresCentroCosto.push({nombre : 'TOTALES',
                         horas : interna,
+                        horasFormat : new Intl.NumberFormat('de-DE').format(interna),
                         externo :externa,
                         total :total,
                         horasCosto :costoUF

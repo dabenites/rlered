@@ -117,7 +117,16 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
         simbolo = "$ ";
       break;
       case 4: // valores en UF
-      //console.log(element);
+        sTable.push(element.cantidad);
+        sTable.push(element.descripcion);
+        precio += element.montopeso ;
+        sTable.push(element.precio_unitario);
+        sTable.push("$ " + element.montopeso);
+        simbolo = "$ ";
+        esUF = true;
+        tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);
+      break;
+      case 2:
         sTable.push(element.cantidad);
         sTable.push(element.descripcion);
         precio += element.montopeso ;

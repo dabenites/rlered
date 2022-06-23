@@ -856,8 +856,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                 break;
                         }
                        break;
+
                        case("UF"):
-                       {
                         switch(moneda) // de salida en pantalla 
                         {
                                 case "US$":// tenemos el valos en USD 
@@ -865,8 +865,23 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         let montoUF_USD = montoFacturar * valorUF / valorDolar;
                                         element.monto_a_facturar = parseFloat(montoUF_USD).toFixed(2); // cambiar los DOLARES A UF 
                                 break;
-                        }     
-                       }
+                        } 
+                        break;   
+                        
+                        case ("$"):
+                                switch(moneda) // de salida en pantalla 
+                                {
+                                        case "UF":
+                                                let montoPeso_UF = montoFacturar / valorUF ;
+                                                element.monto_a_facturar = parseFloat(montoPeso_UF).toFixed(2);
+                                        break;
+                                        case "US$":
+                                                let montoPeso_Dolar = montoFacturar / valorDolar ;
+                                                element.monto_a_facturar = parseFloat(montoPeso_Dolar).toFixed(2);
+                                        break;
+                                }  
+                        break;
+                       
                    }
                 }
                 if (element.estadoFac === "Pagada")

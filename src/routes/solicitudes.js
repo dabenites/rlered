@@ -2970,17 +2970,16 @@ router.post('/verDetalleOrdenCompra',isLoggedIn, async (req,res) => {
     
       // preguntar si existen requerimientos para esta persona que esta logeada.
   const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon, ' +
-                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'), "+
-                                          " if (t1.id_moneda = 4 ,FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * "+
-                                                                        " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE') ,0)) AS monto , " +
-                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') , " +
-                                          " if (t1.id_moneda = 4 , FORMAT( " +
-                                                                        " (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * " +
-                                                                         " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) * " +
-                                                                         " cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) " +
-                                                                        "),0,'de_DE') ,0)) AS montopeso " +
+                                            " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'),  " +
+                                            " if (t1.id_moneda = 4 , FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) *  cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE'), " +
+                                            " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'),0))) AS monto , " +
+                                            " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') ,  " +
+                                            " if (t1.id_moneda = 4 , FORMAT(  (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) *  cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) *  cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) ),0,'de_DE') , " +
+                                            " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE'),0))) AS montopeso "+
                                           ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 '+
                                           ' WHERE t1.id_solicitud = ? AND t1.id_moneda = t2.id_moneda',[id]); 
+
+ 
 
    if (estado == 2)
    {
@@ -3186,17 +3185,16 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
                               ' AND t1.id_centro_costo = t2.id',[id]); 
 
   const requerimientos = await pool.query(" SELECT *, " + 
-  " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'), "+
-                                          " if (t1.id_moneda = 4 ,FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * "+
-                                                                        " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE') ,0)) AS monto , " +
-                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') , " +
-                                          " if (t1.id_moneda = 4 , FORMAT( " +
-                                                                        " (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * " +
-                                                                         " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) * " +
-                                                                         " cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) " +
-                                                                        "),0,'de_DE') ,0)) AS montopeso " +
+                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'),   " +
+											                    " if (t1.id_moneda = 4 , FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) *  cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE'), " +
+												                  " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'),0))) AS monto , " +
+                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') ,   " +
+												                  " if (t1.id_moneda = 4 , FORMAT(  (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) *  cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) *  cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) ),0,'de_DE') , " +
+												                  " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE'),0))) AS montopeso " +
                                         " FROM orden_compra_requerimiento as t1 WHERE t1.id_solicitud = ?",[id] );
   
+console.log(requerimientos);
+
   const stream = res.writeHead(200, {
     'Content-Type': 'application/pdf',
     'Content-Disposition': `attachment;filename=ORDEN DE COMPRA Nº `+oc[0].folio+" " + oc[0].nomPro+`.pdf`,

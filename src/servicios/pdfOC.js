@@ -140,6 +140,8 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
     oTable.push(sTable);
   });
 
+  
+
   const table = {
     title: "",
     subtitle: "",
@@ -175,18 +177,19 @@ doc.table( table, {
  {
    if (oc.conIVA == "Y")
    {
-    valorIVA = Math.round(Number(precio.toString().replace('.','')) * 1.19 - Number(precio.toString().replace('.','')));
+    valorIVA = Math.round(Number(precio.toString().replace('.','').replace('.','')) * 1.19 - Number(precio.toString().replace('.','').replace('.','')));
    
     valorTotal = Number(precio.toString().replace('.',''))  + valorIVA;
  
-     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio.toString().replace('.','')) ,465,valor_y ); 
+     doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio.toString().replace('.','').replace('.','')) ,465,valor_y ); 
      doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorIVA) ,465,valor_y  + 10 ); 
      doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorTotal) ,465,valor_y  + 20 );
    }
    else
    {
-    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio.toString().replace('.','')) ,465,valor_y );
-    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio.toString().replace('.','')) ,465,valor_y  + 10 ); 
+    
+    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio.toString().replace('.','').replace('.','')) ,465,valor_y );
+    doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio.toString().replace('.','').replace('.','')) ,465,valor_y  + 10 ); 
    }
  }
  else
@@ -227,7 +230,7 @@ doc.table( table, {
   else
   {
     doc.font('Times-Bold').fontSize(tletra - 1 ).text("NETO :"       ,0,valor_y , {width: 455,align:'right'});
-    doc.font('Times-Bold').fontSize(tletra - 1 ).text("TOTAL :" ,0,valor_y + 10 , {width: 455,align:'right'});
+    doc.font('Times-Bold').fontSize(tletra - 1 ).text("TOTAL :"      ,0,valor_y + 10 , {width: 455,align:'right'});
   }
   
 

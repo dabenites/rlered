@@ -755,7 +755,7 @@ router.get('/buscarIngRev/:find', isLoggedIn, async (req, res) => {
                                        " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
                                        " AND t1.id_estado = 1" + 
                                        " AND t1.idCategoria = t2.id" +
-                                       " AND t2.idCentroCosto IN (2,7,5)");
+                                       " AND t2.idCentroCosto IN (2,7,5,4)");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
@@ -909,7 +909,7 @@ router.get('/buscarJefe/:find',isLoggedIn, async (req, res) => {
   const jefes =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1 " +
                                   " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
                                   " AND t1.id_estado = 1"+
-                                  " AND t1.idCategoria IN (25,26,28,1,24,22,43)");
+                                  " AND t1.idCategoria IN (25,26,28,1,24,22,43,41,42)");
 
   res.setHeader('Content-Type', 'application/json');
   res.json(jefes);

@@ -14,8 +14,185 @@ const { chdir } = require('process');
 
 const mensajeria = require('../mensajeria/mail');
 
+router.get('/ocproveedor/delete/:id',isLoggedIn, async (req, res) => {
+    try{
+        const { id } = req.params;
+        const nombre = await pool.query('SELECT razon_social FROM orden_compra_proveedor WHERE id = ?', [id]);
+        //console.log(nombre);
+    
+        await pool.query('DELETE FROM orden_compra_proveedor WHERE id = ?', [id]);
+    
+        res.redirect(   url.format({
+            pathname:'/mantenedores/proCompra',
+                    query: {
+                    "a": 3
+                    }
+                }));
+    }catch(error)
+    {
+        mensajeria.MensajerErrores("\n\n Error en el directorio: /ocproveedor/delete/:id \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
+    }
 
+});
 
+router.post('/addOcProveedor',isLoggedIn, async (req,res) => {
+    try{
+
+        const {   rut, razon_social,direccion } = req.body; //Obtener datos title,url,description
+
+        const newProvOC  ={ //Se gurdaran en un nuevo objeto
+            rut : rut,
+            razon_social : razon_social,
+            direccion : direccion
+        };
+
+    //Guardar datos en la BD     
+    const result = await pool.query('INSERT INTO orden_compra_proveedor set ?', [newProvOC]);//Inserción
+ 
+    res.redirect(   url.format({
+        pathname:'/mantenedores/proCompra',
+                query: {
+                "a": 1
+                }
+            }));
+
+    }catch(error)
+    {
+        // ocurrio un problema.
+        mensajeria.MensajerErrores("\n\n Error en el directorio: /addOcProveedor \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
+    }
+});
+
+router.post('/editOcProveedor',isLoggedIn, async (req,res) => {
+
+    try{
+        const {  id, rut, razon_social,direccion } = req.body; //Obtener datos title,url,description
+
+        const newProvOC  ={ //Se gurdaran en un nuevo objeto
+            rut : rut,
+            razon_social : razon_social,
+            direccion : direccion
+        };
+        //Guardar datos en la BD   
+        //console.log(newProvOC);  
+        //console.log(id);
+        await pool.query('UPDATE orden_compra_proveedor set ? WHERE id = ?', [newProvOC, id]);
+    
+    
+       res.redirect(   url.format({
+        pathname:'/mantenedores/proCompra',
+                query: {
+                "a": 2
+                }
+            }));
+    }catch(error)
+    {
+        // ocurrio un problema.
+        mensajeria.MensajerErrores("\n\n Error en el directorio: /editOcProveedor \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
+    }
+});
+
+router.get('/ocproveedor/edit/:id',isLoggedIn, async (req, res) => {
+
+    try{
+        const { id } = req.params;
+        const proveedores = await pool.query('SELECT * FROM orden_compra_proveedor as t1 ORDER BY t1.razon_social ASC');
+        const proveedor = await pool.query('SELECT * FROM orden_compra_proveedor as t1  WHERE t1.id = ? ORDER BY t1.razon_social ASC', [id]);
+
+        res.render('mantenedores/ocpreveedores', { req ,proveedores,proveedor:proveedor[0],  layout: 'template'});
+    }catch(error)
+    {
+          // ocurrio un problema.
+          mensajeria.MensajerErrores("\n\n Error en el directorio: /pais/edit/:id \n" + error + "\n Generado por : " + req.user.login);
+          res.redirect(   url.format({
+              pathname:'/dashboard',
+                      query: {
+                      "a": 1
+                      }
+                  }));
+    }
+});
+
+router.get('/proCompra', isLoggedIn, async (req, res) => {
+
+    try{
+        const proveedores = await pool.query('SELECT * FROM orden_compra_proveedor as t1 ORDER BY t1.razon_social ASC');
+
+        if (req.query.a === undefined)
+        {
+            res.render('mantenedores/ocpreveedores', { req ,proveedores, layout: 'template'});
+        }
+        else
+            {
+                var verToask = {};
+                switch(req.query.a)
+                {
+                    case 1: // Crear
+                    case "1":
+                        verToask= {
+                        titulo : "Mensaje",
+                        body   : "Proveedor de compra agregado correctamente.",
+                        tipo   : "Crear"
+                            };
+    
+                            res.render('mantenedores/ocpreveedores', { verToask, req ,proveedores, layout: 'template'});
+                    break;
+                    case 2: // Actualizado
+                    case "2":
+                        verToask = {
+                        titulo : "Mensaje",
+                        body   : "Proveedor de compra actualizado correctamente.",
+                        tipo   : "Editar"
+                            };
+    
+                            res.render('mantenedores/ocpreveedores', { verToask, req ,proveedores, layout: 'template'});
+                    break;
+                    case 3: // Actualizado
+                    case "3":
+                        verToask = {
+                        titulo : "Mensaje",
+                        body   : "Proveedor de compra se ha eliminado correctamente.",
+                        tipo   : "Eliminar"
+                            };
+    
+                            res.render('mantenedores/ocpreveedores', { verToask, req ,proveedores, layout: 'template'});
+                    break;
+                }
+            }
+
+    }catch(error)
+    {
+        // ocurrio un problema.
+        mensajeria.MensajerErrores("\n\n Error en el directorio: /pais \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));
+    }
+    
+});
+
+// 
 /// MANTENEDOR DE PAIS 
 router.get('/pais', isLoggedIn, async (req, res) => {
 

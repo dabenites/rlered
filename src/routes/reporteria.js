@@ -14,9 +14,22 @@ const { parse } = require('path');
 router.get('/proyectos',isLoggedIn,  async (req, res) => {
     
         try {
-                const paises = await pool.query('SELECT * FROM pais as t1 ORDER BY t1.pais ASC');
+                
+                // const paises = await pool.query('SELECT * FROM pais as t1 ORDER BY t1.pais ASC');
+                // res.render('reporteria/buscarProyecto', {paises,  req , layout: 'template'});
+                
+                sql = "SELECT t3.Nombre AS nomJefe, t4.Nombre AS nomDir, t2.name AS nomCli, t1.*,t5.descripcion as servicio, t6.descripcion as tipoProyecto  FROM pro_proyectos AS t1 "+ 
+                        " LEFT JOIN proyecto_servicio AS t5 ON t1.id_tipo_servicio = t5.id " +
+                        " LEFT JOIN proyecto_tipo AS t6 ON t1.id_tipo_proyecto = t6.id " +
+                        " LEFT JOIN contacto AS t2 ON t1.id_cliente = t2.id " +
+                        " LEFT JOIN sys_usuario AS t3 ON t1.id_jefe = t3.idUsuario " + 
+                        " LEFT JOIN sys_usuario AS t4 ON t1.id_director = t4.idUsuario" +
+                        " ORDER BY t1.id";
 
-                res.render('reporteria/buscarProyecto', {paises,  req , layout: 'template'});
+                const proyectos = await pool.query(sql);
+
+                res.render('reporteria/buscarProyecto2', { proyectos, req, layout: 'template' });
+
         } catch (error) {
                 mensajeria.MensajerErrores("\n\n Archivo : reporteria.js \n Error en el directorio: /proyectos \n" + error + "\n Generado por : " + req.user.login);
                 res.redirect(   url.format({
@@ -886,7 +899,9 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                 }
                 if (element.estadoFac === "Pagada")
                 {
-                        totalPagado = parseFloat(totalPagado) + parseFloat( element.monto_a_facturar);
+                        // console.log(element);
+                        // ___
+                        totalPagado = parseFloat(totalPagado) + parseFloat( element.monto_a_facturar.replace(",","."));
                 }
 
                 totalFacturado = parseFloat(totalFacturado) + parseFloat( element.monto_a_facturar);

@@ -93,6 +93,7 @@ app.use('/ploter', require('./routes/ploter'));
 app.use('/bitacora', require('./routes/bitacora'));
 app.use('/proyecto', require('./routes/proyecto'));
 app.use('/reporteria', require('./routes/reporteria'));
+app.use('/alertas', require('./routes/alertas'));
 //app.use('/mantenedores/usuario', require('./routes/mantenedores'));
 
 

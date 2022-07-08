@@ -17,58 +17,64 @@
 </head>
 
 <body>
-    <div class="col-md-6 col-sm-6  ">
+    <div class="col-md-7 col-sm-7  ">
         <div class="x_panel">
             <div class="x_title">
-                <h2>Países
-                    <!--<small>Pais donde estara ubicado el proyecto en desarrollo</small>-->
-                </h2>
+                <h2>Proveedores de Orden Compra</h2>
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
-                            <th>Opciones</th>
+                            <th>Rut</th>
+                            <th>Razon Social</th>
+                            <th>Dirección</th>
+                            <th>Opcion</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {{#if pais }}
-                            {{#each paises}}
+                        {{#if proveedor }}
+                            {{#each proveedores}}
                                 <tr>
-                                    <td>{{pais}}</td>
+                                   <td>{{rut}}</td>
+                                        <td>{{razon_social}}</td>
+                                        <td>{{direccion}}</td>
                                     <td>
                                         <div class="btn-group" role="group" aria-label="Basic example">
-                                            <button type="button" class="btn btn-secondary btn-sm"><a type="button"href="../../pais/edit/{{id}}" style="color: white;"> Editar </a></button>
-                                            <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../pais/delete/{{id}}" style="color: white;"
-                                            onclick="return confirm('¿Esta seguro de borrar el Pais {{pais}} ?')">Borrar</a></button>
+                                            <button type="button" class="btn btn-secondary btn-sm"><a type="button"href="../../ocproveedor/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                            <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../ocproveedor/delete/{{id}}" style="color: white;"
+                                            onclick="return confirm('¿Esta seguro de borrar el proveedor de oc {{razon_social}} ?')">Borrar</a></button>
                                         </div>
                                     </td>
                                 </tr>
                             {{/each}}
                         {{else}}
                             {{#if verToask }}
-                                {{#each paises}}
+                                {{#each proveedores}}
                                     <tr>
-                                        <td>{{pais}}</td>
+                                        <td>{{rut}}</td>
+                                        <td>{{razon_social}}</td>
+                                        <td>{{direccion}}</td>
                                         <td>
                                             <div class="btn-group" role="group" aria-label="Basic example">
-                                                <button type="button" class="btn btn-secondary btn-sm"><a type="button"href="../../mantenedores/pais/edit/{{id}}" style="color: white;"> Editar </a></button>
-                                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../mantenedores/pais/delete/{{id}}" style="color: white;"
-                                                onclick="return confirm('¿Esta seguro de borrar el Pais proveedor {{pais}} ?')">Borrar</a></button>
+                                                <button type="button" class="btn btn-secondary btn-sm"><a type="button"href="../../mantenedores/ocproveedor/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="../../mantenedores/ocproveedor/delete/{{id}}" style="color: white;"
+                                                onclick="return confirm('¿Esta seguro de borrar el proveedor de oc {{razon_social}} ?')">Borrar</a></button>
                                             </div>
                                         </td>
                                     </tr>
                                 {{/each}}
                             {{else}}
-                                {{#each paises}}
+                                {{#each proveedores}}
                                     <tr>
-                                        <td>{{pais}}</td>
+                                        <td>{{rut}}</td>
+                                        <td>{{razon_social}}</td>
+                                        <td>{{direccion}}</td>
                                         <td>
                                             <div class="btn-group" role="group" aria-label="Basic example">
-                                                <button type="button" class="btn btn-secondary btn-sm"><a type="button"href="pais/edit/{{id}}" style="color: white;"> Editar </a></button>
-                                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="pais/delete/{{id}}" style="color: white;" onclick="return confirm('¿Esta seguro de borrar el Pais proveedor {{pais}} ?')">Borrar</a></button>
+                                                <button type="button" class="btn btn-secondary btn-sm"><a type="button"href="ocproveedor/edit/{{id}}" style="color: white;"> Editar </a></button>
+                                                <button type="button" class="btn btn-danger btn-sm"><a type="button" href="ocproveedor/delete/{{id}}" style="color: white;" onclick="return confirm('¿Esta seguro de borrar el proveedor de oc {{razon_social}} ?')">Borrar</a></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -80,13 +86,13 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 ">
+    <div class="col-md-5 ">
         <div class="x_panel">
             <div class="x_title">
-                {{#if pais }}
-                <h2>Actualizar País <small>{{pais.pais}}</small></h2>
+                {{#if proveedor }}
+                <h2>Actualizar Proveedor Orden Compra <small>{{proveedor.razon_social}}</small></h2>
                 {{else}}
-                <h2>Registrar País
+                <h2>Registrar Proveedor Orden Compra
                     <!--<small>Se podra seleccionar el pais en el ingreso de un proyecto</small>-->
                 </h2>
                 {{/if}}
@@ -96,18 +102,22 @@
             <div class="x_content">
 
                 <!-- start form for validation -->
-                {{#if pais }}
-                <form id="demo-form" data-parsley-validate action="/mantenedores/editPais" method="POST">
-                    {{else}}
-                    <form id="demo-form" data-parsley-validate action="/mantenedores/addPais" method="POST">
+                {{#if proveedor }}
+                     <form id="demo-form" data-parsley-validate action="/mantenedores/editOcProveedor" method="POST">
+                {{else}}
+                    <form id="demo-form" data-parsley-validate action="/mantenedores/addOcProveedor" method="POST">
                         {{/if}}
 
-                        {{#if pais }}
-                        <label for="ID Pais">Id Pais :</label>
-                        <input type="text" id="id" class="form-control" value="{{pais.id}}" name="id" readonly />
+                        {{#if proveedor }}
+                        <label for="ID Pais">Id Proveedor Orden Compra :</label>
+                        <input type="text" id="id" class="form-control" value="{{proveedor.id}}" name="id" readonly />
                         {{/if}}
-                        <label for="Nombre Pais">Nombre País :</label>
-                        <input type="text" id="name" class="form-control" value="{{pais.pais}}" name="name" required />
+                        <label for="">Rut :</label>
+                        <input type="text" id="rut" class="form-control" value="{{proveedor.rut}}" name="rut" required />
+                        <label for="">Razon Social :</label>
+                        <input type="text" id="razon_social" class="form-control" value="{{proveedor.razon_social}}" name="razon_social" required />
+                        <label for="">Direccion :</label>
+                        <input type="text" id="direccion" class="form-control" value="{{proveedor.direccion}}" name="direccion" required />
 
                         <br />
                        
@@ -116,7 +126,7 @@
 
                                     </div>
                                     <div class="col-md-4 col-sm-4 ">
-                                    {{#if pais }}
+                                    {{#if proveedor }}
                                     <button type="submit" class="btn btn-warning btn-block">
                                         Actualizar
                                     </button>
@@ -177,14 +187,18 @@
 function validarIngreso ()
 {
 
-     var pais = $("#name").val();
+     var rut = $("#rut").val();
+     var razon_social = $("#razon_social").val();
+     var direccion = $("#direccion").val();
     
-    if (pais === "")
+    if (rut === "" || razon_social === "" || direccion === "")
     {
-        alert("El campo pais no puede estar sin rellenar.");
+        alert("Todos los campos son necesarios");
     }
     else
     {
+        document.getElementById("demo-form").submit();
+        /*
         namePais = $("#demo-form").serialize();
 
         $.ajax({
@@ -205,6 +219,7 @@ function validarIngreso ()
                 }
             }
             });
+            */
     }
   
 }

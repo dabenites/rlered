@@ -1273,7 +1273,6 @@ router.get('/missolicitudes', isLoggedIn, async (req, res) => {
                                               " t4.id = t1.idEstado"+
                                           " AND 	t1.fecha > DATE_SUB(NOW(),INTERVAL 1 YEAR)" );
 
-
    const horasextrasHistorial =  await pool.query("SELECT t2.Nombre , t1.numhh , DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha,"+
                                               " t3.nombre AS nomPro,t1.comentario,t4.descripcion, "+
                                               " t1.id " +
@@ -2047,7 +2046,7 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
                                            ' WHERE t1.id_ingreso = ? AND (t1.id_solicitud = 0 OR t1.id_solicitud is null) AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
 
   
-  const ordenCompra = await pool.query(" SELECT t1.id_solicitante, t1.id,t1.folio,t1.id_estado, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
+  const ordenCompra = await pool.query(" SELECT SUM(t10.precio_unitario * t10.cantidad) AS montoTotal, t11.simbolo, t1.num_documento, t1.id_solicitante, t1.id,t1.folio,t1.id_estado, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
                                            " , t8.nombre AS proyecto,t9.descripcion as estado , t8.year,t8.code," +
                                            " if (t1.id_tipo = 3 ,  " +
                                            " (SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro) "+
@@ -2068,9 +2067,12 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
                                            " LEFT JOIN centro_costo AS t7 ON t1.id_centro_costo = t7.id " +
                                            " LEFT JOIN pro_proyectos AS t8 ON t1.id_proyecto = t8.id " +
                                            " LEFT JOIN orden_compra_estado as t9 ON t1.id_estado = t9.id " +
+                                           " LEFT JOIN orden_compra_requerimiento AS t10 ON t1.id = t10.id_solicitud " +
+                                           " LEFT JOIN moneda_tipo AS t11 ON t10.id_moneda = t11.id_moneda " +
                                            " WHERE t1.id_estado IN(1,2,3,4,5) " + 
-                                           " ORDER BY t1.id DESC", [req.user.idUsuario]); 
+                                           " GROUP BY t1.id ORDER BY t1.id DESC", [req.user.idUsuario]); 
 
+   
     // buscar el listado de las personas vigentes para poder terminar una OC por parte de finanzas.
     const listadoFinanzas = await pool.query(" SELECT * FROM orden_compra_aprob_finanzas");
 
@@ -3193,7 +3195,7 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
 												                  " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE'),0))) AS montopeso " +
                                         " FROM orden_compra_requerimiento as t1 WHERE t1.id_solicitud = ?",[id] );
   
-console.log(requerimientos);
+
 
   const stream = res.writeHead(200, {
     'Content-Type': 'application/pdf',
@@ -3215,7 +3217,7 @@ router.post('/terminoOC',isLoggedIn, async (req,res) => {
 
   const { id_finanza, comentario_finanza, num_documento} = req.body;
 
-  const result = await pool.query("UPDATE orden_compra set  recepcionado_finanza = 'Y' , num_documento = ?, fecha_finanza = ?, comentario_finanza = ? WHERE id = ? ", [num_documento, new Date(), comentario_finanza , id_finanza]);
+  const result = await pool.query("UPDATE orden_compra set  id_estado = 5 , recepcionado_finanza = 'Y' , num_documento = ?, fecha_finanza = ?, comentario_finanza = ? WHERE id = ? ", [num_documento, new Date(), comentario_finanza , id_finanza]);
   //console.log(req.body);
 
   res.sendStatus(200);
@@ -3238,8 +3240,16 @@ router.post('/terminoOCRechazo',isLoggedIn, async (req,res) => {
 //editarOCIngresada
 router.post('/editarOCIngresada',isLoggedIn, async (req,res) => {
 
-  const {emisor, observaciones, tipo_proveedor,  contacto,  solicitante,  recepcionador,  numpago,  director,  centrocosto,  proyecto,  etapa, id,incluyeIVA} = req.body;
+  let {emisor, observaciones, tipo_proveedor,  contacto,  solicitante,  recepcionador,  numpago,  director,  centrocosto,  proyecto,  etapa, id,incluyeIVA} = req.body;
   
+  if (proyecto === "")
+  {
+    proyecto = 0;
+  }
+  if (etapa === "")
+  {
+    etapa = 0;
+  }
   
   const result = await pool.query("UPDATE orden_compra "+
                                   " set  id_tipo = ? , " +
@@ -3255,6 +3265,8 @@ router.post('/editarOCIngresada',isLoggedIn, async (req,res) => {
                                   " conIVA = ?, " +
                                   " observaciones = ? " +
                                    " WHERE id = ? ", [tipo_proveedor,emisor,contacto,solicitante,director,recepcionador,centrocosto,proyecto,etapa,numpago,incluyeIVA,observaciones,id]);
+  
+  console.lo
 
   res.sendStatus(200);
 

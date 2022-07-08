@@ -773,7 +773,6 @@ module.exports.NotificacionCheckFirmaOC =  async function (objeto) {
   
   }
 
-
   module.exports.NotificacionOCClaudio =  async function (objeto) {
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing
@@ -854,6 +853,89 @@ module.exports.NotificacionCheckFirmaOC =  async function (objeto) {
          const result = await transporter.sendMail(mailOptions);
   
   }
+
+
+  module.exports.NotificacionBitacoraSemanal =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    try {
+
+        
+
+        const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+            CLIENTD_SECRET,
+            REDIRECT_URI);
+
+            oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+
+            const accessToken = await oAuthClient.getAccessToken();
+            const transporter = nodemailer.createTransport({
+            service : "gmail",
+            maxConnections: 30,
+            maxMessages: 500,
+            auth : {
+            type : "OAuth2",
+            user : "planner@renelagos.com",
+            clientId :CLIENTD_ID,
+            clientSecret : CLIENTD_SECRET,
+            refreshToken: REFRESH_TOKEN,
+            accessToken : accessToken,
+            },
+            });
+
+
+            const tabla = " <html><head> " +
+            " <style> " +
+            " table { " +
+            " font-family: arial, sans-serif; " +
+            " border-collapse: collapse; " +
+            "  width: 50%; " +
+            " } " +
+            " td, th { "  +
+            " border: 1px solid #dddddd; "  +
+            "  text-align: left; " +
+            " padding: 8px; " +
+            " } " +
+            " tr:nth-child(even) { " +
+            " background-color: #dddddd; " +
+            " } " +
+            " </style> " +
+            " </head> " +
+            " <body>"+
+            " <p> Estimado/a "+objeto.nombre+" </br> </p>\n"  +
+            " <p> La información del llenado de bitácora del equipo, desde el "+objeto.inicio+" hasta el "+objeto.termino+", es la siguiente: </br> \n </p>" +
+            "<table><tr><th>Colaborador</th>   <th>Centro Costo</th>   <th>HH Semana</th>   <th>HH Ingresadas</th>   <th>% Cumplimiento</th> </tr>" +
+            objeto.tabla +        
+            " </table></body></html>";
+
+            const mailOptions = {
+                                from : "RLE - Planner <planner@renelagos.com>",
+                                //to : "dbenites@renelagos.com",
+                                to : objeto.to,
+                                subject : "AVISO - BITACORA",
+                                html : tabla
+                                };
+
+            const result = await transporter.sendMail(mailOptions);
+            
+            //console.log("####");
+            //await sleep(1500);
+
+    } catch (error) {
+                console.log(error);
+        }
+
+  }
+
+  /*
+  async function sleep(ms) {
+    return new Promise(resolve => {
+      setTimeout(resolve, ms);
+    });
+  }
+  */
+
+
 //NotificacionOCReparos
 
 //main().catch(console.error);

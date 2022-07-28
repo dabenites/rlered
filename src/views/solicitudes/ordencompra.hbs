@@ -57,6 +57,7 @@
         <div class="x_title">
             <h2>Ingresar Orden de Compra</h2>
             <div class="clearfix"></div>
+            
         </div>
         <div class="x_content">
 
@@ -346,6 +347,11 @@
                         <div class="x_panel">
                             <div class="x_title">
                                 <h2>Listado Ingresados </h2> 
+                                <ul class="nav navbar-right panel_toolbox">
+                                    <form id="exportar" action="/solicitudes/exportOCExcel" method="POST"> 
+                                        <button type="submit" class="btn btn-secondary btn-sm" style="margin-top: 15px;"> <i class="fa fa-file-excel-o"> Exportar</i> </button> 
+                                    </form>
+                                </ul>
                                 <div class="clearfix"></div>
                             </div>
         <div class="x_content">
@@ -385,8 +391,16 @@
                                 <td>
                                     <div class="btn-group" role="group" aria-label="Basic example">
                                         {{#if (if_equal 1 id_estado) }}
-                                            <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="verDetalle({{id}},1)">
+                                            <!--
+                                                <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="verDetalle({{id}},1)">
                                                 <i class="fa fa-search"></i>
+                                            </button>
+                                            -->
+                                            <button type="button" class="btn btn-secondary btn-sm">
+                                                <a href="/solicitudes/createPDFPre/{{id}}" style="color: white;" target="_blank">
+                                                <i class="fa fa-search">
+                                                </i>
+                                                </a>
                                             </button>
                                             <!-- SOLO EN ESTE ESTADO SE PUEDE EDITAR -->
                                             <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg3" onclick="EditarOC({{id}})">

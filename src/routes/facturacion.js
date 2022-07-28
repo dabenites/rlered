@@ -8,6 +8,94 @@ var dateFormat = require('dateformat');
 const mensajeria = require('../mensajeria/mail');
 
 var url = require('url');
+var Excel = require('exceljs');
+
+//exportOCExcel
+router.post('/exportFacturasExcel', isLoggedIn, async function (req, res) {
+
+    try {
+  
+        const facturacion =  await pool.query("SELECT " +
+                                                        " *, " +
+                                                        " t1.id as idFacturacion," +
+                                                        " t4.nombre As nomSol ," +
+                                                        " t2.nombre As nomPro ," +
+                                                        " DATE_FORMAT(t1.fecha_solicitud, '%Y-%m-%d') as fechaSolicitante ," +
+                                                        " t5.descripcion As estadoDes," +
+                                                        " t5.color as color ," +
+                                                        " t6.descripcion As tipoCobroDes ," +  
+                                                        " t2a.name As nameCliente " +
+                                                " FROM " +
+                                                        "fact_facturas as t1 LEFT JOIN  sys_usuario as t4 ON t1.id_solicitante = t4.idUsuario, " +
+                                                        "pro_proyectos as t2 LEFT JOIN  contacto as t2a ON t2.id_cliente = t2a.id, "+ 
+                                                        "moneda_tipo as t3, "+ 
+                                                        "fact_estados as t5, "+ 
+                                                        "fact_tipo_cobro as t6 "+
+                                                " WHERE " + 
+                                                        " t1.id_proyecto = t2.id"+
+                                                " AND " + 
+                                                        " t1.id_tipo_moneda = t3.id_moneda"+
+                                                " AND " + 
+                                                        " t5.id = t1.id_estado"+
+                                                " AND " + 
+                                                        " t5.id in ( 0,1,2,3,4,5,6) "+
+                                                " AND " + 
+                                                        " t6.id = t1.id_tipo_cobro"+
+                                                " ORDER BY fechaSolicitante DESC");
+                
+  
+  
+      res.writeHead(200, {
+      'Content-Disposition': 'attachment; filename="Facturacion.xlsx"',
+      'Transfer-Encoding': 'chunked',
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+  
+      var workbook = new Excel.stream.xlsx.WorkbookWriter({ stream: res });
+  
+      var worksheet = workbook.addWorksheet('some-worksheet');
+  
+      worksheet.addRow(['Fecha Solicitud', 'Cliente', 'Nº Proyecto' , 'Proyecto', 'Nº Presupuesto',
+                        'Unidad', 'Monto', '% Ppto', 'Solicitante', 'Inicio Cobro', 'Nº Factura', 'Roc Asociada', 'Estado','Tipo Cobro']).commit();
+  
+      for (const f of facturacion) {
+  
+          worksheet.addRow([f.fechaSolicitante,
+                            f.nameCliente,
+                            f.year+"-"+f.code,
+                            f.nomPro,
+                            f.num_ppto,
+                            f.simbolo,
+                            f.monto_a_facturar,
+                            f.porc_ppto,
+                            f.nomSol,
+                            f.fecha_cobro,
+                            f.num_factura, 
+                            f.roc,
+                            f.estadoDes,
+                            f.tipoCobroDes]);
+                        }
+  
+  
+      worksheet.commit();
+      workbook.commit();
+  
+  
+  } catch (error) 
+  {
+  mensajeria.MensajerErrores("\n\n Archivo : facturacion.js \n Error en el directorio: /exportFacturasExcel \n" + error + "\n Generado por : " + req.user.login);
+  res.redirect(   url.format({
+    pathname:'/dashboard',
+            query: {
+            "a": 1
+            }
+        })); 
+  
+  }
+  
+  
+  
+  });
 
 router.post('/ingresoTrackingFactura', isLoggedIn, async (req, res) => {
 

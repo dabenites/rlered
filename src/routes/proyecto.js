@@ -11,6 +11,7 @@ var dateFormat = require('dateformat');
 var url = require('url');
 
 const mensajeria = require('../mensajeria/mail');
+const { parse } = require('path');
 
 
 
@@ -93,11 +94,8 @@ router.post('/addProyecto', isLoggedIn, async (req, res) => {
     //Guardar datos en la BD     
   //Guardar datos en la BD     
     //Guardar datos en la BD     
-    //console.log(req.body);
     const result = await pool.query('INSERT INTO pro_proyectos set ?', [newProyecto]);//Inserción
-  
-  
-    //console.log(result);
+
     const proye = await pool.query('SELECT * FROM pro_proyectos');
   
   
@@ -154,7 +152,6 @@ router.get('/buscador', isLoggedIn, async (req, res) => {
 
 
 router.post('/listPro', isLoggedIn, async (req, res) => {
-  //console.log(req);
   // const buscadores = await pool.query("SELECT * FROM pro_proyectos");
   // const tipo = await pool.query("SELECT * FROM proyecto_tipo");
   // const usuarios = await pool.query("SELECT * FROM sys_usuario");
@@ -329,10 +326,8 @@ router.post('/edit', isLoggedIn, async (req, res) => {
   
     //res.send("ppp");
   
-  //console.log(nombre+"ind"+id);
   
   const Pedit = await pool.query('UPDATE pro_proyectos set nombre =  ? , code =  ?,  SuperficiePPTO =  ?,  SuperficieAPC =  ?, Ciudad =  ?, Ubicacion =  ?,Npisos =  ?,Nsubterraneo =  ?,ValorMC =  ?,Zona =  ?,Suelo =  ?,Nplanos = ? WHERE id = ?', [nombre,code,SuperficiePPTO,SuperficieAPC,Ciudad,Ubicacion,Npisos, Nsubterraneo,ValorMC,Zona,Suelo,Nplanos,id] );
-   // console.log(nombre);
     //res.send("ppp");
   
   
@@ -416,9 +411,7 @@ router.get('/listado',isLoggedIn, async (req, res) => {
  // JP 24
  // DIRECTORES 26 // 27 // 40 // 41 // 42 // 46
  // Todos los demas pueden ver todo. 
-  //console.log(req.user);
   var sql = ""
-  //console.log(req.user);
   switch(req.user.idCategoria)
   {
     case 21:
@@ -454,8 +447,6 @@ router.get('/listado',isLoggedIn, async (req, res) => {
             " ORDER BY t1.id";
     break;
   }
-
-  //console.log(sql);
 
 
   const proyectos = await pool.query(sql);
@@ -563,7 +554,6 @@ router.get('/facturar/:id', isLoggedIn, async (req, res) => {
     id_revisor,id_complejidad,latitud,altitud,direccion,superficie_ppto,superficie,valor_proyecto,valor_metro_cuadrado,fecha_inicio,
     fecha_entrega,fecha_termino,num_pisos,num_subterraneo,zona,suelo,num_plano_estimado} = proyectos[0];
 
-  // console.log(nombre);
 
   const monedas = await pool.query("SELECT * FROM moneda_tipo AS t1 WHERE t1.factura = 'Y'");
 
@@ -630,7 +620,6 @@ router.get('/editar/:id', isLoggedIn, async (req, res) => {
   let proyectos;
   if (pre[0].id_tipo_servicio == 2)
   {
-    //console.log("Buscar la informacion del ing revi");
     
     proyectos = await pool.query("SELECT * , t1.id as idPro, " +
     " t1.id_director AS idDir, " +
@@ -812,7 +801,7 @@ router.get('/buscarCoordPe/:find',isLoggedIn,  async (req, res) => {
   const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
                                        " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
                                        " AND t1.id_estado = 1" + 
-                                       " AND  t1.idUsuario IN (86)");
+                                       " AND  t1.idUsuario IN (86 , 40 ,43 )");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
@@ -840,10 +829,6 @@ router.get('/buscarProA/:find', isLoggedIn, async (req, res) => {
   const nombre = req.query.term;
 
 
-  console.log("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
-  " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
-  " AND t1.id_estado = 1" + 
-  " AND t1.idUsuario IN (39, 34) )");
   const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
                                        " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
                                        " AND t1.id_estado = 1" + 
@@ -873,14 +858,10 @@ router.get('/buscarProAPe/:find', isLoggedIn, async (req, res) => {
   const nombre = req.query.term;
 
 
-  console.log("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
-  " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
-  " AND t1.id_estado = 1" + 
-  " AND t1.idUsuario IN (39, 34) )");
   const directores =  await pool.query("SELECT t1.idUsuario AS id, t1.Nombre AS value FROM sys_usuario AS t1"+
                                        " WHERE t1.Nombre LIKE '%"+nombre+"%'" +
                                        " AND t1.id_estado = 1" + 
-                                       " AND t1.idUsuario IN (86) ");
+                                       " AND t1.idUsuario IN ( 86 , 40 ) ");
   
   res.setHeader('Content-Type', 'application/json');
   res.json(directores);
@@ -1143,6 +1124,8 @@ router.post('/cargarFactura',isLoggedIn,  async (req, res) => {
     
     const infoDirector = await pool.query("SELECT if(COUNT(t1.idUsuario)=0,'N/A',t1.Nombre) AS  nom , t1.Email  FROM sys_usuario as t1 where t1.idUsuario =  "+[infoProyecto[0].id_director]+" ");
 
+    const infoProyectoResulmen = await pool.query("SELECT * FROM pro_proyectos_info as t1 where t1.id_proyecto =  ? AND t1.id_cabecera = (  SELECT MAX(t2.id_cabecera) FROM pro_proyectos_info AS t2 ) ",[id_proyecto]);
+
     const facturacion = {
       to : 'contabilidad@renelagos.com',
       comentario : comentario,
@@ -1153,32 +1136,17 @@ router.post('/cargarFactura',isLoggedIn,  async (req, res) => {
       nomMoneda : nomMoneda,
       monto : monto,
       mailopt1 : 'cgahona@renelagos.com',
-      mailopt2 : 'mcastillo@renelagos.com'
+      mailopt2 : 'mcastillo@renelagos.com',
+      facturado : parseFloat( infoProyectoResulmen[0].total_facturado,2),
+      costo : parseFloat( infoProyectoResulmen[0].costo_totales,2),
     };
 
-    const mailAvisoClaudio = {
-      to : 'cgahona@renelagos.com',
-      comentario : comentario,
-      proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
-      solicitante : req.user.Nombre,
-      director : infoDirector[0].nom,
-      nomMoneda : nomMoneda,
-      monto : monto
-    };
-    const mailAvisoMario = {
-      to : 'mcastillo@renelagos.com',
-      comentario : comentario,
-      proyecto : infoProyecto[0].year + "-" + infoProyecto[0].code + " : " + infoProyecto[0].nombre,
-      solicitante : req.user.Nombre,
-      director : infoDirector[0].nom,
-      nomMoneda : nomMoneda,
-      monto : monto
-    };
+
+
 
  // Descomentar una vez terminaada las pruebas para el ingreso de facturaciones.    
-  mensajeria.EnvioMailIngresoFactura(facturacion); 
- // mensajeria.EnvioMailIngresoFactura(mailAvisoClaudio); 
- // mensajeria.EnvioMailIngresoFactura(mailAvisoMario); 
+  mensajeria.EnvioMailIngresoFactura(facturacion);  // 
+ 
 
 const resultFactura = await pool.query('INSERT INTO fact_facturas set ?', [newFactura]); 
 
@@ -1476,7 +1444,6 @@ router.post('/ActualizarProyecto',isLoggedIn, async (req, res) => {
 router.post('/buscarPais', isLoggedIn, async (req, res) => {
 
   try {
-     //console.log(req.body.pais);
             const sql = " SELECT * " +
             " FROM  " +
           " pais	 AS t1 " +
@@ -1498,7 +1465,7 @@ router.post('/buscarPais', isLoggedIn, async (req, res) => {
           const categoria = await pool.query("SELECT * FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id_pais = "+pais[0].id+" AND t1.id_parametro = 3 UNION SELECT 1,1,1,'N/A' FROM proyecto_parametro_pais_valor AS t1 WHERE t1.id = 1");
 
           const respuesta = { estado : 1, id_pais : pais[0].id,zona : zona,suelo : suelo,categoria : categoria};
-          //console.log(respuesta);
+         
           res.send(respuesta);
           }
 
@@ -1580,8 +1547,6 @@ router.get('/equipo/delete/:id', isLoggedIn, async (req, res) => {
     
     const { id } = req.params;
 
-  console.log(req.params);
-  console.log(req.body);
 
   const informacion = await pool.query("SELECT * FROM pro_equipo AS t1 WHERE t1.id = "+id+"");
   
@@ -1641,7 +1606,6 @@ router.post('/buscarCodigo', isLoggedIn, async (req, res) => {
 
 
   try {
-     // console.log(req.body.year:);
 
      switch(req.body.pais)
      {
@@ -1674,7 +1638,6 @@ router.post('/buscarCodigo', isLoggedIn, async (req, res) => {
                                                  " t1.year = "+req.body.year+" " +
                                              " AND  " +
                                                  " t1.code >= 400 AND 		t1.code <= 499"); 
-           //console.log(codigo[0].num);
            res.send(String(codigo1b[0].num));
            break;
            default:
@@ -1686,7 +1649,6 @@ router.post('/buscarCodigo', isLoggedIn, async (req, res) => {
                                                  " t1.year = "+req.body.year+" " +
                                              " AND  " +
                                                  " t1.code >= 300 AND 		t1.code <= 399"); 
-           //console.log(codigo[0].num);
            res.send(String(codigo1c[0].num));
            break;
          }
@@ -1701,7 +1663,6 @@ router.post('/buscarCodigo', isLoggedIn, async (req, res) => {
                                                  " t1.year = "+req.body.year+" " +
                                              " AND  " +
                                                  " t1.code >= 200 AND 		t1.code <= 299"); 
-           //console.log(codigo[0].num);
            res.send(String(codigo[0].num));
            break;
        default:
@@ -1886,7 +1847,6 @@ router.post('/filtroProyecto', isLoggedIn, async (req, res) => {
 
   const tipos_proyecto = await pool.query("SELECT * FROM proyecto_tipo");
 
-//console.clear();
 
   const proyectos =  await pool.query(consulta);
 
@@ -1944,7 +1904,6 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
   
   const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?",[proyecto]);
   
-  //console.log(infoProyecto);
   const {id_tipo_proyecto,id_estado,superficie_pre,id_complejidad,num_pisos,num_subterraneo,id_pais,nombre} = infoProyecto[0]; // DATOS GENERALES
   const {id_tipo_moneda,valor_metro_cuadrado,valor_proyecto,fecha_inicio} = infoProyecto[0]; // DATOS FINACIEROS
   const {id_director,id_jefe,id_cliente,id_arquitecto} = infoProyecto[0]; // DATOS EQUIPO
@@ -2056,7 +2015,6 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
           case "5":
           case 6:
           case "6":
-            //console.log(infoProyecto);
             if (id_tipo_proyecto == 0 || id_tipo_proyecto == ""){verificacion.TipoProyecto = id_tipo_proyecto;}
             if (id_estado == 0 || id_estado == ""){verificacion.Estado = id_estado;}
             if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
@@ -2137,7 +2095,6 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
         case "5":
         case 6:
         case "6":
-          //console.log(infoProyecto);
           if (id_tipo_proyecto == 0 || id_tipo_proyecto == ""){verificacion.TipoProyecto = id_tipo_proyecto;}
           if (id_estado == 0 || id_estado == ""){verificacion.Estado = id_estado;}
           if (superficie_pre == 0 || superficie_pre == ""){verificacion.SuperficiePre = superficie_pre;}
@@ -2175,7 +2132,6 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
 	  }
 
     Object.entries(verificacion).forEach( function(elemento, indice, array){
-      //console.log(array[indice][0]);
       error = true;
       switch(array[indice][0])
       {
@@ -2265,7 +2221,6 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
       
 
     // colocar los nombres correctos. 
-    // console.log(verificacion);
       
     datos += "</ul>";
     if (error)
@@ -2304,7 +2259,6 @@ router.get('/ver/:id', isLoggedIn, async (req, res) => {
       let proyectos;
       if (pre[0].id_tipo_servicio == 2)
       {
-        //console.log("Buscar la informacion del ing revi");
         
         proyectos = await pool.query("SELECT *, t1.id as idPro, " +
         " t1s.descripcion AS tipoServicio, " +
@@ -2374,7 +2328,6 @@ router.get('/ver/:id', isLoggedIn, async (req, res) => {
     
       }
       
-      //console.log(proyectos[0]);
 
 
       res.render('proyecto/ver', { req, proyectos:proyectos[0], layout: 'template' });

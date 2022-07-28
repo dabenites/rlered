@@ -23,30 +23,36 @@
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
-                action="/facturacion/facturas" method="POST">
+            
                 <div class="item form-group">
-
-                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="Estado"> Estado</label>
-                    <div class="col-md-4 col-sm-4 ">
-                        <select class="form-control" name="estado" id="estado">
-                            {{#each estados}}
-                                {{#if (if_equal id ../estado) }}
-                                    <option value="{{id}}" selected>{{descripcion}}</option>
-                                {{else}}
-                                    <option value="{{id}}">{{descripcion}}</option>
-                                {{/if}}
-                            {{/each}}
-                        </select>
-                    </div>
-                    <div class="col-md-1 col-sm-1 ">
-                        <button type="submit" class="btn btn-warning btn-block">
-                            Filtrar
-                        </button>
-                    </div>
-
+                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"action="/facturacion/facturas" method="POST"></form>
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="Estado"> Estado</label>
+                        <div class="col-md-4 col-sm-4 ">
+                            <select class="form-control" name="estado" id="estado">
+                                {{#each estados}}
+                                    {{#if (if_equal id ../estado) }}
+                                        <option value="{{id}}" selected>{{descripcion}}</option>
+                                    {{else}}
+                                        <option value="{{id}}">{{descripcion}}</option>
+                                    {{/if}}
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div class="col-md-1 col-sm-1 ">
+                            <button type="submit" class="btn btn-warning btn-block">
+                                Filtrar
+                            </button>
+                        </div>
+                    </form>
+                        <div class="col-md-1 col-sm-1 ">
+                             <form id="exportar" action="/facturacion/exportFacturasExcel" method="POST"> 
+                             <button type="submit" class="btn btn-secondary btn-block">
+                               <i class="fa fa-file-excel-o"> Exportar</i> 
+                            </button>
+                             </form>
+                        </div>
                 </div>
-            </form>
+            
 
 
             <table class="table table-hover" id="tablafacturacion" name="tablafacturacion">

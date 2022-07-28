@@ -304,6 +304,13 @@
                                                     <label class="col-form-label col-md-7 " for="planos" id="planos">{{proyecto.num_plano_estimado}}</label>
                                         </div>
                                         <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="numplanos">
+                                                            <b>Valor Total Proyecto [{{moneda}}]</b>
+                                                            </label>
+                                                    <label class="col-form-label col-md-7 " for="planos" id="totalProyecto"></label>
+                                        </div>
+                                        
+                                        <div class="row">
                                           <div class="col-3">
 
                                           </div>
@@ -359,86 +366,116 @@
                                     </div>
                             </div>
                         </div>
-                        <div class="col-3">
-                            <div class="panel  panel-primary">
-                                <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true"> Indicadores de Productividad </i></div>
-                                <div class="panel-body">
-                                    <table id="exampleIndicadores" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
-                                        <tbody>
-                                                <tr>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem; text-align: right;"> <b>Costo {{moneda}} / m<sup>2</sup></b></td>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="costo_m2"></td>
-
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Valor del Proyecto [{{moneda}}]</b></td>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="valorProyecto">
-                                                        {{#if (if_equal moneda "UF")}}
-                                                            {{proyecto.valor_proyecto}}
-                                                        {{/if}}
-                                                        {{#if (if_equal moneda "US$")}}
-                                                            {{proGeneral.valorUSD}}
-                                                        {{/if}}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Costo {{moneda}} / plano</b></td>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="costo_plano"></td>
-                                                    <input type="hidden" value="" name="dato0" id="dato0">
-                                                    <input type="hidden" value="" name="dato1" id="dato1">
-
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Adicionales [{{moneda}}]</b></td>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="adicionalesProyecto"></td>
-                                                </tr>
-                                                 <tr>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Hrs Dib/ plano</b></td>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="hrsDibPlano"></td>
-
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Valor Total Proyecto [{{moneda}}]</b></td>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="totalProyecto"></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>m<sup>2</sup> / plano</b></td>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="m2_plano"></td>
-
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Costo Esperado [{{moneda}}]</b></td>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="costoTotalEsp">
-                                                        {{#if (if_equal moneda "UF")}}
-                                                            {{costoEsperado}}
-                                                        {{/if}}
-                                                        {{#if (if_equal moneda "US$")}}
-                                                            {{costoEsperadoDolar}}
-                                                        {{/if}}    
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"> <b>Nº Hrs Mod.</b></td>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{modificaciones.horas}}</td>
-
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Costo Total [{{moneda}}]</b></td>
-                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="costoTotalPro"></td>
-
-                                                </tr>
-                                                 <tr>
-                                                     <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Total Facturado [{{moneda}}]</b></td>
-                                                     <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="totalFacturado">{{totalFacturado}}</td>
-
-                                                     <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Total Pagado [{{moneda}}]</b></td>
-                                                     <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="totalPagado">{{totalPagado}}</td>
-
-                                                 </tr>
-                                                  <tr>
-                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Margen [{{moneda}}] (Valor Total Proyecto)</b></td>
-                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="margenPro"></td>
-
-                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;text-align: right;"><b>Margen [{{moneda}}] (Total Pagado)</b></td>
-                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;" id="margenProFac"></td>
-
-                                                  </tr>
-                                        </tbody>
-                                    </table>
+                        <div class="col-4">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="panel  panel-primary">
+                                        <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true"> Indicadores de Productividad </i></div>
+                                            <div class="panel-body">
+                                                 <table id="iproductividad" class="table table-striped table-bordered" style="width:100%;padding: 0.1rem 0.1rem;">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style=" text-align: right;"> Costo {{moneda}} / m<sup>2</sup></td>
+                                                            <td id="costo_m2"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right;">Costo {{moneda}} / plano</td>
+                                                            <td  id="costo_plano"></td>
+                                                            <input type="hidden" value="" name="dato0" id="dato0">
+                                                            <input type="hidden" value="" name="dato1" id="dato1">
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right;">Hrs Dib/ plano</td>
+                                                            <td id="hrsDibPlano"></td>
+                                                        </tr>
+                                                         <tr>
+                                                            <td style="text-align: right;">m<sup>2</sup> / plano</td>
+                                                            <td  id="m2_plano"></td>
+                                                         </tr>
+                                                          <tr>
+                                                            <td style="text-align: right;">Nº Hrs Mod.</td>
+                                                            <td>{{modificaciones.horas}}</td>
+                                                          </tr>
+                                                    </tbody>
+                                                 </table>
+                                            </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="panel  panel-primary">
+                                        <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true"> Indicadores Económicos </i></div>
+                                        <div class="panel-body">
+                                                 <table id="ieconomicos" class="table table-striped table-bordered" style="width:100%;padding: 0.1rem 0.1rem;">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="text-align: right;">Valor del Proyecto [{{moneda}}]</td>
+                                                            <td id="valorProyecto">
+                                                                {{#if (if_equal moneda "UF")}}
+                                                                    {{proyecto.valor_proyecto}}
+                                                                {{/if}}
+                                                                {{#if (if_equal moneda "US$")}}
+                                                                    {{proGeneral.valorUSD}}
+                                                                {{/if}}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right;">Adicionales [{{moneda}}]</td>
+                                                            <td id="adicionalesProyecto"></td>
+                                                        </tr>
+                                                        <!--<tr>
+                                                            
+                                                        </tr>-->
+                                                         <tr>
+                                                            <td style="text-align: right;">Costo Esperado [{{moneda}}]</td>
+                                                            <td id="costoTotalEsp">
+                                                                {{#if (if_equal moneda "UF")}}
+                                                                    {{costoEsperado}}
+                                                                {{/if}}
+                                                                {{#if (if_equal moneda "US$")}}
+                                                                    {{costoEsperadoDolar}}
+                                                                {{/if}}    
+                                                            </td>
+                                                         </tr>
+                                                          <tr>
+                                                                <td style="text-align: right;">Costo Total [{{moneda}}]</td>
+                                                                <td  id="costoTotalPro"></td>
+                                                          </tr>
+                                                    </tbody>
+                                                 </table>
+                                            </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="panel  panel-primary">
+                                        <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true"> Indicadores Financieros  </i></div>
+                                            <table id="ifinancieros" class="table table-striped table-bordered" style="width:100%;padding: 0.1rem 0.1rem;">
+                                                    <tbody>
+                                                        <tr>
+                                                           <td style="text-align: right;">Total Facturado [{{moneda}}]</td>
+                                                            <td id="totalFacturado">{{totalFacturado}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                           <td style="text-align: right;">Total Pagado [{{moneda}}]</td>
+                                                            <td id="totalPagado">{{totalPagado}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right;">Margen [{{moneda}}] (Valor Total Proyecto)</td>
+                                                            <td  id="margenPro"></td>
+                                                        </tr>
+                                                         <tr>
+                                                            <td style="text-align: right;">Margen [{{moneda}}] (Facturado)</td>
+                                                            <td id="margenProFac"></td>
+                                                         </tr>
+                                                          <tr>
+                                                               
+                                                          </tr>
+                                                    </tbody>
+                                            </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-7">
+                        <div class="col-6">
                             <div class="row">
                                  
                                     <div class="col-6">
@@ -1274,8 +1311,11 @@ $(document).ready(function(){
                     {
                         labelsCentrosTotal.push(node.context.children[0].innerText);
                         const centroColor = coloresCentro.find(centro => {return centro.centroCosto === node.context.children[0].innerText });
-
-                        labelsColorTotal.push(centroColor.color)
+                        if (centroColor !== undefined)
+                        {
+                            labelsColorTotal.push(centroColor.color)
+                        }
+                        
                     }
                 });
                 

@@ -15,10 +15,93 @@ var fs = require("fs");
 
 const ftp = require("basic-ftp");
 
+var Excel = require('exceljs');
+
 
 const pdfService = require('../servicios/pdfOC');
 
+//exportOCExcel
+router.post('/exportOCExcel', isLoggedIn, async function (req, res) {
 
+  try {
+
+    const ordenCompra = await pool.query(" SELECT SUM(t10.precio_unitario * t10.cantidad) AS montoTotal, t11.simbolo, t1.num_documento, t1.id_solicitante, t1.id,t1.folio,t1.id_estado, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
+                                           " , t8.nombre AS proyecto,t9.descripcion as estado , t8.year,t8.code," +
+                                           " if (t1.id_tipo = 3 ,  " +
+                                           " (SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro) "+
+                                           "  , (SELECT t9b.nombre FROM prov_externo AS t9b WHERE t9b.id = t1.id_razonsocialpro) " +
+                                           " ) AS nomProoveedor, " +
+                                           " DATE_FORMAT(t1.fecha , '%Y-%m-%d %H:%i') as fechaIngreso, " +
+                                           " DATE_FORMAT(t1.fecha_aprobacion , '%Y-%m-%d %H:%i') as fechaAProbacion, " +
+                                           " DATE_FORMAT(t1.fecha_recepcion , '%Y-%m-%d %H:%i') as fechaRecepcion, " +
+                                           " t1.recepcionado_finanza, " +
+                                           " if (t1.id_solicitante = ?,  " +
+                                            " if (t1.aprobacionSolicitante = 'N', 'Y','N'), 'N') AS aprobacionSolicitante " +
+                                           " FROM orden_compra as t1  " +
+                                           " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
+                                           " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
+                                           " LEFT JOIN sys_usuario AS t4 ON t1.id_solicitante = t4.idUsuario "+
+                                           " LEFT JOIN sys_usuario AS t5 ON t1.id_recepcionador = t5.idUsuario "+
+                                           " LEFT JOIN sys_usuario AS t6 ON t1.id_director = t6.idUsuario " +
+                                           " LEFT JOIN centro_costo AS t7 ON t1.id_centro_costo = t7.id " +
+                                           " LEFT JOIN pro_proyectos AS t8 ON t1.id_proyecto = t8.id " +
+                                           " LEFT JOIN orden_compra_estado as t9 ON t1.id_estado = t9.id " +
+                                           " LEFT JOIN orden_compra_requerimiento AS t10 ON t1.id = t10.id_solicitud " +
+                                           " LEFT JOIN moneda_tipo AS t11 ON t10.id_moneda = t11.id_moneda " +
+                                           " WHERE t1.id_estado IN(1,2,3,4,5) " + 
+                                           " GROUP BY t1.id ORDER BY t1.id DESC", [req.user.idUsuario]); 
+              
+
+
+    res.writeHead(200, {
+    'Content-Disposition': 'attachment; filename="Listado OC.xlsx"',
+    'Transfer-Encoding': 'chunked',
+    'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+
+    var workbook = new Excel.stream.xlsx.WorkbookWriter({ stream: res });
+
+    var worksheet = workbook.addWorksheet('some-worksheet');
+
+    worksheet.addRow(['Emisor', 'Tipo', 'Solicitante' , 'Proveedor', 'Fecha Ingreso',
+                      'Fecha Aprobacion', 'Folio', 'Monto Total', 'Nº Documento', 'Centro Costo', 'Proyecto', 'Estado']).commit();
+
+    for (const e of ordenCompra) {
+
+        worksheet.addRow([e.razonsocial,
+                          e.tipo,
+                          e.solicitante,
+                          e.nomProoveedor,
+                          e.fechaIngreso,
+                          e.fechaAProbacion,
+                          e.folio,
+                          e.simbolo + " - " + e.montoTotal ,
+                          e.num_documento,
+                          e.centroCosto,
+                          e.year + "-" + e.code + " : " + e.proyecto,
+                          e.estado ]);
+                      }
+
+
+    worksheet.commit();
+    workbook.commit();
+
+
+} catch (error) 
+{
+mensajeria.MensajerErrores("\n\n Archivo : reporteria.js \n Error en el directorio: /exportExcel \n" + error + "\n Generado por : " + req.user.login);
+res.redirect(   url.format({
+  pathname:'/dashboard',
+          query: {
+          "a": 1
+          }
+      })); 
+
+}
+
+
+
+});
 
 // Permisos 
 router.get('/permisos', isLoggedIn, async (req, res) => {
@@ -3212,6 +3295,73 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
 
 });
 
+
+router.get('/createPDFPre/:id', isLoggedIn, async (req,res) => {
+
+  const { id } = req.params;
+
+  // buscar la informacion de la OC
+  const oc = await pool.query('SELECT  ' +
+                              " t1b.Nombre as nomSolicitante ," + 
+                              " t1c.Nombre as nomRecepcionador ," +  
+                              " t1c.Telefono as telRecepcionador ," + 
+                              "t1a.rut as rutEmpresa,"+
+                              "t1d.year,"+
+                              "t1.conIVA,"+
+                              "t1d.code," +
+                              "t1d.nombre as nomProyecto," +
+                              "t1a.razonsocial as razonSocialEmpresa," +
+                              "t1a.direccion as direccion," +
+                              "t1a.fono as fonoEmpresa, " +
+                              " DATE_FORMAT(t1.fecha , '%Y-%m-%d') AS fecha, " +
+                              " t1.folio, " +
+                              " t1.id_solicitante, " +
+                              " t1.numdiapago, " +
+                              " t2.centroCosto, " +
+                              " if (t1.id_tipo = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro, " +
+                              " if (t1.id_tipo = 1 , (SELECT tx.direccion FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 2 , (SELECT tx2.direccion FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 3 , (SELECT tx3.direccion FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS dirPro, " +
+                              " if (t1.id_tipo = 1 , (SELECT tx.rut FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 2 , (SELECT tx2.rut FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 3 , (SELECT tx3.rut FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS rutPro " +
+                              ' FROM orden_compra as t1' +
+                              ' LEFT JOIN sys_empresa as t1a ON t1.id_proveedor = t1a.id ' +
+                              ' LEFT JOIN sys_usuario as t1b ON t1.id_solicitante = t1b.idUsuario ' +
+                              ' LEFT JOIN sys_usuario as t1c ON t1.id_recepcionador = t1c.idUsuario ' +
+                              ' LEFT JOIN pro_proyectos as t1d ON t1.id_proyecto = t1d.id, ' +
+                              ' centro_costo as t2 ' +
+                              ' WHERE t1.id = ? ' +
+                              ' AND t1.id_centro_costo = t2.id',[id]); 
+
+  const requerimientos = await pool.query(" SELECT *, " + 
+                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'),   " +
+											                    " if (t1.id_moneda = 4 , FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) *  cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE'), " +
+												                  " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'),0))) AS monto , " +
+                                          " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') ,   " +
+												                  " if (t1.id_moneda = 4 , FORMAT(  (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) *  cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) *  cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) ),0,'de_DE') , " +
+												                  " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE'),0))) AS montopeso " +
+                                        " FROM orden_compra_requerimiento as t1 WHERE t1.id_solicitud = ?",[id] );
+  
+
+
+  const stream = res.writeHead(200, {
+    'Content-Type': 'application/pdf',
+    'Content-Disposition': `attachment;filename=ORDEN DE COMPRA Nº `+oc[0].folio+" " + oc[0].nomPro+`.pdf`,
+  });
+
+  pdfService.buildPDFPre(
+    (chunk) => stream.write(chunk),
+    () => stream.end(),
+    oc[0],
+    requerimientos
+  );
+
+
+});
+
 //terminoOC 
 router.post('/terminoOC',isLoggedIn, async (req,res) => {
 
@@ -3266,7 +3416,7 @@ router.post('/editarOCIngresada',isLoggedIn, async (req,res) => {
                                   " observaciones = ? " +
                                    " WHERE id = ? ", [tipo_proveedor,emisor,contacto,solicitante,director,recepcionador,centrocosto,proyecto,etapa,numpago,incluyeIVA,observaciones,id]);
   
-  console.lo
+  
 
   res.sendStatus(200);
 
@@ -3289,6 +3439,89 @@ router.get('/multiselect',isLoggedIn, async (req,res) => {
   
 
   res.render('solicitudes/multiselect', {  layout: 'blanco'});
+
+});
+
+//exportOCExcel
+router.post('/exportProyectosExcel', isLoggedIn, async function (req, res) {
+
+  try {
+
+    const proyectos = await pool.query("SELECT * FROM pro_proyectos_info as t1 " +
+                                       " WHERE " +
+                                       " t1.id_cabecera = (  SELECT MAX(t2.id_cabecera ) FROM pro_proyectos_info AS t2 )"); 
+              
+
+
+    res.writeHead(200, {
+    'Content-Disposition': 'attachment; filename="Listado proyectos.xlsx"',
+    'Transfer-Encoding': 'chunked',
+    'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+
+    var workbook = new Excel.stream.xlsx.WorkbookWriter({ stream: res });
+
+    var worksheet = workbook.addWorksheet('some-worksheet');
+
+    worksheet.addRow(['Código', 'Nombre', 'Servicio','Tipo' , 'Superficie', 'N° Pisos', 'N° Subte',
+                      'Mandante', 'Arquitecto', 'Director', 'Jefe Proyecto', 'Num Planos',
+                     'HH Ing Interno', 'HH Ing Externo','Total HH Ing', 'HH Dib Interno','HH Dib Externo','Total HH Dib',
+                     'M2/Plano','HH Dib/Plano','m2/ HH Dib',
+                     'Cos Dib/Plano','Costo Dib/hh Dib','m2/ HH Ing','% mod',
+                    'Valor del Proyecto (UF)', 'Adicionales (UF)','Total Proyecto (UF)','Costos Totales (UF)', 'Margen Proyecto (UF)']).commit();
+
+    for (const p of proyectos) {
+
+        worksheet.addRow([p.year + "-" + p.code,
+                          p.nombre,
+                          p.servicio,
+                          p.tipo,
+                          p.superficie,
+                          p.num_pisos,
+                          p.num_subte,
+                          p.mandante,
+                          p.arquitecto,
+                          p.director,
+                          p.jefe_proyecto,
+                          p.num_planos,
+                          p.hh_int_ingenieria,
+                          p.hh_ext_ingenieria,
+                          parseFloat(p.hh_int_ingenieria) + parseFloat( p.hh_ext_ingenieria),
+                          p.hh_int_dibujo,
+                          p.hh_ext_dibujo,
+                          parseFloat(p.hh_int_dibujo) + parseFloat(p.hh_ext_dibujo),
+                          p.metro_por_plano,
+                          p.hh_dib_plano,
+                          p.m2_hh_dib,
+                          p.cst_dib_plano,
+                          p.cst_dib_hh,
+                          p.m2_hh_ing,
+                          p.porc_mod,
+                          p.valor_proyecto,
+                          p.adicionales,
+                          p.total_proyecto,
+                          p.costo_totales,
+                          p.margen_proyecto]);
+                      }
+
+
+    worksheet.commit();
+    workbook.commit();
+
+
+} catch (error) 
+{
+mensajeria.MensajerErrores("\n\n Archivo : reporteria.js \n Error en el directorio: /exportExcel \n" + error + "\n Generado por : " + req.user.login);
+res.redirect(   url.format({
+  pathname:'/dashboard',
+          query: {
+          "a": 1
+          }
+      })); 
+
+}
+
+
 
 });
 

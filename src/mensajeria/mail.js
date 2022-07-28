@@ -418,6 +418,8 @@ module.exports.EnvioMailIngresoFactura =  async function (objeto) {
   
          const generico = "Estimado/a:\n" +
                           " \t Solicitud de facturación "+ objeto.proyecto +", ingresado por "+ objeto.solicitante+" \n" +
+                          " Costo Actual : "+objeto.costo +" \n"+
+                          " Facturado : "+objeto.facturado +" \n"+
                           " Moneda : "+objeto.nomMoneda +" \n"+
                           " Monto : "+objeto.monto +" \n"+
                           " Comentario : "+objeto.comentario +" \n"+
@@ -428,6 +430,7 @@ module.exports.EnvioMailIngresoFactura =  async function (objeto) {
          const mailOptions = {
              from : "RLE - Planner <planner@renelagos.com>",
              to : objeto.to,
+             //to : "dbenites@renelagos.com",
              cc : objeto.mailopt1+","+objeto.mailopt2+","+objeto.mailsolicitante,
              subject : "RLE - Planner - Ingreso Facturación.",
              text : generico

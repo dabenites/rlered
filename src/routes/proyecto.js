@@ -1126,6 +1126,16 @@ router.post('/cargarFactura',isLoggedIn,  async (req, res) => {
 
     const infoProyectoResulmen = await pool.query("SELECT * FROM pro_proyectos_info as t1 where t1.id_proyecto =  ? AND t1.id_cabecera = (  SELECT MAX(t2.id_cabecera) FROM pro_proyectos_info AS t2 ) ",[id_proyecto]);
 
+    // revisar. 
+    let aviso_facturado = "";
+    let aviso_costo = "";
+    
+    if (infoProyectoResulmen.length > 0)
+    {
+      aviso_facturado =  parseFloat( infoProyectoResulmen[0].total_facturado,2);
+      aviso_costo = parseFloat( infoProyectoResulmen[0].costo_totales,2);
+    }
+
     const facturacion = {
       to : 'contabilidad@renelagos.com',
       comentario : comentario,
@@ -1137,12 +1147,14 @@ router.post('/cargarFactura',isLoggedIn,  async (req, res) => {
       monto : monto,
       mailopt1 : 'cgahona@renelagos.com',
       mailopt2 : 'mcastillo@renelagos.com',
-      facturado : parseFloat( infoProyectoResulmen[0].total_facturado,2),
-      costo : parseFloat( infoProyectoResulmen[0].costo_totales,2),
+     // facturado : parseFloat( infoProyectoResulmen[0].total_facturado,2),
+     // costo : parseFloat( infoProyectoResulmen[0].costo_totales,2),
+     facturado : aviso_facturado,
+     costo : aviso_costo,
     };
 
 
-
+  //  console.log(facturacion);
 
  // Descomentar una vez terminaada las pruebas para el ingreso de facturaciones.    
   mensajeria.EnvioMailIngresoFactura(facturacion);  // 

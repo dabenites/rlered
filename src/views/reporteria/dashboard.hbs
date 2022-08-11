@@ -309,6 +309,21 @@
                                                             </label>
                                                     <label class="col-form-label col-md-7 " for="planos" id="totalProyecto2"></label>
                                         </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="numplanos">
+                                                            <b>Costo Esperado[{{moneda}}]</b>
+                                                            </label>
+                                                    <label class="col-form-label col-md-7 " for="planos" id="costoTotalEsp">
+
+                                                                {{#if (if_equal moneda "UF")}}
+                                                                    {{costoEsperado}}
+                                                                {{/if}}
+                                                                {{#if (if_equal moneda "US$")}}
+                                                                    {{costoEsperadoDolar}}
+                                                                {{/if}}
+
+                                                    </label>
+                                        </div>
                                         
                                         <div class="row">
                                           <div class="col-3">
@@ -465,7 +480,8 @@
                                                            <td style="text-align: right;">Total Pagado [{{moneda}}]</td>
                                                             <td id="totalPagado">{{totalPagado}}</td>
                                                         </tr>
-                                                         <tr>
+                                                        <!--
+                                                        <tr>
                                                             <td style="text-align: right;">Costo Esperado [{{moneda}}]</td>
                                                             <td id="costoTotalEsp">
                                                                 {{#if (if_equal moneda "UF")}}
@@ -475,7 +491,8 @@
                                                                     {{costoEsperadoDolar}}
                                                                 {{/if}}    
                                                             </td>
-                                                         </tr>
+                                                         </tr>-->
+                                                        
                                                          <tr>
                                                             <td style="text-align: right;">Margen [{{moneda}}] (Facturado)</td>
                                                             <td id="margenProFac"></td>

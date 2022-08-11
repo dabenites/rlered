@@ -3467,7 +3467,7 @@ router.post('/exportProyectosExcel', isLoggedIn, async function (req, res) {
                       'Mandante', 'Arquitecto', 'Director', 'Jefe Proyecto', 'Num Planos',
                      'HH Ing Interno', 'HH Ing Externo','Total HH Ing', 'HH Dib Interno','HH Dib Externo','Total HH Dib',
                      'M2/Plano','HH Dib/Plano','m2/ HH Dib',
-                     'Cos Dib/Plano','Costo Dib/hh Dib','m2/ HH Ing','% mod',
+                     'Cos Dib/Plano','Costo Dib/hh Dib','m2/ HH Ing','Costo Ing / hh ing','% mod',
                     'Valor del Proyecto (UF)', 'Adicionales (UF)','Total Proyecto (UF)','Costos Totales (UF)', 'Margen Proyecto (UF)']).commit();
 
     for (const p of proyectos) {
@@ -3496,6 +3496,7 @@ router.post('/exportProyectosExcel', isLoggedIn, async function (req, res) {
                           p.cst_dib_plano,
                           p.cst_dib_hh,
                           p.m2_hh_ing,
+                          p.cst_ing_hh,
                           p.porc_mod,
                           p.valor_proyecto,
                           p.adicionales,

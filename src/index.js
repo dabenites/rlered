@@ -95,6 +95,9 @@ app.use('/proyecto', require('./routes/proyecto'));
 app.use('/reporteria', require('./routes/reporteria'));
 app.use('/alertas', require('./routes/alertas'));
 //app.use('/mantenedores/usuario', require('./routes/mantenedores'));
+app.use('/presupuesto', require('./routes/presupuesto')); 
+app.use('/finanzas', require('./routes/finanzas'));
+
 
 
 

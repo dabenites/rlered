@@ -307,7 +307,7 @@
                                                     <label class="col-form-label col-md-5 label-align" for="numplanos">
                                                             <b>Valor Total Proyecto [{{moneda}}]</b>
                                                             </label>
-                                                    <label class="col-form-label col-md-7 " for="planos" id="totalProyecto"></label>
+                                                    <label class="col-form-label col-md-7 " for="planos" id="totalProyecto2"></label>
                                         </div>
                                         
                                         <div class="row">
@@ -422,10 +422,12 @@
                                                             <td style="text-align: right;">Adicionales [{{moneda}}]</td>
                                                             <td id="adicionalesProyecto"></td>
                                                         </tr>
-                                                        <!--<tr>
-                                                            
-                                                        </tr>-->
-                                                         <tr>
+                                                        <tr>
+                                                            <td style="text-align: right;">Total Proyecto [{{moneda}}]</td>
+                                                            <td id="totalProyecto"></td>
+                                                        </tr>
+                                                        <!--
+                                                             <tr>
                                                             <td style="text-align: right;">Costo Esperado [{{moneda}}]</td>
                                                             <td id="costoTotalEsp">
                                                                 {{#if (if_equal moneda "UF")}}
@@ -436,10 +438,15 @@
                                                                 {{/if}}    
                                                             </td>
                                                          </tr>
+                                                         -->
                                                           <tr>
                                                                 <td style="text-align: right;">Costo Total [{{moneda}}]</td>
                                                                 <td  id="costoTotalPro"></td>
                                                           </tr>
+                                                          <tr>
+                                                                <td style="text-align: right;">Margen [{{moneda}}] (Valor Total Proyecto)</td>
+                                                                <td  id="margenPro"></td>
+                                                        </tr>
                                                     </tbody>
                                                  </table>
                                             </div>
@@ -458,14 +465,22 @@
                                                            <td style="text-align: right;">Total Pagado [{{moneda}}]</td>
                                                             <td id="totalPagado">{{totalPagado}}</td>
                                                         </tr>
-                                                        <tr>
-                                                            <td style="text-align: right;">Margen [{{moneda}}] (Valor Total Proyecto)</td>
-                                                            <td  id="margenPro"></td>
-                                                        </tr>
+                                                         <tr>
+                                                            <td style="text-align: right;">Costo Esperado [{{moneda}}]</td>
+                                                            <td id="costoTotalEsp">
+                                                                {{#if (if_equal moneda "UF")}}
+                                                                    {{costoEsperado}}
+                                                                {{/if}}
+                                                                {{#if (if_equal moneda "US$")}}
+                                                                    {{costoEsperadoDolar}}
+                                                                {{/if}}    
+                                                            </td>
+                                                         </tr>
                                                          <tr>
                                                             <td style="text-align: right;">Margen [{{moneda}}] (Facturado)</td>
                                                             <td id="margenProFac"></td>
                                                          </tr>
+                                                         
                                                           <tr>
                                                                
                                                           </tr>
@@ -1391,6 +1406,8 @@ $(document).ready(function(){
 
             let valorTotalProyectoFormateado = $("#totalProyecto").text();
             $("#totalProyecto").html(new Intl.NumberFormat('de-DE').format((parseFloat(valorTotalProyectoFormateado).toFixed(2)).replace(",",".")));
+            $("#totalProyecto2").html(new Intl.NumberFormat('de-DE').format((parseFloat(valorTotalProyectoFormateado).toFixed(2)).replace(",",".")));
+            
 
 
 
@@ -1406,6 +1423,13 @@ $(document).ready(function(){
             
 
             let formulaRecUtilizado = parseFloat(totalUF * 100 / valorFormateadoCostoEsperado).toFixed(2); 
+
+            console.log(valorCostoEsperado2);
+            console.log(totalUF);
+            console.log(valorFormateadoCostoEsperado);
+
+            console.log(formulaRecUtilizado);
+
             let formulaMargenFacturada = 0; 
             
             let totalFacturaPagada = $("#totalPagado").text().replace(".","").replace(",",".");

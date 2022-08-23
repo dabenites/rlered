@@ -1,0 +1,10 @@
+<ul class="list-group">
+    {{#each substructura}}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{descripcion}}
+            <button type="button" class="btn btn-danger btn-sm" onclick="EliminarRegistro({{id}});">
+             X
+            </button>
+        </li>
+    {{/each}}
+</ul>

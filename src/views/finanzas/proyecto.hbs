@@ -7,6 +7,12 @@
 	    position: relative;
   		float: right;
    }
+   #tooltip {
+  background: cornsilk;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 5px;
+}
 </style>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
@@ -30,35 +36,44 @@
                         <form id="cargaNombre" action="#" method="POST">
                             <div class="item form-group">
 					            <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Presupuestos</label>
-                                <div class="col-md-7">
-									<select class="form-control" name="cargaPresupuesto" id="cargaPresupuesto">
+                                <div class="col-md-5">
+									<select class="form-control" name="cargaPresupuesto" id="cargaPresupuesto" onchange="CargaListadoPPto(this.value);">
                                             <option value="0">Seleccione</option>   
                                             {{#each presupuestos}}
                                                 <option value="{{id_presupuesto}}">{{codigo}}</option>   
                                              {{/each}}     
                                     </select>	
+                                    <input type="hidden" name="idproyecto" id="idproyecto" value="{{proyecto.id}}">
 								</div>
-                                <div class="col-md-2">
-									
+                                <div class="col-md-4">
+									<div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="na_ppto" name="na_ppto" onclick="cargaNAPresupuesto()">
+                                            <label class="form-check-label" for="flexCheckDefault">
+                                                N/A Presupuesto
+                                            </label>
+                                    </div>
 								</div>
                             </div>
                             <div class="item form-group">
 					            <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Nombre</label>
-                                <div class="col-md-7">
+                                <div class="col-md-5">
 										<input type="text" id="nombre" name="nombre" required="required" class="form-control">
 								</div>
-                                <div class="col-md-2">
+                                <div class="col-md-4">
                                     <button type="button" class="btn btn-success" onclick="cargaNombreCobro()">Agregar</button>
                                 </div>
                             </div>
                         </form>
                     </div>
+                     <div class="col-md-3" name="listadoNombrePpto" id="listadoNombrePpto">
+
+                     </div>
                 </div>  
             </div>
           </div>
 </div>
 
-<div class="col-md-5">
+<div class="col-md-4">
     <div class="x_panel">
         <div class="x_title">
             <h2>Ingresar un cobro o Metodologia</h2>
@@ -75,17 +90,63 @@
                         </select>
 					</div>
 			</div>
+             <div class="clearfix"></div>
+             <br>
+             
+            <div name="ingresoCobro" id="ingresoCobro">
+
+
+            </div>
         </div>
+
     </div>
 </div>
-<div class="col-md-7">
+<div class="col-md-8">
     <div class="x_panel">
         <div class="x_title">
             <h2> Listado de cobros</h2>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            Lsitar todos los cobros ingresar en el sistema.
+            <table class="table table-hover" >
+                <thead>
+                    <tr>
+                        <th>Presupuesto</th>
+                        <th>Tipo</th>
+                        <th>Sub-Estructura</th>
+                        <th>Hito / Motivo</th>
+                        <th>Moneda</th>
+                        <th>%</th>
+                        <th>monto</th>
+                        <th>opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <div id="tooltip" display="none" style="position: absolute; display: none;"></div>
+                      {{#each cobros_pago_adiocionales}}
+                        <tr>
+                            <td><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-text" viewBox="0 0 16 16" onmousemove="showTooltip(evt, '{{observacion}}');" onmouseout="hideTooltip();" >
+                                <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                                <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8zm0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>
+                                </svg> {{codigo}} </td>
+                            <td>{{tipo}}</td>
+                            <td>{{substructura}}</td>
+                            <td>{{motivohito}}</td>
+                            <td>{{moneda}}</td>
+                            <td>{{porcentaje}}</td>
+                            <td>{{monto}}</td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="EliminarRegistroMetodologia({{tiporegistro}},{{id}});">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"></path>
+                                </svg>
+                                                Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                     {{/each}}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -169,44 +230,251 @@
 
 function cargaOpcionCobro( opcion)
 {
-    // cargar informacion 
-    alert(opcion);
-    switch(opcion)
-    {
-        case 2:// cobros adicionales 
-            
-        break;
+    let idppto  = $("#cargaPresupuesto").val();
+    let idProyecto = $("#idproyecto").val();
 
-    }
+    let informacion = {tipo : opcion , idppto , idProyecto};
+
+        if (opcion === 0 || opcion === "0")
+        {
+            $("#ingresoCobro").html("");
+        }
+        else
+        {
+        $.ajax({
+                    type: 'post',
+                    //url: '/finanzas/ocCambioEstado',
+                    url: '/finanzas/cargaFormIngreso',
+                    data: informacion,
+                    dataType: 'text'
+                    })
+                    .done(function (data) {  
+                            $("#ingresoCobro").html(data);
+                    });
+        }
 }
 
 function cargaNombreCobro()
 {
 
-     let nombre  = $("#nombre").val();
+    let nombre  = $("#nombre").val();
+    let idppto  = $("#cargaPresupuesto").val();
+    let idProyecto = $("#idproyecto").val();
+    
+
+
+    //console.log(params);
 
     let informacion = { 
         nombre : nombre,
-        idppto : 1234
+        idppto : idppto,
+        idProyecto : idProyecto
     };
 
-    console.log(informacion);
+    
 
          
          $.ajax({
               type: 'post',
-              //url: '/finanzas/ocCambioEstado',
               url: '/finanzas/cargaNombreSub',
               data: informacion,
               dataType: 'text'
                })
+              .done(function (data) {  
+                    $("#listadoNombrePpto").html(data);
+                    $("#nombre").val("");
+              });
+
+
+      toastr.success('Carga de sub-estructura terminada', 'Titulo', {
+            "progressBar": true
+        });
+
+
+}
+
+function CargaListadoPPto(idPPto)
+{
+    // con el ide del ppto mostrar las que estan cargadas en un listado al costado izquierdo. 
+let idProyecto = $("#idproyecto").val();
+
+let informacion = {   idPPto,idProyecto  };
+
+    $.ajax({
+              type: 'post',
+              //url: '/finanzas/ocCambioEstado',
+              url: '/finanzas/cargaListadoPpto',
+              data: informacion,
+              dataType: 'text'
+               })
               .done(function (data) {
-                if (data)
-                {
-                    //$(location).attr('href','/solicitudes/aordencompra?a=1');
-                }
+                    $("#listadoNombrePpto").html(data);
               });
 
 }
+
+function EliminarRegistro(Id)
+{
+    let idppto  = $("#cargaPresupuesto").val();
+    let idProyecto = $("#idproyecto").val();
+
+    let informacion = {   Id ,idppto,idProyecto };
+
+
+   $.ajax({
+              type: 'post',
+              //url: '/finanzas/ocCambioEstado',
+              url: '/finanzas/EliminarSubStructura',
+              data: informacion,
+              dataType: 'text'
+               })
+              .done(function (data) {
+                toastr.error('Registro Eliminado', 'Titulo', {
+                                        "progressBar": true
+                                    });
+                    $("#listadoNombrePpto").html(data);
+              });
+
+}
+
+
+function EliminarRegistroMetodologia(tipo , id)
+{
+
+ let informacion = {   tipo ,id };
+
+ $.ajax({
+              type: 'post',
+              //url: '/finanzas/ocCambioEstado',
+              url: '/finanzas/EliminarRegistroMetoPago',
+              data: informacion,
+              dataType: 'text'
+               })
+              .done(function (data) {
+                    //  location.reload();
+              });
+
+
+toastr.error('Registro Eliminado', 'Titulo', {
+                                        "progressBar": true
+                                    });
+
+setTimeout(() => {  console.log("ejecutando");
+                        
+                        }
+                    , 5000);
+
+    location.reload();
+
+
+}
+
+
+function cargaNAPresupuesto()
+{
+    //alert(("#na_ppto").val());
+    if( $('#na_ppto').prop('checked') ) {
+         $("#listadoNombrePpto").val("");
+         $("#nombre").val("");
+    }
+}
+
+function cargarFormMetodologia()
+{
+    let idProyecto          = $("#idproyecto").val();
+    let idppto              = $("#presupuesto").val();
+    let edificiotorre       = $("#edificiotorre").val(); 
+    let hito                = $("#hito").val(); 
+    let porcentaje          = $("#porcentaje").val();
+    let monto               = $("#monto").val();
+    let moneda              = $("#moneda").val();
+    let observacion         = $("#observacion").val();
+    
+    let informacion = {idProyecto,  idppto, edificiotorre, hito,porcentaje,monto,moneda, observacion};
+
+   // console.log(informacion);
+
+
+    $.ajax({
+              type: 'post',
+              //url: '/finanzas/ocCambioEstado',
+              url: '/finanzas/cargaMetodologiaPago',
+              data: informacion,
+              dataType: 'text'
+               })
+              .done(function (data) {
+              });
+
+toastr.success('Carga de metodologia de pago', 'Titulo', {
+                                        "progressBar": true
+                                    });
+
+setTimeout(() => {  console.log("ejecutando");
+                        
+                        }
+                    , 5000);
+
+    location.reload();
+
+
+}
+
+function cargarFormAdicional()
+{
+
+    let idProyecto      = $("#idproyecto").val();
+    let tipoCobro       = $("#tipoCobro").val();
+    let numero          = $("#numero").val(); 
+    let motivo          = $("#motivo").val(); 
+    let porcentaje      = $("#porcentaje").val();
+    let monto           = $("#monto").val();
+    let moneda          = $("#moneda").val();
+    let observacion     = $("#observacion").val(); 
+    let presupuesto     = $("#presupuesto").val(); 
+    let edificiotorre     = $("#edificiotorre").val();
+
+    let informacion = {idProyecto,  tipoCobro, numero,motivo,porcentaje,monto,moneda, observacion, presupuesto , edificiotorre};
+
+
+ $.ajax({
+              type: 'post',
+              //url: '/finanzas/ocCambioEstado',
+              url: '/finanzas/cargaPagoAdiocional',
+              data: informacion,
+              dataType: 'text'
+               })
+              .done(function (data) {
+              //      location.reload();
+              });
+
+
+toastr.success('Carga de pago Adicional', 'Titulo', {
+                                        "progressBar": true
+                                    });
+
+setTimeout(() => {  console.log("ejecutando");
+                        
+                        }
+                    , 5000);
+
+    location.reload();
+
+
+}
+
+
+function showTooltip(evt, text) {
+  let tooltip = document.getElementById("tooltip");
+  tooltip.innerHTML = text;
+  tooltip.style.display = "block";
+ // tooltip.style.left = evt.pageX + 10 + 'px';
+ // tooltip.style.top = evt.pageY + 10 + 'px';
+}
+
+function hideTooltip() {
+  var tooltip = document.getElementById("tooltip");
+  tooltip.style.display = "none";
+}
+
 
 </script>

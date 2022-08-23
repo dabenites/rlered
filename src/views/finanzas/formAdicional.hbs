@@ -1,0 +1,90 @@
+<div class="item form-group">
+    <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Presupuesto</label>
+            <div class="col-md-5">
+					<select class="form-control" name="presupuesto" id="presupuesto">
+                                <option value="0">N/A</option>   
+                                    {{#each presupuestos}}
+                                        <option value="{{id_presupuesto}}">{{codigo}}</option>   
+                                    {{/each}}     
+                    </select>
+            </div>
+</div>
+
+<div class="item form-group">
+    <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Edificio / Torre</label>
+            <div class="col-md-5">
+					<select class="form-control" name="edificiotorre" id="edificiotorre">
+                                <option value="0">N/A</option>   
+                                    {{#each substructura}}
+                                        <option value="{{id}}">{{descripcion}}</option>   
+                                    {{/each}}     
+                    </select>
+            </div>
+</div>
+
+<div class="item form-group">
+    <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Tipo Cobro</label>
+            <div class="col-md-5">
+					<select class="form-control" name="tipoCobro" id="tipoCobro">
+                                <option value="0">Seleccione</option>   
+                                    {{#each tipoCobro}}
+                                        <option value="{{id}}">{{descripcion}}</option>   
+                                    {{/each}}     
+                    </select>
+            </div>
+</div>
+
+<div class="item form-group">
+    <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Numero </label>
+            <div class="col-md-5">
+					<input type="text" id="numero" name="numero" required="required" class="form-control">
+            </div>
+</div>
+
+<div class="item form-group">
+    <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Motivo</label>
+            <div class="col-md-5">
+					<select class="form-control" name="motivo" id="motivo">
+                                <option value="0">Seleccione</option>   
+                                    {{#each motivos}}
+                                        <option value="{{id}}">{{descripcion}}</option>   
+                                    {{/each}}     
+                    </select>
+            </div>
+</div>
+
+<div class="item form-group">
+    <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Porcentaje </label>
+            <div class="col-md-5">
+					<input type="text" id="porcentaje" name="porcentaje" required="required" class="form-control">
+            </div>
+</div>
+<div class="item form-group">
+    <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Monto </label>
+            <div class="col-md-5">
+					<input type="text" id="monto" name="monto" required="required" class="form-control">
+            </div>
+</div>
+<div class="item form-group">
+    <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Moneda </label>
+            <div class="col-md-5">
+				<select class="form-control" name="moneda" id="moneda">
+                                <option value="0">Seleccione</option>   
+                                    {{#each monedas}}
+                                        <option value="{{id_moneda}}">{{descripcion}}</option>   
+                                    {{/each}}     
+                    </select>
+            </div>
+</div>
+<div class="item form-group">
+    <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Observación </label>
+            <div class="col-md-5">
+                <textarea id="observacion" name="observacion" class="form-control" rows="3" ></textarea>
+            </div>
+</div>
+<div class="item form-group">
+    <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <button type="button" class="btn btn-success" onclick="cargarFormAdicional();">Agregar</button>
+        </div>
+</div>

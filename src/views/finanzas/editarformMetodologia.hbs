@@ -1,0 +1,88 @@
+<div class="item form-group">
+    <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">Presupuesto</label>
+            <div class="col-md-5">
+					<select class="form-control" name="presupuesto" id="presupuesto" onchange="cargaOpcionesPresupuesto(this.value);">
+                                    <option value="0">N/A</option>   
+                                    {{#each presupuestos}}
+                                        {{#if (if_equal id_presupuesto ../contrato_metodologia.id_presupuesto) }}
+                                            <option value="{{id_presupuesto}}" selected>{{codigo}}</option>   
+                                         {{else}}
+                                            <option value="{{id_presupuesto}}">{{codigo}}</option>   
+                                         {{/if}}
+                                    {{/each}}     
+                    </select>
+            </div>
+</div>
+
+<div class="item form-group">
+    <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">Edificio / Torre</label>
+            <div class="col-md-5">
+					<select class="form-control" name="edificiotorre" id="edificiotorre">
+                                <option value="0">N/A</option>   
+                                    {{#each substructura}}
+                                        {{#if (if_equal id ../contrato_metodologia.id_substructura) }}
+                                            <option value="{{id}}" selected>{{descripcion}}</option>   
+                                        {{else}}
+                                            <option value="{{id}}">{{descripcion}}</option>   
+                                         {{/if}}
+                                        
+                                    {{/each}}     
+                    </select>
+            </div>
+            <div class="col-md-2">
+                <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="chkAll" name="chkAll" onclick="cargarTodosSegunProyecto();">
+                <label class="form-check-label" for="defaultCheck1"> Agregar Todos </label>
+                <input type="hidden" id="id" name="id" required="required" class="form-control"  value="{{contrato_metodologia.id}}">
+                </div>
+            </div>
+</div>
+<div class="item form-group">
+    <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">Hito Pago</label>
+            <div class="col-md-5">
+					<select class="form-control" name="hito" id="hito">
+                                <option value="0">Seleccione</option>   
+                                    {{#each hitos}}
+                                        {{#if (if_equal id ../contrato_metodologia.id_hitopago) }}
+                                            <option value="{{id}}" selected>{{descripcion}}</option>   
+                                        {{else}}
+                                            <option value="{{id}}">{{descripcion}}</option>   
+                                        {{/if}}
+                                    {{/each}}     
+                    </select>
+            </div>
+</div>
+<div class="item form-group">
+    <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">Porcentaje </label>
+            <div class="col-md-5">
+					<input type="text" id="porcentaje" name="porcentaje" required="required" class="form-control" value="{{contrato_metodologia.porcentaje}}">
+            </div>
+</div>
+<div class="item form-group">
+    <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">Monto </label>
+            <div class="col-md-5">
+					<input type="text" id="monto" name="monto" required="required" class="form-control"  value="{{contrato_metodologia.monto}}">
+            </div>
+</div>
+<div class="item form-group">
+    <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">Moneda </label>
+            <div class="col-md-5">
+				<select class="form-control" name="moneda" id="moneda">
+                                <option value="0">Seleccione</option>   
+                                    {{#each monedas}}
+                                        {{#if (if_equal id_moneda ../contrato_metodologia.id_moneda) }}
+                                            <option value="{{id_moneda}}" selected>{{descripcion}}</option>   
+                                        {{else}}
+                                            <option value="{{id_moneda}}">{{descripcion}}</option>   
+                                        {{/if}}
+                                        
+                                    {{/each}}     
+                    </select>
+            </div>
+</div>
+<div class="item form-group">
+    <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">Observación </label>
+            <div class="col-md-5">
+                <textarea id="observacion" name="observacion" class="form-control" rows="3" >{{contrato_metodologia.observacion}}</textarea>
+            </div>
+</div>

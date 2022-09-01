@@ -47,6 +47,14 @@ async function cargarArchivoFTPbyArchivo(archivo, name,req) {
     executeLogic(archivo, name,numeroAsignado,req);
 }
 
+
+function checkYearFolder()
+{
+
+
+    
+}
+
 function  executeLogic(archivo, name,numeroAsignado,req)
 {
 

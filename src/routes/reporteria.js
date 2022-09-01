@@ -1636,8 +1636,8 @@ router.get('/analisisProyectos',  async (req, res) => {
                                " LEFT JOIN sys_usuario AS t6 ON t1.id_director = t6.idUsuario"+
                                " LEFT JOIN sys_usuario AS t7 ON t1.id_jefe = t7.idUsuario "+
                         " WHERE "+
-                      //          " t1.id_jefe in (8 , 52 , 73, 81 , 39, 21, 25,27,18,40,86,43,35,6,15,174,80,104,28,65,127,46,114,132,48,139,200) ";//+
-                                  " t1.id_jefe in ( 81 ) ";
+                                " t1.id_jefe in (8 , 52 , 73, 81 , 39, 21, 25,27,18,40,86,43,35,6,15,174,80,104,28,65,127,46,114,132,48,139,200) ";//+
+                      //        " t1.id_jefe in ( 81 ) ";
                       // " AND " +
                       //        " t1.id = 1977";
 

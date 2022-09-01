@@ -1,8 +1,8 @@
 <div class="item form-group">
     <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Presupuesto</label>
             <div class="col-md-5">
-					<select class="form-control" name="presupuesto" id="presupuesto">
-                                <option value="0">N/A</option>   
+					<select class="form-control" name="presupuesto" id="presupuesto" onchange="cargaOpcionesPresupuesto(this.value);">
+                                <option value="0" selected>N/A</option>   
                                     {{#each presupuestos}}
                                         <option value="{{id_presupuesto}}">{{codigo}}</option>   
                                     {{/each}}     
@@ -19,6 +19,12 @@
                                         <option value="{{id}}">{{descripcion}}</option>   
                                     {{/each}}     
                     </select>
+            </div>
+            <div class="col-md-2">
+                <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="chkAll" name="chkAll" onclick="cargarTodosSegunProyecto();">
+                <label class="form-check-label" for="defaultCheck1"> Agregar Todos </label>
+                </div>
             </div>
 </div>
 <div class="item form-group">

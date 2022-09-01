@@ -4,7 +4,11 @@
 					<select class="form-control" name="edificiotorre" id="edificiotorre">
                                 <option value="0">N/A</option>   
                                     {{#each substructura}}
-                                        <option value="{{id}}">{{descripcion}}</option>   
+                                            {{#if (if_equal id ../pago_adcional.id_substructura) }}
+                                                <option value="{{id}}" selected>{{descripcion}}</option>   
+                                            {{else}}
+                                                <option value="{{id}}">{{descripcion}}</option>   
+                                            {{/if}}
                                     {{/each}}     
                     </select>
             </div>
@@ -16,7 +20,11 @@
 					<select class="form-control" name="etipoCobro" id="etipoCobro">
                                 <option value="0">Seleccione</option>   
                                     {{#each tipoCobro}}
-                                        <option value="{{id}}">{{descripcion}}</option>   
+                                        {{#if (if_equal id ../pago_adcional.id_tipo_cobro) }}
+                                            <option value="{{id}}" selected>{{descripcion}}</option>   
+                                        {{else}}
+                                            <option value="{{id}}">{{descripcion}}</option>   
+                                        {{/if}}
                                     {{/each}}     
                     </select>
             </div>
@@ -25,7 +33,8 @@
 <div class="item form-group">
     <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Numero </label>
             <div class="col-md-5">
-					<input type="text" id="numero" name="numero" required="required" class="form-control">
+					<input type="text" id="numero" name="numero" required="required" class="form-control" value="{{pago_adcional.numero}}">
+                    <input type="hidden" id="id" name="id" required="required" class="form-control"  value="{{pago_adcional.id}}">
             </div>
 </div>
 
@@ -35,7 +44,11 @@
 					<select class="form-control" name="motivo" id="motivo">
                                 <option value="0">Seleccione</option>   
                                     {{#each motivos}}
-                                        <option value="{{id}}">{{descripcion}}</option>   
+                                        {{#if (if_equal id ../pago_adcional.id_motivo) }}
+                                            <option value="{{id}}" selected>{{descripcion}}</option>   
+                                        {{else}}
+                                            <option value="{{id}}">{{descripcion}}</option>   
+                                        {{/if}}
                                     {{/each}}     
                     </select>
             </div>
@@ -44,13 +57,13 @@
 <div class="item form-group">
     <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Porcentaje </label>
             <div class="col-md-5">
-					<input type="text" id="porcentaje" name="porcentaje" required="required" class="form-control">
+					<input type="text" id="porcentaje" name="porcentaje" required="required" class="form-control" value="{{pago_adcional.porcentaje}}">
             </div>
 </div>
 <div class="item form-group">
     <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Monto </label>
             <div class="col-md-5">
-					<input type="text" id="monto" name="monto" required="required" class="form-control">
+					<input type="text" id="monto" name="monto" required="required" class="form-control" value="{{pago_adcional.monto}}">
             </div>
 </div>
 <div class="item form-group">
@@ -59,7 +72,11 @@
 				<select class="form-control" name="moneda" id="moneda">
                                 <option value="0">Seleccione</option>   
                                     {{#each monedas}}
-                                        <option value="{{id_moneda}}">{{descripcion}}</option>   
+                                        {{#if (if_equal id_moneda ../pago_adcional.id_moneda) }}
+                                            <option value="{{id_moneda}}" selected>{{descripcion}}</option>   
+                                        {{else}}
+                                            <option value="{{id_moneda}}">{{descripcion}}</option>   
+                                        {{/if}}
                                     {{/each}}     
                     </select>
             </div>
@@ -67,12 +84,6 @@
 <div class="item form-group">
     <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Observación </label>
             <div class="col-md-5">
-                <textarea id="observacion" name="observacion" class="form-control" rows="3" ></textarea>
+                <textarea id="observacion" name="observacion" class="form-control" rows="3" >{{pago_adcional.observacion}}</textarea>
             </div>
-</div>
-<div class="item form-group">
-    <div class="col-md-4"></div>
-        <div class="col-md-4">
-            <button type="button" class="btn btn-success" onclick="cargarFormAdicional();">Agregar</button>
-        </div>
 </div>

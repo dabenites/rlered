@@ -1271,10 +1271,17 @@ $(document).ready(function(){
                     
                  }
              }
+            // console.log(cExternos[centros]);
              labelsCentrosExterno.push(cExternos[centros].nombre );
              labelsColorExterno.push(cExternos[centros].color );
              labelsHHExterno.push(cExternos[centros].horas );
-             labelsCostoExterno.push(cExternos[centros].costo );
+            // labelsCostoExterno.push(cExternos[centros].costo );
+            labelsCostoExterno.push(
+                    new Intl.NumberFormat('de-DE').format((parseFloat(cExternos[centros].costo).toFixed(2)).replace(",","."))  
+                 );
+
+            
+
          }
 
          var dataCostoExternoHH = {

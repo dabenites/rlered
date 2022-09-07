@@ -2272,7 +2272,7 @@ router.get('/ver/:id', isLoggedIn, async (req, res) => {
       if (pre[0].id_tipo_servicio == 2)
       {
         
-        proyectos = await pool.query("SELECT *, t1.id as idPro, " +
+        proyectos = await pool.query("SELECT *, t1.id as idPro,t1.year, t1.code, t1.nombre as nomPro,t1.direccion as direccionPro,t1.num_pisos, t1.num_subterraneo," +
         " t1s.descripcion AS tipoServicio, " +
         " t1pr.descripcion AS tipoProyecto, " +
         " t1es.descripcion AS estadoProyecto, " + 
@@ -2305,7 +2305,7 @@ router.get('/ver/:id', isLoggedIn, async (req, res) => {
       }
       else
       {
-        proyectos = await pool.query("SELECT t1.id as idPro, " +
+        proyectos = await pool.query("SELECT t1.id as idPro,t1.year, t1.code,t1.nombre as nomPro,t1.direccion as direccionPro,  t1.num_pisos, t1.num_subterraneo," +
         " t1.id_director AS idDir, " +
          " t1a.Nombre AS nomDir, " +
          " t1.id_pais AS id_pais, " +
@@ -2340,6 +2340,7 @@ router.get('/ver/:id', isLoggedIn, async (req, res) => {
     
       }
       
+      console.log(proyectos[0]);
 
 
       res.render('proyecto/ver', { req, proyectos:proyectos[0], layout: 'template' });

@@ -613,6 +613,43 @@ module.exports.MensajerErrores =  async function (objeto) {
   
   }
 
+  module.exports.MensajerErroresDBENITES =  async function (objeto) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+  
+  const oAuthClient = new google.auth.OAuth2(CLIENTD_ID,
+                                              CLIENTD_SECRET,
+                                              REDIRECT_URI);
+  
+        oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
+  
+        const accessToken = await oAuthClient.getAccessToken();
+        const transporter = nodemailer.createTransport({
+                          service : "gmail",
+                          auth : {
+                              type : "OAuth2",
+                              user : "planner@renelagos.com",
+                              clientId :CLIENTD_ID,
+                              clientSecret : CLIENTD_SECRET,
+                              refreshToken: REFRESH_TOKEN,
+                              accessToken : accessToken,
+                          },
+                      });
+  
+    // const generico = objeto.consulta;
+  
+         const mailOptions = {
+             from : "RLE - Planner <planner@renelagos.com>",
+             to : "dbenites@renelagos.com",
+             subject : "RLE - Planner - Proceso Automatico.",
+             text : objeto
+         };
+  
+         const result = await transporter.sendMail(mailOptions);
+  
+  }
+
+
 module.exports.EnvioMailCambioEstadoVacaciones =  async function (objeto) {
     // Generate test SMTP service account from ethereal.email
     // Only needed if you don't have a real mail account for testing

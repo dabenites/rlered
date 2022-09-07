@@ -1,0 +1,42 @@
+<form action="cargaDocumento/" method="post" enctype="multipart/form-data">
+                                <div class="item form-group">
+                                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Tipo <span class="required"></span> </label>
+                                        <div class="col-md-8 col-sm-8 ">
+                                            <select class="form-control" name="tipoDocumento" id="tipoDocumento" >
+                                                    <option value="0">Seleccione</option>        
+                                                    {{#each tipoDocumentos}} 
+                                                            {{#if (if_equal id ../documento.id_tipo) }}
+                                                                <option value="{{id}}" selected>{{descripcion}}</option>   
+                                                            {{else}}
+                                                                <option value="{{id}}">{{descripcion}}</option>   
+                                                            {{/if}}
+
+                                                    {{/each}}  
+                                            </select>
+                                        </div>
+                                </div>
+                                <div class="item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Numero</label>
+                                    <div class="col-md-8">
+                                            <input type="text" id="unumerodoc" name="unumerodoc" class="form-control" value="{{documento.numero}}">
+                                    </div>
+                                </div>
+                                <div class="item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Monto</label>
+                                    <div class="col-md-8">
+                                            <input type="text" id="umontodoc" name="umontodoc" class="form-control" value="{{documento.monto}}">
+                                    </div>
+                                </div>
+                                <div class="item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Documento</label>
+                                    <div class="col-md-8">
+                                             <input type="file" class="form-control" id="uarchivo" name="uarchivo" > 
+                                    </div>
+                                </div>
+                                <div class="item form-group">
+                                    <div class="col-md-6">
+                                        <input type="hidden" name="uid_proyecto" id="uid_proyecto" value="{{documento.id_proyecto}}">
+                                    </div>
+                                   
+                                </div>
+                            </form>

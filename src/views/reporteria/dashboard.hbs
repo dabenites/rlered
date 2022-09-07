@@ -1093,8 +1093,7 @@ $(document).ready(function(){
                     dataset[c].data.push(valor);
                 }
             }
-             
-            //console.log(dataset);
+            
 
             var mostrar = $("#myChart");
             var mostrar2 = $("#barChart");
@@ -1205,8 +1204,6 @@ $(document).ready(function(){
                         }
                 });
 
-
-          //  console.log(labelsCentros);
           // Recorrer la tabla de costos externos.
 
           let cExternos= [];
@@ -1237,7 +1234,6 @@ $(document).ready(function(){
                     centroCostoExternoValor.costo =  parseFloat(centroCostoExternoValor.costo) +  parseFloat(costoExterno);
                 }
 
-               // console.log(node.context.children[4].innerText);
            });
 
         let RocFacturado = 0;
@@ -1271,7 +1267,6 @@ $(document).ready(function(){
                     
                  }
              }
-            // console.log(cExternos[centros]);
              labelsCentrosExterno.push(cExternos[centros].nombre );
              labelsColorExterno.push(cExternos[centros].color );
              labelsHHExterno.push(cExternos[centros].horas );
@@ -1358,7 +1353,6 @@ $(document).ready(function(){
                     }
                 });
                 
-            //console.log(coloresCentro);
             let totalUF =0;
             let totalUFDib =0;
             let totalHrsDib =0;
@@ -1411,19 +1405,23 @@ $(document).ready(function(){
             
 
             //$("#costo_m2").html( (parseFloat(totalUF / valorSuperficie).toFixed(2)).replace(".",",") );
-            $("#costo_m2").html(new Intl.NumberFormat('de-DE').format((parseFloat(totalUF / valorSuperficie).toFixed(2)).replace(",",".") ));
+
+            //console.log(totalUF);
+            //console.log(valorSuperficie);
+
+            $("#costo_m2").html(new Intl.NumberFormat('de-DE').format((parseFloat(totalUF / valorSuperficie).toFixed(3)).replace(",",".") ));
             $("#costo_plano").html(new Intl.NumberFormat('de-DE').format( (parseFloat( totalUF / valorNumPlanos).toFixed(2)).replace(",",".") ));
             $("#m2_plano").html(new Intl.NumberFormat('de-DE').format( (parseFloat( valorSuperficie / valorNumPlanos).toFixed(2)).replace(",",".")));
             $("#valorProyecto").html(new Intl.NumberFormat('de-DE').format((parseFloat(valorProyectoFormato).toFixed(2)).replace(",",".")));
             $("#adicionalesProyecto").html(new Intl.NumberFormat('de-DE').format((parseFloat(valorProyectoAdicionalFormateado).toFixed(2)).replace(",",".")));
-            //console.log(totalHrsDib);
 
             $("#hrsDibPlano").html( new Intl.NumberFormat('de-DE').format((parseFloat( totalHrsDib / valorNumPlanos).toFixed(2)).replace(",",".")));
 
-            //console.log(totalUF);
 
             let formateoCostoToralPro = totalUF;
 
+            //console.log(valorDelProyecto + "/// valorDelProyecto");
+            //console.log(RocFacturado + "/// RocFacturado");
             $("#costoTotalPro").html( new Intl.NumberFormat('de-DE').format(  formateoCostoToralPro )); 
 
             $("#totalProyecto").html( parseFloat( valorDelProyecto + RocFacturado).toFixed(2));
@@ -1442,17 +1440,13 @@ $(document).ready(function(){
             let margenPro = parseFloat(totalProyectoRoc - totalUF).toFixed(2);
 
             
-            //console.log(valorCostoEsperado);
+            
             let valorFormateadoCostoEsperado = valorCostoEsperado2.replace(".","").replace(",",".");
             
 
             let formulaRecUtilizado = parseFloat(totalUF * 100 / valorFormateadoCostoEsperado).toFixed(2); 
 
-            console.log(valorCostoEsperado2);
-            console.log(totalUF);
-            console.log(valorFormateadoCostoEsperado);
-
-            console.log(formulaRecUtilizado);
+           // console.log("AQUI");
 
             let formulaMargenFacturada = 0; 
             

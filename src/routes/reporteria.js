@@ -251,6 +251,9 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                     " AND " +
                                                             "t1.id_tipo_cobro = t5.id",[id]);
 
+                //console.log(facturas);
+
+
 
 
                 const cexternos = await pool.query("SELECT " +
@@ -1636,10 +1639,13 @@ router.get('/analisisProyectos',  async (req, res) => {
                                " LEFT JOIN sys_usuario AS t6 ON t1.id_director = t6.idUsuario"+
                                " LEFT JOIN sys_usuario AS t7 ON t1.id_jefe = t7.idUsuario "+
                         " WHERE "+
-                                " t1.id_jefe in (8 , 52 , 73, 81 , 39, 21, 25,27,18,40,86,43,35,6,15,174,80,104,28,65,127,46,114,132,48,139,200) ";//+
+                                " t1.id_jefe in (8 , 52 , 73, 81 , 39, 21, 25,27,18,40,86,43,35,6,15,174,80,104,28,65,127,46,114,132,48,139,200,97) ";//+
                       //        " t1.id_jefe in ( 81 ) ";
                       // " AND " +
                       //        " t1.id = 1977";
+
+        //process.exit();
+
 
         let proyectos =  await pool.query(sqlProyectos);               
 
@@ -1649,9 +1655,6 @@ router.get('/analisisProyectos',  async (req, res) => {
 
         const idCabecera = await pool.query('INSERT INTO pro_proyectos_info_cabecera set ?', [cabecera]);
 
-       // console.log(idCabecera);
-
-        console.log("INICIO : " + Date());
         let star = 0;
         let registros = [];
         for (const p of proyectos) {
@@ -1694,7 +1697,6 @@ router.get('/analisisProyectos',  async (req, res) => {
                       });
 
                 // Metro cuadrado por plano 
-                //console.log(p.num_plano_estimado);
                 let metro_por_plano = "";
                 if (isNaN(parseFloat(p.num_plano_estimado)))
                 {
@@ -1720,13 +1722,12 @@ router.get('/analisisProyectos',  async (req, res) => {
                 
                 let costoTotal = 0; // costo total del proyecto sumatoria interno + externo 
                 costosInternoPorCentroCosto.forEach(costoInterno => {
-                        //console.log(costoInterno);
                         if (costoInterno.nombre == "INGENIERIA"){cst_int_ing = parseFloat(costoInterno.costoUF);}
                         if (costoInterno.nombre == "COORDINACION"){cst_int_cord = parseFloat(costoInterno.costoUF);}
                         if (costoInterno.nombre == "DIBUJO"){cst_int_dib = parseFloat(costoInterno.costoUF);}
                         if (costoInterno.nombre == "I+D"){cst_int_imasd = parseFloat(costoInterno.costoUF);}
                         if (costoInterno.nombre == "OBRA"){cst_int_obra = parseFloat(costoInterno.costoUF);}
-                        //console.log(costoInterno.costoUF);
+                        
                         costoTotal = costoTotal + parseFloat(costoInterno.costoUF);
                       });
 
@@ -1819,7 +1820,6 @@ router.get('/analisisProyectos',  async (req, res) => {
                         porc_mod = "0";
                 }
                 
-                // console.log(p);
                 
                 let data_facturacion_proyecto = await getDataFacturacionProyecto(p.id);;
                 let total_facturacion = await getTotalFacturacionProyecto(data_facturacion_proyecto);
@@ -1911,15 +1911,14 @@ router.get('/analisisProyectos',  async (req, res) => {
 
                 }catch(err)
                 {
-                        console.log(err);
+                        mensajeria.MensajerErroresDBENITES("\n\n Archivo : reporteria.js \n Error en el directorio: /proyectos \n" + err + "\n Generado por : Proceso Automatico ");
+                        
                 }
                 
-                console.log("TERMINO PROYECTO : " + star + "////"+ p.nombre + " --- " + Date());
+                
         }
 
-       // console.log(registros);
         
-        console.log("TERMINO" + Date());
         
         res.send("PROYECTOS");
 
@@ -2120,7 +2119,6 @@ router.get('/analisisProyectos',  async (req, res) => {
 
                 let costoColaborador = []; // registrar los valores por mes para el mes actual. 
                 datos.forEach(element => {
-                        //console.log(element);
                         // validar que exista el valor de la UF
                         let valorDelMesUF = 0;
                         const containsValorUF = !!valoresUF.find(fecha => {return fecha.fecha === element.fecha });
@@ -2152,7 +2150,6 @@ router.get('/analisisProyectos',  async (req, res) => {
                         
                         if (containsCentro === false)
                                         {
-                                                //console.log(element.costoMes);
                                                 centroCosto.push(
                                                         { 
                                                                 nombre : element.centroCosto,
@@ -2176,8 +2173,7 @@ router.get('/analisisProyectos',  async (req, res) => {
                                 {
                                         if (valorDelMesUF == 0)
                                         {
-                                                console.log(element.fecha );
-                                                console.log(valorDelMesUF);
+                                                
                                         }
                                         
                                 }

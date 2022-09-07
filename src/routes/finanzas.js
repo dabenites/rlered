@@ -566,6 +566,39 @@ router.post('/cargaFormularioEditar', isLoggedIn, async (req, res) => {
 
 });
 
+//cargaFormularioEditarDocRespaldo
+
+router.post('/cargaFormularioEditarDocRespaldo', isLoggedIn, async (req, res) => {
+
+    const { iId,idProyecto } = req.body;
+
+
+    let documento = await pool.query("SELECT * FROM contrato_documento as t1 where t1.id = ? ",[iId]);
+    let tipoDocumentos = await pool.query("SELECT * FROM contrato_tipo_documento as t1 ");
+
+
+    //console.log(iId);
+    //console.log("SELECT * FROM contrato_documento as t1 where t1.id = ? ");
+
+    const isEqualHelperHandlerbar = function(a, b, opts) {
+        if (a == b) {
+            return true
+        } else { 
+            return false
+        } 
+    };
+    
+
+
+
+            res.render('finanzas/editarformMetodologiaDocRespaldo', { req, documento : documento[0], tipoDocumentos,
+                        layout: 'blanco', helpers : {
+                            if_equal : isEqualHelperHandlerbar
+                        }}); 
+    
+});
+
+
 router.post('/cargaOpcionesSubStructuraAll', isLoggedIn, async (req, res) => {
 
     const { idProyecto } = req.body;

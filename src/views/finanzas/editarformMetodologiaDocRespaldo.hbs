@@ -1,8 +1,8 @@
-<form action="cargaDocumento/" method="post" enctype="multipart/form-data">
+
                                 <div class="item form-group">
                                         <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Tipo <span class="required"></span> </label>
                                         <div class="col-md-8 col-sm-8 ">
-                                            <select class="form-control" name="tipoDocumento" id="tipoDocumento" >
+                                            <select class="form-control" name="utipoDocumento" id="utipoDocumento" >
                                                     <option value="0">Seleccione</option>        
                                                     {{#each tipoDocumentos}} 
                                                             {{#if (if_equal id ../documento.id_tipo) }}
@@ -39,4 +39,5 @@
                                     </div>
                                    
                                 </div>
-                            </form>
+
+                            

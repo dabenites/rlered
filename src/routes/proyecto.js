@@ -2340,7 +2340,7 @@ router.get('/ver/:id', isLoggedIn, async (req, res) => {
     
       }
       
-      console.log(proyectos[0]);
+     // console.log(proyectos[0]);
 
 
       res.render('proyecto/ver', { req, proyectos:proyectos[0], layout: 'template' });

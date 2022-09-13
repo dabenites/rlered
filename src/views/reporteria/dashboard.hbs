@@ -141,6 +141,46 @@
             <div class="x_title">
                 <h2>{{proyecto.year}}-{{proyecto.code}} : {{proyecto.nombre}}</h2>
                     <ul class="nav navbar-right panel_toolbox">
+
+                         {{#if (if_equal registros.cantidad 1)}}
+                            
+                            <a type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#errores"> <i class="fa fa-close" aria-hidden="true"> Alertas </i> </a>
+
+                            <div class="modal fade" id="errores" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title" id="exampleModalLongTitle">Listado falta de datos</h6>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <table id="listadoErrores" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                <thead>
+                                                    <tr>
+                                                            <th>Tipo</th>
+                                                            <th>Dato</th>
+                                                            <th>Fecha</th>
+                                                            <th>Valor Ocupado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                        {{#each registros.datos}}
+                                                        <tr>
+                                                            <td>{{tipo}} </td>
+                                                            <td>{{dato}} </td>
+                                                            <td>{{fecha}} </td>
+                                                            <td>{{valor_ref}}</td>
+                                                        </tr>   
+                                                         {{/each}}  
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         {{/if}}
                         <a type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#ingresar"> <i class="fa fa-archive" aria-hidden="true"> Ingresar Avance Proyecto</i> </a> 
 
                         <div class="modal fade" id="ingresar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -292,7 +332,7 @@
                                         <div class="row">
                                                     <label class="col-form-label col-md-5 label-align" for="tarifa">
                                                         
-                                                            <b> Tarifa UF/m<sup>2</sup></b>
+                                                            <b> Tarifa [{{moneda}}]/m<sup>2</sup></b>
                                                             </label>
                                                     <label class="col-form-label col-md-7 " for="nombre">{{proyecto.valor_metro_cuadrado}}</label>
                                         </div>
@@ -1356,8 +1396,14 @@ $(document).ready(function(){
             let totalUF =0;
             let totalUFDib =0;
             let totalHrsDib =0;
+
+            
+
             for (let centros in labelsCentrosTotal)
             {
+
+                //console.log(centros);
+                
                 dataTable2a.rows().iterator('row', function(context, index){
                 var node = $(this.row(index).node()); 
                     
@@ -1406,8 +1452,8 @@ $(document).ready(function(){
 
             //$("#costo_m2").html( (parseFloat(totalUF / valorSuperficie).toFixed(2)).replace(".",",") );
 
-            //console.log(totalUF);
-            //console.log(valorSuperficie);
+            //console.log(totalUF + "////// totalUF ");
+            //console.log(valorSuperficie + "////// valorSuperficie " );
 
             $("#costo_m2").html(new Intl.NumberFormat('de-DE').format((parseFloat(totalUF / valorSuperficie).toFixed(3)).replace(",",".") ));
             $("#costo_plano").html(new Intl.NumberFormat('de-DE').format( (parseFloat( totalUF / valorNumPlanos).toFixed(2)).replace(",",".") ));
@@ -1420,8 +1466,8 @@ $(document).ready(function(){
 
             let formateoCostoToralPro = totalUF;
 
-            //console.log(valorDelProyecto + "/// valorDelProyecto");
-            //console.log(RocFacturado + "/// RocFacturado");
+            console.log(valorDelProyecto + "/// valorDelProyecto");
+            console.log(RocFacturado + "/// RocFacturado");
             $("#costoTotalPro").html( new Intl.NumberFormat('de-DE').format(  formateoCostoToralPro )); 
 
             $("#totalProyecto").html( parseFloat( valorDelProyecto + RocFacturado).toFixed(2));

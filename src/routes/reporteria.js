@@ -128,30 +128,66 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                 let moneda = "UF";
 
                 let selectUF,selectUSD,selectSOL = "";
+
                 if(isNaN(id)) 
                 {
                         let informacion = id.split('_');
                         id = informacion[1];
                         moneda = getSimboloByIdMoneda(informacion[0]);
-                }
 
-                switch(moneda)
+                        switch(moneda)
+                        {
+                                case "UF":
+                                        selectUF = "selected";
+                                        selectUSD = "";
+                                        selectSOL = "";
+                                break;
+                                case "US$":
+                                        selectUF = "";
+                                        selectUSD = "selected";
+                                        selectSOL = "";
+                                break;
+                                case "S/":
+                                        selectUF = "";
+                                        selectUSD = "";
+                                        selectSOL = "selected";
+                                break;
+                        }
+                }
+                else
                 {
-                        case "UF":
-                                selectUF = "selected";
-                                selectUSD = "";
-                                selectSOL = "";
-                        break;
-                        case "US$":
-                                selectUF = "";
-                                selectUSD = "selected";
-                                selectSOL = "";
-                        break;
-                        case "S/":
-                                selectUF = "";
-                                selectUSD = "";
-                                selectSOL = "selected";
-                        break;
+
+                        // informacion del proyecto para que sea dinamico
+                        let infoProyectoMoneda = await pool.query(" SELECT * FROM pro_proyectos as t1 WHERE t1.id = ? ", [id]);
+
+                        switch(infoProyectoMoneda[0].id_tipo_moneda)
+                        {
+                                case 0:
+                                case "0":
+                                case 1:
+                                case "1":
+                                        selectUF = "selected";
+                                        selectUSD = "";
+                                        selectSOL = "";  
+                                        moneda = "UF" ;
+                                break;
+                                case 2:
+                                case "2":
+                                        selectUF = "";
+                                        selectUSD = "selected";
+                                        selectSOL = "";
+                                        moneda = "US$" ;
+                                break;
+                                case 10:
+                                case "10":
+                                        selectUF = "";
+                                        selectUSD = "";
+                                        selectSOL = "selected";
+                                        moneda = "S/";
+                                break;
+                        
+                        }
+
                 }
                 const indicadoresAvancesUser = await pool.query("SELECT *, DATE_FORMAT( t1.fecha, '%Y-%m-%d') as fecha " +
                                                                 " FROM pro_proyecto_avance AS t1 " +
@@ -203,7 +239,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
    
                 /// buscar la informacion del proyecto con el id que viene por la ruta GET
             
-                const proyecto = await pool.query("SELECT t1.year, t1.nombre, t1.code, t2.descripcion , t1a.name AS nomCliente,t1.valor_metro_cuadrado,t1.num_plano_estimado,"+
+                const proyecto = await pool.query("SELECT t1.id_tipo_moneda,  t1.year, t1.nombre, t1.code, t2.descripcion , t1a.name AS nomCliente,t1.valor_metro_cuadrado,t1.num_plano_estimado,"+
                                                   " t1b.Nombre AS nomDire, t1c.Nombre AS nomJefe, t3.descripcion AS tipologia,t1.superficie_pre,t1.id, t4.descripcion AS tipoServicio," +
                                                   " t1.valor_proyecto, t3.porcentaje_costo, t3.limite_rojo, t3.limite_amarillo, " +
                                                   " t1e.valor AS valorDolar, "+
@@ -251,7 +287,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                     " AND " +
                                                             "t1.id_tipo_cobro = t5.id",[id]);
 
-                //console.log(facturas);
+                
 
 
 
@@ -322,8 +358,6 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                  
                 var numHH = 0;
                 let centroCostoHH = [];
-
-                
 
                 cexternos.forEach(element => {
                                         
@@ -516,6 +550,10 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
         let colaboradoresCentroCostoGeneral = [];
         let costoColaborador = [];                        
         let arregloErroresUserCosto = [];
+
+        let ArregloErroresFormateados = [];
+
+
         detalleInterno.forEach(
                 element => {   
                                if (element.costoMes === null) {
@@ -530,9 +568,17 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         // registrar este problema.
                                         element.costoMes = 15000;
                                         arregloErroresUserCosto.push(element);
-                                }
 
+                                        let error = {
+                                                tipo : "Costo Usuario",
+                                                dato : element.nombre,
+                                                fecha : element.fecha,
+                                                valor_ref : 15000
+                                        }
+                                        ArregloErroresFormateados.push(error);
+                                }
                                }
+
                                else
                                {
                                 const costoColaboradorUser = !!costoColaborador.find(user => {return user.nombre === element.nombre });
@@ -555,11 +601,29 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
                                let valorDelMesUF = 0;
                                let valorDelMesDolar = 0;
+                        
+                               
 
                                if (containsValorUF === true)
                                {
                                 const colUF = valorUfMensual.find(fecha => {return fecha.fecha === element.fecha });
                                 valorDelMesUF = colUF.valor;
+                               }
+                               else
+                               {
+                                 // No existe el valor de la UF
+                                 
+                                 valorDelMesUF = 32000;
+
+                                 let error = {
+                                        tipo : "Costo Moneda",
+                                        dato : "UF",
+                                        fecha : element.fecha,
+                                        valor_ref : 32000
+                                }
+                                ArregloErroresFormateados.push(error);
+
+
                                }
 
                                if (containsValorDolar === true)
@@ -567,8 +631,20 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                 const colDolar = valorDolarMensual.find(fecha => {return fecha.fecha === element.fecha });
                                 valorDelMesDolar = colDolar.valor;
                                }
+                               else
+                               {
+                                // No existe el valor del Dolar. 
+                                valorDelMesDolar = 800;
 
+                                let error = {
+                                        tipo : "Costo Moneda",
+                                        dato : "USD",
+                                        fecha : element.fecha,
+                                        valor_ref : 800
+                                }
+                                ArregloErroresFormateados.push(error);
 
+                               }
 
 
                                 if (containsUser === true)
@@ -720,7 +796,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                 }
         );
 
-            
+
             let interna = 0;
             let externa = 0;
             let total = 0;
@@ -778,6 +854,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         });
 
             
+                  
+
 
             colaboradoresCentroCosto.push({nombre : 'TOTALES',
                         horas : interna,
@@ -787,7 +865,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         horasCosto :costoUF,
                         horasCostoDolar :costoDolar
                 });
-
+            
             colaboradoresCentroCostoGeneral.push({nombre : 'TOTALES',
                         horas : internaGeneral,
                         externo :externaGeneral,
@@ -798,7 +876,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                 });
 
         
-
+                
 
         colaboradoresCentroCosto.forEach(element => {  
                         const col = colaboradoresCentroCosto.find(centro => {return centro.nombre === element.nombre });
@@ -808,6 +886,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         col.horasCosto = parseFloat( col.horasCosto ).toFixed(2);
                         col.horasCostoDolar = parseFloat( col.horasCostoDolar ).toFixed(2);
                         });
+
+                        
 
         colaboradoresCentroCostoGeneral.forEach(element => {  
                                 
@@ -836,10 +916,11 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
                                 });
 
-
+        
+        
             let porcentaje = proyecto[0].porcentaje_costo / 100;
             let costoEsperado = (parseFloat( proyecto[0].valor_proyecto) * porcentaje).toFixed(2);
-
+        
           
             // facturas. 
             let totalFacturado = 0;
@@ -908,12 +989,14 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
                 totalFacturado = parseFloat(totalFacturado) + parseFloat( element.monto_a_facturar);
             });
+
             
+
             totalFacturado = parseFloat(totalFacturado).toFixed(2);
             totalPagado = parseFloat(totalPagado).toFixed(2);
 
 
-            // console revisar los valores de las de las facturas. 
+            // revisar los valores de las de las facturas. 
             const isEqualHelperHandlerbar = function(a, b, opts) {
                 if (a == b) {
                     return true
@@ -925,12 +1008,45 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             let proGeneral = proyecto[0];
             proGeneral.valorUSD =  parseFloat(proGeneral.valor_proyecto * proGeneral.valorUF / proGeneral.valorDolar).toFixed(2);
 
-            let costoEsperadoDolar = (parseFloat(proGeneral.valorUSD) * porcentaje).toFixed(2);
+            let costoEsperadoDolar = "";
+            //(parseFloat(proGeneral.valorUSD) * porcentaje).toFixed(2);
+
+            switch(proyecto[0].id_tipo_moneda)
+            {
+                case 0:
+                case "0":
+                case "4":
+                case 4:
+                        proGeneral.valorUSD =  parseFloat(proGeneral.valor_proyecto * proGeneral.valorUF / proGeneral.valorDolar).toFixed(2);
+                        costoEsperadoDolar = (parseFloat(proGeneral.valorUSD) * porcentaje).toFixed(2);
+                break;
+                case 2:
+                case "2":
+                        proGeneral.valorUSD = parseFloat(proGeneral.valor_proyecto).toFixed(2);
+                        costoEsperadoDolar = (parseFloat(proGeneral.valorUSD) * porcentaje).toFixed(2);
+                break;
+            }
+            
+            let flag = 0;
+
+            if (ArregloErroresFormateados.length > 0 )
+            {
+                flag = 1;
+            }
+           
+            let registros = {
+                                cantidad : flag,
+                                datos : ArregloErroresFormateados
+            };
+
+
+            //console.log(registros);
+
 
 
             if (mensaje === "")
             {
-                    res.render('reporteria/dashboard', {selectUF,selectUSD,selectSOL ,proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado, 
+                    res.render('reporteria/dashboard', {registros, selectUF,selectUSD,selectSOL ,proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado, 
                                                         modificaciones:modificaciones[0], costoEsperado,costoEsperadoDolar,colaboradoresCentroCostoGeneral, 
                                                         colaboradoresCentroCosto, colaboradores, erroresCosto, varTotalProyecto, numHH, 
                                                         centro_costo, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template', helpers : {
@@ -939,7 +1055,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             }
             else
             {
-                    res.render('reporteria/dashboard', {selectUF,selectUSD,selectSOL , proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado,
+                    res.render('reporteria/dashboard', {registros, selectUF,selectUSD,selectSOL , proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado,
                                                         modificaciones:modificaciones[0], costoEsperado,
                                                         colaboradoresCentroCosto, colaboradores, erroresCosto, mensaje, varTotalProyecto, numHH, centro_costo, 
                                                         costoEsperadoDolar, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template', helpers : {

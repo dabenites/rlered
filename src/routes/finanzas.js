@@ -192,7 +192,6 @@ async function cargaDocumentoServidor( id_proyecto, num, cadena, extension , old
     let proyecto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ? ", [id_proyecto]);
     let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
 
-        console.log("####################################");
         let annio = proyecto[0].year;
         let code = proyecto[0].code;
 
@@ -219,6 +218,43 @@ async function cargaDocumentoServidor( id_proyecto, num, cadena, extension , old
         }
         catch(err) {
             console.log("EEOOOOOOOOOOOOOORRRR cargaDocumentoServidor");
+            console.log(err);
+
+            estado = false;
+        }
+        client.close();
+
+
+        return estado;
+}
+
+async function cargaDocumentoServidorUpdate(  directorio, cadena, extension , oldpath)
+{
+
+    let estado = false;
+    let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
+
+    //  console.log(directorio);
+    const client = new ftp.Client();
+
+    // console.log("####################################");
+    // console.log(oldpath);
+
+        client.ftp.verbose = true;
+        try {
+            let informacion = await client.access({
+                                            host: opciones[0].ip,
+                                            user: opciones[0].usuario,
+                                            password: opciones[0].password,
+                                            secure: false
+                                        });
+             await client.cd(directorio);
+             let name = cadena + "." + extension;
+             await client.uploadFrom(oldpath, name);
+            estado = true;
+        }
+        catch(err) {
+            console.log("EEOOOOOOOOOOOOOORRRR cargaDocumentoServidorUpdate");
             console.log(err);
 
             estado = false;
@@ -937,6 +973,83 @@ router.get('/metodologia', isLoggedIn, async (req, res) => {
     } catch (error) {
         
         mensajeria.MensajerErrores("\n\n Archivo : finanzas.js \n Error en el directorio: /metodologia \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+
+
+    }
+
+}); 
+
+
+
+router.post('/proyecto/actualizarDocumentoResplado', isLoggedIn, async (req, res) => {
+    try {
+
+        //const { nombre, idppto,idProyecto } = req.body;
+        let {cadena,oldpath,oldname,extension } = "";
+        var form = new formidable.IncomingForm();
+
+        
+
+        form.parse(req, async function (err, fields, files) {
+            
+            let documento =await pool.query("SELECT * FROM contrato_documento as t1 where t1.id = ? ", [fields.uDoc]);
+
+            if(files.uarchivo.name != "")
+            {
+                cadena = getCadenaAletoria();
+                oldpath = files.uarchivo.path;
+                oldname = files.uarchivo.name;
+                extension = getExtension(oldname);
+
+                cargaDocumentoServidorUpdate(documento[0].path_file,cadena,extension, oldpath);
+            }
+           
+            
+            let registro = {
+                monto : fields.umontodoc,
+                numero : fields.unumerodoc,
+                id_tipo : fields.utipoDocumento
+            }
+
+            await pool.query('UPDATE contrato_documento set ? WHERE id = ?', [registro, fields.uDoc]);
+
+            let registro2 = {
+                id_documento : fields.uDoc,
+                id_proyecto : fields.uid_proyecto,
+                id_tipo : fields.utipoDocumento,
+                id_carga_doc : req.user.idUsuario,
+                path_file : documento[0].path_file,
+                nombre_real : documento[0].nombre_real,
+                nombre_servidor : documento[0].nombre_servidor,
+                ext_archivo : documento[0].ext_archivo,
+                numero : fields.unumerodoc,
+                monto : fields.umontodoc
+            }
+
+
+            const cargaDocumento = pool.query('INSERT INTO contrato_documento_tracking  set ? ', [registro2]);
+
+
+
+            res.redirect(   url.format({
+                pathname:'/finanzas/proyecto/'+fields.uid_proyecto,
+                        query: {
+                        "a": 1
+                        }
+                    }));
+
+        });
+        
+
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : finanzas.js \n Error en el directorio: /actualizarDocumentoResplado \n" + error + "\n Generado por : " + req.user.login);
         res.redirect(   url.format({
             pathname:'/dashboard',
                     query: {

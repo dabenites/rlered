@@ -273,7 +273,7 @@
                                                 <select class="col-form-label col-md-4" name="idMoneda" id="idMoneda" onchange="ActualizaMonedas(this.value);">
                                                          <option value="4" {{selectUF}}>UF</option>
                                                          <option value="2" {{selectUSD}}>USD</option>
-                                                         <!-- <option value="10"{{selectSOL}}>SOL</option> -->
+                                                         <option value="10"{{selectSOL}}>SOL</option>
 
                                                 </select>
                                                 <input type="hidden" name="idProyecto" id="idProyecto" value="{{proyecto.id}}">
@@ -360,6 +360,9 @@
                                                                 {{/if}}
                                                                 {{#if (if_equal moneda "US$")}}
                                                                     {{costoEsperadoDolar}}
+                                                                {{/if}}
+                                                                {{#if (if_equal moneda "S/")}}
+                                                                    {{costoEsperadoSol}}
                                                                 {{/if}}
 
                                                     </label>
@@ -470,6 +473,9 @@
                                                                 {{/if}}
                                                                 {{#if (if_equal moneda "US$")}}
                                                                     {{proGeneral.valorUSD}}
+                                                                {{/if}}
+                                                                {{#if (if_equal moneda "S/")}}
+                                                                    {{proGeneral.valorSOL}}
                                                                 {{/if}}
                                                             </td>
                                                         </tr>
@@ -587,6 +593,9 @@
                                                     {{#if (if_equal ../moneda "US$") }}
                                                         {{horasCostoDolar}}
                                                     {{/if}}
+                                                    {{#if (if_equal ../moneda "S/") }}
+                                                        {{horasCostoSol}}
+                                                    {{/if}}
                                                     </td>
                                                 <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{externo}}</td>
                                                 <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{costoUFExterno}}</td>
@@ -597,6 +606,9 @@
                                                     {{/if}}
                                                     {{#if (if_equal ../moneda "US$") }}
                                                         {{costoTotalDolar}}
+                                                    {{/if}}
+                                                    {{#if (if_equal ../moneda "S/") }}
+                                                        {{costoTotalSol}}
                                                     {{/if}}
 
                                                 </td>
@@ -706,6 +718,9 @@
                                                 {{#if (if_equal ../moneda "US$") }}
                                                     {{valorDolar}}
                                                 {{/if}}
+                                                {{#if (if_equal ../moneda "S/") }}
+                                                    {{valorSol}}
+                                                {{/if}}
                                                 </td>
                                             <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{porcentaje}}</td>
                                         </tr>
@@ -735,6 +750,9 @@
                                                     {{/if}}
                                                     {{#if (if_equal ../moneda "US$") }}
                                                     {{horasCostoDolar}}
+                                                    {{/if}}
+                                                    {{#if (if_equal ../moneda "S/") }}
+                                                    {{horasCostoSol}}
                                                     {{/if}}
                                                 </td>
                                             <!-- <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{externo}}</td> -->
@@ -829,11 +847,12 @@
                                     <tr>
                                         <th>Solicitó</th>
                                         <th>Monto [{{moneda}}]</th>
-                                        <th>Valor [{{moneda}}]</th>
+                                        <th>Moneda Factura</th>
+                                        <th>Tasa Cambio</th>
                                         <th>Facturación [%]</th>
                                         <th>Hito</th>
                                         <th>Nº Documento</th>
-                                        <th>Fecha Emisión</th>
+                                        <th>Fecha Factura</th>
                                         <th>Fecha Depósito</th>
                                         <th>ROC</th>
                                         <th>Estado</th>
@@ -844,12 +863,16 @@
                                         <tr>
                                             <td>{{Nombre}}</td>
                                             <td>{{monto_a_facturar}}</td>
+                                            <td>{{simbolo}}</td>
                                             <td>
                                                 {{#if (if_equal ../moneda "UF") }}
                                                     {{uf_valor}}
                                                 {{/if}}
                                                 {{#if (if_equal ../moneda "US$") }}
                                                     {{dolar_valor}}
+                                                {{/if}}
+                                                {{#if (if_equal ../moneda "S/") }}
+                                                    {{sol_valor}}
                                                 {{/if}}
                                             </td>
                                             <td>{{porc_ppto}}</td>
@@ -1850,7 +1873,7 @@ dataTable3.rows().iterator('row', function(context, index){
             //$("#margenPro").html(new Intl.NumberFormat('de-DE').format((parseFloat(margenProFormato).toFixed(2)).replace(",",".")));
 
             //let margenProFacFormato      = $("#margenProFac").text();
-            
+            console.log(costoEsperadoFormato + "costoEsperadoFormato ++++");
             $("#costoTotalEsp").html( new Intl.NumberFormat('de-DE').format((parseFloat( costoEsperadoFormato).toFixed(2)).replace(",",".")));
             //$("#costoTotalPro").html( new Intl.NumberFormat('de-DE').format((parseFloat( costoTotalProFormato).toFixed(2)).replace(",",".")));
             $("#totalPagado").html( new Intl.NumberFormat('de-DE').format((parseFloat( costoTotalPagadoFormato).toFixed(2)).replace(",",".")));

@@ -1539,7 +1539,8 @@ router.get('/missolicitudes/:id', isLoggedIn, async (req, res) => {
                                           " FROM sol_horaextra AS t1, sys_usuario AS t2, pro_proyectos AS t3, sol_estado AS t4 " +
                                           " WHERE " +
                                           " t1.idSolicitante = t2.idUsuario AND t1.idProyecto = t3.id "+
-                                          " AND t4.id = t1.idEstado"+
+                                          " AND t4.id = t1.idEstado "+
+                                          " AND t1.idSolicitante = "+req.user.idUsuario+"" +
                                           " AND 	t1.fecha_solicitante > DATE_SUB(NOW(),INTERVAL 1 YEAR)");
 
 

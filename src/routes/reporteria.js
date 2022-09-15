@@ -198,10 +198,12 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                 // valores de moneda de UF 
                 const valorUFMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
                 const valorDolarMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 2 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
+                const valorSolMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 10 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
 
                 
                 let valorUfMensual = []; 
                 let valorDolarMensual = [];
+                let valorSolMensual = [];
 
                 valorUFMes.forEach(
                         element => {    
@@ -235,6 +237,23 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                     }
                        );
 
+                valorSolMes.forEach(
+                        element => {    
+                                       const containsFecha = !!valorSolMensual.find(fecha => {return fecha.fecha === element.fecha });
+
+                                        if (containsFecha === false)
+                                        {
+                                                valorSolMensual.push(
+                                                        { 
+                                                                fecha : element.fecha,
+                                                                valor : element.valor
+                                                        }
+                                                      );
+                                        }
+                                    }
+                       );
+
+                //console.log(valorSolMes);
                   
    
                 /// buscar la informacion del proyecto con el id que viene por la ruta GET
@@ -269,8 +288,9 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                         " LIMIT 1 " +
                                                         " ) AS 'uf_valor'," +
                                                         " (  SELECT format(t1b.valor,2, 'de_DE')   " +
-                                                        " FROM  moneda_valor AS t1b  WHERE   t1b.id_moneda = 2  AND  t1b.fecha_valor = t1.fecha_factura  LIMIT 1  ) "+
-                                                        " AS 'dolar_valor' " +
+                                                        " FROM  moneda_valor AS t1b  WHERE   t1b.id_moneda = 2  AND  t1b.fecha_valor = t1.fecha_factura  LIMIT 1  ) AS 'dolar_valor', " +
+                                                        " (  SELECT format(t1c.valor,2, 'de_DE') " +
+                                                        " FROM  moneda_valor AS t1c  WHERE   t1c.id_moneda = 10  AND  t1c.fecha_valor = t1.fecha_factura LIMIT 1  ) AS 'sol_valor' " +
                                                     " FROM fact_facturas AS t1 " +
                                                     " LEFT JOIN sys_usuario AS t1a ON t1.id_solicitante = t1a.idUsuario,"+
                                                     " fact_estados AS t2, " +
@@ -286,10 +306,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                             " t1.id_tipo_moneda = t4.id_moneda" +
                                                     " AND " +
                                                             "t1.id_tipo_cobro = t5.id",[id]);
-
                 
-
-
 
 
                 const cexternos = await pool.query("SELECT " +
@@ -313,6 +330,9 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                              " (  SELECT format(t1b.valor,2, 'de_DE')   " +
                                                                         " FROM  moneda_valor AS t1b  WHERE   t1b.id_moneda = 2  AND  t1b.fecha_valor = DATE_FORMAT( t1.fecha_carga, '%Y-%m-%d')  LIMIT 1  ) "+
                                                                         " AS 'dolar_valor', " +
+                                                             " (  SELECT format(t1c.valor,2, 'de_DE')   " +
+                                                                        " FROM  moneda_valor AS t1c  WHERE   t1c.id_moneda = 10  AND  t1c.fecha_valor = DATE_FORMAT( t1.fecha_carga, '%Y-%m-%d')  LIMIT 1  ) "+
+                                                                        " AS 'sol_valor', " +
                                                              " 1 as punitario ," +
                                                              " 1 as pcambio" +
                                                                 " FROM " +
@@ -339,6 +359,9 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                             " (  SELECT format(t1b.valor,2, 'de_DE')   " +
                                                                         " FROM  moneda_valor AS t1b  WHERE   t1b.id_moneda = 2  AND  t1b.fecha_valor = DATE_FORMAT( t1.fecha_aprobacion, '%Y-%m-%d')  LIMIT 1  ) "+
                                                                         " AS 'dolar_valor', " +
+                                                            " (  SELECT format(t1c.valor,2, 'de_DE')   " +
+                                                                        " FROM  moneda_valor AS t1c  WHERE   t1c.id_moneda = 10  AND  t1c.fecha_valor = DATE_FORMAT( t1.fecha_aprobacion, '%Y-%m-%d')  LIMIT 1  ) "+
+                                                                        " AS 'sol_valor' , " +
                                                             " t3.precio_unitario as punitario ," +
                                                             " t3.tipo_cambio as pcambio" +
                                                      " FROM " +
@@ -355,16 +378,40 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                       " AND  " +
                                                             " t1.id = t3.id_solicitud  ",[id, id]);
       
+
                  
                 var numHH = 0;
                 let centroCostoHH = [];
 
+                //console.log(moneda);
+                //console.log(cexternos);
+
                 cexternos.forEach(element => {
                                         
                                 let costoIngresado = element.costo.replace(".","");
-                                                                        
+                                
+                                //dolar_valor: null,
+                                //sol_valor: null,
+                                if (element.dolar_valor === null)
+                                {
+                                        element.dolar_valor = "850";   
+                                }
+                                if (element.sol_valor === null)
+                                {
+                                        element.sol_valor = "240";
+                                }
+
+
                                         switch(moneda) // moneda visualizacion por defecto UF
                                         {
+                                                case "S/":
+                                                        switch(element.simbolo)
+                                                        {
+                                                                case "UF":
+                                                                        console.log(element);
+                                                                break;
+                                                        }
+                                                break;
                                                 case "UF":
                                                         switch(element.simbolo)
                                                         {
@@ -389,6 +436,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                         switch(element.simbolo)
                                                         {
                                                                 case "UF":// ingresaron el costo externo en UF
+                                                                       // console.log(element);
                                                                         if (element.pcambio === "1") // no es una OC
                                                                         {
                                                                                 let costoUF_Pesos = costoIngresado * parseFloat(element.uf_valor.replace(".",""));
@@ -399,8 +447,14 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                                         {
                                                                                 //let costoUF_Pesos = costoIngresado * parseFloat(element.pcambio.replace(".",""));
                                                                                 let costoUF_Pesos = element.numhh * element.punitario * element.pcambio;
+
                                                                                 element.costo = new Intl.NumberFormat('de-DE').format(parseInt( costoUF_Pesos));
-                                                                                element.totPro = parseFloat(costoUF_Pesos / element.dolar_valor.replace(",",".")).toFixed(2); 
+                                                                                //console.log(costoUF_Pesos + "  costoUF_Pesos");
+                                                                                //console.log(element.dolar_valor + "  element.dolar_valor");
+
+                                                                                element.totPro = costoUF_Pesos / element.dolar_valor.replace(",",".");
+                                                                                element.totPro = parseFloat(element.totPro).toFixed(2); 
+                                                                                
                                                                         }
                                                                         
                                                                 break;
@@ -599,8 +653,12 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
                                const containsValorDolar = !!valorDolarMensual.find(fecha => {return fecha.fecha === element.fecha });
 
+                               const containsValorSol = !!valorSolMensual.find(fecha => {return fecha.fecha === element.fecha });
+
+
                                let valorDelMesUF = 0;
                                let valorDelMesDolar = 0;
+                               let valorDelMesSol = 0;
                         
                                
 
@@ -646,6 +704,28 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
                                }
 
+                               if (containsValorSol === true)
+                               {
+                                const colSol = valorSolMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                valorDelMesSol = colSol.valor;
+                               }
+                               else
+                               {
+                                // No existe el valor del Dolar. 
+                                valorDelMesSol = 240;
+
+                                let error = {
+                                        tipo : "Costo Moneda",
+                                        dato : "SOL",
+                                        fecha : element.fecha,
+                                        valor_ref : 240
+                                }
+                                ArregloErroresFormateados.push(error);
+
+                               }
+
+                                
+
 
                                 if (containsUser === true)
                                 {
@@ -656,6 +736,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         col.costoHHMes  =   col.costoHHMes + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5);
                                         col.valorUF     =   col.valorUF + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF;
                                         col.valorDolar  =   col.valorDolar + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesDolar;
+                                        col.valorSol    =   col.valorSol + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesSol;
 
                                 }
                                 else
@@ -671,7 +752,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                                 porcentaje : 0,
                                                                 costoHHMes : element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5,
                                                                 valorUF : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF,
-                                                                valorDolar : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesDolar
+                                                                valorDolar : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesDolar,
+                                                                valorSol : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesSol
                                                         }
                                                       );
                                 }
@@ -684,6 +766,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         colCentro.horas       =   colCentro.horas + element.t;
                                         colCentro.horasCosto  =   colCentro.horasCosto + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF;
                                         colCentro.horasCostoDolar  =   colCentro.horasCostoDolar + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesDolar;
+                                        colCentro.horasCostoSol  =   colCentro.horasCostoSol + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesSol;
                                    }
                                    else
                                    {
@@ -693,6 +776,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                         horas : element.t,
                                                         horasCosto : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF,
                                                         horasCostoDolar : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesDolar,
+                                                        horasCostoSol : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesSol,
                                                         externo : 0,
                                                         total :0
                                                 }
@@ -705,6 +789,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         colCentroGeneral.horas       =   colCentroGeneral.horas + element.t;
                                         colCentroGeneral.horasCosto  =   colCentroGeneral.horasCosto + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF;
                                         colCentroGeneral.horasCostoDolar  =   colCentroGeneral.horasCostoDolar + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesDolar;
+                                        colCentroGeneral.horasCostoSol  =   colCentroGeneral.horasCostoSol + (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesSol;
                                    }
                                    else
                                    {
@@ -714,6 +799,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                         horas : element.t,
                                                         horasCosto : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesUF,
                                                         horasCostoDolar : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesDolar,
+                                                        horasCostoSol : (element.costoMes * element.numHH + element.costoMes * element.numHE * 1.5 ) / valorDelMesSol,
                                                         externo : 0,
                                                         total :0
                                                 }
@@ -731,10 +817,14 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                 });
                 
                 colaboradores.forEach(element => {  
+
+                        //console.log(element);
+
                         const col = colaboradores.find(user => {return user.nombre === element.nombre });
                                 col.porcentaje = parseFloat(  (col.horastotal /horasTotal)*100 ).toFixed(2);
                                 col.valorUF = parseFloat( col.valorUF ).toFixed(2);
                                 col.valorDolar = parseFloat( col.valorDolar ).toFixed(2);
+                                col.valorSol = parseFloat( col.valorSol ).toFixed(2);
                                 col.horas = parseFloat(col.horas ).toFixed(2);
                                 col.horastotal = parseFloat( col.horastotal ).toFixed(2);
                                 
@@ -743,6 +833,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             
             colaboradoresCentroCosto.forEach(
                     element=> {
+                         // console.log(element);
+
                         const containsCentro = !!centroCostoHH.find(centro => {return centro.nombre === element.nombre });
                          if (containsCentro === true)    
                          {
@@ -802,12 +894,15 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             let total = 0;
             let costoUF = 0;
             let costoDolar = 0;
+            let costoSol = 0;
 
             let internaGeneral = 0;
             let externaGeneral = 0;
             let totalGeneral = 0;
             let costoUFGeneral = 0;
             let costoDolarGeneral = 0;
+            let costoSolGeneral = 0;
+
             let costoUFExteroGeneral = 0;
             let costoDolarExteroGeneral = 0;
 
@@ -822,8 +917,10 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         total = total + centro.total;
                         costoUF = costoUF + centro.horasCosto;
                         costoDolar = costoDolar + centro.horasCostoDolar;
+                        costoSol = costoSol + centro.horasCostoSol;
                 });
 
+        
            colaboradoresCentroCostoGeneral.forEach(
                         element => {
                                 const centro = colaboradoresCentroCostoGeneral.find(centro => {return centro.nombre === element.nombre });
@@ -838,7 +935,12 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                 if (centro.horasCostoDolar === undefined){costoDolarGeneral = costoDolarGeneral + 0;}
                                 else {costoDolarGeneral = costoDolarGeneral + centro.horasCostoDolar;}
 
-                                
+                                if (centro.horasCostoSol === undefined){costoSolGeneral = costoSolGeneral + 0;}
+                                else {costoSolGeneral = costoSolGeneral + centro.horasCostoSol;}
+
+
+                                //costoSolGeneral
+
                                 if (centro.costoUFExterno === undefined)
                                 {
                                         costoUFExteroGeneral = parseFloat(costoUFExteroGeneral) + 0;
@@ -863,7 +965,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         externo :externa,
                         total :total,
                         horasCosto :costoUF,
-                        horasCostoDolar :costoDolar
+                        horasCostoDolar :costoDolar,
+                        horasCostoSol :costoSol
                 });
             
             colaboradoresCentroCostoGeneral.push({nombre : 'TOTALES',
@@ -872,7 +975,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         total :totalGeneral,
                         costoUFExterno : costoUFExteroGeneral,
                         horasCosto :costoUFGeneral,
-                        horasCostoDolar :costoDolarGeneral
+                        horasCostoDolar :costoDolarGeneral,
+                        horasCostoSol :costoSolGeneral
                 });
 
         
@@ -908,10 +1012,13 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                 
                                 let costoUfLinea = parseFloat(col.costoUFExterno) + parseFloat(col.horasCosto);
                                 let costoDolarLinea = parseFloat(col.costoUFExterno) + parseFloat(col.horasCostoDolar);
+                                let costoSolLinea = parseFloat(col.costoUFExterno) + parseFloat(col.horasCostoSol);
 
                                 col.costoTotal = parseFloat( costoUfLinea).toFixed(2);
 
                                 col.costoTotalDolar = parseFloat( costoDolarLinea).toFixed(2);
+
+                                col.costoTotalSol = parseFloat( costoSolLinea).toFixed(2);
 
 
                                 });
@@ -930,7 +1037,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
             facturas.forEach(element => {  
 
-
+                // console.log(moneda);
+                // console.log(element);
                 if (element.simbolo !== moneda) // la moneda de pago de la factura es distinta a la que se esta viendo en pantalla revisar los montos.
                 {
                         let montoFacturar = 0;
@@ -950,6 +1058,15 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                 case "UF":
                                         let montoUSD_UF = montoFacturar * valorDolar / valorUF;
                                         element.monto_a_facturar = parseFloat(montoUSD_UF).toFixed(2); // cambiar los DOLARES A UF 
+                                break;
+                                case "S/":
+                                        
+                                        let USD_PESO = parseFloat(montoFacturar) * parseFloat(valorDolar);
+                                        //console.log(USD_PESO); 
+                                        let PESO_SOL = USD_PESO / parseFloat( element.sol_valor);
+
+                                        element.monto_a_facturar = parseFloat(PESO_SOL).toFixed(2); // cambiar los DOLARES A SOL 
+                                        element.sol_valor = parseFloat(PESO_SOL) / parseFloat(montoFacturar);
                                 break;
                         }
                        break;
@@ -981,6 +1098,12 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                        
                    }
                 }
+                else
+                {
+                        element.sol_valor = 1;
+                        element.dolar_valor = 1;
+                        element.uf_valor = 1;
+                }
                 if (element.estadoFac === "Pagada")
                 {
                         // ___
@@ -1009,6 +1132,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             proGeneral.valorUSD =  parseFloat(proGeneral.valor_proyecto * proGeneral.valorUF / proGeneral.valorDolar).toFixed(2);
 
             let costoEsperadoDolar = "";
+            let costoEsperadoSol = "";
             //(parseFloat(proGeneral.valorUSD) * porcentaje).toFixed(2);
 
             switch(proyecto[0].id_tipo_moneda)
@@ -1025,6 +1149,14 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         proGeneral.valorUSD = parseFloat(proGeneral.valor_proyecto).toFixed(2);
                         costoEsperadoDolar = (parseFloat(proGeneral.valorUSD) * porcentaje).toFixed(2);
                 break;
+                /**
+                 * REVISAR LA OPCION DE SOL
+                 */
+                case 10:
+                case "10":
+                        proGeneral.valorSOL = parseFloat(proGeneral.valor_proyecto).toFixed(2);
+                        costoEsperadoSol = (parseFloat(proGeneral.valorSOL) * porcentaje).toFixed(2);
+                break;
             }
             
             let flag = 0;
@@ -1040,14 +1172,10 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             };
 
 
-            //console.log(registros);
-
-
-
             if (mensaje === "")
             {
                     res.render('reporteria/dashboard', {registros, selectUF,selectUSD,selectSOL ,proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado, 
-                                                        modificaciones:modificaciones[0], costoEsperado,costoEsperadoDolar,colaboradoresCentroCostoGeneral, 
+                                                        modificaciones:modificaciones[0], costoEsperado,costoEsperadoDolar,costoEsperadoSol, colaboradoresCentroCostoGeneral, 
                                                         colaboradoresCentroCosto, colaboradores, erroresCosto, varTotalProyecto, numHH, 
                                                         centro_costo, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template', helpers : {
                                                                 if_equal : isEqualHelperHandlerbar

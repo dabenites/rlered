@@ -27,7 +27,7 @@
             <table class="table table-hover" id="tablaProyectos" name="tablaProyectos">
                 <thead>
                     <tr>
-                        <th>Proyecto</th>
+                        <th style="width: 20%;">Proyecto</th>
                         <th>Servicio</th>
                         <th>Tipo Proyecto</th>
                         <th>Cliente</th>
@@ -114,10 +114,11 @@
 
 <script>
 
+
         $('#tablaProyectos thead tr').clone(true).appendTo('#tablaProyectos thead');
         $('#tablaProyectos thead tr:eq(1) th').each(function (i) {
             var title = $(this).text();
-            $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+            $(this).html('<input type="text"  class="form-control" />');
 
             $('input', this).on('keyup change', function () {
                 if (table.column(i).search() !== this.value) {
@@ -128,6 +129,7 @@
                 }
             });
         });
+        
 
         var table = $('#tablaProyectos').DataTable({
             "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
@@ -135,7 +137,7 @@
                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
             "order": [[ 0, "desc" ]],
             orderCellsTop: true,
-            fixedHeader: true,
+            fixedHeader: false,
             "scrollX": true,
             language: {
                 "decimal": ".",

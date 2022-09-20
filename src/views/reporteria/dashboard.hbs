@@ -334,7 +334,7 @@
                                                         
                                                             <b> Tarifa [{{moneda}}]/m<sup>2</sup></b>
                                                             </label>
-                                                    <label class="col-form-label col-md-7 " for="nombre">{{proyecto.valor_metro_cuadrado}}</label>
+                                                    <label class="col-form-label col-md-7 " for="nombre" id="tarifaMetroCuadrado">{{proyecto.valor_metro_cuadrado}}</label>
                                         </div>
                                         <div class="row">
                                                     <label class="col-form-label col-md-5 label-align" for="numplanos">
@@ -1100,6 +1100,7 @@ $('#tablaCinternos').DataTable({
       });
 
 $(document).ready(function(){
+    let aux_margenProFac = 0;
     let valorPrimero = 0;
     $.ajax({
         url: "horas/{{proyecto.id}}",
@@ -1489,8 +1490,6 @@ $(document).ready(function(){
 
             let formateoCostoToralPro = totalUF;
 
-            console.log(valorDelProyecto + "/// valorDelProyecto");
-            console.log(RocFacturado + "/// RocFacturado");
             $("#costoTotalPro").html( new Intl.NumberFormat('de-DE').format(  formateoCostoToralPro )); 
 
             $("#totalProyecto").html( parseFloat( valorDelProyecto + RocFacturado).toFixed(2));
@@ -1515,11 +1514,24 @@ $(document).ready(function(){
 
             let formulaRecUtilizado = parseFloat(totalUF * 100 / valorFormateadoCostoEsperado).toFixed(2); 
 
-           // console.log("AQUI");
 
             let formulaMargenFacturada = 0; 
             
             let totalFacturaPagada = $("#totalPagado").text().replace(".","").replace(",",".");
+
+             aux_margenProFac = new Intl.NumberFormat('de-DE').format(parseFloat(totalFacturaPagada - totalUF).toFixed(2));
+            //alert(aux_margenProFac);
+            if (aux_margenProFac.replace(",",".") < 0)
+            {
+                // pintar rojo 
+                $("#margenProFac").css("color","red");
+            }
+            else
+            {
+                // pintar verde
+                 $("#margenProFac").css("color","green");
+            }
+
 
             $("#margenProFac").html(new Intl.NumberFormat('de-DE').format(parseFloat(totalFacturaPagada - totalUF).toFixed(2)));
              if (formulaRecUtilizado > 100)
@@ -1549,7 +1561,15 @@ $(document).ready(function(){
             valorPrimero = formulaRecUtilizado;
 
 
+           
+
+
             let margenFacturado = parseFloat( 100 - ((totalUF * 100 ) / totalFacturaPagada)).toFixed(2);
+
+            if (totalFacturaPagada == 0)
+            {
+                margenFacturado = 0;
+            }
 
             $("#dato1").val(margenFacturado);
 
@@ -1780,6 +1800,9 @@ var chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions2,
     title: {
       text: 'Margen (Pagado)'
     }
+  }, 
+  credits: {
+    enabled: false
   },
 
   series: [{
@@ -1787,8 +1810,9 @@ var chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions2,
     data: [parseFloat(margenFacturado)],
     dataLabels: {
       format:
-        '<div style="text-align:center">' +
-        '<span style="font-size:25px">{y:.1f}</span></span><span style="font-size:13px;opacity:0.4"> %</span><br/>' +
+         '<div style="text-align:center">' +
+        '<span style="font-size:25px">{y}</span><span style="font-size:13px;opacity:0.4"> %</span><br/>' +
+        '<span style="font-size:12px;opacity:0.4"></span>' +
         '</div>'
     }
   }]
@@ -1804,7 +1828,8 @@ var chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions2,
         // termina ajax
     });
 
-    $(".highcharts-credits").html("");
+    //$(".highcharts-credits").html("");
+    //$(".highcharts-credits").html("");
 
 
 //
@@ -1878,6 +1903,19 @@ dataTable3.rows().iterator('row', function(context, index){
             //$("#costoTotalPro").html( new Intl.NumberFormat('de-DE').format((parseFloat( costoTotalProFormato).toFixed(2)).replace(",",".")));
             $("#totalPagado").html( new Intl.NumberFormat('de-DE').format((parseFloat( costoTotalPagadoFormato).toFixed(2)).replace(",",".")));
             //$("#margenProFac").html( new Intl.NumberFormat('de-DE').format((parseFloat( margenProFacFormato).toFixed(2)).replace(",",".")));
+
+
+
+    let tarifaMetroCuadrado = parseFloat( $("#tarifaMetroCuadrado").html());
+    let superficie = parseFloat( $("#superficie").html());
+
+    $("#tarifaMetroCuadrado").html(tarifaMetroCuadrado.toFixed(3));
+    $("#superficie").html(new Intl.NumberFormat('de-DE').format(superficie));
+
+   // let margenProFac =  $("#margenProFac").html();
+
+        
+
 
 
 });
@@ -1998,6 +2036,10 @@ function ActualizaMonedas( valorMoneda )
    $(location).attr('href','/reporteria/proyectos/'+ findMonedaProyecto);
    
 }
+
+
+
+
 
 </script>
 

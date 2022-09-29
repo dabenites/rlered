@@ -132,7 +132,8 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
       case 2:
         sTable.push(element.cantidad);
         sTable.push(element.descripcion);
-        precio += element.montopeso ;
+        //precio += element.montopeso ;
+        precio = parseInt( precio ) + parseInt(element.montopeso.replace(".","").replace(".",""));
         sTable.push(element.precio_unitario);
         sTable.push("$ " + element.montopeso);
         simbolo = "$ ";
@@ -373,7 +374,9 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
       case 2:
         sTable.push(element.cantidad);
         sTable.push(element.descripcion);
-        precio += element.montopeso ;
+        //console.log(element.montopeso.replace(".","") );
+        
+        precio = parseInt( precio ) + parseInt(element.montopeso.replace(".","").replace(".",""));
         sTable.push(element.precio_unitario);
         sTable.push("$ " + element.montopeso);
         simbolo = "$ ";
@@ -465,7 +468,7 @@ doc.table( table, {
 
   if (oc.conIVA == "Y")
   {
-    doc.font('Times-Bold').fontSize(tletra - 1 ).text("NETO :"       ,0,valor_y , {width: 455,align:'right'});
+    doc.font('Times-Bold').fontSize(tletra - 1 ).text("NETO :"       ,0,valor_y ,      {width: 455,align:'right'});
     doc.font('Times-Bold').fontSize(tletra - 1 ).text("19% I.V.A. :" ,0,valor_y + 10 , {width: 455,align:'right'});
     doc.font('Times-Bold').fontSize(tletra - 1 ).text("TOTAL :"      ,0,valor_y + 20 , {width: 455,align:'right'});
   }

@@ -49,6 +49,35 @@ router.get('/download/:id', isLoggedIn, async (req, res) => {
 
 });
 
+//_________________________
+
+router.get('/downloadContrato/:id', isLoggedIn, async (req, res) => {
+
+    const { id } = req.params;
+
+    let informacionDownload =  exampleDownload(id); // function tiene que dejar el archivo de forma temporal en el servidor en alguna carpeta temporal 
+
+
+    informacionDownload.then((informacion)=>{
+
+            //console.log(nombreArchivo);
+
+                 res.setHeader('Content-Type', 'application/pdf');
+                 res.setHeader('Content-Disposition', 'inline;filename='+informacion.nombreSalida+''); 
+                 
+                 var file = fs.createReadStream(''+informacion.cadena+'.pdf');
+                 var stat = fs.statSync(''+informacion.cadena+'.pdf');
+                 res.setHeader('Content-Length', stat.size);
+                 res.setHeader('Content-Type', 'application/pdf');
+                 res.setHeader('Content-Disposition', 'attachment; filename='+informacion.nombreSalida+'');
+                file.pipe(res);
+
+
+    });
+
+});
+
+
 async function example( iId) {
 
     let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
@@ -73,12 +102,65 @@ async function example( iId) {
                                                                                 console.log(err);
                                                                             });
                                                                             */
-         await client.downloadTo ( cadenaSalida +".pdf", "LpTBPxZ.pdf",0);
+         await client.downloadTo ( cadenaSalida +".pdf", informacionDocumento[0].nombre_servidor+".pdf",0);
+
          informacionSalida = {
                                 cadena : cadenaSalida,
                                 extension : informacionDocumento[0].ext_archivo,
                                 nombreSalida : informacionDocumento[0].nombre_real
-         }
+         };
+
+         console.log(informacionSalida);
+
+    }
+    catch(err) {
+      console.log(err)
+    }
+    client.close();
+
+
+    return new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+                        resolve(informacionSalida);
+                },100);
+});
+
+  }
+
+
+  async function exampleDownload( iId) {
+
+    let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
+    let informacionDocumento = await pool.query("SELECT * FROM contrato_contrato as t1 WHERE t1.id = ? ", [iId]);
+
+    let cadenaSalida = getCadenaAletoria();
+    let informacionSalida = {};
+    const client = new ftp.Client()
+    client.ftp.verbose = true
+    try {
+            await client.access({
+                                host: opciones[0].ip,
+                                user: opciones[0].usuario,
+                                password: opciones[0].password,
+                                secure: false
+            });
+
+      await client.cd(informacionDocumento[0].path_file);
+     /*
+      await client.downloadTo ( fs.createWriteStream("LpTBPxZ.pdf"), "prueba.pdf", 0).then(()=> { let casst = "dsadas";})
+                                                                            .catch(err=>{
+                                                                                console.log(err);
+                                                                            });
+                                                                            */
+         await client.downloadTo ( cadenaSalida +".pdf", informacionDocumento[0].nombre_servidor+".pdf",0);
+
+         informacionSalida = {
+                                cadena : cadenaSalida,
+                                extension : informacionDocumento[0].ext_archivo,
+                                nombreSalida : informacionDocumento[0].nombre_real
+         };
+
+        // console.log(informacionSalida);
 
     }
     catch(err) {
@@ -149,7 +231,7 @@ router.post('/proyecto/cargaDocumento', isLoggedIn, async (req, res) => {
                              checkDocFolder(id_proyecto, num).then( (respuesta) =>{
 
                                 // registrar en la base de datos y subir el archivo. 
-                                let directorio = "finanzas/"+annio+"/"+code+"/"+num+"/";
+                                let directorio = "finanzas/documentos/"+annio+"/"+code+"/"+num+"/";
                                 let registro = {
                                                     id_proyecto : id_proyecto,
                                                     id_tipo : tipoDocumento,
@@ -184,7 +266,107 @@ router.post('/proyecto/cargaDocumento', isLoggedIn, async (req, res) => {
 
 });
 
-async function cargaDocumentoServidor( id_proyecto, num, cadena, extension , oldpath)
+
+
+router.post('/contrato/cargaContrato', isLoggedIn, async (req, res) => {
+
+    //const { id_proyecto,tipoDocumento,montodoc,numerodoc,archivo } = req.body;
+
+    let {contienePpto,presupuesto,tipo,moneda,monto, garantia , porcgarantia,montogarantia,observacion, id_proyecto} = "";
+   
+
+    var form = new formidable.IncomingForm();
+        form.parse(req, async function (err, fields, files) {
+
+            //console.log(files);
+
+            contienePpto    = fields.contienePpto;
+            presupuesto     = fields.presupuesto;
+            tipo            = fields.tipo;
+            moneda          = fields.moneda;
+            monto           = fields.monto;
+            garantia        = fields.garantia;
+            porcgarantia    = fields.porcgarantia;
+            montogarantia   = fields.montogarantia;
+            observacion     = fields.observacion;
+            id_proyecto     = fields.id_proyecto;
+
+            let proyecto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ? ", [id_proyecto]);
+            
+            let annio = proyecto[0].year;
+            let code = proyecto[0].code;
+            let cadena = getCadenaAletoria();
+
+            if (checkYearFolderContrato(id_proyecto)) // verifico la carpeta
+             {
+                 if (checkCodeFolderContrato(id_proyecto)) // verifico el codigo.
+                 {
+                     let numeroArchivosCargados = getNumberFileContrato(id_proyecto);
+
+
+                     numeroArchivosCargados.then((num)=>{
+
+                        checkDocFolderContrato(id_proyecto, num).then( (respuesta) =>{
+
+                            let directorio = "finanzas/contratos/"+annio+"/"+code+"/"+num+"/";
+                            let nombre_real,nombre_servidor,ext_archivo,oldpath,extension = "";
+
+                            if (files.archivo.size > 0) // contiene archivo. 
+                            {
+                                oldpath = files.archivo.path;
+                                nombre_real = files.archivo.name;
+                                extension = getExtension(nombre_real);
+                            }
+                            let registro = {
+                                                id_proyecto : id_proyecto,
+                                                contienePpto : contienePpto,
+                                                presupuesto : presupuesto,
+                                                id_tipo : tipo,
+                                                id_moneda : moneda,
+                                                monto : monto,
+                                                garantia : garantia,
+                                                porcgarantia : porcgarantia,
+                                                montogarantia : montogarantia,
+                                                observacion : observacion,
+                                                path_file : directorio,
+                                                nombre_real : nombre_real,
+                                                nombre_servidor : cadena,
+                                                ext_archivo : extension,
+                                                fecha_ingreso : new Date(),
+                                                id_ingreso : req.user.idUsuario
+                                            }
+    
+    
+                            const cargaDocumento = pool.query('INSERT INTO contrato_contrato  set ? ', [registro]);
+                            if (files.archivo.size > 0) // contiene archivo. 
+                            {
+                                cargaDocumentoServidorContrato(id_proyecto, num , cadena, "."+extension, oldpath );
+                            }
+                            
+                            
+                            res.redirect(   url.format({
+                                pathname:'/finanzas/contrato/'+id_proyecto,
+                                        query: {
+                                        "a": 1
+                                        }
+                                    }));
+
+
+                        });
+
+                     });
+
+                 }
+             }
+
+        });
+
+});
+
+// cargaContrato
+
+
+async function cargaDocumentoServidorContrato( id_proyecto, num, cadena, extension , oldpath)
 {
 
 
@@ -195,7 +377,7 @@ async function cargaDocumentoServidor( id_proyecto, num, cadena, extension , old
         let annio = proyecto[0].year;
         let code = proyecto[0].code;
 
-        let directorio = "finanzas/"+annio+"/"+code+"/" + num + "/";
+        let directorio = "finanzas/contratos/"+annio+"/"+code+"/" + num + "/";
       //  console.log(directorio);
         const client = new ftp.Client();
 
@@ -211,7 +393,55 @@ async function cargaDocumentoServidor( id_proyecto, num, cadena, extension , old
              // nombre de la carpeta a buscar. 
             
              // vamos a la carpeta base de finanzas
-             await client.cd("finanzas/"+ annio.toString() +"/" + code.toString()+"/" + num.toString() + "/");
+             console.log("AQUI 1");
+             await client.cd("finanzas/contratos/"+ annio.toString() +"/" + code.toString()+"/" + num.toString() + "/");
+             console.log("AQUI 2");
+             let name = cadena + extension;
+             await client.uploadFrom(oldpath, name);
+             console.log("AQUI 3");
+            estado = true;
+        }
+        catch(err) {
+            console.log("EEOOOOOOOOOOOOOORRRR cargaDocumentoServidorContrato");
+            console.log(err);
+
+            estado = false;
+        }
+        client.close();
+
+
+        return estado;
+}
+
+
+async function cargaDocumentoServidor( id_proyecto, num, cadena, extension , oldpath)
+{
+
+
+    let estado = false;
+    let proyecto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ? ", [id_proyecto]);
+    let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
+
+        let annio = proyecto[0].year;
+        let code = proyecto[0].code;
+
+        let directorio = "finanzas/documentos/"+annio+"/"+code+"/" + num + "/";
+      //  console.log(directorio);
+        const client = new ftp.Client();
+
+        client.ftp.verbose = true;
+        try {
+            let informacion = await client.access({
+                                            host: opciones[0].ip,
+                                            user: opciones[0].usuario,
+                                            password: opciones[0].password,
+                                            secure: false
+                                        });
+    
+             // nombre de la carpeta a buscar. 
+            
+             // vamos a la carpeta base de finanzas
+             await client.cd("finanzas/documentos/"+ annio.toString() +"/" + code.toString()+"/" + num.toString() + "/");
              let name = cadena + extension;
              await client.uploadFrom(oldpath, name);
             estado = true;
@@ -266,7 +496,46 @@ async function cargaDocumentoServidorUpdate(  directorio, cadena, extension , ol
 }
 
 
-async function checkYearFolder( id_proyecto)
+async function cargaDocumentoServidorUpdateContrato(  directorio, cadena, extension , oldpath)
+{
+
+    let estado = false;
+    let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
+
+    //  console.log(directorio);
+    const client = new ftp.Client();
+
+    // console.log("####################################");
+    // console.log(oldpath);
+
+        client.ftp.verbose = true;
+        try {
+            let informacion = await client.access({
+                                            host: opciones[0].ip,
+                                            user: opciones[0].usuario,
+                                            password: opciones[0].password,
+                                            secure: false
+                                        });
+             await client.cd(directorio);
+             let name = cadena + "." + extension;
+             await client.uploadFrom(oldpath, name);
+            estado = true;
+        }
+        catch(err) {
+            console.log("EEOOOOOOOOOOOOOORRRR cargaDocumentoServidorUpdate");
+            console.log(err);
+
+            estado = false;
+        }
+        client.close();
+
+
+        return estado;
+}
+
+//cargaDocumentoServidorUpdate
+
+async function checkYearFolderContrato( id_proyecto)
 {
 
 
@@ -290,7 +559,7 @@ async function checkYearFolder( id_proyecto)
              let annio = proyecto[0].year;
              let code = proyecto[0].code;
              // vamos a la carpeta base de finanzas
-             await client.cd("finanzas/");
+             await client.cd("finanzas/contratos/");
     
              let carpetas  = await client.list(); // listados las carpetas que estan dentro de este directorio. 
     
@@ -324,7 +593,7 @@ async function checkYearFolder( id_proyecto)
         return estado;
 }
 
-async function checkCodeFolder( id_proyecto)
+async function checkYearFolder( id_proyecto)
 {
 
 
@@ -348,7 +617,66 @@ async function checkCodeFolder( id_proyecto)
              let annio = proyecto[0].year;
              let code = proyecto[0].code;
              // vamos a la carpeta base de finanzas
-             await client.cd("finanzas/"+annio+"/");
+             await client.cd("finanzas/documentos/");
+    
+             let carpetas  = await client.list(); // listados las carpetas que estan dentro de este directorio. 
+    
+             let existeCarpetaAnnio = false;
+             carpetas.forEach(carpeta => {
+                    
+                    if (carpeta.type == 2)
+                    {
+                        if (carpeta.name == annio.toString())
+                        {
+                            existeCarpetaAnnio = true;
+                        }
+                    }
+             });
+             
+             if (existeCarpetaAnnio == false)
+             {
+                await client.ensureDir(annio.toString());
+             }
+    
+            
+            estado = true;
+        }
+        catch(err) {
+            console.log("ERROR ====> " +  "checkYearFolder")
+            estado = false;
+        }
+        client.close();
+
+
+        return estado;
+}
+
+
+async function checkCodeFolderContrato( id_proyecto)
+{
+
+
+    let estado = false;
+    let proyecto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ? ", [id_proyecto]);
+    let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
+
+
+        const client = new ftp.Client();
+
+        client.ftp.verbose = false;
+        try {
+            let informacion = await client.access({
+                                            host: opciones[0].ip,
+                                            user: opciones[0].usuario,
+                                            password: opciones[0].password,
+                                            secure: false
+                                        });
+    
+             // nombre de la carpeta a buscar. 
+             let annio = proyecto[0].year;
+             let code = proyecto[0].code;
+             // vamos a la carpeta base de finanzas
+             await client.cd("finanzas/contratos/"+annio+"/");
     
              let carpetas  = await client.list(); // listados las carpetas que estan dentro de este directorio. 
     
@@ -383,6 +711,123 @@ async function checkCodeFolder( id_proyecto)
         return estado;
 }
 
+async function checkCodeFolder( id_proyecto)
+{
+
+
+    let estado = false;
+    let proyecto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ? ", [id_proyecto]);
+    let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
+
+
+        const client = new ftp.Client();
+
+        client.ftp.verbose = false;
+        try {
+            let informacion = await client.access({
+                                            host: opciones[0].ip,
+                                            user: opciones[0].usuario,
+                                            password: opciones[0].password,
+                                            secure: false
+                                        });
+    
+             // nombre de la carpeta a buscar. 
+             let annio = proyecto[0].year;
+             let code = proyecto[0].code;
+             // vamos a la carpeta base de finanzas
+             await client.cd("finanzas/documentos/"+annio+"/");
+    
+             let carpetas  = await client.list(); // listados las carpetas que estan dentro de este directorio. 
+    
+             let existeCarpetaCode = false;
+             carpetas.forEach(carpeta => {
+                    
+                    if (carpeta.type == 2)
+                    {
+                        if (carpeta.name == code.toString())
+                        {
+                            existeCarpetaCode = true;
+                        }
+                    }
+             });
+             
+             if (existeCarpetaCode == false)
+             {
+                await client.ensureDir(code.toString());
+             }
+    
+            
+            estado = true;
+        }
+        catch(err) {
+            console.log("ERROR ====> " +  "checkCodeFolder");
+            console.log(err);
+            estado = false;
+        }
+        client.close();
+
+
+        return estado;
+}
+
+
+async function checkDocFolderContrato( id_proyecto, num)
+{    
+    let estado = false;
+    let proyecto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ? ", [id_proyecto]);
+    let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
+
+
+        const client = new ftp.Client();
+
+        client.ftp.verbose = false;
+        try {
+            let informacion = await client.access({
+                                            host: opciones[0].ip,
+                                            user: opciones[0].usuario,
+                                            password: opciones[0].password,
+                                            secure: false
+                                        });
+    
+             // nombre de la carpeta a buscar. 
+             let annio = proyecto[0].year;
+             let code = proyecto[0].code;
+             // vamos a la carpeta base de finanzas
+             await client.cd("finanzas/contratos/"+annio+"/"+code+"/");
+    
+             let carpetas  = await client.list(); // listados las carpetas que estan dentro de este directorio. 
+    
+             let existeCarpetaDoc = false;
+             carpetas.forEach(carpeta => {
+                    
+                    if (carpeta.type == 2)
+                    {
+                        if (carpeta.name == num.toString())
+                        {
+                            existeCarpetaDoc = true;
+                        }
+                    }
+             });
+             
+             if (existeCarpetaDoc == false)
+             {
+                await client.ensureDir(num.toString());
+             }
+    
+            
+            estado = true;
+        }
+        catch(err) {
+            console.log("ERROR ====> " +  "checkDocFolder");
+            console.log(err);
+            estado = false;
+        }
+        client.close();
+
+
+        return estado;
+}
+
 async function checkDocFolder( id_proyecto, num)
 {    
     let estado = false;
@@ -405,7 +850,7 @@ async function checkDocFolder( id_proyecto, num)
              let annio = proyecto[0].year;
              let code = proyecto[0].code;
              // vamos a la carpeta base de finanzas
-             await client.cd("finanzas/"+annio+"/"+code+"/");
+             await client.cd("finanzas/documentos/"+annio+"/"+code+"/");
     
              let carpetas  = await client.list(); // listados las carpetas que estan dentro de este directorio. 
     
@@ -468,7 +913,70 @@ async function getNumberFile( id_proyecto )
              let code = proyecto[0].code;
              // vamos a la carpeta base de finanzas
 
-             await client.cd("finanzas/"+annio+"/"+code+"/");
+             await client.cd("finanzas/documentos/"+annio+"/"+code+"/");
+             //await client.ensureDir("/my/remote/directory")
+             numCarpetaActual = await (await client.list()).length;
+            
+
+           //  let numCarpetas = await (await client.list()).length;
+/*
+             let carpetas  = await client.list();
+
+             carpetas.forEach(carpeta => {
+
+                    
+                    if (carpeta.type == 2)
+                    {
+                        numCarpetaActual++;
+                    }
+             });*/
+          
+
+
+        }
+        catch(err) {
+            numCarpetaActual = 0;
+        }
+        client.close();
+
+
+        return new Promise((resolve,reject)=>{
+            setTimeout(()=>{
+                            resolve(numCarpetaActual);
+                    },100);
+    });
+
+}
+
+async function getNumberFileContrato( id_proyecto )
+{
+    let numCarpetaActual = 0;
+
+
+
+    let estado = false;
+    let proyecto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ? ", [id_proyecto]);
+    let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
+
+
+        const client = new ftp.Client();
+        
+
+        client.ftp.verbose = false;
+        try {
+            let informacion = await client.access({
+                                            host: opciones[0].ip,
+                                            user: opciones[0].usuario,
+                                            password: opciones[0].password,
+                                            secure: false
+                                        });
+    
+             // nombre de la carpeta a buscar. 
+             let annio = proyecto[0].year;
+             let code = proyecto[0].code;
+             // vamos a la carpeta base de finanzas
+
+             await client.cd("finanzas/contratos/"+annio+"/"+code+"/");
              //await client.ensureDir("/my/remote/directory")
              numCarpetaActual = await (await client.list()).length;
             
@@ -633,6 +1141,45 @@ router.post('/cargaFormularioEditarDocRespaldo', isLoggedIn, async (req, res) =>
                         }}); 
     
 });
+
+
+router.post('/cargaFormularioEditarDocContrato', isLoggedIn, async (req, res) => {
+
+    const { iId,idProyecto } = req.body;
+
+
+    let contrato = await pool.query("SELECT * FROM contrato_contrato as t1 where t1.id = ? ",[iId]);
+    let tipoDocumentos = await pool.query("SELECT * FROM contrato_tipo_documento as t1 ");
+
+    let tiene_ppto = await pool.query("SELECT * FROM contrato_tiene_ppto ");
+    let tipos_contrato = await pool.query("SELECT * FROM contrato_contrato_tipo ");
+    let tiene_garantia = await pool.query("SELECT * FROM contrato_tiene_garantia ");
+    let monedas = await pool.query("SELECT * FROM moneda_tipo as t1 where t1.factura = 'Y' ");
+
+    let presupuestos =await pool.query("SELECT * FROM ppto_presupuesto as t1 where t1.id_proyecto = ? ", [idProyecto]);
+
+    //console.log(idProyecto);
+
+    //console.log("SELECT * FROM contrato_documento as t1 where t1.id = ? ");
+
+    const isEqualHelperHandlerbar = function(a, b, opts) {
+        if (a == b) {
+            return true
+        } else { 
+            return false
+        } 
+    };
+    
+
+
+
+            res.render('finanzas/editarformMetodologiaDocContrato', { req, tiene_ppto,presupuestos, tipos_contrato,tiene_garantia, monedas,  contrato : contrato[0], tipoDocumentos,
+                        layout: 'blanco', helpers : {
+                            if_equal : isEqualHelperHandlerbar
+                        }}); 
+    
+});
+
 
 
 router.post('/cargaOpcionesSubStructuraAll', isLoggedIn, async (req, res) => {
@@ -874,6 +1421,52 @@ router.post('/cargaListadoPpto', isLoggedIn, async (req, res) => {
     res.render('finanzas/tablaSub', { req, substructura,  layout: 'blanco'}); 
 });
 
+//contrato
+router.get('/contrato/:id', isLoggedIn, async (req, res) => {
+
+    const { id } = req.params; // id del proyecto que deseamos cargar la información. 
+    try {
+        // informacion 
+        let presupuestos = await pool.query("SELECT * FROM ppto_presupuesto as t1 where t1.id_proyecto = ? ", [id]);
+        let monedas = await pool.query("SELECT * FROM moneda_tipo as t1 where t1.factura = 'Y' ");
+        let proyecto = await pool.query("SELECT * FROM pro_proyectos as t1 where t1.id = ? ", [id]);
+        let tiene_ppto = await pool.query("SELECT * FROM contrato_tiene_ppto ");
+        let tipos_contrato = await pool.query("SELECT * FROM contrato_contrato_tipo "); 
+        let tiene_garantia = await pool.query("SELECT * FROM contrato_tiene_garantia "); 
+
+        
+        let contratos = await pool.query(" SELECT t1.*, "  +
+                                          " t2.descripcion AS tipo, " +
+                                          " t1a.codigo AS codido, " +
+                                          " DATE_FORMAT(t1.fecha_ingreso , '%Y-%m-%d') AS fecha_ingreso, " +
+                                          " if(t1.garantia = 1 , 'SI', 'NO') AS esgarantia, " +
+                                          " t1b.descripcion AS moneda " +
+                                         " FROM contrato_contrato as t1 "  +
+                                         " LEFT JOIN ppto_presupuesto AS t1a ON t1.presupuesto = t1a.id_presupuesto " +
+                                         " LEFT JOIN moneda_tipo AS t1b ON t1.id_moneda = t1b.id_moneda, " +
+                                         " contrato_contrato_tipo AS t2 " + 
+                                         " WHERE  " +
+                                                " t1.id_proyecto= ?" +
+                                         " AND  " +
+	                                            " t1.id_tipo = t2.id " ,[id]);
+
+        //console.log(contratos);
+
+        res.render('finanzas/contrato', { req,presupuestos, tiene_ppto , tipos_contrato, tiene_garantia, monedas,proyecto:proyecto[0],contratos, layout: 'template'}); 
+
+    }catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : finanzas.js \n Error en el directorio: /contrato/:id \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+    }
+
+
+});
 
 router.get('/proyecto/:id', isLoggedIn, async (req, res) => {
     try {
@@ -1044,6 +1637,122 @@ router.post('/proyecto/actualizarDocumentoResplado', isLoggedIn, async (req, res
                         }
                     }));
 
+        });
+        
+
+    } catch (error) {
+        
+        mensajeria.MensajerErrores("\n\n Archivo : finanzas.js \n Error en el directorio: /actualizarDocumentoResplado \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+
+
+    }
+
+}); 
+
+
+router.post('/contrato/actualizarContrato', isLoggedIn, async (req, res) => {
+    try {
+
+        //const { nombre, idppto,idProyecto } = req.body;
+        let {cadena,oldpath,oldname,extension } = "";
+        let {apath_file , anombre_real , anombre_servidor , a_ext_archivo} = "";
+        var form = new formidable.IncomingForm();
+
+        
+
+        form.parse(req, async function (err, fields, files) {
+            
+            let documento =await pool.query("SELECT * FROM contrato_contrato as t1 where t1.id = ? ", [fields.uDoc]);
+
+            if(files.uarchivo.name != "")
+            {
+                cadena = getCadenaAletoria();
+                oldpath = files.uarchivo.path;
+                oldname = files.uarchivo.name;
+                extension = getExtension(oldname);
+
+                cargaDocumentoServidorUpdateContrato(documento[0].path_file,cadena,extension, oldpath);
+            }
+           
+            let registroUpdate = { };
+            if(files.uarchivo.name != "")
+            {
+                // se modifica el archivo
+                registroUpdate ={
+                    contienePpto :fields.contienePpto ,
+                    presupuesto : fields.presupuesto,
+                    id_tipo : fields.tipo,
+                    id_moneda : fields.moneda,
+                    monto :fields.monto ,
+                    garantia :fields.garantia ,
+                    porcgarantia : fields.porcgarantia,
+                    montogarantia : fields.montogarantia,
+                    observacion : fields.observacion,
+                    nombre_real : oldname,
+                    nombre_servidor : cadena,
+                    ext_archivo : extension
+                }
+
+            }
+            else
+            {
+                registroUpdate ={
+                    contienePpto :fields.contienePpto ,
+                    presupuesto : fields.presupuesto,
+                    id_tipo : fields.tipo,
+                    id_moneda : fields.moneda,
+                    monto :fields.monto ,
+                    garantia :fields.garantia ,
+                    porcgarantia : fields.porcgarantia,
+                    montogarantia : fields.montogarantia,
+                    observacion : fields.observacion
+                }
+            }
+            
+            
+            await pool.query('UPDATE contrato_contrato set ? WHERE id = ?', [registroUpdate, fields.uDoc]);
+
+            let registroTracking = {
+                id_contrato : fields.uDoc,
+                id_proyecto : fields.idproyecto,
+                contienePpto : fields.contienePpto,
+                presupuesto : fields.presupuesto,
+                id_tipo : fields.tipo,
+                id_moneda :fields.moneda, 
+                monto : fields.monto,
+                garantia : fields.garantia,
+                porcgarantia : fields.porcgarantia,
+                montogarantia : fields.montogarantia,
+                observacion : fields.observacion,
+                path_file : documento[0].path_file,
+                nombre_real : oldname,
+                nombre_servidor : cadena,
+                ext_archivo : extension,
+                fecha_ingreso : new Date(),
+                id_ingreso : req.user.idUsuario
+            }
+            
+
+
+            //console.log(registroTracking);
+
+            const cargaDocumento = pool.query('INSERT INTO contrato_contrato_tracking  set ? ', [registroTracking]);
+
+
+          
+            res.redirect(   url.format({
+                pathname:'/finanzas/contrato/'+fields.idproyecto,
+                        query: {
+                        "a": 1
+                        }
+                    }));
+                    
         });
         
 

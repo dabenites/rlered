@@ -253,7 +253,6 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                     }
                        );
 
-                //console.log(valorSolMes);
                   
    
                 /// buscar la informacion del proyecto con el id que viene por la ruta GET
@@ -310,6 +309,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
 
                 const cexternos = await pool.query("SELECT " +
+                                                            " 3200 AS valorUFAux," +
+                                                            " t1.fecha_carga  as fecha_carga, " +
                                                             " t1.cc_a_pagar 	AS ccosto, " +
                                                             " t2.descripcion AS moneda, " +
                                                             " t2.simbolo AS simbolo, " +
@@ -346,6 +347,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                             "t1.id_moneda = t2.id_moneda"+
                                                     " UNION " +
                                                     " SELECT  " +
+                                                            " ( SELECT th.valor FROM moneda_valor AS th WHERE th.id_moneda = 4 AND th.fecha_valor = DATE_FORMAT( t1.fecha_aprobacion, '%Y-%m-%d')) AS valorUFAux, " +
+                                                            " DATE_FORMAT( t1.fecha_aprobacion, '%Y-%m-%d') as fecha_carga, " +
                                                             " t2.centroCosto AS ccosto,"+
                                                             " t3a.descripcion AS moneda, " +
                                                             " t3a.simbolo AS simbolo, " +
@@ -378,13 +381,9 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                       " AND  " +
                                                             " t1.id = t3.id_solicitud  ",[id, id]);
       
-
-                 
                 var numHH = 0;
                 let centroCostoHH = [];
 
-                //console.log(moneda);
-                //console.log(cexternos);
 
                 cexternos.forEach(element => {
                                         
@@ -408,7 +407,6 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                         switch(element.simbolo)
                                                         {
                                                                 case "UF":
-                                                                        console.log(element);
                                                                 break;
                                                         }
                                                 break;
@@ -430,13 +428,39 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                                         }
                                                                         
                                                                 break;
+                                                                case "$":
+                                                                                
+
+                                                                                if (element.pcambio === "1")
+                                                                                {
+                                                                                        if(element.uf_valor == "1")
+                                                                                        {
+                                                                                                // REVISAR 
+                                                                                                element.totPro =  new Intl.NumberFormat('de-DE').format(parseInt( element.numhh * element.punitario / element.valorUFAux));
+                                                                                                element.costo =  new Intl.NumberFormat('de-DE').format(parseInt( element.numhh * element.punitario));
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                                element.costo =  new Intl.NumberFormat('de-DE').format(parseInt( element.totPro * element.uf_valor.replace(".","").replace(",",".")));
+                                                                                        }
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                        if(element.uf_valor == "1")
+                                                                                        {
+                                                                                                // REVISAR 
+                                                                                                element.totPro =  new Intl.NumberFormat('de-DE').format(parseInt( element.numhh * element.punitario / element.valorUFAux));
+                                                                                                element.costo =  new Intl.NumberFormat('de-DE').format(parseInt( element.numhh * element.punitario));
+                                                                                        }
+                                                                                }
+                                                                break;
+
                                                         }
                                                 break;
                                                 case "US$":
                                                         switch(element.simbolo)
                                                         {
                                                                 case "UF":// ingresaron el costo externo en UF
-                                                                       // console.log(element);
                                                                         if (element.pcambio === "1") // no es una OC
                                                                         {
                                                                                 let costoUF_Pesos = costoIngresado * parseFloat(element.uf_valor.replace(".",""));
@@ -449,8 +473,6 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                                                 let costoUF_Pesos = element.numhh * element.punitario * element.pcambio;
 
                                                                                 element.costo = new Intl.NumberFormat('de-DE').format(parseInt( costoUF_Pesos));
-                                                                                //console.log(costoUF_Pesos + "  costoUF_Pesos");
-                                                                                //console.log(element.dolar_valor + "  element.dolar_valor");
 
                                                                                 element.totPro = costoUF_Pesos / element.dolar_valor.replace(",",".");
                                                                                 element.totPro = parseFloat(element.totPro).toFixed(2); 
@@ -818,7 +840,6 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                 
                 colaboradores.forEach(element => {  
 
-                        //console.log(element);
 
                         const col = colaboradores.find(user => {return user.nombre === element.nombre });
                                 col.porcentaje = parseFloat(  (col.horastotal /horasTotal)*100 ).toFixed(2);
@@ -833,7 +854,6 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             
             colaboradoresCentroCosto.forEach(
                     element=> {
-                         // console.log(element);
 
                         const containsCentro = !!centroCostoHH.find(centro => {return centro.nombre === element.nombre });
                          if (containsCentro === true)    
@@ -1037,8 +1057,6 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
             facturas.forEach(element => {  
 
-                // console.log(moneda);
-                // console.log(element);
                 if (element.simbolo !== moneda) // la moneda de pago de la factura es distinta a la que se esta viendo en pantalla revisar los montos.
                 {
                         let montoFacturar = 0;
@@ -1062,7 +1080,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                 case "S/":
                                         
                                         let USD_PESO = parseFloat(montoFacturar) * parseFloat(valorDolar);
-                                        //console.log(USD_PESO); 
+                                        
                                         let PESO_SOL = USD_PESO / parseFloat( element.sol_valor);
 
                                         element.monto_a_facturar = parseFloat(PESO_SOL).toFixed(2); // cambiar los DOLARES A SOL 
@@ -1171,6 +1189,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                 datos : ArregloErroresFormateados
             };
 
+            
 
             if (mensaje === "")
             {
@@ -1830,6 +1849,20 @@ router.post('/exportExcelHoras', isLoggedIn, async function (req, res) {
         
           
         });
+
+
+router.get('/buscaErroresProyecto',  async (req, res) => {
+
+        // buscar informacion de los proyectos. 
+
+        let fitrado_proyecto =  await pool.query(sqlProyectos);               
+
+
+        
+
+
+});
+
 
 router.get('/analisisProyectos',  async (req, res) => {
 

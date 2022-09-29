@@ -2422,24 +2422,25 @@ router.post('/editarOC', isLoggedIn, async (req, res) => {
 
   const requerimientos = await pool.query('SELECT t1.*, t2.descripcion as mon, ' +
                                           " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'), "+
+                                          " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'), "+
                                           " if (t1.id_moneda = 4 ,FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * "+
-                                                        " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE') ,0)) AS monto , " +
+                                                        " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE') ,0))) AS monto , " +
                                           " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') , " +
+                                          " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') ,  " +
                                                         " if (t1.id_moneda = 4 , FORMAT( " +
                                                                         " (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) * " +
                                                                         " cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) * " +
                                                                         " cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) " +
-                                                                        "),0,'de_DE') ,0)) AS montopeso " +
+                                                                        "),0,'de_DE') ,0))) AS montopeso " +
                                           ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 '+
                                           ' WHERE t1.id_solicitud = ?  AND t1.id_moneda = t2.id_moneda',[id]); 
-
+ 
 
   let opcionesIVA = [];
   opcionesIVA.push({id:"Y",descripcion:"SI"});
   opcionesIVA.push({id:"N",descripcion:"NO"});
 
-  console.log(oc[0]);
-
+  
     res.render('solicitudes/editarOC', {oc:oc[0],requerimientos, opciones,opcionesIVA, tipo, solicitantes, directores, recepcionador,centroCostos,proyectos, empresas,etapas,monedas, req , layout: 'blanco', helpers : {
         if_equal : isEqualHelperHandlerbar
     }});
@@ -3347,6 +3348,7 @@ router.get('/createPDFPre/:id', isLoggedIn, async (req,res) => {
                                         " FROM orden_compra_requerimiento as t1 WHERE t1.id_solicitud = ?",[id] );
   
 
+  //console.log(requerimientos);
 
   const stream = res.writeHead(200, {
     'Content-Type': 'application/pdf',

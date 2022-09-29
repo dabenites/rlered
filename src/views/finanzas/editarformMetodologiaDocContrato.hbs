@@ -1,0 +1,124 @@
+            <div class="alert alert-secondary" role="alert">
+                <div class="item form-group">
+                    <label class="col-form-label col-md-4 col-sm-4 label-align" for="tieneppto" >Tiene Presupuesto  </label>
+                        <div class="col-md-7 col-sm-7 ">
+                            <select class="form-control" name="contienePpto" id="contienePpto" onchange="cargaPresupuesto(this.value);">
+                                 {{#each tiene_ppto}}
+                                    {{#if (if_equal id ../contrato.contienePpto) }}
+                                        <option value="{{id}}" selected>{{descripcion}}</option>
+                                    {{else}}
+                                        <option value="{{id}}">{{descripcion}}</option>
+                                    {{/if}}
+                                {{/each}} 
+                        </select>
+                    </div>
+                </div>
+                <div class="item form-group" id="opt1a" >
+                    <label class="col-form-label col-md-4 col-sm-4 label-align" for="presupuesto"> Presupuesto  </label>
+                        <div class="col-md-7 col-sm-7 ">
+                            <select class="form-control" name="presupuesto" id="presupuesto">
+                                <option value="0">Seleccione</option>   
+                                    {{#each presupuestos}}
+                                        {{#if (if_equal id_presupuesto ../contrato.presupuesto) }}
+                                            <option value="{{id_presupuesto}}" selected>{{codigo}}</option>   
+                                        {{else}}
+                                            <option value="{{id_presupuesto}}">{{codigo}}</option>   
+                                        {{/if}} 
+                                    {{/each}} 
+                            </select>
+                        </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-form-label col-md-4 col-sm-4 label-align" for="tipo" > Tipo</label>
+                        <div class="col-md-7 col-sm-7 ">
+                            <select class="form-control" name="tipo" id="tipo" onchange="cargaGarantia(this.value);">
+                                 <option value="0">Seleccione</option>   
+                                {{#each tipos_contrato}} 
+                                    {{#if (if_equal id ../contrato.id_tipo) }}
+                                        <option value="{{id}}" selected>{{descripcion}}</option>    
+                                    {{else}}
+                                        <option value="{{id}}">{{descripcion}}</option>    
+                                    {{/if}} 
+                                    
+                                {{/each}} 
+                            </select>
+                        </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-form-label col-md-4 col-sm-4 label-align" for="presupuesto"> Moneda </label>
+                        <div class="col-md-7 col-sm-7 ">
+                            <select class="form-control" name="moneda" id="moneda">
+                                <option value="0">Seleccione</option>   
+                                    {{#each monedas}}
+                                        {{#if (if_equal id_moneda ../contrato.id_moneda) }}
+                                            <option value="{{id_moneda}}" selected >{{descripcion}}</option>   
+                                        {{else}}
+                                            <option value="{{id_moneda}}" >{{descripcion}}</option>   
+                                        {{/if}} 
+                                        
+                                    {{/each}} 
+                            </select>
+                        </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">Monto</label>
+                        <div class="col-md-7 col-sm-7">
+							<input type="text" id="monto" name="monto"  class="form-control" value="{{contrato.monto}}">
+					    </div>
+                </div>
+                <div class="item form-group" id="opt2a">
+                    <label class="col-form-label col-md-4 col-sm-4 label-align" for="tipo"> Garantia  </label>
+                        <div class="col-md-7 col-sm-7 ">
+                            <select class="form-control" name="garantia" id="garantia">
+                                
+                                <option value="0">Seleccione</option>  
+
+                                 {{#each tiene_garantia}} 
+                                    {{#if (if_equal id ../contrato.garantia) }}
+                                        <option value="{{id}}" selected>{{descripcion}}</option>    
+                                    {{else}}
+                                        <option value="{{id}}">{{descripcion}}</option>    
+                                    {{/if}} 
+                                    
+                                {{/each}} 
+
+                                                            
+                            </select>
+                        </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">% Garantia</label>
+                        <div class="col-md-7 col-sm-7">
+							<input type="text" id="porcgarantia" name="porcgarantia"  class="form-control" value="{{contrato.porcgarantia}}">
+					    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">Monto Garantia</label>
+                        <div class="col-md-7 col-sm-7">
+							<input type="text" id="montogarantia" name="montogarantia"  class="form-control" value="{{contrato.montogarantia}}">
+					    </div>
+                </div>
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">Observación </label>
+                            <div class="col-md-7">
+                                <textarea id="observacion" name="observacion" class="form-control" rows="3">{{contrato.observacion}}</textarea>
+                            </div>
+                    </div>
+
+                    <div class="item form-group">
+                                    <label class="col-form-label col-md-4 col-sm-4 label-align" for="titulo">Documento</label>
+                                    <div class="col-md-7">
+                                             <input type="file" class="form-control" id="uarchivo" name="uarchivo"> 
+                                    </div>
+                    </div>
+
+                    <div class="item form-group">
+					    <label class="col-form-label col-md-3" ></label>
+                            <div class="col-md-2">
+							</div>
+                            <div class="col-md-2">
+                                    <input type="hidden" name="id_proyecto" id="id_proyecto" value="{{contrato.id_proyecto}}">
+                                   
+                            </div>
+                    </div>
+                </div>

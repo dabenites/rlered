@@ -39,21 +39,23 @@
   <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
-
+<div class="col-md-12">
+     <div class="x_panel">
+            <div class="x_title">
+                  <h2><small>{{proyecto.year}}-{{proyecto.code}} : {{proyecto.nombre}}</small></h2> 
+                  <div class="clearfix"></div>
+            </div>
+     </div>
+</div>
 <div class="col-md-12">
           <div class="x_panel">
             <div class="x_title">
-                 <h2><small>{{proyecto.year}}-{{proyecto.code}} : {{proyecto.nombre}}</small></h2>
+                   <!-- <h2><small>{{proyecto.year}}-{{proyecto.code}} : {{proyecto.nombre}}</small></h2> -->
+                  <h2> Estructuras Asociadas </h2>
                   <div class="clearfix"></div>
             </div>
             <div class="x_content">
                 <div class="row">
-                    <div class="col-md-3">
-                        <div class="alert alert-secondary" role="alert">
-                            Agregar divisiones a la metodologia de pago, en caso que solo sea un edificio unitario se tomara como N/A.
-                            Ejemplo de divisiones : Torre A , Torre B , Placa
-                        </div>
-                    </div>
                     <div class="col-md-3">
                         <form id="cargaNombre" action="#" method="POST">
                             <div class="item form-group">
@@ -83,9 +85,33 @@
                             </div>
                         </form>
                     </div>
-                     <div class="col-md-3" name="listadoNombrePpto" id="listadoNombrePpto">
+                     <div class="col-md-2" name="listadoNombrePpto" id="listadoNombrePpto">
 
+                        <ul class="list-group">
+                            {{#each substructura}}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{descripcion}}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-square-fill" viewBox="0 0 16 16" onclick="EliminarRegistro({{id}})";>
+                                    <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm3.354 4.646L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 1 1 .708-.708z"/>
+                                    </svg>
+                                    <!-- 
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="EliminarRegistro({{id}});">
+                                    X
+                                    </button>
+                                    -->
+                                </li>
+                            {{/each}}
+                        </ul>
                      </div>
+                    <div class="col-md-3">
+
+                    </div>  
+                     <div class="col-md-3">
+                        <div class="alert alert-secondary" role="alert">
+                            <b>Estructuras Asociadas</b><br>
+                            Puedes agregar divisiones al proyecto, para la metodología de pago (ej. Torre A , Torre B , Placa, etc.). En caso que no tenga divisiones, se indica como como N/A.
+                        </div>
+                    </div>
                 </div>  
             </div>
           </div>
@@ -94,11 +120,12 @@
 <div class="col-md-4">
     <div class="x_panel">
         <div class="x_title">
-            <h2>Ingresar un cobro o Metodologia</h2>
+            <h2>Ingresar Cobro</h2>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            <div class="item form-group">
+            <div class="alert alert-secondary" role="alert">
+                <div class="item form-group">
 					<label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Tipo Cobro<span class="required"></span> </label>
 					<div class="col-md-6 col-sm-6 ">
 						<select class="form-control" name="tipoCobro" id="tipoCobro" onchange="cargaOpcionCobro(this.value);">
@@ -107,7 +134,10 @@
                                 <option value="2">Cobro Adicional</option>
                         </select>
 					</div>
-			</div>
+                
+			    </div>
+            </div>
+            
              <div class="clearfix"></div>
              <br>
              
@@ -123,7 +153,7 @@
     <div class="x_panel">
         <ul class="nav nav-tabs justify-content-end bar_tabs" id="myTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="metodologia-tab" data-toggle="tab" href="#metodologia" role="tab" aria-controls="metodologia" aria-selected="true">Metodologia Pago</a>
+                    <a class="nav-link active" id="metodologia-tab" data-toggle="tab" href="#metodologia" role="tab" aria-controls="metodologia" aria-selected="true">Metodología Pago</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="cobro-tab" data-toggle="tab" href="#cobro" role="tab" aria-controls="cobro" aria-selected="false">Cobro Adicional</a>
@@ -139,8 +169,8 @@
                             <th>Hito</th>
                             <th>Moneda</th>
                             <th>%</th>
-                            <th>monto</th>
-                            <th>opciones</th>
+                            <th>Monto</th>
+                            <th>Ppciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -203,8 +233,8 @@
                             <th>Motivo</th>
                             <th>Moneda</th>
                             <th>%</th>
-                            <th>monto</th>
-                            <th>opciones</th>
+                            <th>Monto</th>
+                            <th>Opciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -268,7 +298,7 @@
 <div class="col-md-12">
     <div class="x_panel">
         <div class="x_title">
-            <h2>Documentos de respaldo</h2>
+            <h2>Documentos de Respaldo</h2>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -319,7 +349,7 @@
                             <thead>
                                 <tr>
                                         <th>Respaldo Facturacion</th>
-                                        <th>Numero</th>
+                                        <th>Número</th>
                                         <th>Monto</th>
                                         <th>Doc</th>
                                         <th></th>
@@ -344,6 +374,12 @@
                                                     <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
                                                 </svg>
                                                 Editar
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="EliminarRegistroDocRespaldo({{idDoc}});">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"></path>
+                                            </svg>
+                                                            Eliminar
                                             </button>
                                             <div class="modal fade" id="cver{{idDoc}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -566,6 +602,37 @@ function EliminarRegistro(Id)
                                     });
                     $("#listadoNombrePpto").html(data);
               });
+
+}
+
+
+function EliminarRegistroDocRespaldo(id)
+{
+    let informacion = {  id };
+
+
+$.ajax({
+              type: 'post',
+              //url: '/finanzas/ocCambioEstado',
+              url: '/finanzas/EliminarDocRespaldo',
+              data: informacion,
+              dataType: 'text'
+               })
+              .done(function (data) {
+                
+              });
+
+  toastr.error('Registro Eliminado', 'Titulo', {
+                                        "progressBar": true
+                                    });
+
+    setTimeout(() => {  console.log("ejecutando");
+                        
+                        }
+                    , 5000);
+
+    location.reload();
+
 
 }
 

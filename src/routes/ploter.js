@@ -47,7 +47,14 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
             esDocumento = true;
         break;   
     }
-   // console.log(esDocumento);
+    switch(req.user.idUsuario)
+    {
+        case 64:
+            esDocumento = true;
+        break;
+    }
+
+    //console.log(req.user);
 
     var mensaje = -1;
   
@@ -71,7 +78,6 @@ router.get('/ploteo', isLoggedIn, async (req, res) => {
                             };
                     if (esDocumento === true)             
                     {
-                        console.log("asdad");
                         res.render('ploter/ingresar', {documento:'ok', verToask, ploteos_pendiente, ploteos_proceso ,ploteos_terminados, req ,layout: 'template'});
                     }
                     else

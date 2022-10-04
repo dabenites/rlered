@@ -1345,6 +1345,21 @@ router.post('/EliminarRegistroMetoPago', isLoggedIn, async (req, res) => {
 
 });
 
+router.post('/EliminarDocRespaldo', isLoggedIn, async (req, res) => {
+
+    const {  id } = req.body;
+
+    let borradoMetodologia = await pool.query('DELETE FROM contrato_documento WHERE id = ? LIMIT 1;', [id]);
+
+
+    
+
+    res.send("ok");
+
+});
+
+//EliminarDocRespaldo
+
 
 router.post('/EliminarSubStructura', isLoggedIn, async (req, res) => {
 
@@ -1531,7 +1546,26 @@ router.get('/proyecto/:id', isLoggedIn, async (req, res) => {
                                             " where  " +
                                             " t1.id_tipo = t2.id AND " +
                                             " t1.id_proyecto = ? ", [id]);
-        res.render('finanzas/proyecto', { req ,proyecto:proyecto[0] ,presupuestos, tipoDocumentos,  metodologia_pago, pago_adicional,respaldo_doc, layout: 'template'}); 
+
+        let substructura =await pool.query("SELECT * FROM metod_subestructura as t1 where t1.id_proyecto = ? ", [id]);
+
+        //console.log(substructura);
+
+        metodologia_pago.forEach(element => {
+            element.monto = new Intl.NumberFormat('de-DE').format(parseInt( element.monto));
+        });
+
+        pago_adicional.forEach(element => {
+            element.monto = new Intl.NumberFormat('de-DE').format(parseInt( element.monto));
+        });
+
+        respaldo_doc.forEach(element => {
+            element.monto = new Intl.NumberFormat('de-DE').format(parseInt( element.monto));
+        });
+
+        
+
+        res.render('finanzas/proyecto', { req ,proyecto:proyecto[0] ,presupuestos,substructura, tipoDocumentos,  metodologia_pago, pago_adicional,respaldo_doc, layout: 'template'}); 
         
 
     } catch (error) {

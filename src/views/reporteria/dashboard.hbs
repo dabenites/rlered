@@ -141,6 +141,13 @@
             <div class="x_title">
                 <h2>{{proyecto.year}}-{{proyecto.code}} : {{proyecto.nombre}}</h2>
                     <ul class="nav navbar-right panel_toolbox">
+                        <a type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#cargaExtra"> <i class="fa fa-plus" aria-hidden="true"> Cargar Costo Adicional</i> </a> 
+
+                            <div class="modal fade" id="cargaExtra" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                 <div class="modal-dialog modal-dialog-centered" role="document">
+                                        ...
+                                 </div>
+                            </div>
 
                          {{#if (if_equal registros.cantidad 1)}}
                             

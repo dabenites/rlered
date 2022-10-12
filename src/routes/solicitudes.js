@@ -3466,21 +3466,56 @@ router.post('/exportProyectosExcel', isLoggedIn, async function (req, res) {
 
     var worksheet = workbook.addWorksheet('some-worksheet');
 
-    worksheet.addRow(['Código', 'Nombre', 'Servicio','Tipo' , 'Superficie', 'N° Pisos', 'N° Subte',
-                      'Mandante', 'Arquitecto', 'Director', 'Jefe Proyecto', 'Num Planos',
-                     'HH Ing Interno', 'HH Ing Externo','Total HH Ing', 'HH Dib Interno','HH Dib Externo','Total HH Dib',
-                     'M2/Plano','HH Dib/Plano','m2/ HH Dib',
-                     'Cos Dib/Plano','Costo Dib/hh Dib','m2/ HH Ing','Costo Ing / hh ing','% mod',
-                    'Valor del Proyecto (UF)', 'Adicionales (UF)','Total Proyecto (UF)','Costos Totales (UF)', 'Margen Proyecto (UF)']).commit();
+    worksheet.addRow(['Código', 
+                      'Nombre', 
+                      'Servicio',
+                      'Tipo' , 
+                      'Superficie', 
+                      'N° Pisos', 
+                      'N° Subte',
+                      'Mandante', 
+                      'Arquitecto', 
+                      'Director', 
+                      'Jefe Proyecto', 
+                      'Num Planos',
+                     'HH Ing Interno', 
+                     'HH Ing Externo',
+                     'Total HH Ing', 
+                     'HH Dib Interno',
+                     'HH Dib Externo',
+                     'Total HH Dib',
+                     'M2/Plano',
+                     'HH Dib/Plano',
+                     'm2/ HH Dib',
+                     'Cos Dib/Plano',
+                     'Costo Dib/hh Dib',
+                     'm2/ HH Ing',
+                     'Costo Ing / hh ing',
+                     '% mod',
+                    'Valor del Proyecto (UF)', 
+                    'Adicionales ROC (UF)',
+                    'Adicionales Ingresado (UF)',
+                    'Total Proyecto (UF)',
+                    'Costos Totales (UF)', 
+                    'Margen Proyecto (UF)',
+                    'Total Facturado',
+                    'Total Pagado']).commit();
 
     for (const p of proyectos) {
+
+        // Formateo de numeros.
+        if (p.num_pisos == "" ) {p.num_pisos = 0;}
+
+        if(isNaN(p.num_pisos)){
+            console.log(p);
+        }
 
         worksheet.addRow([p.year + "-" + p.code,
                           p.nombre,
                           p.servicio,
                           p.tipo,
                           p.superficie,
-                          p.num_pisos,
+                          parseInt(p.num_pisos),
                           p.num_subte,
                           p.mandante,
                           p.arquitecto,
@@ -3503,9 +3538,12 @@ router.post('/exportProyectosExcel', isLoggedIn, async function (req, res) {
                           p.porc_mod,
                           p.valor_proyecto,
                           p.adicionales,
+                          "adicionales ingresados",
                           p.total_proyecto,
                           p.costo_totales,
-                          p.margen_proyecto]);
+                          p.margen_proyecto,
+                        "total facturado",
+                        "total pagado"]);
                       }
 
 

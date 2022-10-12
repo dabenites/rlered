@@ -5,11 +5,12 @@ const pool = require('../database');
 const { isEmptyObject } = require('jquery');
 
 const mensajeria = require('../mensajeria/mail');
-
+var dateFormat = require('dateformat');
 var url = require('url');
 
 var Excel = require('exceljs');
 const { parse } = require('path');
+const { tpu_v1 } = require('googleapis');
 
 router.get('/proyectos',isLoggedIn,  async (req, res) => {
     
@@ -195,6 +196,11 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                                 " t1.id_proyecto = ? ", [id] );
 
 
+                // listado de costos adiocionales que estan en la tabla de facturas. 
+                let costoAdiocionales = await pool.query("SELECT t2.simbolo, t3.Nombre, t1.monto_a_facturar, t1.id,t1.fecha_solicitud  FROM fact_facturas AS t1, moneda_tipo AS t2, sys_usuario AS t3   " +
+		                                         " WHERE t1.id_estado =  6 AND t1.id_proyecto = ? AND t1.id_tipo_moneda = t2.id_moneda AND t1.id_solicitante = t3.idUsuario" , [id]);
+
+
                 // valores de moneda de UF 
                 const valorUFMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
                 const valorDolarMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 2 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
@@ -300,7 +306,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                     " AND " +
                                                             " t1.id_proyecto = ? " +
                                                     " AND  " +
-                                                            " t1.id_estado in (1,2,3) "+
+                                                            " t1.id_estado in (0,1,2,3,6) "+
                                                     " AND  " +
                                                             " t1.id_tipo_moneda = t4.id_moneda" +
                                                     " AND " +
@@ -1046,14 +1052,18 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
         
         
             let porcentaje = proyecto[0].porcentaje_costo / 100;
-            let costoEsperado = (parseFloat( proyecto[0].valor_proyecto) * porcentaje).toFixed(2);
+
+
+
         
           
             // facturas. 
+            let totalFacturadoIngresado = 0;
             let totalFacturado = 0;
             let totalFacturadoDolar = 0;
             let totalPagado = 0;
             let totalPagadoDolar = 0;
+            let totalRocPagado = 0;
 
             facturas.forEach(element => {  
 
@@ -1062,11 +1072,42 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         let montoFacturar = 0;
                         let valorUF = 0;
                         let valorDolar = 0;
+                        
+
+                        if (element.estadoFac == "Ingresado")
+                        {
+                                
+                                let fechaBuscar = dateFormat(element.fecha_solicitud, "yyyy-mm");
+
+                                let containsFechaSol = !!valorSolMensual.find(fecha => {return fecha.fecha === fechaBuscar});
+                                let containsFechaUf = !!valorUfMensual.find(fecha => {return fecha.fecha === fechaBuscar});
+                                let containsFechaUsd = !!valorDolarMensual.find(fecha => {return fecha.fecha === fechaBuscar});
+                                
+
+                                if (containsFechaSol === true){
+                                        const colSOL = valorSolMensual.find(fecha => {return fecha.fecha === fechaBuscar });
+                                        element.sol_valor = colSOL.valor.toString().replace(".",",");
+                                }
+                                if (containsFechaUf === true){
+                                        const colUF = valorUfMensual.find(fecha => {return fecha.fecha === fechaBuscar });
+                                        element.uf_valor = colUF.valor.toString().replace(".",",");
+                                }
+                                if (containsFechaUsd === true){
+                                        const colUSD = valorDolarMensual.find(fecha => {return fecha.fecha === fechaBuscar });
+                                        element.dolar_valor = colUSD.valor.toString().replace(".",",");
+                                }
+                        
+                        }
 
                         if (element.monto_a_facturar !== null){ montoFacturar = parseFloat(element.monto_a_facturar.replace(".",""));}else{ montoFacturar =element.monto_a_facturar;}
                         if (element.uf_valor !== null){valorUF = parseFloat(element.uf_valor.replace(".","")); }else{valorUF =element.uf_valor; }
                         if (element.dolar_valor !== null){valorDolar = parseFloat(element.dolar_valor.replace(".",""));}else {valorDolar = element.dolar_valor;}
                         // intentar traer el valor del dolar 
+
+
+        
+
+        //const containsFecha = !!valorSolMensual.find(fecha => {return fecha.fecha === element.fecha });
                 
                    switch(element.simbolo) // simbolo de la entrada de la factura 
                    {
@@ -1113,6 +1154,18 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         break;
                                 }  
                         break;
+
+                        case ("S/"):
+                                {
+                                        switch(moneda) // de salida en pantalla 
+                                        {
+                                                case "UF":
+                                                        let montoSOL_UF = montoFacturar * element.sol_valor / valorUF ;
+                                                        element.monto_a_facturar = parseFloat(montoSOL_UF).toFixed(2);
+                                                break;
+                                        }     
+                                }
+
                        
                    }
                 }
@@ -1126,16 +1179,35 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                 {
                         // ___
                         totalPagado = parseFloat(totalPagado) + parseFloat( element.monto_a_facturar.replace(",","."));
+                        //totalRocPagado
+                        if (element.roc == "SI")
+                        {
+                                totalRocPagado = parseFloat(totalRocPagado) + parseFloat( element.monto_a_facturar);
+                        }
                 }
-
-                totalFacturado = parseFloat(totalFacturado) + parseFloat( element.monto_a_facturar);
+                if (element.estadoFac != "Ingresado")
+                {
+                        totalFacturado = parseFloat(totalFacturado) + parseFloat( element.monto_a_facturar);
+                }
+                else
+                {
+                        //console.log(element.monto_a_facturar);
+                        totalFacturadoIngresado = parseFloat(totalFacturadoIngresado) + parseFloat( element.monto_a_facturar);
+                }
+                
             });
 
             
 
             totalFacturado = parseFloat(totalFacturado).toFixed(2);
+            totalFacturadoIngresado = parseFloat(totalFacturadoIngresado).toFixed(2);
             totalPagado = parseFloat(totalPagado).toFixed(2);
 
+            let suma_a = parseFloat( proyecto[0].valor_proyecto);
+            let suma_b = parseFloat( totalFacturadoIngresado);
+            let suma_c = suma_a + suma_b + totalRocPagado;
+           
+            let costoEsperado = parseFloat( suma_c * porcentaje).toFixed(2);
 
             // revisar los valores de las de las facturas. 
             const isEqualHelperHandlerbar = function(a, b, opts) {
@@ -1193,7 +1265,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
             if (mensaje === "")
             {
-                    res.render('reporteria/dashboard', {registros, selectUF,selectUSD,selectSOL ,proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado, 
+                    res.render('reporteria/dashboard', {totalFacturadoIngresado, costoAdiocionales, registros, selectUF,selectUSD,selectSOL ,proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado, 
                                                         modificaciones:modificaciones[0], costoEsperado,costoEsperadoDolar,costoEsperadoSol, colaboradoresCentroCostoGeneral, 
                                                         colaboradoresCentroCosto, colaboradores, erroresCosto, varTotalProyecto, numHH, 
                                                         centro_costo, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template', helpers : {
@@ -1202,7 +1274,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             }
             else
             {
-                    res.render('reporteria/dashboard', {registros, selectUF,selectUSD,selectSOL , proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado,
+                    res.render('reporteria/dashboard', {totalFacturadoIngresado, costoAdiocionales, registros, selectUF,selectUSD,selectSOL , proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado,
                                                         modificaciones:modificaciones[0], costoEsperado,
                                                         colaboradoresCentroCosto, colaboradores, erroresCosto, mensaje, varTotalProyecto, numHH, centro_costo, 
                                                         costoEsperadoDolar, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template', helpers : {
@@ -1652,6 +1724,49 @@ router.post('/uptProyecto', isLoggedIn, async function (req, res) {
         res.send("1");
 });
 
+
+//cargaCostoAdicional 
+router.post('/cargaCostoAdicional', isLoggedIn, async function (req, res) {
+
+        let idProyecto = req.body["idProyecto"];
+        let ingreso_tipo_moneda = req.body["ingreso_tipo_moneda"];
+        let ingreso_monto = req.body["ingreso_monto"];
+
+        // cargar 
+        //fact_facturas
+
+        var fecha_ingreso = dateFormat(new Date(), "yyyy-mm-dd h:MM:ss");
+
+        let registro = {
+                fecha_solicitud : fecha_ingreso,
+                id_proyecto : idProyecto,
+                id_tipo_moneda : ingreso_tipo_moneda,
+                id_estado : 6,
+                monto_a_facturar : ingreso_monto,
+                id_solicitante : req.user.idUsuario,
+                roc : ''
+        };
+
+        
+        const idLogIngreso = await pool.query('INSERT INTO fact_facturas set ?', [registro]);
+
+        res.send("1");
+
+});
+
+//eliminarCostoAdiocional 
+router.post('/eliminarCostoAdiocional', isLoggedIn, async function (req, res) {
+
+        let iId = req.body["iId"];
+
+        
+        const idDelete = await pool.query('DELETE FROM `fact_facturas` WHERE  `id`= ? LIMIT 1;', [iId]);
+
+        res.send("1");
+
+});
+
+
 router.post('/avance', isLoggedIn, async function (req, res) {
 
    let avance = {
@@ -1874,8 +1989,22 @@ router.get('/analisisProyectos',  async (req, res) => {
                                             " FROM " + 
                                             " moneda_valor AS t1 " +
                                             " WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
+        
+        const valorUSDMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 2 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
+
+        const valorSOLMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 10 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
 
         let valorUfMensual = []; 
+        let valorUsdMensual = [];
+        let valorSolMensual = [];
                                           
                             
         valorUFMes.forEach(element => {    
@@ -1889,6 +2018,31 @@ router.get('/analisisProyectos',  async (req, res) => {
                                                         }
                                         }
                            );
+
+        valorUSDMes.forEach(element => {    
+                                const containsFecha = !!valorUsdMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                        if (containsFecha === false)
+                                                {
+                                                        valorUsdMensual.push({ 
+                                                                                    fecha : element.fecha,
+                                                                                    valor : element.valor
+                                                                            });
+                                                }
+                                }
+                   );
+
+        valorSOLMes.forEach(element => {    
+                        const containsFecha = !!valorSolMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                if (containsFecha === false)
+                                        {
+                                                valorSolMensual.push({ 
+                                                                            fecha : element.fecha,
+                                                                            valor : element.valor
+                                                                    });
+                                        }
+                        }
+           );
+
 
         let sqlProyectos = " SELECT  " +
                                 " t1.id,"+
@@ -1915,11 +2069,14 @@ router.get('/analisisProyectos',  async (req, res) => {
                                " LEFT JOIN contacto AS t5 ON t1.id_arquitecto = t5.id"+
                                " LEFT JOIN sys_usuario AS t6 ON t1.id_director = t6.idUsuario"+
                                " LEFT JOIN sys_usuario AS t7 ON t1.id_jefe = t7.idUsuario "+
-                        " WHERE "+
-                                " t1.id_jefe in (8 , 52 , 73, 81 , 39, 21, 25,27,18,40,86,43,35,6,15,174,80,104,28,65,127,46,114,132,48,139,200,97) ";//+
+                         " WHERE " +
+                            " t1.id_jefe in (8 , 52 , 73, 81 , 39, 21, 25,27,18,40,86,43,35,6,15,174,80,104,28,65,127,46,114,132,48,139,200,97) ";//+
+                           // " t1.id_jefe in (8) "+//+
+                            // "  t1.id in (2011,2015) ";
+                                   //"  t1.id in (2316) ";
                       //        " t1.id_jefe in ( 81 ) ";
-                      // " AND " +
-                      //        " t1.id = 1977";
+                       //" AND " +
+                         //    " t1.id = 2570";
 
         //process.exit();
 
@@ -1938,6 +2095,9 @@ router.get('/analisisProyectos',  async (req, res) => {
                 star++;
                 //preguntar la informacion
                 //let informacionProyecto = await getInfoProyecto(p.id);
+
+                let msj_proyecto = "";
+                let msj_registro = {};
                 
                 try{
                     // SECTOR DE LAS HORAS INTERNAS DEL PROYECTO     
@@ -1977,7 +2137,7 @@ router.get('/analisisProyectos',  async (req, res) => {
                 let metro_por_plano = "";
                 if (isNaN(parseFloat(p.num_plano_estimado)))
                 {
-                        metro_por_plano = ""; 
+                        metro_por_plano = "0"; 
                 }
                 else
                 {
@@ -1997,6 +2157,8 @@ router.get('/analisisProyectos',  async (req, res) => {
                 const valores = await getCostosInternoProyecto(p.id); 
                 const costosInternoPorCentroCosto = await getDataCostoInterno(valores, valorUFMes);
                 
+
+
                 let costoTotal = 0; // costo total del proyecto sumatoria interno + externo 
                 costosInternoPorCentroCosto.forEach(costoInterno => {
                         if (costoInterno.nombre == "INGENIERIA"){cst_int_ing = parseFloat(costoInterno.costoUF);}
@@ -2036,11 +2198,11 @@ router.get('/analisisProyectos',  async (req, res) => {
 
                 if (metro_por_plano == "")
                 {
-                        hh_ing_plano = "";
-                        hh_dib_plano = "";
-                        hh_cord_plano = "";
-                        hh_imasd_plano = "";
-                        hh_obra_plano = "";
+                        hh_ing_plano = "0";
+                        hh_dib_plano = "0";
+                        hh_cord_plano = "0";
+                        hh_imasd_plano = "0";
+                        hh_obra_plano = "0";
                 }
                 
                 let m2_hh_ing =  parseFloat(p.superficie_pre) / (hh_ext_ing + hh_int_ing); if (m2_hh_ing === Infinity){m2_hh_ing = 0;}
@@ -2070,11 +2232,11 @@ router.get('/analisisProyectos',  async (req, res) => {
                 
                 if (metro_por_plano == "")
                 {
-                        cst_ing_plano = "";
-                        cst_dib_plano = "";
-                        cst_cord_plano = "";
-                        cst_imasd_plano = "";
-                        cst_obra_plano = "";
+                        cst_ing_plano = "0";
+                        cst_dib_plano = "0";
+                        cst_cord_plano = "0";
+                        cst_imasd_plano = "0";
+                        cst_obra_plano = "0";
                 }
 
                 let cst_ing_hh = (cst_ext_ing + cst_int_ing) / (hh_ext_ing + hh_int_ing) ; if (isNaN(parseFloat(cst_ing_hh))){cst_ing_hh = 0;}
@@ -2098,22 +2260,72 @@ router.get('/analisisProyectos',  async (req, res) => {
                 }
                 
                 
-                let data_facturacion_proyecto = await getDataFacturacionProyecto(p.id);;
-                let total_facturacion = await getTotalFacturacionProyecto(data_facturacion_proyecto);
+                let data_facturacion_proyecto = await getDataFacturacionProyecto(p.id);
+                //console.log(data_facturacion_proyecto);
+                //let valorUfMensual = []; 
+                //let valorUsdMensual = [];
+                //let valorSolMensual = [];
+                let total_facturacion = await getTotalFacturacionProyecto(data_facturacion_proyecto , valorUfMensual , valorUsdMensual , valorSolMensual);
 
                 let totalProyecto = "";
                 let margen_proyecto = "";
                 if (p.valor_proyecto == "" || p.valor_proyecto == null)
                 {
-                        totalProyecto = "";
-                        margen_proyecto = "";
+                        totalProyecto = "0";
+                        margen_proyecto = "0";
                 }
                 else
                 {
-                        totalProyecto = parseFloat( p.valor_proyecto) + parseFloat( total_facturacion["adicional"]);
-                        margen_proyecto = parseFloat( p.valor_proyecto) + parseFloat( total_facturacion["adicional"]) - parseFloat(costoTotal);
+                        totalProyecto = parseFloat( p.valor_proyecto) + parseFloat( total_facturacion["adicional"]) + parseFloat( total_facturacion["adicional_ingresado"]);
+                        margen_proyecto = parseFloat( p.valor_proyecto) + parseFloat( total_facturacion["adicional"]) + parseFloat( total_facturacion["adicional_ingresado"]) - parseFloat(costoTotal);
                 }
                 
+
+                // validar numero de pisos. 
+                if (p.num_pisos == "" ||p.num_pisos == null )
+                {
+                        p.num_pisos = 0;    
+                }
+
+                // validar num subterraneo
+                if (p.num_subterraneo == "" ||p.num_subterraneo == null )
+                {
+                        p.num_subterraneo = 0;    
+                }
+
+                // validar superficie lo dejamos en 1 entregado por lorenzo.
+                if (p.superficie_pre == "" ||p.superficie_pre == null )
+                {
+                        p.superficie_pre = 1;    
+                }
+
+                // validar numero de planos estimados
+                if (p.num_plano_estimado == "" ||p.num_plano_estimado == null )
+                {
+                        p.num_plano_estimado = 1;    
+                }
+                // validar valor del proyecto 
+                if (p.valor_proyecto == "" ||p.valor_proyecto == null )
+                {
+                        p.valor_proyecto = 0;    
+                }
+
+                //
+                if (isNaN(parseFloat(hh_ing_plano))){ hh_ing_plano = "0";}
+                if (isNaN(parseFloat(hh_dib_plano))){ hh_dib_plano = "0";}
+                if (isNaN(parseFloat(hh_cord_plano))){ hh_cord_plano = "0";}
+                if (isNaN(parseFloat(hh_imasd_plano))){ hh_imasd_plano = "0";}
+                if (isNaN(parseFloat(hh_obra_plano))){ hh_obra_plano = "0";}
+
+                if (isNaN(parseFloat(cst_ing_plano))){ cst_ing_plano = "0";}
+                if (isNaN(parseFloat(cst_dib_plano))){ cst_dib_plano = "0";}
+                if (isNaN(parseFloat(cst_cord_plano))){ cst_cord_plano = "0";}
+                if (isNaN(parseFloat(cst_imasd_plano))){ cst_imasd_plano = "0";}
+                if (isNaN(parseFloat(cst_obra_plano))){ cst_obra_plano = "0";}
+
+
+
+                msj_proyecto = p.id;
                 let registro = {
                         id_proyecto: p.id,
                         id_cabecera : idCabecera.insertId,
@@ -2135,60 +2347,72 @@ router.get('/analisisProyectos',  async (req, res) => {
                         hh_int_coordinacion : hh_int_cord,
                         hh_int_imasd : hh_int_imasd,
                         hh_int_obra : hh_int_obra ,
+                        hh_int_totales : hh_int_ing + hh_int_dib + hh_int_cord + hh_int_imasd +hh_int_obra ,
                         hh_ext_ingenieria : hh_ext_ing,
                         hh_ext_dibujo : hh_ext_dib,
                         hh_ext_coordinacion : hh_ext_cord,
                         hh_ext_imasd : hh_ext_imasd,
                         hh_ext_obra : hh_ext_obra,
+                        hh_ext_totales : hh_ext_ing + hh_ext_dib + hh_ext_cord +hh_ext_imasd +hh_ext_obra,
                         metro_por_plano : metro_por_plano,
                         cst_int_ing :cst_int_ing,
                         cst_int_dib : cst_int_dib,
-                        cst_ext_cord : cst_int_cord,
+                        cst_int_cord : cst_int_cord,
                         cst_int_imasd : cst_int_imasd,
                         cst_int_obra :  cst_int_obra,
+                        cst_int_total : cst_int_ing + cst_int_dib +cst_int_cord +cst_int_imasd +cst_int_obra,
                         cst_ext_ing: cst_ext_ing,
                         cst_ext_dib : cst_ext_dib,
                         cst_ext_cord : cst_ext_cord,
                         cst_ext_imasd :  cst_ext_imasd,
                         cst_ext_obra : cst_ext_obra,
+                        cst_ext_total : cst_ext_ing + cst_ext_dib + cst_ext_cord + cst_ext_imasd +cst_ext_obra,
                         hh_ing_plano :hh_ing_plano,
                         hh_dib_plano :hh_dib_plano,
                         hh_cord_plano : hh_cord_plano,
                         hh_imasd_plano : hh_imasd_plano,
                         hh_obra_plano : hh_obra_plano,
+                        hh_total_plano : hh_ing_plano + hh_dib_plano + hh_cord_plano + hh_imasd_plano + hh_obra_plano ,
                         m2_hh_ing: m2_hh_ing,
                         m2_hh_dib: m2_hh_dib,
                         m2_hh_cord: m2_hh_cord,
                         m2_hh_imasd: m2_hh_imasd,
                         m2_hh_obra: m2_hh_obra,
+                        m2_hh_total : m2_hh_ing + m2_hh_dib +m2_hh_cord +  m2_hh_imasd + m2_hh_obra,
                         cst_ing_plano : cst_ing_plano,
                         cst_dib_plano : cst_dib_plano,
                         cst_cord_plano : cst_cord_plano,
                         cst_imasd_plano : cst_imasd_plano,
                         cst_obra_plano : cst_obra_plano,
+                        cst_total_plano : cst_ing_plano + cst_dib_plano +  cst_cord_plano + cst_imasd_plano + cst_obra_plano,
                         cst_ing_hh : cst_ing_hh,
                         cst_dib_hh : cst_dib_hh,
                         cst_cord_hh : cst_cord_hh,
                         cst_imasd_hh : cst_imasd_hh,
                         cst_obra_hh : cst_obra_hh,
+                        cst_total_hh : cst_ing_hh + cst_dib_hh + cst_cord_hh + cst_imasd_hh + cst_obra_hh,
                         total_horas_proyecto : total_horas_proyecto,
                         total_horas_proyecto_moficiacion : total_horas_proyecto_moficiacion,
                         porc_mod : porc_mod,
                         valor_proyecto : p.valor_proyecto,
                         adicionales : total_facturacion["adicional"],
+                        adicionales_ingresados :total_facturacion["adicional_ingresado"],
                         total_proyecto : totalProyecto,
-                        total_facturado :total_facturacion["total_facturado"] ,
+                        total_facturado :total_facturacion["total_facturado"] , 
+                        total_facturado_pagado :total_facturacion["total_pagado"] , 
                         costo_totales : costoTotal,
                         margen_proyecto : margen_proyecto
 
                 };
-
+                
+                msj_registro = registro;
                 const idLogIngreso = await pool.query('INSERT INTO pro_proyectos_info set ?', [registro]);
 
 
                 }catch(err)
                 {
-                        mensajeria.MensajerErroresDBENITES("\n\n Archivo : reporteria.js \n Error en el directorio: /proyectos \n" + err + "\n Generado por : Proceso Automatico ");
+
+                        mensajeria.MensajerErroresDBENITES("\n\n Archivo : reporteria.js \n Error en el directorio: /proyectos \n" + err + "\n  Proyecto id : "+ msj_proyecto + " \n Generado por : Proceso Automatico ");
                         
                 }
                 
@@ -2469,6 +2693,7 @@ router.get('/analisisProyectos',  async (req, res) => {
 
                 });
 
+
                 return new Promise((resolve,reject)=>{
                         setTimeout(()=>{
                                 resolve(centroCosto);
@@ -2699,7 +2924,7 @@ router.get('/analisisProyectos',  async (req, res) => {
                                         " AND " +
                                                 " t1.id_proyecto = ? " +
                                         " AND  " +
-                                                " t1.id_estado in (1,2,3) "+
+                                                " t1.id_estado in (1,2,3,4,6) "+
                                         " AND  " +
                                                 " t1.id_tipo_moneda = t4.id_moneda" +
                                         " AND " +
@@ -2713,56 +2938,146 @@ router.get('/analisisProyectos',  async (req, res) => {
 
         }
 
-        function getTotalFacturacionProyecto( facturas )
+        function getTotalFacturacionProyecto( facturas, valorUF, valorUSD, valorSOL )
         {
-
+                //estadoFac
                 let totalFacturado = 0;
                 let totalFacturadoPagado = 0;
                 let totalfacturadoAdicional = 0;
+                let totalfacturadoIngresado = 0;
                     
                 let facturacion = [];
                 facturas.forEach(element => {  
 
                         
-                        switch(element.simbolo)
+                        if (element.monto_a_facturar == "")
+                                {
+                                        element.monto_a_facturar = 0;     
+                                }
+
+                        if (element.estadoFac == "Ingresado")
                         {
-                                case "UF":
+                                let fechaBuscar = dateFormat(element.fecha_solicitud, "yyyy-mm");
+                                let containsFechaSol = !!valorSOL.find(fecha => {return fecha.fecha === fechaBuscar});
+                                let containsFechaUf = !!valorUF.find(fecha => {return fecha.fecha === fechaBuscar});
+                                let containsFechaUsd = !!valorUSD.find(fecha => {return fecha.fecha === fechaBuscar});
+                                // adicionales informados. 
+                                switch(element.simbolo)
+                                {
+                                        case "UF":
+                                                totalfacturadoIngresado = totalfacturadoIngresado + parseFloat(element.monto_a_facturar);
+                                        break;
+                                        case "$":
+                                                if (containsFechaUf === true){
+                                                        const colUF = valorUF.find(fecha => {return fecha.fecha === fechaBuscar });
+                                                        let valor = colUF.valor;
+                                                        let aux = parseFloat( element.monto_a_facturar / valor);
 
-                                        totalFacturado = totalFacturado + parseFloat(element.monto_a_facturar);
-                                        if (element.es_roc === 1)
-                                        {
-                                                totalfacturadoAdicional = totalfacturadoAdicional + parseFloat(element.monto_a_facturar);
-                                        }
-                                break;
-                                case "$":
-                                        if (element.uf_valor != null)
-                                        {
-                                                let peso_uf = parseFloat(element.monto_a_facturar) /  parseFloat(element.uf_valor.replace(".","").replace(",","."));
-                                                totalFacturado = totalFacturado + peso_uf;
+                                                       totalfacturadoIngresado = totalfacturadoIngresado + aux;
+                                                }
+                                        break;
+                                        case "US$":
+                                                if (containsFechaUsd === true){
+                                                        const colUF = valorUF.find(fecha => {return fecha.fecha === fechaBuscar });
+                                                        const colUSD = valorUSD.find(fecha => {return fecha.fecha === fechaBuscar });
+                                                        let valor_UF = colUF.valor;
+                                                        let valor_USD = colUSD.valor;
+
+                                                        let auxUSD_TO_PESO = element.monto_a_facturar  * valor_USD;
+                                                        let PESO_TO_UF = parseFloat( auxUSD_TO_PESO / valor_UF);
+                                                        totalfacturadoIngresado = totalfacturadoIngresado + PESO_TO_UF;
+                                                }
+                                        break;
+                                        case "S/":
+                                                if (containsFechaSol === true){
+                                                        const colUF = valorUF.find(fecha => {return fecha.fecha === fechaBuscar });
+                                                        const colSOL = valorSOL.find(fecha => {return fecha.fecha === fechaBuscar });
+                                                        let valor_UF = colUF.valor;
+                                                        let valor_SOL = colSOL.valor;
+
+                                                        let auxSOL_TO_PESO = element.monto_a_facturar  * valor_SOL;
+                                                        let PESO_TO_UF = parseFloat( auxSOL_TO_PESO / valor_UF);
+                                                        totalfacturadoIngresado = totalfacturadoIngresado + PESO_TO_UF;
+                                                }
+                                        break;
+                                        
+                                }
+                        }
+                        else
+                        {
+                                switch(element.simbolo)
+                                {
+                                        case "UF":
+        
+                                                totalFacturado = totalFacturado + parseFloat(element.monto_a_facturar);
                                                 if (element.es_roc === 1)
                                                 {
-                                                        totalfacturadoAdicional = totalfacturadoAdicional + peso_uf; 
+                                                        if (element.estadoFac != "Ingresado")
+                                                        {
+                                                                totalfacturadoAdicional = totalfacturadoAdicional + parseFloat(element.monto_a_facturar);
+                                                        }
+                                                        
                                                 }
-                                        }
-                                break;
-                                case "US$":
-                                        if (element.dolar_valor != null)
-                                        {
-                                                let peso_dolar = parseFloat(element.monto_a_facturar) *  parseFloat(element.dolar_valor.replace(".","").replace(",",".")) / parseFloat(element.uf_valor.replace(".","").replace(",","."));
-                                                totalFacturado = totalFacturado + peso_dolar;
-                                                if (element.es_roc === 1)
+        
+                                                if (element.estadoFac == "Pagada")
                                                 {
-                                                        totalfacturadoAdicional = totalfacturadoAdicional + peso_dolar; 
+                                                        totalFacturadoPagado = totalFacturadoPagado +  parseFloat(element.monto_a_facturar);
                                                 }
-                                        }
-                                break;
-
+        
+                                        break;
+                                        case "$":
+                                                if (element.uf_valor != null)
+                                                {
+                                                        let peso_uf = parseFloat(element.monto_a_facturar) /  parseFloat(element.uf_valor.replace(".","").replace(",","."));
+                                                        totalFacturado = totalFacturado + peso_uf;
+                                                        if (element.es_roc === 1)
+                                                        {
+                                                                if (element.estadoFac != "Ingresado")
+                                                                        {
+                                                                                totalfacturadoAdicional = totalfacturadoAdicional + peso_uf; 
+                                                                        }
+                                                                
+                                                        }
+                                                        if (element.estadoFac == "Pagada")
+                                                        {
+                                                                totalFacturadoPagado = totalFacturadoPagado +  peso_uf;
+                                                        }
+                                                        
+                                                }
+                                        break;
+                                        case "US$":
+                                                if (element.dolar_valor != null)
+                                                {
+                                                        let peso_dolar = parseFloat(element.monto_a_facturar) *  parseFloat(element.dolar_valor.replace(".","").replace(",",".")) / parseFloat(element.uf_valor.replace(".","").replace(",","."));
+                                                        totalFacturado = totalFacturado + peso_dolar;
+                                                        if (element.es_roc === 1)
+                                                        {
+                                                                if (element.estadoFac != "Ingresado")
+                                                                {
+                                                                        totalfacturadoAdicional = totalfacturadoAdicional + peso_dolar; 
+                                                                }
+                                                        }
+                                                        if (element.estadoFac == "Pagada")
+                                                        {
+                                                                totalFacturadoPagado = totalFacturadoPagado +  peso_dolar;
+                                                        }
+                                                        
+        
+                                                }
+                                        break;
+                                        // agregar soles. 
+        
+                                }
                         }
 
                 });
 
-                facturacion["total_facturado"] = totalFacturado;
-                facturacion["adicional"] = totalfacturadoAdicional;
+                facturacion["total_facturado"]          = totalFacturado;
+                facturacion["adicional"]                = totalfacturadoAdicional; 
+                facturacion["total_pagado"]             = totalFacturadoPagado;
+                facturacion["adicional_ingresado"]      = totalfacturadoIngresado;
+                
+                ///console.log(facturacion);
 
                 return facturacion;
         }

@@ -141,13 +141,89 @@
             <div class="x_title">
                 <h2>{{proyecto.year}}-{{proyecto.code}} : {{proyecto.nombre}}</h2>
                     <ul class="nav navbar-right panel_toolbox">
-                        <a type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#cargaExtra"> <i class="fa fa-plus" aria-hidden="true"> Cargar Costo Adicional</i> </a> 
+                        <a type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#cargaExtra"> <i class="fa fa-plus" aria-hidden="true"> Costo Adicional</i> </a> 
 
-                            <div class="modal fade" id="cargaExtra" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                 <div class="modal-dialog modal-dialog-centered" role="document">
-                                        ...
-                                 </div>
+                            <div class="modal fade" id="cargaExtra" tabindex="3" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title" id="exampleModalLongTitle">Costo Adicional</h6>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <ul class="nav nav-tabs" id="myTab2" role="tablist">
+                                                <li class="nav-item" role="presentation">
+                                                    <a class="nav-link active" id="ingresoCosto-tab" data-toggle="tab" href="#ingresoCosto" role="tab" aria-controls="ingresoCosto" aria-selected="true">Ingresar Costo</a>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <a class="nav-link" id="listadoCosto-tab" data-toggle="tab" href="#listadoCosto" role="tab" aria-controls="listadoCosto" aria-selected="false">Listado Costo</a>
+                                                </li>
+                                            </ul>
+                                            <div class="tab-content" id="myTabContent">
+                                                    <div class="tab-pane fade show active" id="ingresoCosto" role="tabpanel" aria-labelledby="ingresoCosto-tab"> 
+                                                        <br>
+                                                        <div class="form-group row">
+                                                            <label for="staticEmail" class="col-sm-3 col-form-label">Tipo Moneda</label>
+                                                            <div class="col-sm-7">
+                                                                <select class="form-control col-md-4" name="ingreso_tipo_moneda" id="ingreso_tipo_moneda">
+                                                                    <option value="1">PESOS</option>
+                                                                    <option value="4">UF</option>
+                                                                    <option value="2">USD</option>
+                                                                    <option value="10">SOL</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="staticEmail" class="col-sm-3 col-form-label">Monto</label>
+                                                            <div class="col-sm-7">
+                                                                <input type="text"  class="form-control" id="ingreso_monto" name="ingreso_monto" value="">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <div class="col-sm-4"></div>
+                                                            <div class="col-sm-4">
+                                                                <button class="btn btn-success btn-sm" onclick="cargaCobroAdicional({{proyecto.id}});"> Ingresar </button>   
+                                                            </div>
+                                                            <div class="col-sm-4"></div>
+                                                        </div>
+                                                    </div>
+                                                <div class="tab-pane fade" id="listadoCosto" role="tabpanel" aria-labelledby="listadoCosto-tab">
+                                                    <br>
+                                                    <table class="table table-striped table-bordered" id="tablaCostoAdiocionales">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Ingresado</th>
+                                                                <th>Fecha</th>
+                                                                <th>Moneda</th>
+                                                                <th>Monto</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {{#each costoAdiocionales}}
+                                                                <tr>
+                                                                    <td>{{Nombre}}</td>
+                                                                    <td>{{fecha_solicitud}}</td>
+                                                                    <td>{{simbolo}}</td>
+                                                                    <td>{{monto_a_facturar}}</td>
+                                                                    <td>
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-x-fill" viewBox="0 0 16 16" onclick="borrarCostoAdiocional({{id}});">
+                                                                        <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM6.854 6.146 8 7.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 8l1.147 1.146a.5.5 0 0 1-.708.708L8 8.707 6.854 9.854a.5.5 0 0 1-.708-.708L7.293 8 6.146 6.854a.5.5 0 1 1 .708-.708z"/>
+                                                                        </svg>
+                                                                    </td>
+                                                                </tr>
+                                                            {{/each}}
+                                                        </tbody>
+                                                        </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            
 
                          {{#if (if_equal registros.cantidad 1)}}
                             
@@ -188,7 +264,7 @@
                                 </div>
                             </div>
                          {{/if}}
-                        <a type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#ingresar"> <i class="fa fa-archive" aria-hidden="true"> Ingresar Avance Proyecto</i> </a> 
+                        <a type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#ingresar"> <i class="fa fa-archive" aria-hidden="true">Avance Proyecto</i> </a> 
 
                         <div class="modal fade" id="ingresar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -487,8 +563,12 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="text-align: right;">Adicionales [{{moneda}}]</td>
+                                                            <td style="text-align: right;">Adicionales Pagados [{{moneda}}]</td>
                                                             <td id="adicionalesProyecto"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right;">Adicionales Ingresados [{{moneda}}]</td>
+                                                            <td id="adicionalesIngresados">{{totalFacturadoIngresado}}</td>
                                                         </tr>
                                                         <tr>
                                                             <td style="text-align: right;">Total Proyecto [{{moneda}}]</td>
@@ -1310,7 +1390,7 @@ $(document).ready(function(){
         let RocFacturado = 0;
         dataTableFact.rows().iterator('row', function(context, index){
                 var node = $(this.row(index).node());
-                  if (node.context.children[8].innerText === "SI" && node.context.children[9].innerText === "Pagada")
+                  if (node.context.children[9].innerText === "SI" && node.context.children[10].innerText === "Pagada")
                   {
                     RocFacturado = parseFloat( RocFacturado) + parseFloat( node.context.children[1].innerText);
                   }
@@ -1433,7 +1513,6 @@ $(document).ready(function(){
             for (let centros in labelsCentrosTotal)
             {
 
-                //console.log(centros);
                 
                 dataTable2a.rows().iterator('row', function(context, index){
                 var node = $(this.row(index).node()); 
@@ -1470,9 +1549,10 @@ $(document).ready(function(){
 
 
             // mostrar informacion. 
-            let valorSuperficie     = parseFloat($("#superficie").text());
+            let valorSuperficie     = parseFloat($("#superficie").text().replace(".","").replace(".",""));
             let valorNumPlanos      = parseFloat($("#planos").text()); 
             let valorDelProyecto    = parseFloat($("#valorProyecto").text());
+            let adicionalesIngresados    = parseFloat($("#adicionalesIngresados").text());
             let valorCostoEsperado  = parseFloat($("#costoTotalEsp").text());
             let valorCostoEsperado2  = $("#costoTotalEsp").text();
 
@@ -1482,9 +1562,8 @@ $(document).ready(function(){
             
 
             //$("#costo_m2").html( (parseFloat(totalUF / valorSuperficie).toFixed(2)).replace(".",",") );
-
-            //console.log(totalUF + "////// totalUF ");
-            //console.log(valorSuperficie + "////// valorSuperficie " );
+            //console.log(totalUF);
+            //console.log(valorSuperficie);
 
             $("#costo_m2").html(new Intl.NumberFormat('de-DE').format((parseFloat(totalUF / valorSuperficie).toFixed(3)).replace(",",".") ));
             $("#costo_plano").html(new Intl.NumberFormat('de-DE').format( (parseFloat( totalUF / valorNumPlanos).toFixed(2)).replace(",",".") ));
@@ -1499,9 +1578,10 @@ $(document).ready(function(){
 
             $("#costoTotalPro").html( new Intl.NumberFormat('de-DE').format(  formateoCostoToralPro )); 
 
-            $("#totalProyecto").html( parseFloat( valorDelProyecto + RocFacturado).toFixed(2));
+            $("#totalProyecto").html( parseFloat( valorDelProyecto + RocFacturado + adicionalesIngresados).toFixed(2));
 
             let valorTotalProyectoFormateado = $("#totalProyecto").text();
+
             $("#totalProyecto").html(new Intl.NumberFormat('de-DE').format((parseFloat(valorTotalProyectoFormateado).toFixed(2)).replace(",",".")));
             $("#totalProyecto2").html(new Intl.NumberFormat('de-DE').format((parseFloat(valorTotalProyectoFormateado).toFixed(2)).replace(",",".")));
             
@@ -1905,7 +1985,6 @@ dataTable3.rows().iterator('row', function(context, index){
             //$("#margenPro").html(new Intl.NumberFormat('de-DE').format((parseFloat(margenProFormato).toFixed(2)).replace(",",".")));
 
             //let margenProFacFormato      = $("#margenProFac").text();
-            console.log(costoEsperadoFormato + "costoEsperadoFormato ++++");
             $("#costoTotalEsp").html( new Intl.NumberFormat('de-DE').format((parseFloat( costoEsperadoFormato).toFixed(2)).replace(",",".")));
             //$("#costoTotalPro").html( new Intl.NumberFormat('de-DE').format((parseFloat( costoTotalProFormato).toFixed(2)).replace(",",".")));
             $("#totalPagado").html( new Intl.NumberFormat('de-DE').format((parseFloat( costoTotalPagadoFormato).toFixed(2)).replace(",",".")));
@@ -2042,6 +2121,59 @@ function ActualizaMonedas( valorMoneda )
 
    $(location).attr('href','/reporteria/proyectos/'+ findMonedaProyecto);
    
+}
+
+function cargaCobroAdicional(idProyecto)
+{
+    // cargar todo con ajac 
+    let ingreso_tipo_moneda    = $("#ingreso_tipo_moneda").val() ; 
+    let ingreso_monto          = $("#ingreso_monto").val() ;
+
+     let informacion  = {
+        idProyecto,
+        ingreso_tipo_moneda,
+        ingreso_monto };
+
+
+            $.ajax({
+				async: false,
+				type : 'POST', 
+				url	 : "/reporteria/cargaCostoAdicional", 
+				data : informacion,
+					success : function (resultado) 
+						{ 
+                            toastr.success('Carga de Costo Adicional cargado', 'Información', {
+                                    "progressBar": true
+                                });
+                            location.reload();
+						} 
+				});
+
+
+
+}
+
+function borrarCostoAdiocional (iId)
+{
+
+     let informacion  = { iId };
+
+
+            $.ajax({
+				async: false,
+				type : 'POST', 
+				url	 : "/reporteria/eliminarCostoAdiocional", 
+				data : informacion,
+					success : function (resultado) 
+						{ 
+                            toastr.error('Carga de Costo Adicional eliminado', 'Información', {
+                                    "progressBar": true
+                                });
+                            location.reload();
+						} 
+				});
+
+
 }
 
 

@@ -393,12 +393,12 @@ async function cargaDocumentoServidorContrato( id_proyecto, num, cadena, extensi
              // nombre de la carpeta a buscar. 
             
              // vamos a la carpeta base de finanzas
-             console.log("AQUI 1");
+             //console.log("AQUI 1");
              await client.cd("finanzas/contratos/"+ annio.toString() +"/" + code.toString()+"/" + num.toString() + "/");
-             console.log("AQUI 2");
+             //console.log("AQUI 2");
              let name = cadena + extension;
              await client.uploadFrom(oldpath, name);
-             console.log("AQUI 3");
+             //console.log("AQUI 3");
             estado = true;
         }
         catch(err) {

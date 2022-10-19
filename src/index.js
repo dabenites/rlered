@@ -98,6 +98,9 @@ app.use('/alertas', require('./routes/alertas'));
 app.use('/presupuesto', require('./routes/presupuesto')); 
 app.use('/finanzas', require('./routes/finanzas'));
 
+app.use('/revit', require('./routes/revit'));
+
+
 
 
 

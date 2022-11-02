@@ -6,30 +6,50 @@
         <div class="clearfix"></div>
     </div>
     <div class="x_content">
+        <form id="demo-form" data-parsley-validate="" action="#" method="POST">
+        
          <table class="table table-hover" name="tablapermisos" id="tablapermisos" style="width: 100%;">
-                            <thead>
+                <thead>
+                    <tr>
+                        <th>
+                           
+                        </th>
+                        <th>ID REVIT</th>
+                        <th>ID MODULO</th>
+                        <th>Revit</th>
+                        <th>Grupo</th>
+                        <th>Sub-Grupo</th>
+                        <th>Modulo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {{#each permisos}}
+                    <tr>
+                        <td>
+                            <input class="form-check-input" type="checkbox" id="estado_{{id_revit}}_{{id}}" name="estado_{{id_revit}}_{{id}}" {{estado}}>
+                        </td>
+                        <td>{{id_revit}}</td>
+                        <td>{{id}}</td>
+                        <td>{{revit}}</td>
+                        <td>{{grupo}}</td>
+                        <td>{{subgrupo}}</td>
+                        <td>{{aplicativo}}</td>
+                    </tr>
+                        {{/each}} 
+                </tbody>
+                 <tfoot>
                                 <tr>
-                                        <th></th>
-                                        <th>Revit</th>
-                                        <th>Grupo</th>
-                                        <th>Sub-Grupo</th>
-                                        <th>Modulo</th>
+                                    <td colspan="7">
+                                        <button type="button" class="btn btn-secondary" onclick="cargaTodos();">Seleccionar Todos </button>
+                                        <button type="button" class="btn btn-secondary" onclick="cargaTodosDes();">Deseleccionar Todos </button>
+                                        <input type="hidden" name="id_usuario" id="id_usuario"  value="{{infoUsuario.idUsuario}}">
+                                        <button type="button" class="btn btn-success" onclick="revisarData();" style="margin-left: 25%;">Ingresar Permisos</button>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {{#each permisos}}
-                                    <tr>
-                                        <td>
-                                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" name="">
-                                        </td>
-                                        <td>{{revit}}</td>
-                                        <td>{{grupo}}</td>
-                                        <td>{{subgrupo}}</td>
-                                        <td>{{aplicativo}}</td>
-                                    </tr>
-                                {{/each}} 
-                            </tbody>
+                                 
+                            </tfoot>
          </table>
+         </form>
     </div>
 </div>
 
@@ -73,4 +93,101 @@
                 }
             }
         });
+
+
+        function revisarData()
+      {
+           var data = table.rows().data();
+           
+            var allPages = table.cells( ).nodes( );
+            var concatenar = "";
+            let arregloPermisos = [];
+
+            //var estado = $("#estado_2_53").val();
+            //console.log(estado);
+            data.each(function (value, index) {
+                let id_revit = value[1];
+                let id       = value[2];
+                //console.log(id_revit);
+                //console.log(id);
+                var estado = $(allPages).find("#estado_"+id_revit+"_"+id+"").val();
+                //console.log(estado);
+                //console.log(id);
+                if ($(allPages).find("#estado_"+value[1]+"_"+value[2]+"").prop('checked') == true)
+            {
+                
+                  arregloPermisos.push({
+                  id_revit,id
+                   });
+            }
+                
+            });
+
+            const jsonString = JSON.stringify(arregloPermisos);
+            
+                
+                 let informacion = {  id_usuario : 124,  
+                                      jsonString};
+
+
+        $.ajax({
+                type: 'post',
+                //url: '/finanzas/ocCambioEstado',
+                url: '/revit/cargarPermisos',
+                data: informacion,
+                dataType: 'text'
+                })
+                .done(function (response) {
+                    
+                });
+      }
+
+
+      function cargaTodos()
+      {
+        
+        var data = table.rows().data();
+        var allPages = table.cells( ).nodes( );
+
+        
+         data.each(function (value, index) {
+                let id_revit = value[1];
+                let id       = value[2];
+                
+                var estado = $(allPages).find("#estado_"+id_revit+"_"+id+"").val();
+                
+            if ($(allPages).find("#estado_"+value[1]+"_"+value[2]+""))
+            {
+                $(allPages).find("#estado_"+value[1]+"_"+value[2]+"").prop('checked',true);
+                
+            }
+                
+            });
+
+
+      }
+     function cargaTodosDes()
+      {
+        
+        var data = table.rows().data();
+        var allPages = table.cells( ).nodes( );
+
+        
+         data.each(function (value, index) {
+                let id_revit = value[1];
+                let id       = value[2];
+                
+                var estado = $(allPages).find("#estado_"+id_revit+"_"+id+"").val();
+                
+            if ($(allPages).find("#estado_"+value[1]+"_"+value[2]+""))
+            {
+                $(allPages).find("#estado_"+value[1]+"_"+value[2]+"").prop('checked',false);
+                
+            }
+                
+            });
+
+
+      }
+      
 </script>

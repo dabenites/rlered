@@ -9,16 +9,8 @@
     </div>
     <div class="x_content">
 
-        <ul class="nav nav-tabs justify-content-end bar_tabs" id="myTab" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="ingreso-tab" data-toggle="tab" href="#ingreso" role="tab" aria-controls="ingreso" aria-selected="true">Registrar Licencia</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="listar-tab" data-toggle="tab" href="#listar" role="tab" aria-controls="listar" aria-selected="false">Listar Licencias</a>
-                </li>
-        </ul>
-        <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="ingreso" role="tabpanel" aria-labelledby="ingreso-tab">
+
+   
                   <div class="col-md-4">
                         <div class="alert alert-secondary" role="alert">
                             <h2>Formulario Registro de Licencia</h2>
@@ -26,7 +18,7 @@
                                 <div class="item form-group">
 					                <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Ingrese Mail</label>
                                     <div class="col-md-6">
-										<input type="text" id="email" name="email" required="required" class="form-control" value="dbenites@renelagos.com">
+										<input type="text" id="email" name="email" required="required" class="form-control" value="">
 								    </div>
                                     <div class="col-md-3">
                                         
@@ -35,12 +27,23 @@
                                 <div class="item form-group">
                                     <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Hard Disk Serial</label>
                                     <div class="col-md-6">
-										<input type="text" id="hdserial" name="hdserial" required="required" class="form-control" value="2K242LAGSQEA">
+										<input type="text" id="hdserial" name="hdserial" required="required" class="form-control" value="">
 								    </div>
                                     <div class="col-md-3">
                                         <button type="button" class="btn btn-success" onclick="validarRegistro();">Validar</button>
                                     </div>
                                 </div>
+                                <div class="item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Comentario</label>
+                                    <div class="col-md-6">
+										<textarea class="form-control" name="comentario" id="comentario"></textarea>
+								    </div>
+                                    <div class="col-md-3">
+                                      
+                                    </div>
+                                </div>
+
+                                
                                 <div class="item form-group">
                                      <div class="col-md-4">
 
@@ -58,6 +61,7 @@
                             <thead>
                                 <tr>
                                         <th>Colaborador</th>
+                                        <th>Descripcion</th>
                                         <th>Mail</th>
                                         <th>Ingresado por</th>
                                         <th>Fecha Inicio</th>
@@ -68,6 +72,7 @@
                                 {{#each licencias}}
                                      <tr>
                                         <td>{{nombreCol}}</td>
+                                        <td>{{comentario}}</td>
                                         <td>{{email}}</td>
                                         <td>{{nombreIng}}</td>
                                         <td>{{fecha_inicio}}</td>
@@ -88,7 +93,7 @@
                                             
                                             &nbsp;
                                             <a >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-square-fill" viewBox="0 0 16 16" onclick="EliminarLicencia({{id}})";>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-square-fill" viewBox="0 0 16 16" onclick="EliminarLicencia({{id}} , '{{nombreCol}}')";>
                                             <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm3.354 4.646L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 1 1 .708-.708z"/>
                                             </svg>
                                             </a>
@@ -96,14 +101,12 @@
                                     </tr>
                                 {{/each}}  
                             </tbody>
+
                         </table>
 
                   </div>
                   
-            </div>
-            <div class="tab-pane fade" id="listar" role="tabpanel" aria-labelledby="listar-tab">
-                    Listar licencias registradas. 
-            </div>
+           
         </div>
 
     </div>
@@ -149,6 +152,28 @@
             }
         });
 
+
+            if ("{{verToask.tipo}}" == "Editar") {
+        toastr.warning('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Crear") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Eliminar") {
+        toastr.error('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Permisos") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+
     function validarRegistro()
     {
         // validar informacion para el registro
@@ -161,6 +186,17 @@
         // 2K242LAGSQEA
         // dbenites@renelagos.com
         // alert(email + "---" + hdserial ); 
+
+
+        if (email == "" || hdserial == "")
+        {
+            toastr.error('Para validar el ingreso, es necesario llenar los campos Mail y Hard Disk', 'Titulo', {
+                                        "progressBar": true
+                                    });
+
+            
+            return false;
+        }
 
 
          let informacion = {  email,  hdserial};
@@ -187,7 +223,11 @@
                    else
                    {
                         //$('#buttonIngreso').removeAttr("disabled");
-                    // enviar algun mensaje de error a la pantalla. 
+                        // enviar algun mensaje de error a la pantalla. 
+                        toastr.error(resultado.tipo, 'Titulo', {
+                                        "progressBar": true
+                                    });
+
                    } 
                 });
     }
@@ -197,8 +237,9 @@
     {
         let email      = $("#email").val();
         let hdserial   = $("#hdserial").val();
+        let comentario   = $("#comentario").val();
 
-         let informacion = {  email,  hdserial};
+         let informacion = {  email,  hdserial , comentario};
 
                 $.ajax({
                 type: 'post',
@@ -207,16 +248,43 @@
                 dataType: 'text'
                 })
                 .done(function (response) {
+                    //console.log(resultado);
+                    
+                     var resultado = JSON.parse(response);
+
+                     if (resultado.error == 0)
+                     {
+                         toastr.success('Licencia Creada', 'Titulo', {
+                                        "progressBar": true
+                                    });
+
+                         setTimeout(() => {  console.log("ejecutando");
+                                            
+                                            }
+                                        , 5000);
+                     }
+                     else if (resultado.error == 1)
+                     {
+                         toastr.error(resultado.tipo, 'Titulo', {
+                                        "progressBar": true
+                                    });
+
+                         setTimeout(() => {  console.log("ejecutando");
+                                            
+                                            }
+                                        , 5000);
+                     }
+
                     location.reload();
                 });
     }
 
 
-    function EliminarLicencia( id)
+    function EliminarLicencia( id , Colaborador)
     {
-
-
-         let informacion = {  id};
+        if (confirm("Realemente desea eliminar la licencia correspondiente ha " + Colaborador))
+        {
+            let informacion = {  id};
 
                 $.ajax({
                 type: 'post',
@@ -225,10 +293,25 @@
                 dataType: 'text'
                 })
                 .done(function (response) {
-                    location.reload();
+                    
+                    var resultado = JSON.parse(response);
+
+                    if (resultado.error == 0)
+                     {
+                         toastr.error('Licencia Eliminada', 'Titulo', {
+                                        "progressBar": true
+                                    });
+
+                         setTimeout(() => {  console.log("ejecutando");
+                                            
+                                            }
+                                        , 5000);
+                     }
+                     
+                 location.reload();
+
                 });
-
-
+        }
     }
 
 

@@ -349,8 +349,43 @@ router.get('/rutinas', isLoggedIn, async (req, res) => {
 
         let rutinas = await pool.query(sql);
 
+        let estadoPublicar = false;
 
-        res.render('revit/rutinas', {  req ,rutinas, res, layout: 'template'});
+        switch(req.user.idCategoria)
+        {
+            case 1:
+            case 29:
+            case 30:
+            case 39:
+            case 40:
+            case 53:
+                estadoPublicar = true;
+            break;
+        }
+
+
+        const isEqualHelperHandlerbar = function(a, b, opts) {
+            if (a == b) {
+                return true
+            } else { 
+                return false
+            } 
+        };
+
+        let publicar = true;
+        if (estadoPublicar)
+        {
+            res.render('revit/rutinas', {  req ,rutinas, publicar, res, layout: 'template', helpers : {
+                if_equal : isEqualHelperHandlerbar
+            }});
+        }
+        else
+        {
+            res.render('revit/rutinas', {  req ,rutinas, res, layout: 'template', helpers : {
+                if_equal : isEqualHelperHandlerbar
+            }});
+        }
+
 
     }catch (error) {
         mensajeria.MensajerErrores("\n\n Archivo : rutinas.js \n Error en el directorio: /rutinas \n" + error + "\n Generado por : " + req.user.login);
@@ -933,7 +968,7 @@ router.post('/cargarPermisos', isLoggedIn, async (req, res) => {
 
     permisos.forEach(permiso => {
         
-        console.log(permiso.id_revit);
+      //  console.log(permiso.id_revit);
 
         let registro = {
             idUsuario : id_usuario,
@@ -943,6 +978,7 @@ router.post('/cargarPermisos', isLoggedIn, async (req, res) => {
 
         const cargaDocumento = pool.query('INSERT INTO sys_usuario_revit_permisos  set ? ', [registro]);
 
+       // console.log(registro);
 
     });
 

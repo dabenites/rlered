@@ -15,13 +15,16 @@
                                 <thead>
                                     <tr>
                                             <th>Version Revit</th>
-                                            <th>Descargar</th>
+                                            <th>Descargar.</th>
+                                            {{#if publicar }}
                                             <th>Publicar</th>
+                                            {{/if}}
+                                            
                                     </tr>
                                 </thead>
                             <tbody>
                                 {{#each rutinas}}
-                                     <tr>
+                                    <tr>
                                         <td>{{version}}</td>
                                         <td>
                                             <a href="/revit/DescargarRutina/{{id_revit}}" target="_blank">
@@ -31,6 +34,7 @@
                                                 </svg>
                                             </a>
                                         </td>
+                                        {{#if ../publicar }}
                                         <td>
                                             <a href="/revit/rutinas/{{id_revit}}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-badge-ad" viewBox="0 0 16 16">
@@ -39,6 +43,8 @@
                                                 </svg>
                                             </a>
                                         </td>
+                                        {{/if}}
+                                        
                                     </tr>
                                 {{/each}}  
                             </tbody>
@@ -46,7 +52,8 @@
                         </div>
                   </div>
                   <div class="col-md-5">
-                    <div class="x_panel">
+                    {{#if rutina }}
+                        <div class="x_panel">
                         <div class="x_title">
                             <h2>Publicaciónes Revit<small>{{rutina.version}}</small></h2> 
                             <div class="clearfix"></div>
@@ -76,9 +83,11 @@
                             </table>
                         </div>
                     </div>
+                    {{/if}}
                   </div>
                   <div class="col-md-4">
-                    <div class="x_panel">
+                     {{#if rutina }}
+                       <div class="x_panel">
                         <div class="x_title">
                             <h2>Publicar Revit <small>{{rutina.version}}</small></h2> 
                             <div class="clearfix"></div>
@@ -127,6 +136,7 @@
                             </div>
                         </div>
                     </div>
+                     {{/if}}
                   </div>
                   
                   

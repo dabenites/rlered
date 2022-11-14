@@ -94,9 +94,32 @@
             }
         });
 
+            if ("{{verToask.tipo}}" == "Editar") {
+        toastr.warning('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Crear") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Eliminar") {
+        toastr.error('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
+    else if ("{{verToask.tipo}}" == "Permisos") {
+        toastr.success('{{verToask.body}}', '{{verToask.titulo}}', {
+            "progressBar": true
+        });
+    }
 
         function revisarData()
       {
+
+        let email      = $("#email").val();
+
            var data = table.rows().data();
            
             var allPages = table.cells( ).nodes( );
@@ -124,9 +147,9 @@
             });
 
             const jsonString = JSON.stringify(arregloPermisos);
-            
+            let idUser =  $("#id_usuario").val(); 
                 
-                 let informacion = {  id_usuario : 124,  
+                 let informacion = {  id_usuario : idUser,  
                                       jsonString};
 
 
@@ -139,6 +162,15 @@
                 })
                 .done(function (response) {
                     
+                     toastr.success('Permisos Cargados', 'Titulo', {
+                                        "progressBar": true
+                                    });
+
+                         setTimeout(() => {  console.log("ejecutando");
+                                            
+                                            }
+                                        , 5000);
+
                 });
       }
 

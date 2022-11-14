@@ -390,6 +390,14 @@
                                 <td>{{estado}}</td>
                                 <td>
                                     <div class="btn-group" role="group" aria-label="Basic example">
+
+                                        <button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="{{obs}}">
+                                             
+                                             <i class="fa fa-info">
+                                             </i>
+                                             
+                                         </button>
+
                                         {{#if (if_equal 1 id_estado) }}
                                             <!--
                                                 <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg" onclick="verDetalle({{id}},1)">

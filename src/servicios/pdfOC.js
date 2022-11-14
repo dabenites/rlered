@@ -52,7 +52,7 @@ function  buildPDF(dataCallback, endCallback, oc, requerimientos) {
   let tercerBloque = 195;
   doc.fontSize(tletra).text("Facturar a"         , 50, tercerBloque); doc.fontSize(tletra).text(":"  , puntoPrimer, tercerBloque); doc.fontSize(tletra).text(oc.razonSocialEmpresa  , puntoPrimer + 10, tercerBloque); 
   doc.fontSize(tletra).text("Dirección"          , 50, tercerBloque + 10); doc.fontSize(tletra).text(":"  , puntoPrimer, tercerBloque + 10); doc.fontSize(tletra).text(oc.direccion  , puntoPrimer + 10, tercerBloque + 10); 
-  doc.fontSize(tletra).text("Contacto"           , 50, tercerBloque + 20); doc.fontSize(tletra).text(":"  , puntoPrimer, tercerBloque + 20); doc.fontSize(tletra).text("Mauricio Lopez" , puntoPrimer + 10, tercerBloque + 20);  
+  doc.fontSize(tletra).text("Contacto"           , 50, tercerBloque + 20); doc.fontSize(tletra).text(":"  , puntoPrimer, tercerBloque + 20); doc.fontSize(tletra).text("Leydi Vicente" , puntoPrimer + 10, tercerBloque + 20);  
   //doc.fontSize(tletra).text("Dirección entrega"  , 50, tercerBloque + 30); doc.fontSize(tletra).text(":"  , puntoPrimer, tercerBloque + 30);
 
   doc.fontSize(tletra).text("RUT"                , 400, tercerBloque); doc.fontSize(tletra).text(":"  , puntoSegundo, tercerBloque); doc.fontSize(tletra).text(oc.rutEmpresa  , puntoSegundo + 10 , tercerBloque ); 
@@ -292,7 +292,7 @@ if (oc.nomProyecto == null){ oc.nomProyecto = "";}
   let tercerBloque = 195;
   doc.fontSize(tletra).text("Facturar a"         , 50, tercerBloque); doc.fontSize(tletra).text(":"  , puntoPrimer, tercerBloque); doc.fontSize(tletra).text(oc.razonSocialEmpresa  , puntoPrimer + 10, tercerBloque); 
   doc.fontSize(tletra).text("Dirección"          , 50, tercerBloque + 10); doc.fontSize(tletra).text(":"  , puntoPrimer, tercerBloque + 10); doc.fontSize(tletra).text(oc.direccion  , puntoPrimer + 10, tercerBloque + 10); 
-  doc.fontSize(tletra).text("Contacto"           , 50, tercerBloque + 20); doc.fontSize(tletra).text(":"  , puntoPrimer, tercerBloque + 20); doc.fontSize(tletra).text("Mauricio Lopez" , puntoPrimer + 10, tercerBloque + 20);  
+  doc.fontSize(tletra).text("Contacto"           , 50, tercerBloque + 20); doc.fontSize(tletra).text(":"  , puntoPrimer, tercerBloque + 20); doc.fontSize(tletra).text("Leydi Vicente" , puntoPrimer + 10, tercerBloque + 20);  
   //doc.fontSize(tletra).text("Dirección entrega"  , 50, tercerBloque + 30); doc.fontSize(tletra).text(":"  , puntoPrimer, tercerBloque + 30);
 
   doc.fontSize(tletra).text("RUT"                , 400, tercerBloque); doc.fontSize(tletra).text(":"  , puntoSegundo, tercerBloque); doc.fontSize(tletra).text(oc.rutEmpresa  , puntoSegundo + 10 , tercerBloque ); 

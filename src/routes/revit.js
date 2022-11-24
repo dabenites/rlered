@@ -768,6 +768,51 @@ async function downloadJsonFile( iId) {
 
 //crearLicencia
 // verificoLicencia
+//validarCodigo
+router.post('/validarCodigo', isLoggedIn, async (req, res) => {
+
+    const { id_proyecto, id_origen,codigo } = req.body;
+
+    // partes del codigo del proyecto 
+    var partesCodigo = codigo.split("_");
+
+    let verificacion =  await pool.query("SELECT * FROM rvt_origen_proyecto as t1 WHERE t1.annio = ? AND t1.code = ? ",[partesCodigo[0],partesCodigo[1]]);
+
+
+    console.log( verificacion ) ;
+
+    let respuesta = {
+        error : 0,
+        tipo : ""
+    }
+
+
+    if (verificacion.length == 0)
+    {
+        let origen = {
+            id_proyecto : id_proyecto,
+            id_origen : id_origen,
+            annio: partesCodigo[0],
+            code :  partesCodigo[1],
+            fecha_asociacion : new Date()
+        }
+
+        const infoOrigen = await pool.query('INSERT INTO rvt_origen_proyecto  set ? ', [origen]);
+
+    }
+    else
+    {
+        respuesta.error = 1;
+        respuesta.tipo = "El codigo del proyecto ya esta en uso";
+    }
+
+
+
+    res.send(respuesta);
+
+});
+
+
 router.post('/crearLicencia', isLoggedIn, async (req, res) => {
 
     const { email, hdserial,comentario } = req.body;
@@ -900,8 +945,6 @@ function getCadenaAletoria()
 
 async function checkFolderUsuario( id_usuario )
 {
-
-
     let estado = false;
     let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
 
@@ -984,6 +1027,51 @@ router.post('/cargarPermisos', isLoggedIn, async (req, res) => {
 
     res.send("OK");
 });
+
+
+
+//configuracion 
+router.get('/configuracion', isLoggedIn, async (req, res) => {
+
+    // proyectos. 
+    let proyectos = await pool.query("SELECT * FROM pro_proyectos as t1  order by t1.year DESC, t1.code desc");
+
+    let origenes = await pool.query("SELECT * FROM rvt_origen_fierro ");
+
+
+    // proyectos anteriores.
+
+    let codigos = await pool.query(" SELECT "+
+                                    " t1.id_origen_proyecto AS id," +
+                                    " t3.nombre, " +
+                                    " t2.descripcion, " +
+                                    " t1.annio, " +
+                                    " t1.code " +
+                                    " FROM  " +
+                                            " rvt_origen_proyecto AS t1 " +
+                                            " LEFT JOIN rvt_origen_fierro AS t2 ON t1.id_origen = t2.id_origen " +
+                                            " LEFT JOIN pro_proyectos AS t3 ON t1.id_proyecto = t3.id");
+    
+    res.render('revit/seteo', { proyectos,origenes, req ,res,codigos, layout: 'template'});
+
+
+});
+
+
+//
+router.get('/seteoProyecto/:id', isLoggedIn, async (req, res) => {
+
+    const { id } = req.params;
+    
+
+    res.render('revit/configuracionProyecto', { req ,res, layout: 'template'});
+
+    
+});
+
+
+
+
 
 
 module.exports = router;

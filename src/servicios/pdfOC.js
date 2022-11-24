@@ -140,6 +140,17 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
         esUF = true;
         tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);
       break;
+      case 10:
+        sTable.push(element.cantidad);
+        sTable.push(element.descripcion);
+        //precio += element.montopeso ;
+        precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
+        sTable.push(element.precio_unitario);
+        element.montopeso = element.tipo_cambio * element.precio_unitario;
+        sTable.push("$ " + new Intl.NumberFormat(['ban', 'id']).format(element.montopeso));
+        simbolo = "$ ";
+        tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);
+      break;
     }
     oTable.push(sTable);
   });
@@ -175,7 +186,7 @@ doc.table( table, {
   let valorIVA;
   let valorTotal;
 
-  //console.log(oc);
+ // console.log(esUF);
 
  if (esUF)
  {
@@ -203,12 +214,14 @@ doc.table( table, {
     valorIVA = precio * 1.19 - precio;
     valorTotal = precio + valorIVA;
  
+    console.log("CON IVA");
      doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y ); 
      doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorIVA) ,465,valor_y  + 10 ); 
      doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(valorTotal) ,465,valor_y  + 20 );
   }
   else
   {
+    console.log("SIN IVA");
      doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y ); 
      doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y  + 10 ); 
   }
@@ -381,6 +394,17 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
         sTable.push("$ " + element.montopeso);
         simbolo = "$ ";
         esUF = true;
+        tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);
+      break;
+      case 10:
+        sTable.push(element.cantidad);
+        sTable.push(element.descripcion);
+        //precio += element.montopeso ;
+        precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
+        sTable.push(element.precio_unitario);
+        element.montopeso = element.tipo_cambio * element.precio_unitario;
+        sTable.push("$ " + new Intl.NumberFormat(['ban', 'id']).format(element.montopeso));
+        simbolo = "$ ";
         tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);
       break;
     }

@@ -21,7 +21,7 @@ router.post('/cargaRutinas', isLoggedIn, async (req, res) => {
         let id = "";
         form.parse(req, async function (err, fields, files) {
 
-            //console.log(fields);
+            
             let id_version = fields.id_version;
             id = id_version;
             let version = fields.version;
@@ -172,8 +172,6 @@ async function moverVigenteRespaldo(rutina)
         // verifico que el archivo exista
         let informacionCarperta  = await client.list();
         let existeArchivo = false;
-        //console.log(informacionCarperta);
-
         informacionCarperta.forEach(carpetaFile => {
             if (carpetaFile.type == 1)
             {
@@ -305,7 +303,7 @@ async function eliminarRespaldoAnterior(rutina)
         // verifico que el archivo exista
         let informacionCarperta  = await client.list();
         let existeArchivo = false;
-        //console.log(informacionCarperta);
+
 
         informacionCarperta.forEach(carpetaFile => {
             if (carpetaFile.type == 1)
@@ -454,7 +452,6 @@ router.get('/licencias', isLoggedIn, async (req, res) => {
 
         let licencias = await pool.query(sql);
 
-        //console.log(licencias);
 
         res.render('revit/licencias', {  req ,res,licencias , layout: 'template'});
 
@@ -511,7 +508,6 @@ router.post('/verificoLicencia', isLoggedIn, async (req, res) => {
         checkFolderUsuario(usuario[0].idUsuario);
     }
 
-    //console.log(respuesta);
 
     res.send(respuesta);
 
@@ -540,7 +536,6 @@ router.get('/permisosRevit/:id', isLoggedIn, async (req, res) => {
 
     let infoUsuario = await pool.query("SELECT * FROM sys_usuario as t1 WHERE t1.idUsuario=?", [id]);
 
-    //console.log(infoUsuario);
 
      let sql =   "  SELECT " +
                   "  t1.id_tab_Button AS id, " +
@@ -569,9 +564,6 @@ router.get('/permisosRevit/:id', isLoggedIn, async (req, res) => {
 
        aplicativos.forEach(aps => {
             revits.forEach(rev => {
-               // console.log(aps);
-              // let info =[];
-              // info.revit = rev.version;
 
                
                permisos.push({
@@ -590,11 +582,8 @@ router.get('/permisosRevit/:id', isLoggedIn, async (req, res) => {
             });
        });
 
-      // console.log(permisos);
        // sys_usuario_revit_permisos
        let permisosActuales = await pool.query("SELECT * FROM sys_usuario_revit_permisos as t1 WHERE t1.idUsuario = ? ", [id]);
-
-       //console.log(permisosActuales);
 
 
        permisos.forEach(permisos => {
@@ -605,9 +594,6 @@ router.get('/permisosRevit/:id', isLoggedIn, async (req, res) => {
                     }
             });
        });
-
-
-      // console.log(permisos);
 
 
     res.render('revit/permisos', { infoUsuario:infoUsuario[0], permisos, req ,res, layout: 'template'});
@@ -624,7 +610,6 @@ router.get('/DescargarRutina/:id', isLoggedIn, async (req, res) => {
 
     informacionDownload.then((informacion)=>{
 
-        //console.log(nombreArchivo);
 
              res.setHeader('Content-Type', 'application/zip');
              res.setHeader('Content-Disposition', 'inline;filename='+nombre+''); 
@@ -640,7 +625,6 @@ router.get('/DescargarRutina/:id', isLoggedIn, async (req, res) => {
 });
 
 
-    //console.log(rutina);
 });
 router.get('/DescargarLicencia/:id', isLoggedIn, async (req, res) => {
 
@@ -648,12 +632,10 @@ router.get('/DescargarLicencia/:id', isLoggedIn, async (req, res) => {
 
     let licencia = await pool.query('SELECT * FROM sys_usuario_licencias_revit WHERE id = ? ;', [id]);
 
-    //console.log(licencia);
     let informacionDownload =  downloadJsonFile(id);
 
     informacionDownload.then((informacion)=>{
 
-        //console.log(nombreArchivo);
 
              res.setHeader('Content-Type', 'application/json');
              res.setHeader('Content-Disposition', 'inline;filename=key.json'); 
@@ -779,8 +761,6 @@ router.post('/validarCodigo', isLoggedIn, async (req, res) => {
     let verificacion =  await pool.query("SELECT * FROM rvt_origen_proyecto as t1 WHERE t1.annio = ? AND t1.code = ? ",[partesCodigo[0],partesCodigo[1]]);
 
 
-    console.log( verificacion ) ;
-
     let respuesta = {
         error : 0,
         tipo : ""
@@ -893,16 +873,15 @@ async function cargaDocumentoServidorContrato( nombreServidor, idUsuario )
                                             secure: false
                                         });
     
-             console.log("AQUI 1");
+             
              await client.cd("licencias/"+ idUsuario.toString()  + "/");
-             console.log("AQUI 2");
+             
              let name = nombreServidor + ".json";
              await client.uploadFrom(nombreArchivoServidor, name); // esto tiene que ser dinamico. 
-             console.log("AQUI 3");
+             
             estado = true;
         }
         catch(err) {
-            console.log("EEOOOOOOOOOOOOOORRRR cargaDocumentoServidorContrato");
             console.log(err);
 
             estado = false;
@@ -913,7 +892,6 @@ async function cargaDocumentoServidorContrato( nombreServidor, idUsuario )
         return estado;
 }
 
-
 function crearLicencia(email, hdserial , nombreServidor)
 {
     const path = './src/uploads/licencias/'+nombreServidor+'.json';
@@ -923,11 +901,10 @@ function crearLicencia(email, hdserial , nombreServidor)
     
     writeFile(path, JSON.stringify(config, null, 2), (error) => {
       if (error) {
-        //console.log('An error has occurred ', error);
+        
         mensajeria.MensajerErroresDBENITES("crearLicencia 349")
         return - 1;
       }
-      //console.log('Data written successfully to disk');
     });
     return 1;
 }
@@ -987,7 +964,6 @@ async function checkFolderUsuario( id_usuario )
             estado = true;
         }
         catch(err) {
-            console.log("ERROR ====> " + err +  "checkYearFolder")
             estado = false;
         }
         client.close();
@@ -1011,7 +987,6 @@ router.post('/cargarPermisos', isLoggedIn, async (req, res) => {
 
     permisos.forEach(permiso => {
         
-      //  console.log(permiso.id_revit);
 
         let registro = {
             idUsuario : id_usuario,
@@ -1021,7 +996,6 @@ router.post('/cargarPermisos', isLoggedIn, async (req, res) => {
 
         const cargaDocumento = pool.query('INSERT INTO sys_usuario_revit_permisos  set ? ', [registro]);
 
-       // console.log(registro);
 
     });
 
@@ -1062,16 +1036,613 @@ router.get('/configuracion', isLoggedIn, async (req, res) => {
 router.get('/seteoProyecto/:id', isLoggedIn, async (req, res) => {
 
     const { id } = req.params;
+
+    // buscar la informacion del proyecto. 
+    //
+    let informacion = await pool.query("SELECT " +
+                                        " t1.id_origen_proyecto, " +
+                                        " t2.nombre, " +
+                                        " t2.`year`, " +
+                                        " t2.code, " +
+                                        " t1.code AS codigo " +
+                                        " FROM  " +
+                                                " rvt_origen_proyecto AS t1 " +
+                                                " LEFT JOIN pro_proyectos AS t2 ON t1.id_proyecto = t2.id " +
+                                        " WHERE  " +
+                                                "t1.id_origen_proyecto = ?", [id]);
+
     
 
-    res.render('revit/configuracionProyecto', { req ,res, layout: 'template'});
+    res.render('revit/configuracionProyecto', { informacion:informacion[0], req ,res, layout: 'template'});
 
     
 });
 
 
+router.post('/cargaCriterio', isLoggedIn, async (req, res) => {
+
+    const {id,tipo} = req.body;
+
+    
+    let origen =  await pool.query("SELECT * FROM rvt_origen_proyecto as t1 where t1.id_origen_proyecto =  ? ",[id]); // pasar esto a dinamico 
+    let codigo = origen[0].annio + "_" + origen[0].code;
+    let fierros = await pool.query("SELECT * FROM rvt_fierros as t1 where t1.id_origen =  ? order by t1.mm asc",[origen[0].id_origen]); // pasar esto a dinamico 
+
+    let tipoObjetos = await pool.query("SELECT * FROM rvt_tipo_objeto ");
+
+    switch(tipo)
+    {
+        case 1: // Empalmes 
+        case "1":
+            res.render('revit/empalmes', { id, tipoObjetos, req ,res, layout: 'blanco'});
+
+        break;
+
+        case 2: // Emapalme Malla 
+        case "2":
+            // Mallas Cargadas 
+            let empalmeMallasCargadas =  await pool.query("SELECT * FROM rvt_cfg_empalme_malla_proyecto as t1 where t1.codigo_proyecto =  ? ",[codigo]);
+            res.render('revit/empalmesMallas', { empalmeMallasCargadas, codigo,fierros, id,  req ,res, layout: 'blanco'});
+        break;
+
+        case 3: // Anclajes
+        case "3": 
+            
+            res.render('revit/anclajes', {  tipoObjetos,id, req ,res, layout: 'blanco'});
+        break;
+
+        case 5: // Patas
+        case "5": 
+            
+        let infoFierros = await pool.query( " SELECT * " +
+                                            "  FROM " +
+                                                    " rvt_fierros AS t1 " +
+                                                    " LEFT JOIN rvt_cfg_largo_patas_detalle AS t2 ON t2.id_cfg_largo_patas = (SELECT t3.id_configuracion_largo_patas " +
+                                                " FROM " +
+                                                " rvt_cfg_largo_patas AS t3 " +
+                                                " WHERE " +
+                                                        " t3.estado = 'SI' " +
+                                                " AND  " +
+                                                        " t3.codigo_proyecto = ? )  " +
+                                                        " AND t1.id_fierros = t2.id_fierro " +
+                                                " WHERE  " +
+                                                    "t1.id_origen = ?", [codigo, origen[0].id_origen]);
+
+            res.render('revit/Patas', {  infoFierros, origen:origen[0].id_origen, codigo,id, req ,res, layout: 'blanco'});
+        break;
+
+        case 6:
+        case "6":
+        break;
+
+        case 7:
+        case "7":
+            res.render('revit/largoFe', {  tipoObjetos,id, req ,res, layout: 'blanco'});
+        break;
+
+    }
+
+    //res.send("asdadsa");
+
+});
+
+//cargaOpcionesEmpalme
+router.post('/cargaOpcionesEmpalme', isLoggedIn, async (req, res) => {
+
+    const {idCodigo,  opt } = req.body;
+
+    
+    //
+    let infoOrigen = await pool.query("SELECT * FROM rvt_origen_proyecto as t1 WHERE t1.id_origen_proyecto = ? ", [idCodigo]);
+
+    let origen = infoOrigen[0].id_origen;
+
+    let opcionesDefecto = await pool.query("SELECT * FROM rvt_opcion_tipo as t1 WHERE t1.id_origen = ? AND t1.id_tipo_objeto = ?" , [origen,opt])
+
+    let codigo = infoOrigen[0].annio + "_" + infoOrigen[0].code;
+    //codigo = "2022_04"; // estatico para que muestre informacion
+
+    let opcionesCargadas = await pool.query("SELECT * FROM rvt_cfg_empalme as t1 WHERE t1.codigo_proyecto = ? AND t1.id_tipo_objeto = ? ", [codigo,opt]); 
+
+    res.render('revit/optDefectoCargadas', { idCodigo, codigo, opt, opcionesDefecto,opcionesCargadas,  req ,res, layout: 'blanco'});
+   
+
+});
+
+router.post('/cargaOpcionesEmpalmeTabla', isLoggedIn, async (req, res) => {
+
+    const { tipo,  idCargada , codigo} = req.body;
+
+    let infoOpcionTipo = await pool.query("SELECT * FROM rvt_opcion_tipo as t1 WHERE t1.id_opcion = ? ", [idCargada]);
+
+    let hormigones = await pool.query("SELECT * FROM rvt_hormigon ");
+    let fierros = await pool.query("SELECT * FROM rvt_fierros as t1 where t1.id_origen =  ? order by t1.mm asc",[infoOpcionTipo[0].id_origen]);
+
+    let informacion = await pool.query("SELECT * FROM rvt_opcion_tipo_valor as t1 where t1.id_opcion_tipo = ? ", [idCargada]);
 
 
+    switch(infoOpcionTipo[0].id_origen)
+    {
+        case 1:
+        case "1":
+
+            let infoHormigonfierro = [];
+            let cabecera = {
+                hormigon : "Hormigon",
+                opt_1 : "Ø8",
+                opt_2 : "Ø10",
+                opt_3 : "Ø12",
+                opt_4 : "Ø16",
+                opt_5 : "Ø18",
+                opt_6 : "Ø22",
+                opt_7 : "Ø25",
+                opt_8 : "Ø28",
+                opt_9 : "Ø32",
+                opt_10 : "Ø36"
+
+            };
+            
+            //infoHormigonfierro.push(cabecera);    
+
+            hormigones.forEach(element => {
+                let info = {
+                    hormigon : element.descripcion,
+                    hormigon_id : element.id_hormigon,
+                    opt_k1 : fierros[0].id_fierros,
+                    opt_k1v : buscaValorDefecto(informacion, element.id_hormigon,fierros[0].id_fierros),
+                    opt_k2 : fierros[1].id_fierros,
+                    opt_k2v : buscaValorDefecto(informacion, element.id_hormigon,fierros[1].id_fierros),
+                    opt_k3 : fierros[2].id_fierros,
+                    opt_k3v : buscaValorDefecto(informacion, element.id_hormigon,fierros[2].id_fierros),
+                    opt_k4 : fierros[3].id_fierros,
+                    opt_k4v : buscaValorDefecto(informacion, element.id_hormigon,fierros[3].id_fierros),
+                    opt_k5 : fierros[4].id_fierros,
+                    opt_k5v : buscaValorDefecto(informacion, element.id_hormigon,fierros[4].id_fierros),
+                    opt_k6 : fierros[5].id_fierros,
+                    opt_k6v : buscaValorDefecto(informacion, element.id_hormigon,fierros[5].id_fierros),
+                    opt_k7 : fierros[6].id_fierros,
+                    opt_k7v : buscaValorDefecto(informacion, element.id_hormigon,fierros[6].id_fierros),
+                    opt_k8 : fierros[7].id_fierros,
+                    opt_k8v : buscaValorDefecto(informacion, element.id_hormigon,fierros[7].id_fierros),
+                    opt_k9 : fierros[8].id_fierros,
+                    opt_k9v : buscaValorDefecto(informacion, element.id_hormigon,fierros[8].id_fierros),
+                    opt_k10 : fierros[9].id_fierros,
+                    opt_k10v : buscaValorDefecto(informacion, element.id_hormigon,fierros[9].id_fierros),
+                };
+
+                infoHormigonfierro.push(info);    
+            });
+
+            res.render('revit/tablaIngresoCL', { codigo, tipo , cabecera, hormigones,infoHormigonfierro, req ,res, layout: 'blanco'});
+        break;
+        case 2:
+        case "2":
+        break;
+    }
+
+});
+
+
+router.post('/cargaOpcionesEmpalmeTablaIngresada', isLoggedIn, async (req, res) => {
+
+    const { tipo,  idCargada , codigo , idCodigo}  = req.body;
+
+    let infoOpcionTipo = await pool.query("SELECT * FROM rvt_origen_proyecto as t1 WHERE t1.id_origen_proyecto = ? ", [idCodigo]);
+
+    let hormigones = await pool.query("SELECT * FROM rvt_hormigon ");
+    let fierros = await pool.query("SELECT * FROM rvt_fierros as t1 where t1.id_origen =  ? order by t1.mm asc",[infoOpcionTipo[0].id_origen]);
+
+    let informacion = await pool.query("SELECT * FROM rvt_cfg_empalme_proyecto as t1 where t1.id_configuracion_empalme = ? ", [idCargada]);
+
+
+    switch(infoOpcionTipo[0].id_origen)
+    {
+        case 1:
+        case "1":
+
+            let infoHormigonfierro = [];
+            let cabecera = {
+                hormigon : "Hormigon",
+                opt_1 : "Ø8",
+                opt_2 : "Ø10",
+                opt_3 : "Ø12",
+                opt_4 : "Ø16",
+                opt_5 : "Ø18",
+                opt_6 : "Ø22",
+                opt_7 : "Ø25",
+                opt_8 : "Ø28",
+                opt_9 : "Ø32",
+                opt_10 : "Ø36"
+
+            };
+            
+            //infoHormigonfierro.push(cabecera);    
+
+            hormigones.forEach(element => {
+                let info = {
+                    hormigon : element.descripcion,
+                    hormigon_id : element.id_hormigon,
+                    opt_k1 : fierros[0].id_fierros,
+                    opt_k1v : buscaValorDefecto(informacion, element.id_hormigon,fierros[0].id_fierros),
+                    opt_k2 : fierros[1].id_fierros,
+                    opt_k2v : buscaValorDefecto(informacion, element.id_hormigon,fierros[1].id_fierros),
+                    opt_k3 : fierros[2].id_fierros,
+                    opt_k3v : buscaValorDefecto(informacion, element.id_hormigon,fierros[2].id_fierros),
+                    opt_k4 : fierros[3].id_fierros,
+                    opt_k4v : buscaValorDefecto(informacion, element.id_hormigon,fierros[3].id_fierros),
+                    opt_k5 : fierros[4].id_fierros,
+                    opt_k5v : buscaValorDefecto(informacion, element.id_hormigon,fierros[4].id_fierros),
+                    opt_k6 : fierros[5].id_fierros,
+                    opt_k6v : buscaValorDefecto(informacion, element.id_hormigon,fierros[5].id_fierros),
+                    opt_k7 : fierros[6].id_fierros,
+                    opt_k7v : buscaValorDefecto(informacion, element.id_hormigon,fierros[6].id_fierros),
+                    opt_k8 : fierros[7].id_fierros,
+                    opt_k8v : buscaValorDefecto(informacion, element.id_hormigon,fierros[7].id_fierros),
+                    opt_k9 : fierros[8].id_fierros,
+                    opt_k9v : buscaValorDefecto(informacion, element.id_hormigon,fierros[8].id_fierros),
+                    opt_k10 : fierros[9].id_fierros,
+                    opt_k10v : buscaValorDefecto(informacion, element.id_hormigon,fierros[9].id_fierros),
+                };
+
+                infoHormigonfierro.push(info);    
+            });
+
+
+            res.render('revit/tablaIngresoCL', { codigo, tipo , cabecera, hormigones,infoHormigonfierro, req ,res, layout: 'blanco'});
+        break;
+        case 2:
+        case "2":
+        break;
+    }
+
+});
+//cargaOpcionesEmpalmeTablaDatos
+router.post('/cargaOpcionesEmpalmeTablaDatos', isLoggedIn, async (req, res) => {
+
+    const { codigo,  tipo ,nombre , infoData} = req.body;
+
+
+    let registro = {
+        login : req.user.login,
+        fecha_ingreso : new Date(),
+        estado : "SI",
+        esPredeterminada : "NO",
+        codigo_proyecto : codigo,
+        id_tipo_objeto : tipo,
+        descripcion : nombre
+
+    }
+
+
+    const insertCabecera = pool.query('INSERT INTO rvt_cfg_empalme  set ? ', [registro]);
+
+
+
+    let data = JSON.parse(infoData);
+
+    insertCabecera.then( function(rest) {
+
+            let idInsertCabecera = rest.insertId;
+
+
+            data.forEach(element => {
+        
+                if (element.id === "fnombre")
+                {
+                }
+                else
+                {
+                   let informacion =   element.id.split("_");
+        
+                   let registroDato = {
+                    id_configuracion_empalme :idInsertCabecera,
+                    id_fierros :informacion[2],
+                    id_hormigon :informacion[1],
+                    valor : element.valor
+                   }
+
+                   const insertDato = pool.query('INSERT INTO rvt_cfg_empalme_proyecto  set ? ', [registroDato]);
+
+                }
+        
+            });
+
+
+    }
+
+    );
+
+
+    res.send("ok");
+
+});
+
+router.post('/cargaOpcionesEmpalmeMallaTablaDatos', isLoggedIn, async (req, res) => {
+
+    const { codigo,  nombre , infoData} = req.body;
+
+    let registro = {
+        tipo_configuracion : 2,
+        codigo_proyecto : codigo,
+        nombre : nombre,
+        esPredeterminada : "NO"
+    }
+
+    const insertCabecera = pool.query('INSERT INTO rvt_cfg_empalme_malla_proyecto  set ? ', [registro]);
+
+    let data = JSON.parse(infoData);
+
+    insertCabecera.then( function(rest) {
+
+            let idInsertCabecera = rest.insertId;
+
+
+            data.forEach(element => {
+        
+                console.log(element.id );
+                if (element.id == "fnombre" || element.id == "veces" || element.id == "suma")
+                {
+
+                }
+                else
+                {
+                    let informacion =   element.id.split("_");
+
+                    let registroDato = {
+                        id_empalme_malla :idInsertCabecera,
+                        id_fierro :informacion[1],
+                        valor : element.valor
+                       }
+    
+                       const insertDato = pool.query('INSERT INTO rvt_cfg_empalme_malla_proyecto_detalle  set ? ', [registroDato]);
+
+                }
+        
+            });
+
+
+    }
+
+    );
+
+res.send("OK");
+});
+
+router.post('/verTablaMallaEmpalme', isLoggedIn, async (req, res) => {
+
+    const { id } = req.body;
+
+    let infoMallaEmpalme = await pool.query("  SELECT * " +
+                                            " FROM " +
+                                                     " rvt_cfg_empalme_malla_proyecto_detalle AS t1, " +
+                                                     " rvt_fierros AS t2 " +
+                                            " WHERE  " +
+                                                     " t1.id_empalme_malla = ? "  +
+                                            " AND  " +
+                                                     " t1.id_fierro = t2.id_fierros " +
+                                            " ORDER BY t2.mm ASC ", [id]);
+    
+   
+    res.render('revit/tablaEmpalmeMalla', { infoMallaEmpalme, req ,res, layout: 'blanco'});
+});
+
+router.post('/cargaOpcionesAnclaje', isLoggedIn, async (req, res) => {
+
+    const {idCodigo,  opt } = req.body;
+
+        //
+        let infoOrigen = await pool.query("SELECT * FROM rvt_origen_proyecto as t1 WHERE t1.id_origen_proyecto = ? ", [idCodigo]);
+        let origen = infoOrigen[0].id_origen;
+        let codigo = infoOrigen[0].annio + "_" + infoOrigen[0].code;
+
+
+
+        
+
+        let infoFierros = await pool.query( " SELECT * " +
+                                            " FROM " +
+                                                " rvt_fierros AS t1 " +
+                                                " LEFT JOIN rvt_cfg_largo_anclaje_detalle AS t2 ON t2.id_configuracion_largo_anclaje = (SELECT t3.id_configuracion_largo_anclaje "+
+                                            " FROM " +
+                                            " rvt_cfg_largo_anclaje AS t3 " +
+                                            " WHERE " +
+                                                    " t3.estado = 'SI' " +
+                                            " AND  " +
+                                                    " t3.codigo_proyecto = ?"+
+                                            " AND  " +
+		                                            " t3.id_tipo_objeto = ? )"+
+                                            "  AND t1.id_fierros = t2.id_fierro " +
+                                            " WHERE  "  +
+                                                " t1.id_origen = ?", [codigo, opt, origen]);
+
+        
+
+        /*
+        let infoFierros = await pool.query( " SELECT * " +
+                                                 " FROM " +
+                                                            " rvt_fierros AS t1 " +
+                                                 " WHERE " +
+                                                            " t1.id_origen = ? ", [origen]);
+
+        */
+                                    
+
+
+    
+    res.render('revit/tablaFierros', { origen,  infoFierros, codigo,opt, req ,res, layout: 'blanco'});
+
+});
+
+
+
+router.post('/cargaOpcionesAnclajeTablaDatos', isLoggedIn, async (req, res) => {
+
+    const { codigo,  nombre , infoData,ftipo , forigen} = req.body;
+
+    let registro = {
+        login : req.user.login,
+        fecha_ingreso : new Date(),
+        estado : "SI",
+        codigo_proyecto : codigo,
+        id_tipo_objeto : ftipo,
+        id_origen_fierro : forigen
+    }
+
+
+    const updateCabecera = pool.query("UPDATE  rvt_cfg_largo_anclaje  set  estado = 'NO' WHERE  codigo_proyecto = ? ", [codigo]);
+
+    const insertCabecera = pool.query('INSERT INTO rvt_cfg_largo_anclaje  set ? ', [registro]);
+
+    let data = JSON.parse(infoData);
+
+    insertCabecera.then( function(rest) {
+
+            let idInsertCabecera = rest.insertId;
+
+
+            data.forEach(element => {
+        
+                console.log(element.id );
+                if (element.id == "fnombre" || element.id == "veces" || element.id == "suma")
+                {
+
+                }
+                else
+                {
+                    let informacion =   element.id.split("_");
+
+                    let registroDato = {
+                        id_configuracion_largo_anclaje :idInsertCabecera,
+                        id_fierro :informacion[1],
+                        largo : element.valor
+                       }
+    
+                       const insertDato = pool.query('INSERT INTO rvt_cfg_largo_anclaje_detalle  set ? ', [registroDato]);
+
+                }
+        
+            });
+
+
+    }
+
+    );
+
+res.send("OK");
+});
+
+//cargaOpcionesAnclajeTablaDatos
+
+router.post('/cargaOpcionPatas', isLoggedIn, async (req, res) => {
+
+    const { codigo, infoData, forigen} = req.body;
+
+    let registro = {
+        login : req.user.login,
+        fecha_ingreso : new Date(),
+        estado : "SI",
+        codigo_proyecto : codigo
+    }
+
+
+    const updateCabecera = pool.query("UPDATE  rvt_cfg_largo_patas  set  estado = 'NO' WHERE  codigo_proyecto = ? ", [codigo]);
+
+    const insertCabecera = pool.query('INSERT INTO rvt_cfg_largo_patas  set ? ', [registro]);
+
+    let data = JSON.parse(infoData);
+
+    insertCabecera.then( function(rest) {
+
+            let idInsertCabecera = rest.insertId;
+
+
+            data.forEach(element => {
+        
+                if (element.id == "fnombre" || element.id == "veces" || element.id == "suma")
+                {
+
+                }
+                else
+                {
+                    let informacion =   element.id.split("_");
+
+                    let registroDato = {
+                        id_cfg_largo_patas :idInsertCabecera,
+                        id_fierro :informacion[1],
+                        largo : element.valor
+                       }
+    
+                       const insertDato = pool.query('INSERT INTO rvt_cfg_largo_patas_detalle  set ? ', [registroDato]);
+
+                }
+        
+            });
+
+
+    }
+
+    );
+
+res.send("OK");
+});
+
+//Largo Fe
+
+
+//cargaOpcionesLargoFe
+
+router.post('/cargaOpcionesLargoFe', isLoggedIn, async (req, res) => {
+
+    const {idCodigo,  opt } = req.body;
+
+        //
+        let infoOrigen = await pool.query("SELECT * FROM rvt_origen_proyecto as t1 WHERE t1.id_origen_proyecto = ? ", [idCodigo]);
+        let origen = infoOrigen[0].id_origen;
+        let codigo = infoOrigen[0].annio + "_" + infoOrigen[0].code;
+
+
+
+        
+
+        let infoFierros = await pool.query( " SELECT * " +
+                                            " FROM " +
+                                                " rvt_fierros AS t1 " +
+                                                " LEFT JOIN rvt_cfg_largo_fierro_detalle AS t2 ON t2.id_configuracion_largo_fierro = (SELECT t3.id_configuracion_largo_fierro "+
+                                            " FROM " +
+                                            " rvt_cfg_largo_fierro AS t3 " +
+                                            " WHERE " +
+                                                    " t3.estado = 'SI' " +
+                                            " AND  " +
+                                                    " t3.codigo_proyecto = ?"+
+                                            " AND  " +
+		                                            " t3.id_tipo_objeto = ? )"+
+                                            "  AND t1.id_fierros = t2.id_fierro " +
+                                            " WHERE  "  +
+                                                " t1.id_origen = ?", [codigo, opt, origen]);
+                                    
+
+
+    
+    res.render('revit/tablaFierros', { origen,  infoFierros, codigo,opt, req ,res, layout: 'blanco'});
+
+});
+
+
+function buscaValorDefecto(informacion , id_hormigon, id_fierro)
+{
+    let v = 0;
+
+    informacion.forEach(element => {
+        
+        if (element.id_hormigon ==id_hormigon && element.id_fierros ==  id_fierro)
+        {
+            v = element.valor;
+        }
+
+    });
+ 
+    return v;
+}
 
 
 module.exports = router;

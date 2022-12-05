@@ -1,0 +1,30 @@
+<div class="col-md-12">
+        <div class="x_panel">
+             <div class="x_title">
+                <h2>Configuración Inicial <b>Empalmes</b></h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="form-group row">
+                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Tipo Objeto
+                        <input type="hidden" name="id_codigo" id="id_codigo" value="{{id}}">
+
+                    </label>
+					<div class="col-md-6 col-sm-6 ">
+						<select class="form-control" name="presupuesto" id="presupuesto" onchange="cargaOpcionesObjeto(this.value);">
+                                <option value="0">Seleccione</option>
+                                {{#each tipoObjetos}}
+                                    <option value="{{id_tipo_objeto}}">{{descripcion}}</option>
+                                {{/each}}
+                        </select>
+					</div>
+                </div>
+                <div class="col-md-12" id="cargaOpcion" name="cargaOpcion">
+
+                </div>
+                <div class="col-md-12" id="cargaValores" name="cargaValores">
+
+                </div>
+            </div>
+        </div>
+</div>

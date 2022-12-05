@@ -1,0 +1,133 @@
+<div class="col-md-12">
+        <div class="x_panel">
+             <div class="x_title">
+                <h2>Configuración Inicial <b>Empalmes Mallas</b></h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <input type="hidden" name="id_codigo" id="id_codigo" value="{{id}}">
+                <div class="col-md-4">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>Ingresar Empalmes Malla </h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="opcion" id="formula" onchange="cargaOpcionEmpalmeMalla();" checked>
+                                <label class="form-check-label" for="flexRadioDefault1">
+                                    Formula
+                                </label>
+                                </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="opcion" id="personificada" onchange="cargaOpcionEmpalmeMalla();">
+                                <label class="form-check-label" for="flexRadioDefault2">
+                                    Personalizada
+                                </label>
+                            </div> 
+
+                            <div class="form-group row" id="formulaRevisar">
+                                <label class="col-form-label col-md-2 label-align" for="titulo"> Texto
+                                </label>
+                                <div class="col-md-3">
+                                    <input type="text" name="veces" id="veces" value="" class="form-control">
+                                </div>
+                                <label class="col-form-label col-md-1 label-align" for="titulo"> Phi+ </label>
+                                <div class="col-md-3">
+                                    <input type="text" name="suma" id="suma" value="" class="form-control">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-outline-success" onclick="cargaInfoTabla();">
+                                            Cal.
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                            <div class="col-md-1">
+
+                            </div>
+                            <div class="col-md-10">
+                                <table class="table table-striped" name="tablaEmpalmesMallas" id="tablaEmpalmesMallas">
+                                <thead>
+                                    <tr>
+                                            <th>Fierro</th>
+                                            <th>mm</th>
+                                            <th>Valor</th>
+                                            <th>id</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each fierros}}
+                                        <tr>
+                                            <td>{{desripcion}}</td>
+                                            <td>{{mm}}</td>
+                                            <td>
+                                                <input class="form-control input-sm" id="v_{{id_fierros}}" type="text" value="" readonly>
+                                            </td>
+                                            <td>{{id_fierros}}</td>
+                                        </tr>
+                                     {{/each}}
+                                </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-1">
+
+                            </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group row">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Nombre
+                                        
+                                    </label>
+                                    <div class="col-md-5">
+                                        <input class="form-control input-sm" id="fnombre" name="fnombre" type="text" value="">
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 ">
+                                        <input type="hidden" name="fcodigo" id="fcodigo" value="{{codigo}}">
+                                        <button type="button" class="btn btn-success" onclick="cargaInformacionMallaEmpalmeBD()">Ingresar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-md-4">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>Empalmes Mallas Registradas</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <table class="table table-hover" name="tablaEmpalmesMallas" id="tablaEmpalmesMallas">
+                                <thead>
+                                    <tr>
+                                            <th>Nombre</th>
+                                            <th>Ver Configuración</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each empalmeMallasCargadas}}
+                                        <tr>
+                                            <td>{{nombre}}</td>
+                                            <td>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16" onclick="cargaInfoMallaEmpalme({{id_empalme_malla_proyecto}})">
+                                                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                                </svg>
+                                            </td>
+                                        </tr>
+                                     {{/each}}
+                                </tbody>
+                            </table>
+                            <div id="cargaTablaMallaEmpalme">
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                 </div>
+            </div>
+        </div>
+</div>

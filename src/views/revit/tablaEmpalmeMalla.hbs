@@ -1,0 +1,20 @@
+<table class="table table-striped" name="tablaEmpalmesMallas" id="tablaEmpalmesMallas">
+                                <thead>
+                                    <tr>
+                                            <th>Fierro</th>
+                                            <th>mm</th>
+                                            <th>Valor</th>
+                                            <th>id</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each infoMallaEmpalme}}
+                                        <tr>
+                                            <td>{{desripcion}}</td>
+                                            <td>{{mm}}</td>
+                                            <td>{{valor}}</td>
+                                            <td>{{id_fierros}}</td>
+                                        </tr>
+                                     {{/each}}
+                                </tbody>
+</table>

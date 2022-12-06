@@ -1,0 +1,43 @@
+ <div class="col-md-4">
+    <div class="x_panel">
+        <div class="x_content">
+                            <table class="table table-striped" name="tablaEmpalmes" id="tablaEmpalmes" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                            <th>Fierro</th>
+                                            <th>Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each infoFierros}}
+                                        <tr>
+                                                <td>{{desripcion}}</td>
+                                                <td>
+                                                    <input class="form-control input-sm" id="v_{{id_fierros}}" type="text" value="{{largo}}">
+                                                </td>
+                                        </tr>
+                                    {{/each}}
+                                </tbody>       
+                            </table>
+             <div class="form-group row">
+                    <!--
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Nombre
+                        
+                    </label>
+					<div class="col-md-5">
+						<input class="form-control input-sm" id="fnombre" name="fnombre" type="text" value="">
+					</div>
+                    -->
+                    <div class="col-md-2">
+
+                    </div>
+                    <div class="col-md-8">
+                        <input type="hidden" name="fcodigo" id="fcodigo" value="{{codigo}}">
+                        <input type="hidden" name="ftipo" id="ftipo" value="{{opt}}">
+                        <input type="hidden" name="forigen" id="forigen" value="{{origen}}">
+                        <button type="button" class="btn btn-success" onclick="cargaInformacionLargosFe()">Ingresar / Actualizar </button>
+                    </div>
+            </div>
+        </div>
+    </div>
+ </div>

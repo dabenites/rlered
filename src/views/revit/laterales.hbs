@@ -1,0 +1,47 @@
+<div class="col-md-12">
+        <div class="x_panel">
+             <div class="x_title">
+                <h2>Configuración Inicial <b>Laterales</b></h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+               <table class="table table-striped" name="tablaEmpalmes" id="tablaEmpalmes" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Altura Inicial</th>
+                            <th>Altura Final</th>
+                            <th>Nº Laterales</th>
+                            <th>Distancia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each laterales}}
+                            <tr>
+                                <td><input class="form-control input-sm" name="ai_{{id_laterales_info}}" id="ai_{{id_laterales_info}}" type="text" value="{{altura_inicial}}"></td>                
+                                <td><input class="form-control input-sm" name="af_{{id_laterales_info}}" id="af_{{id_laterales_info}}" type="text" value="{{altura_final}}"></td>
+                                <td><input class="form-control input-sm" name="nl_{{id_laterales_info}}" id="nl_{{id_laterales_info}}" type="text" value="{{num_laterales}}"></td>
+                                <td><input class="form-control input-sm" name="dt_{{id_laterales_info}}" id="dt_{{id_laterales_info}}" type="text" value="{{distancia}}"></td>
+                            </tr>
+                        {{/each}}
+                    </tbody>       
+                </table>
+                <div class="form-group row">
+                    <!--
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Nombre
+                        
+                    </label>
+					<div class="col-md-5">
+						<input class="form-control input-sm" id="fnombre" name="fnombre" type="text" value="">
+					</div>
+                    -->
+                    <div class="col-md-5">
+
+                    </div>
+                    <div class="col-md-6">
+                        <input type="hidden" name="fcodigo" id="fcodigo" value="{{codigo}}">
+                        <button type="button" class="btn btn-success" onclick="cargaInformacionLaterales()">{{opcion}}</button>
+                    </div>
+            </div>
+            </div>
+        </div>
+</div>

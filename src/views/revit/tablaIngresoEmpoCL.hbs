@@ -1,0 +1,69 @@
+ <form >
+ <table class="table table-striped" name="tablaEmpalmes" id="tablaEmpalmes" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                        <th>Hormigon</th>
+                                        <th>Ø8</th>
+                                        <th>Ø10</th>
+                                        <th>Ø12</th>
+                                        <th>Ø16</th>
+                                        <th>Ø18</th>
+                                        <th>Ø22</th>
+                                        <th>Ø25</th>
+                                        <th>Ø28</th>
+                                        <th>Ø32</th>
+                                        <th>Ø36</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                 {{#each infoHormigonfierro}}
+                                    <tr>
+                                            <th>{{hormigon}}</th>
+                                            <td>
+                                                <input class="form-control input-sm" id="v_{{hormigon_id}}_{{opt_k1}}" type="text" value="{{opt_k1v}}">
+                                            </td>
+                                            <td>
+                                                <input class="form-control input-sm" id="v_{{hormigon_id}}_{{opt_k2}}" type="text" value="{{opt_k2v}}">
+                                            </td>
+                                            <td>
+                                                <input class="form-control input-sm" id="v_{{hormigon_id}}_{{opt_k3}}" type="text" value="{{opt_k3v}}">
+                                            </td>
+                                            <td>
+                                                <input class="form-control input-sm" id="v_{{hormigon_id}}_{{opt_k4}}" type="text" value="{{opt_k4v}}">
+                                            </td>
+                                            <td>
+                                                <input class="form-control input-sm" id="v_{{hormigon_id}}_{{opt_k5}}" type="text" value="{{opt_k5v}}">
+                                            </td>
+                                            <td>
+                                                <input class="form-control input-sm" id="v_{{hormigon_id}}_{{opt_k6}}" type="text" value="{{opt_k6v}}">
+                                            </td>
+                                            <td>
+                                                <input class="form-control input-sm" id="v_{{hormigon_id}}_{{opt_k7}}" type="text" value="{{opt_k7v}}">
+                                            </td>
+                                            <td>
+                                                <input class="form-control input-sm" id="v_{{hormigon_id}}_{{opt_k8}}"  type="text" value="{{opt_k8v}}">
+                                            </td>
+                                            <td>
+                                                <input class="form-control input-sm" id="v_{{hormigon_id}}_{{opt_k9}}"  type="text" value="{{opt_k9v}}">
+                                            </td>
+                                            <td>
+                                                <input class="form-control input-sm" id="v_{{hormigon_id}}_{{opt_k10}}"  type="text" value="{{opt_k10v}}">
+                                            </td>
+                                    </tr>
+                                 {{/each}}
+                            </tbody>       
+ </table>
+ <div class="form-group row">
+                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Nombre
+                        
+                    </label>
+					<div class="col-md-4 col-sm-4 ">
+						<input class="form-control input-sm" id="fnombre" name="fnombre" type="text" value="{{opt_k10v}}">
+					</div>
+                    <div class="col-md-4 col-sm-4 ">
+                        <input type="hidden" name="fcodigo" id="fcodigo" value="{{codigo}}">
+                        <input type="hidden" name="ftipo" id="ftipo" value="{{tipo}}">
+                        <button type="button" class="btn btn-success" onclick="cargaInformacionEmpotramientoBD()">Ingresar</button>
+                    </div>
+                </div>
+                </form>

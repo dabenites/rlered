@@ -1,133 +1,154 @@
 <div class="col-md-12">
         <div class="x_panel">
              <div class="x_title">
-                <h2>Configuración Inicial <b>Empalmes Mallas</b></h2>
+                <h2>Criterios : <b>Empalmes Mallas</b></h2>
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-                <input type="hidden" name="id_codigo" id="id_codigo" value="{{id}}">
-                <div class="col-md-4">
-                    <div class="x_panel">
-                        <div class="x_title">
-                            <h2>Ingresar Empalmes Malla </h2>
-                            <div class="clearfix"></div>
+                <div class="row">
+                    <div class="col-md-3">
+                          <div class="row" >
+                            <div class="card border-dark">
+                                <div class="card-header">Criterios Ingresados</div>
+                                    <div class="card-body">
+                                        <table class="table table-hover" name="tablaCargas" id="tablaCargas" style="width: 100%;">
+                                            <tbody>
+                                                {{#each empalmeMallasCargadas}}
+                                                <tr>
+                                                    <td>{{nombre}}</td>
+                                                    <td>
+                                                        <a href="#" onclick="cargaInfoMallaEmpalme({{id_empalme_malla_proyecto}});"> 
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16" >
+                                                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                                        </svg>
+                                                        </a>
+
+                                                        <a href="#" onclick="EliminarRegistroMallaEmpalme({{id_empalme_malla_proyecto}}, '{{nombre}}')"> 
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                                                        </svg>
+                                                        </a>
+
+                                                        <a href="#" onclick="MarcaPredeterminadaMallaEmpalme({{id_empalme_malla_proyecto}}, '{{nombre}}', '{{../codigo}}')"> 
+
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{esPre}}" class="bi bi-file-check" viewBox="0 0 16 16">
+                                                        <path d="M10.854 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 8.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                                        <path d="M4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4zm0 1h8a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+                                                        </svg>
+
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {{/each}}
+                                            </tbody>
+                                        </table>
+                                        <div id="cargaTablaMallaEmpalme">
+
+                                        </div>
+                                    </div>
+                            </div>
+                          </div>
+                          <div class="row" style="padding-top: 1rem;">
+                            <div class="card border-dark">
+                                <div class="card-header">Criterio Predeterminado</div>
+                                    <div class="card-body">
+                                        {{predeterminada}}
+                                </div>
+                            </div>
                         </div>
-                        <div class="x_content">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="opcion" id="formula" onchange="cargaOpcionEmpalmeMalla();" checked>
-                                <label class="form-check-label" for="flexRadioDefault1">
-                                    Formula
-                                </label>
-                                </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="opcion" id="personificada" onchange="cargaOpcionEmpalmeMalla();">
-                                <label class="form-check-label" for="flexRadioDefault2">
-                                    Personalizada
-                                </label>
-                            </div> 
-
-                            <div class="form-group row" id="formulaRevisar">
-                                <label class="col-form-label col-md-2 label-align" for="titulo"> Texto
-                                </label>
-                                <div class="col-md-3">
-                                    <input type="text" name="veces" id="veces" value="" class="form-control">
-                                </div>
-                                <label class="col-form-label col-md-1 label-align" for="titulo"> Phi+ </label>
-                                <div class="col-md-3">
-                                    <input type="text" name="suma" id="suma" value="" class="form-control">
-                                </div>
-                                <div class="col-md-2">
-                                    <button type="button" class="btn btn-outline-success" onclick="cargaInfoTabla();">
-                                            Cal.
-                                    </button>
-                                </div>
+                    </div>
+                    <div class="col-md-9">
+                        <input type="hidden" name="id_codigo" id="id_codigo" value="{{id}}">
+                        <div class="x_panel">
+                            <div class="x_title">
+                                    <h2>Ingresar Empalmes Malla </h2>
+                                    <div class="clearfix"></div>
                             </div>
-                            <div class="row">
-                            <div class="col-md-1">
-
-                            </div>
-                            <div class="col-md-10">
-                                <table class="table table-striped" name="tablaEmpalmesMallas" id="tablaEmpalmesMallas">
-                                <thead>
-                                    <tr>
-                                            <th>Fierro</th>
-                                            <th>mm</th>
-                                            <th>Valor</th>
-                                            <th>id</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{#each fierros}}
-                                        <tr>
-                                            <td>{{desripcion}}</td>
-                                            <td>{{mm}}</td>
-                                            <td>
-                                                <input class="form-control input-sm" id="v_{{id_fierros}}" type="text" value="" readonly>
-                                            </td>
-                                            <td>{{id_fierros}}</td>
-                                        </tr>
-                                     {{/each}}
-                                </tbody>
-                                </table>
-                            </div>
-                            <div class="col-md-1">
-
-                            </div>
-                            </div>
-                            <div class="row">
-                                <div class="form-group row">
-                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Nombre
+                            <div class="x_content">
+                                 <div class="row" style="">
+                                        <div class="col-md-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="opcion" id="formula" onchange="cargaOpcionEmpalmeMalla();" checked>
+                                                <label class="form-check-label" for="flexRadioDefault1">
+                                                    Formula
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="opcion" id="personificada" onchange="cargaOpcionEmpalmeMalla();">
+                                                <label class="form-check-label" for="flexRadioDefault2">
+                                                    Personalizada
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="form-group row" id="formulaRevisar">
+                                                <label class="col-form-label col-md-2 label-align" for="titulo"> Texto
+                                                </label>
+                                                <div class="col-md-3">
+                                                    <input type="text" name="veces" id="veces" value="" class="form-control">
+                                                </div>
+                                                <label class="col-form-label col-md-1 label-align" for="titulo"> Phi+ </label>
+                                                <div class="col-md-3">
+                                                    <input type="text" name="suma" id="suma" value="" class="form-control">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button type="button" class="btn btn-outline-success" onclick="cargaInfoTabla();">
+                                                            Cal.
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                 </div>
+                                 <div class="row">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <table class="table table-striped" name="tablaEmpalmesMallas" id="tablaEmpalmesMallas">
+                                            <thead>
+                                                <tr>
+                                                        <th>Fierro</th>
+                                                        <th>mm</th>
+                                                        <th>Valor</th>
+                                                        <th>id</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {{#each fierros}}
+                                                    <tr>
+                                                        <td>{{desripcion}}</td>
+                                                        <td>{{mm}}</td>
+                                                        <td>
+                                                            <input class="form-control input-sm" id="v_{{id_fierros}}" type="text" value="" readonly>
+                                                        </td>
+                                                        <td>{{id_fierros}}</td>
+                                                    </tr>
+                                                {{/each}}
+                                            </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="row">
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-3 col-sm-3 label-align" for="titulo">Nombre
+                                                        
+                                                    </label>
+                                                    <div class="col-md-5">
+                                                        <input class="form-control input-sm" id="fnombre" name="fnombre" type="text" value="">
+                                                    </div>
+                                                    <div class="col-md-4 col-sm-4 ">
+                                                        <input type="hidden" name="fcodigo" id="fcodigo" value="{{codigo}}">
+                                                        <button type="button" class="btn btn-success" onclick="cargaInformacionMallaEmpalmeBD()">Ingresar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         
-                                    </label>
-                                    <div class="col-md-5">
-                                        <input class="form-control input-sm" id="fnombre" name="fnombre" type="text" value="">
                                     </div>
-                                    <div class="col-md-4 col-sm-4 ">
-                                        <input type="hidden" name="fcodigo" id="fcodigo" value="{{codigo}}">
-                                        <button type="button" class="btn btn-success" onclick="cargaInformacionMallaEmpalmeBD()">Ingresar</button>
-                                    </div>
-                                </div>
+                                    <div class="col-md-3"></div>
+                                 </div>
                             </div>
-                            
                         </div>
                     </div>
                 </div>
-                 <div class="col-md-4">
-                    <div class="x_panel">
-                        <div class="x_title">
-                            <h2>Empalmes Mallas Registradas</h2>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="x_content">
-                            <table class="table table-hover" name="tablaEmpalmesMallas" id="tablaEmpalmesMallas">
-                                <thead>
-                                    <tr>
-                                            <th>Nombre</th>
-                                            <th>Ver Configuración</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{#each empalmeMallasCargadas}}
-                                        <tr>
-                                            <td>{{nombre}}</td>
-                                            <td>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16" onclick="cargaInfoMallaEmpalme({{id_empalme_malla_proyecto}})">
-                                                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                                                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-                                                </svg>
-                                            </td>
-                                        </tr>
-                                     {{/each}}
-                                </tbody>
-                            </table>
-                            <div id="cargaTablaMallaEmpalme">
-
-                            </div>
-
-                        </div>
-                    </div>
-
-                 </div>
             </div>
         </div>
 </div>

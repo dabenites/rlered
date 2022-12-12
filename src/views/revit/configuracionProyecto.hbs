@@ -1,17 +1,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <div class="col-md-4 col-sm-4  ">
+    <div class="col-md-3">
         <div class="x_panel">
             <div class="x_title">
-                <h2>Configuración Inicial</h2>
+                <h2>Ingresar Configuración Inicial - Criterios de Armado</h2>
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
                   <div class="form-group row">
-                        <label for="staticEmail" class="col-sm-2 col-form-label"> <b>Proyecto :</b></label>
+                        <label for="staticEmail" class="col-sm-3 col-form-label"> <b>Proyecto :</b></label>
                         <label for="staticEmail" class="col-sm-8 col-form-label">{{informacion.year}}_{{informacion.code}} {{informacion.nombre}} </label>
                   </div>
                   <div class="form-group row">
-                     <label for="staticEmail" class="col-sm-2 col-form-label"> <b>Código :</b></label>
+                     <label for="staticEmail" class="col-sm-3 col-form-label"> <b>Código :</b></label>
                       <label for="staticEmail" class="col-sm-8 col-form-label">{{informacion.codigo}} </label>
                   </div>
                 
@@ -87,6 +87,16 @@
                                         <td>Largo Fierro </td>
                                         <td>
                                             <a href="#" onclick="cargaCriterioRevision({{informacion.id_origen_proyecto}} , 7)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                            <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                                            </svg>
+                                            </a>
+                                        </td>
+                                </tr>
+                                <tr>
+                                        <td>Fe Vigas</td>
+                                        <td>
+                                            <a href="#" onclick="cargaCriterioRevision({{informacion.id_origen_proyecto}} , 8)">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
                                             <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
                                             </svg>
@@ -685,4 +695,261 @@
                         });
 
     }
+
+    function cargarFeVigas()
+    {
+
+        let as1 = $('#as1').val();
+        let as2 = $('#as2').val();
+        let bs1 = $('#bs1').val();
+        let bs2 = $('#bs2').val();
+        let cs1 = $('#cs1').val();
+        let cs2 = $('#cs2').val();
+
+        let ai1 = $('#ai1').val();
+        let ai2 = $('#ai2').val();
+        let bi1 = $('#bi1').val();
+        let bi2 = $('#bi2').val();
+        let ci1 = $('#ci1').val();
+        let ci2 = $('#ci2').val();
+
+        let maxima = $('#maxima').val();
+        let nombre = $('#nombre').val();
+        let codigo = $('#fcodigo').val();
+
+
+        let elementos = document.querySelectorAll("input[type=text], input[type=email]");
+
+        let datos = [];
+
+        elementos.forEach((elemento) => {
+                datos.push({
+                    id : elemento.id,
+                    valor : elemento.value
+                });
+                
+            });
+
+        var infoData = JSON.stringify(datos);
+
+        let informacion = { as1, as2, bs1,bs2,cs1,cs2,
+                            ai1, ai2, bi1,bi2,ci1,ci2,  codigo, nombre,maxima, infoData};
+
+
+        $.ajax({
+                type: 'post',
+                url: '/revit/cargaFeVigas',
+                data: informacion,
+                dataType: 'text'
+                        })
+                        .done(function (data) {
+                            location.reload();
+                        });
+    
+
+    }
+
+    function EliminarRegistroEmpalme( id , nombre)
+    {
+        if (confirm("Esta seguro de elminar el empalme " + nombre))
+        {
+            let informacion = { id}
+            $.ajax({
+                type: 'post',
+                url: '/revit/eliminarEmpalme',
+                data: informacion,
+                dataType: 'text'
+                        })
+                        .done(function (data) {
+                            location.reload();
+                        });
+
+        }
+        
+
+    }
+
+    function EliminarRegistroFeVigas( id , nombre)
+    {
+        if (confirm("Esta seguro de elminar la configuracion de vigas :  " + nombre))
+        {
+            let informacion = { id}
+            $.ajax({
+                type: 'post',
+                url: '/revit/eliminarFeVigas',
+                data: informacion,
+                dataType: 'text'
+                        })
+                        .done(function (data) {
+                            location.reload();
+                        });
+
+        }
+        
+
+    }
+
+
+    function EliminarRegistroEmpotramiento( id , nombre)
+    {
+        if (confirm("Esta seguro de elminar el empotramiento " + nombre))
+        {
+            let informacion = { id}
+            $.ajax({
+                type: 'post',
+                url: '/revit/eliminarEmpotramiento',
+                data: informacion,
+                dataType: 'text'
+                        })
+                        .done(function (data) {
+                            location.reload();
+                        });
+
+        }
+        
+
+    }
+
+    function EliminarRegistroMallaEmpalme(id, nombre)
+    {
+
+        if (confirm("Esta seguro de elminar la Malla Empalme " + nombre))
+        {
+            let informacion = { id}
+            $.ajax({
+                type: 'post',
+                url: '/revit/eliminarMallaEmpalme',
+                data: informacion,
+                dataType: 'text'
+                        })
+                        .done(function (data) {
+                            location.reload();
+                        });
+
+        }
+
+    }
+
+    function MarcaPredeterminadaEmpalme(id , nombre, codigo)
+    {
+        if (confirm("Esta seguro de marcar como predeterminada el empalme " + nombre))
+            {
+                let informacion = { id , codigo}
+                $.ajax({
+                    type: 'post',
+                    url: '/revit/EmpalmePredeterminado',
+                    data: informacion,
+                    dataType: 'text'
+                            })
+                            .done(function (data) {
+                                location.reload();
+                            });
+
+            }
+    }
+    
+    function MarcaPredeterminadaEmpotramiento(id , nombre, codigo)
+    {
+        if (confirm("Esta seguro de marcar como predeterminada el empotramiento " + nombre))
+            {
+                let informacion = { id , codigo}
+                $.ajax({
+                    type: 'post',
+                    url: '/revit/EmpotramientoPredeterminado',
+                    data: informacion,
+                    dataType: 'text'
+                            })
+                            .done(function (data) {
+                                location.reload();
+                            });
+
+            }
+    }
+
+
+    function MarcaPredeterminadaMallaEmpalme(id , nombre, codigo)
+    {
+        if (confirm("Esta seguro de marcar como predeterminada la Malla Empalme " + nombre))
+            {
+                let informacion = { id , codigo}
+                $.ajax({
+                    type: 'post',
+                    url: '/revit/MallaEmpalmePredeterminado',
+                    data: informacion,
+                    dataType: 'text'
+                            })
+                            .done(function (data) {
+                                location.reload();
+                            });
+
+            }
+    }
+
+    function MarcaPredeterminadaFeVigas(id , nombre, codigo)
+    {
+        if (confirm("Esta seguro de marcar como predeterminada la configuracion Fe Vigas " + nombre))
+            {
+                let informacion = { id , codigo}
+                $.ajax({
+                    type: 'post',
+                    url: '/revit/FeVigasPredeterminado',
+                    data: informacion,
+                    dataType: 'text'
+                            })
+                            .done(function (data) {
+                                location.reload();
+                            });
+
+            }
+    }
+
+    
+
+    function cargaValoresFeVigas( id )
+    {
+
+        //console.log(id);
+        let informacion = { id }
+
+         $.ajax({
+                    type: 'post',
+                    url: '/revit/cargaValoresFeVigas',
+                    data: informacion,
+                    dataType: 'text'
+                            })
+                            .done(function (data) {
+                                //location.reload();
+                                let info = JSON.parse(data);
+                                // cargar las variables. 
+                                
+                                $("#as1").val(info.general.pata_sup_izq_1);
+                                $("#as2").val(info.general.pata_sup_izq_2);
+
+                                $("#bs1").val(info.general.tramo_sup_izq_1);
+                                $("#bs2").val(info.general.tramo_sup_izq_2);
+
+                                $("#cs1").val(info.general.pata_sup_der_1);
+                                $("#cs2").val(info.general.pata_sup_der_2);
+
+                                $("#ai1").val(info.general.pata_inf_izq_1);
+                                $("#ai2").val(info.general.pata_inf_izq_2);
+
+                                $("#bi1").val(info.general.tramo_inf_izq_1);
+                                $("#bi2").val(info.general.tramo_inf_izq_2);
+
+                                $("#ci1").val(info.general.pata_inf_der_1);
+                                $("#ci2").val(info.general.pata_inf_der_2);
+
+                                $("#maxima").val(info.general.largo_l1);
+
+                                // FOREACH
+                                info.detalle.forEach(function(element) {
+                                    $("#v_"+element.id_fierro).val(element.valor);
+                                });
+                            });
+
+    }
+
+
+//
 </script>

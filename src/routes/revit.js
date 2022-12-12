@@ -1081,8 +1081,18 @@ router.post('/cargaCriterio', isLoggedIn, async (req, res) => {
         case 2: // Emapalme Malla 
         case "2":
             // Mallas Cargadas 
-            let empalmeMallasCargadas =  await pool.query("SELECT * FROM rvt_cfg_empalme_malla_proyecto as t1 where t1.codigo_proyecto =  ? ",[codigo]);
-            res.render('revit/empalmesMallas', { empalmeMallasCargadas, codigo,fierros, id,  req ,res, layout: 'blanco'});
+            let empalmeMallasCargadas =  await pool.query("SELECT *, if(t1.esPredeterminada = 'SI','green','currentColor') AS esPre "+
+                                                          " FROM rvt_cfg_empalme_malla_proyecto as t1 where t1.codigo_proyecto =  ? ",[codigo]);
+
+            
+            let optPrede = await pool.query("SELECT * FROM rvt_cfg_empalme_malla_proyecto as t1 WHERE t1.codigo_proyecto = ? AND esPredeterminada = 'SI' ", [codigo]); 
+
+            let predeterminada = "";
+                                                      
+            if (optPrede.length == 1){predeterminada = optPrede[0].nombre;}
+            else { predeterminada = "No existe una opcion predeterminada";}
+
+            res.render('revit/empalmesMallas', { predeterminada, empalmeMallasCargadas, codigo,fierros, id,  req ,res, layout: 'blanco'});
         break;
 
         case 3: // Anclajes
@@ -1112,7 +1122,13 @@ router.post('/cargaCriterio', isLoggedIn, async (req, res) => {
                                                 " WHERE  " +
                                                     "t1.id_origen = ?", [codigo, origen[0].id_origen]);
 
-            res.render('revit/Patas', {  infoFierros, origen:origen[0].id_origen, codigo,id, req ,res, layout: 'blanco'});
+            let msjBoton = "";
+
+            if (infoFierros[0].largo == ""){msjBoton = "Ingresar";            }
+            else {msjBoton = "Actualizar";}
+
+
+            res.render('revit/Patas', {  msjBoton, infoFierros, origen:origen[0].id_origen, codigo,id, req ,res, layout: 'blanco'});
         break;
 
         case 6:
@@ -1128,7 +1144,6 @@ router.post('/cargaCriterio', isLoggedIn, async (req, res) => {
                                              " AND  " +
                                                     " t1.id_cfg_laterales = t2.id_configuracion_empalme",[codigo]);
 
-            //console.log(laterales.length);
             let mensaje = "";
             let opcion = "Actualizar";
             if (laterales.length == 0 )
@@ -1158,6 +1173,23 @@ router.post('/cargaCriterio', isLoggedIn, async (req, res) => {
             res.render('revit/largoFe', {  tipoObjetos,id, req ,res, layout: 'blanco'});
         break;
 
+
+        case 8:
+        case "8"://Fe Vigas
+            let = cargadas = await pool.query("SELECT *, if(t1.esPredeterminada = 'SI','green','currentColor') AS esPre FROM rvt_cfg_fe AS t1 WHERE t1.codigo_proyecto = ? AND t1.estado = 'SI'", [codigo]);
+
+
+            let optPrede2 = await pool.query("SELECT * FROM rvt_cfg_fe as t1 WHERE t1.codigo_proyecto = ? AND esPredeterminada = 'SI' AND id_tipo_objeto = 2 ", [codigo]); 
+
+            let predeterminada2 = "";
+                                                      
+            if (optPrede2.length == 1){predeterminada2 = optPrede2[0].descripcion;}
+            else { predeterminada2 = "No existe una opcion predeterminada";}
+
+
+            res.render('revit/FeVigas', {  predeterminada2, cargadas, fierros,codigo, id, req ,res, layout: 'blanco'});
+        break;
+
     }
 
     //res.send("asdadsa");
@@ -1180,12 +1212,123 @@ router.post('/cargaOpcionesEmpalme', isLoggedIn, async (req, res) => {
     let codigo = infoOrigen[0].annio + "_" + infoOrigen[0].code;
     //codigo = "2022_04"; // estatico para que muestre informacion
 
-    let opcionesCargadas = await pool.query("SELECT * FROM rvt_cfg_empalme as t1 WHERE t1.codigo_proyecto = ? AND t1.id_tipo_objeto = ? ", [codigo,opt]); 
+    let opcionesCargadas = await pool.query("SELECT *, if(t1.esPredeterminada = 'SI','green','currentColor') AS esPre FROM rvt_cfg_empalme as t1 WHERE t1.codigo_proyecto = ? AND t1.id_tipo_objeto = ? ", [codigo,opt]); 
 
-    res.render('revit/optDefectoCargadas', { idCodigo, codigo, opt, opcionesDefecto,opcionesCargadas,  req ,res, layout: 'blanco'});
+   
+    let optPrede = await pool.query("SELECT * FROM rvt_cfg_empalme as t1 WHERE t1.codigo_proyecto = ? AND t1.id_tipo_objeto = ? AND esPredeterminada = 'SI' ", [codigo,opt]); 
+
+    let predeterminada = "";
+
+    if (optPrede.length == 1)
+    {
+        predeterminada = optPrede[0].descripcion;
+    }
+    else
+    {
+        predeterminada = "No existe una opcion predeterminada";
+    }
+
+
+    res.render('revit/optDefectoCargadas', { predeterminada, idCodigo, codigo, opt, opcionesDefecto,opcionesCargadas,  req ,res, layout: 'blanco'});
    
 
 });
+//eliminarEmpalme
+router.post('/eliminarEmpalme', isLoggedIn, async (req, res) => {
+    
+    const { id} = req.body;
+
+    let cab = await pool.query('DELETE FROM rvt_cfg_empalme WHERE id_configuracion_empalme = ? LIMIT 1;', [id]);
+    let det = await pool.query('DELETE FROM rvt_cfg_empalme_proyecto WHERE id_configuracion_empalme = ?;', [id]);
+
+    res.send("ok");
+
+});
+
+router.post('/eliminarFeVigas', isLoggedIn, async (req, res) => {
+    
+    const { id} = req.body;
+
+    let cab = await pool.query('DELETE FROM rvt_cfg_fe WHERE id_configuracion_fe = ? LIMIT 1;', [id]);
+    let cab2 = await pool.query('DELETE FROM rvt_cfg_fe_vigas WHERE id_configuracion_fe = ? LIMIT 1;', [id]);
+    let det = await pool.query('DELETE FROM rvt_cfg_fe_vigas_fierros WHERE id_configuracion_fe = ?', [id]);
+
+    res.send("ok");
+
+});
+
+//eliminarFeVigas
+
+router.post('/eliminarMallaEmpalme', isLoggedIn, async (req, res) => {
+    
+    const { id} = req.body;
+
+    let cab = await pool.query('DELETE FROM rvt_cfg_empalme_malla_proyecto WHERE id_empalme_malla_proyecto = ? LIMIT 1;', [id]);
+    let det = await pool.query('DELETE FROM rvt_cfg_empalme_malla_proyecto_detalle WHERE id_empalme_malla = ? ', [id]);
+
+    res.send("ok");
+
+});
+
+router.post('/eliminarEmpotramiento', isLoggedIn, async (req, res) => {
+    
+    const { id} = req.body;
+
+    let cab = await pool.query('DELETE FROM rvt_cfg_empotramiento WHERE id_configuracion_empotramiento = ? LIMIT 1;', [id]);
+    let det = await pool.query('DELETE FROM rvt_cfg_empotramiento_proyecto WHERE id_configuracion_empotramiento = ? ', [id]);
+
+    res.send("ok");
+
+});
+
+
+
+router.post('/EmpalmePredeterminado', isLoggedIn, async (req, res) => {
+    
+    const { id ,codigo} = req.body;
+    //const updateCabecera = pool.query("UPDATE  rvt_cfg_largo_anclaje  set  estado = 'NO' WHERE  codigo_proyecto = ? ", [codigo]);
+    let cab = await pool.query("UPDATE  rvt_cfg_empalme set  esPredeterminada = 'NO' WHERE codigo_proyecto = ?;", [codigo]);
+    let det = await pool.query("UPDATE  rvt_cfg_empalme set  esPredeterminada = 'SI' WHERE id_configuracion_empalme = ? LIMIT 1;", [id]);
+
+    res.send("ok");
+
+});
+
+//MallaEmpalmePredeterminado
+router.post('/MallaEmpalmePredeterminado', isLoggedIn, async (req, res) => {
+    
+    const { id ,codigo} = req.body;
+    //const updateCabecera = pool.query("UPDATE  rvt_cfg_largo_anclaje  set  estado = 'NO' WHERE  codigo_proyecto = ? ", [codigo]);
+    let cab = await pool.query("UPDATE  rvt_cfg_empalme_malla_proyecto set  esPredeterminada = 'NO' WHERE codigo_proyecto = ?;", [codigo]);
+    let det = await pool.query("UPDATE  rvt_cfg_empalme_malla_proyecto set  esPredeterminada = 'SI' WHERE id_empalme_malla_proyecto = ? LIMIT 1;", [id]);
+
+    res.send("ok");
+
+});
+router.post('/EmpotramientoPredeterminado', isLoggedIn, async (req, res) => {
+    
+    const { id ,codigo} = req.body;
+    //const updateCabecera = pool.query("UPDATE  rvt_cfg_largo_anclaje  set  estado = 'NO' WHERE  codigo_proyecto = ? ", [codigo]);
+    let cab = await pool.query("UPDATE  rvt_cfg_empotramiento set  esPredeterminada = 'NO' WHERE codigo_proyecto = ?;", [codigo]);
+    let det = await pool.query("UPDATE  rvt_cfg_empotramiento set  esPredeterminada = 'SI' WHERE id_configuracion_empotramiento = ? LIMIT 1;", [id]);
+
+    res.send("ok");
+
+});
+
+router.post('/FeVigasPredeterminado', isLoggedIn, async (req, res) => {
+    
+    const { id ,codigo} = req.body;
+    //const updateCabecera = pool.query("UPDATE  rvt_cfg_largo_anclaje  set  estado = 'NO' WHERE  codigo_proyecto = ? ", [codigo]);
+    let cab = await pool.query("UPDATE  rvt_cfg_fe set  esPredeterminada = 'NO' WHERE codigo_proyecto = ? AND id_tipo_objeto = 2 ;", [codigo]);
+    let det = await pool.query("UPDATE  rvt_cfg_fe set  esPredeterminada = 'SI' WHERE id_configuracion_fe = ? LIMIT 1;", [id]);
+
+    res.send("ok");
+
+});
+
+///FeVigasPredeterminado
+
 
 router.post('/cargaOpcionesEmpalmeTabla', isLoggedIn, async (req, res) => {
 
@@ -1504,10 +1647,23 @@ router.post('/cargaOpcionesAnclaje', isLoggedIn, async (req, res) => {
 
         */
                                     
-
+    let optPrede = await pool.query("SELECT * FROM rvt_cfg_largo_anclaje as t1 WHERE t1.codigo_proyecto = ? AND id_tipo_objeto = ? AND estado = 'SI' ", [codigo,opt ]);
 
     
-    res.render('revit/tablaFierros', { origen,  infoFierros, codigo,opt, req ,res, layout: 'blanco'});
+    let predeterminada = "";
+
+    if (optPrede.length == 1)
+    {
+        predeterminada = "Actualizar";
+    }
+    else
+    {
+        predeterminada = "Ingresar";
+    }
+
+
+
+    res.render('revit/tablaFierros', { predeterminada, origen,  infoFierros, codigo,opt, req ,res, layout: 'blanco'});
 
 });
 
@@ -1658,10 +1814,14 @@ router.post('/cargaOpcionesLargoFe', isLoggedIn, async (req, res) => {
                                             " WHERE  "  +
                                                 " t1.id_origen = ?", [codigo, opt, origen]);
                                     
+        let msjBoton = "";
+        console.log(infoFierros);
 
-
+        if (infoFierros[0].largo == "" || infoFierros[0].largo == null){ msjBoton = "Ingresar";}
+        else { msjBoton = "Actualizar";}
+        
     
-    res.render('revit/tablaFierrosLargoFe', { origen,  infoFierros, codigo,opt, req ,res, layout: 'blanco'});
+    res.render('revit/tablaFierrosLargoFe', { msjBoton, origen,  infoFierros, codigo,opt, req ,res, layout: 'blanco'});
 
 });
 
@@ -1732,9 +1892,19 @@ router.post('/cargaOpcionesEmpotramiento', isLoggedIn, async (req, res) => {
     let codigo = infoOrigen[0].annio + "_" + infoOrigen[0].code;
     //codigo = "2022_04"; // estatico para que muestre informacion
 
-    let opcionesCargadas = await pool.query("SELECT * FROM rvt_cfg_empotramiento as t1 WHERE t1.codigo_proyecto = ? AND t1.id_tipo_objeto = ? ", [codigo,opt]); 
+    let opcionesCargadas = await pool.query("SELECT *, if(t1.esPredeterminada = 'SI','green','currentColor') AS esPre FROM rvt_cfg_empotramiento as t1 WHERE t1.codigo_proyecto = ? AND t1.id_tipo_objeto = ? ", [codigo,opt]); 
 
-    res.render('revit/optDefectoCargadasEmpotramiento', { idCodigo, codigo, opt, opcionesDefecto,opcionesCargadas,  req ,res, layout: 'blanco'});
+   // console.log(opcionesCargadas);
+
+   let optPrede = await pool.query("SELECT * FROM rvt_cfg_empotramiento as t1 WHERE t1.codigo_proyecto = ? AND id_tipo_objeto = ? AND esPredeterminada = 'SI' ", [codigo , opt]); 
+
+            let predeterminada = "";
+                                                      
+            if (optPrede.length == 1){predeterminada = optPrede[0].descripcion;}
+            else { predeterminada = "No existe una opcion predeterminada";}
+
+
+    res.render('revit/optDefectoCargadasEmpotramiento', { predeterminada, idCodigo, codigo, opt, opcionesDefecto,opcionesCargadas,  req ,res, layout: 'blanco'});
    
 
 });
@@ -2050,6 +2220,120 @@ router.post('/cargaInformacionLaterales', isLoggedIn, async (req, res) => {
 
 });
 
+//cargaFeVigas
+router.post('/cargaFeVigas', isLoggedIn, async (req, res) => {
+
+    const { codigo,  as1 ,as2 ,bs1,bs2,cs1,cs2,ai1,ai2,bi1,bi2,ci1,ci2,nombre,maxima ,infoData} = req.body;
+
+
+    let data = JSON.parse(infoData);   
+
+    let registros= [];
+
+    data.forEach(element => {
+
+        let informacion =   element.id.split("_");
+
+        //console.log(informacion.length);
+        if (informacion.length == 2)
+        {
+            registros.push({
+                id_fierro : informacion[1],
+                valor : element.valor
+            });
+
+        }
+    });
+
+
+    let dato = {
+        login : req.user.login,
+        fecha_ingreso : new Date(),
+        estado : "SI",
+        esPredeterminada : "NO",
+        codigo_proyecto :codigo,
+        descripcion : nombre,
+        id_tipo_objeto : 2
+
+    };
+
+    const insertCabecera = pool.query('INSERT INTO rvt_cfg_fe  set ? ', [dato]);
+
+
+    insertCabecera.then( function(rest) {
+
+        idInsertCabecera = rest.insertId;
+
+        let dato2 = {
+            id_configuracion_fe : idInsertCabecera,
+            pata_sup_izq_1 :as1,
+            pata_sup_izq_2 : as2,
+            tramo_sup_izq_1 : bs1,
+            tramo_sup_izq_2 : bs2,
+            tramo_sup_der_2  : bs2,
+            pata_sup_der_1 : cs1,
+            pata_sup_der_2 : cs2,
+            pata_inf_izq_1 : ai1,
+            pata_inf_izq_2 : ai2,
+            tramo_inf_izq_1 : bi1,
+            tramo_inf_izq_2 : bi2,
+            tramo_inf_der_2 : bi2,
+            pata_inf_der_1 : ci1,
+            pata_inf_der_2 :ci2,
+            largo_l1 : maxima
+        }
+
+        const insertCabecera = pool.query('INSERT INTO rvt_cfg_fe_vigas  set ? ', [dato2]);
+
+
+        registros.forEach( e => {
+            //rvt_cfg_laterales_info 
+            let dato = {
+                id_configuracion_fe : idInsertCabecera,
+                id_fierro : e.id_fierro,
+                valor : e.valor
+            };
+
+            const datoCabecera = pool.query('INSERT INTO rvt_cfg_fe_vigas_fierros  set ? ', [dato]);
+
+        }
+       );
+
+
+
+    });
+
+   
+
+
+
+
+    res.send("OK");
+
+
+
+});
+//cargaValoresFeVigas
+
+router.post('/cargaValoresFeVigas', isLoggedIn, async (req, res) => {
+
+    const { id} = req.body;
+
+
+    let feVigas = await pool.query("SELECT * FROM rvt_cfg_fe_vigas as t1 WHERE t1.id_configuracion_fe = ? ", [id]);
+    let feVigasDetalle = await pool.query("SELECT * FROM rvt_cfg_fe_vigas_fierros as t1 WHERE t1.id_configuracion_fe = ? ", [id]);
+
+
+    let informacion = {
+        general : feVigas[0],
+        detalle : feVigasDetalle
+    }
+
+    res.send(informacion);
+
+
+
+});
 
 
 function buscaValorDefecto(informacion , id_hormigon, id_fierro)

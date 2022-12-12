@@ -100,6 +100,9 @@ app.use('/finanzas', require('./routes/finanzas'));
 
 app.use('/revit', require('./routes/revit'));
 
+//app.use('/imagenes', require('./images'));
+
+
 
 
 
@@ -107,6 +110,7 @@ app.use('/revit', require('./routes/revit'));
 //Archivos publicos 
 // app.use(express.static(path.join("netoffice.herokuapp.com", 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 //Satart servidor 
 app.listen(app.get('port'), () => {

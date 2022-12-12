@@ -1,0 +1,252 @@
+<div class="col-md-12">
+        <div class="x_panel">
+             <div class="x_title">
+                <h2>Criterios :<b>Fe Vigas</b></h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="row" >
+                            <div class="card border-dark">
+                                    <div class="card-header">Criterios Ingresados</div>
+                                        <div class="card-body">
+                                            <table class="table table-hover" name="tablaCargas" id="tablaCargas" style="width: 100%;">
+                                                <tbody>
+                                                    {{#each cargadas}}
+                                                        <tr>
+                                                            <td>{{descripcion}}</td>
+                                                            <td>
+                                                                <a href="#" onclick="cargaValoresFeVigas( {{id_configuracion_fe}})">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-index" viewBox="0 0 16 16">
+                                                                    <path d="M6.75 1a.75.75 0 0 1 .75.75V8a.5.5 0 0 0 1 0V5.467l.086-.004c.317-.012.637-.008.816.027.134.027.294.096.448.182.077.042.15.147.15.314V8a.5.5 0 1 0 1 0V6.435a4.9 4.9 0 0 1 .106-.01c.316-.024.584-.01.708.04.118.046.3.207.486.43.081.096.15.19.2.259V8.5a.5.5 0 0 0 1 0v-1h.342a1 1 0 0 1 .995 1.1l-.271 2.715a2.5 2.5 0 0 1-.317.991l-1.395 2.442a.5.5 0 0 1-.434.252H6.035a.5.5 0 0 1-.416-.223l-1.433-2.15a1.5 1.5 0 0 1-.243-.666l-.345-3.105a.5.5 0 0 1 .399-.546L5 8.11V9a.5.5 0 0 0 1 0V1.75A.75.75 0 0 1 6.75 1zM8.5 4.466V1.75a1.75 1.75 0 1 0-3.5 0v5.34l-1.2.24a1.5 1.5 0 0 0-1.196 1.636l.345 3.106a2.5 2.5 0 0 0 .405 1.11l1.433 2.15A1.5 1.5 0 0 0 6.035 16h6.385a1.5 1.5 0 0 0 1.302-.756l1.395-2.441a3.5 3.5 0 0 0 .444-1.389l.271-2.715a2 2 0 0 0-1.99-2.199h-.581a5.114 5.114 0 0 0-.195-.248c-.191-.229-.51-.568-.88-.716-.364-.146-.846-.132-1.158-.108l-.132.012a1.26 1.26 0 0 0-.56-.642 2.632 2.632 0 0 0-.738-.288c-.31-.062-.739-.058-1.05-.046l-.048.002zm2.094 2.025z"></path>
+                                                                </svg>
+                                                                </a>
+
+                                                                <a href="#" onclick="EliminarRegistroFeVigas({{id_configuracion_fe}}, '{{descripcion}}')"> 
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                                                                </svg>
+                                                                </a>
+
+                                                                <a href="#" onclick="MarcaPredeterminadaFeVigas({{id_configuracion_fe}}, '{{descripcion}}', '{{../codigo}}')"> 
+
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="{{esPre}}" class="bi bi-file-check" viewBox="0 0 16 16">
+                                                                <path d="M10.854 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 8.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                                                <path d="M4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4zm0 1h8a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+                                                                </svg>
+
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    {{/each}}
+                                                </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="padding-top: 1rem;">
+                                <div class="card border-dark">
+                                    <div class="card-header">Criterio Predeterminado</div>
+                                        <div class="card-body">
+                                            {{predeterminada2}}
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    As1
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="as1" name="as1" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    Bs1
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="bs1" name="bs1" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    Cs1
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="cs1" name="cs1" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    As2
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="as2" name="as2" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    Bs2
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="bs2" name="bs2" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    Cs2
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="cs2" name="cs2" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <img src="../../../img/seteoViga.png" class="img-fluid" alt="Responsive image">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    Ai1
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="ai1" name="ai1" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    Bi1
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="bi1" name="bi1" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    Ci1
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="ci1" name="ci1" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    Ai2
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="ai2" name="ai2" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    Bi2
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="bi2" name="bi2" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-md-3">
+                                    Ci2
+                                </div>
+                                <div class="col-md-6">
+                                    <input class="form-control input-sm" id="ci2" name="ci2" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                </div>
+                                <div class="col-md-2">
+                                    [cm]
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="padding-top: 1.0rem;">
+                            <div class="col-md-4">
+                                <table class="table table-striped" name="tablaEmpalmes" id="tablaEmpalmes" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                                <th>Fierro</th>
+                                                <th>Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{#each fierros}}
+                                            <tr style="padding: 0.1rem 0.1rem;">
+                                                    <td>{{desripcion}}</td>
+                                                    <td>
+                                                        <input class="form-control input-sm" id="v_{{id_fierros}}" type="text" value="" style="padding: 0.0rem 0.0rem;">
+                                                    </td>
+                                            </tr>
+                                        {{/each}}
+                                    </tbody>       
+                                </table>
+                            </div>
+                            <div class="col-md-8" style="padding-top: 2rem;">
+                                <div class="form-group row">
+                                    <label class="col-form-label col-md-6 label-align" for="titulo">Distancia de máxima cuantía
+                        
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input class="form-control input-sm" id="maxima" name="maxima" type="text" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-form-label col-md-6 label-align" for="titulo">Nombre
+                        
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input class="form-control input-sm" id="nombre" name="nombre" type="text" value="">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="hidden" name="fcodigo" id="fcodigo" value="{{codigo}}">
+                                        <button type="button" class="btn btn-success" onclick="cargarFeVigas()">Ingresar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>

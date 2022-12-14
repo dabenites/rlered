@@ -11,6 +11,7 @@ const { isLoggedIn } = require('../lib/auth');
 const fs = require('fs');
 const mensajeria = require('../mensajeria/mail');
 var formidable = require('formidable');
+const e = require('connect-flash');
 
 
 router.post('/cargaRutinas', isLoggedIn, async (req, res) => {
@@ -2331,6 +2332,497 @@ router.post('/cargaValoresFeVigas', isLoggedIn, async (req, res) => {
 
     res.send(informacion);
 
+
+
+});
+
+
+//cargoInfoProyecto
+router.get('/cargoInfoProyecto/:id', isLoggedIn, async (req, res) => {
+
+    const { id } = req.params;
+
+    let informacion = await pool.query("SELECT t1.*, t2.nombre FROM rvt_origen_proyecto as t1 " +
+                                        " LEFT JOIN pro_proyectos as t2 on t1.id_proyecto = t2.id WHERE t1.id_origen_proyecto = ? ", [id]);
+
+    //console.log( informacion );
+
+    let codigos = await pool.query(" SELECT "+
+                                    " t1.id_origen_proyecto AS id," +
+                                    " t3.nombre, " +
+                                    " t2.descripcion, " +
+                                    " t1.annio, " +
+                                    " t1.code " +
+                                    " FROM  " +
+                                            " rvt_origen_proyecto AS t1 " +
+                                            " LEFT JOIN rvt_origen_fierro AS t2 ON t1.id_origen = t2.id_origen " +
+                                            " LEFT JOIN pro_proyectos AS t3 ON t1.id_proyecto = t3.id");
+
+
+    
+res.render('revit/duplicadoInfo', {codigos,  informacion:informacion[0], req ,res, layout: 'template'});
+
+});
+//duplicaInformacion
+router.post('/duplicaInformacion', isLoggedIn, async (req, res) => {
+
+    const { idBase , idEjemplo} = req.body;
+
+    //rvt_origen_proyecto
+    let infoProyectoBase = await pool.query("SELECT * FROM rvt_origen_proyecto as t1 WHERE t1.id_origen_proyecto = ? ", [idBase]);
+    let codigoProyectoBase = infoProyectoBase[0].annio+"_"+ infoProyectoBase[0].code;
+
+    let infoProyectoFind = await pool.query("SELECT * FROM rvt_origen_proyecto as t1 WHERE t1.id_origen_proyecto = ? ", [idEjemplo]);
+    let codigoProyectoFind = infoProyectoFind[0].annio+"_"+ infoProyectoFind[0].code;
+
+
+    // Borrar la informacion completa de un proyecto. 
+    // Empalmes
+    // Empalme Mallas
+    // Anclaje
+    // Empotramiento
+    // Patas 
+    // Laterales
+    // LArgo Fierro
+    // Fe Vigas. 
+
+    let detalleEmpalme = await pool.query(" DELETE FROM rvt_cfg_empalme_proyecto  WHERE " +
+										    " id_configuracion_empalme IN (  " +
+										    " SELECT t2.id_configuracion_empalme FROM rvt_cfg_empalme AS t2 WHERE t2.codigo_proyecto = ? ) " +
+										    "", [codigoProyectoBase]);
+
+    let cabeceraEmpalme = await pool.query("DELETE FROM rvt_cfg_empalme  WHERE codigo_proyecto= ?", [codigoProyectoBase]);
+
+
+    let detalleEmpalmeMalla = await pool.query("DELETE FROM rvt_cfg_empalme_malla_proyecto_detalle  WHERE " +
+										        " id_empalme_malla IN (  " +
+										        " SELECT t2.id_empalme_malla_proyecto FROM rvt_cfg_empalme_malla_proyecto AS t2 WHERE t2.codigo_proyecto = ? ) " +
+										        "", [codigoProyectoBase]);
+										
+    let cabeceraEmpalmeMalla = await pool.query("DELETE FROM rvt_cfg_empalme_malla_proyecto  WHERE codigo_proyecto= ?",[codigoProyectoBase]);
+
+
+
+    let detalleAnclaje = await pool.query("DELETE FROM rvt_cfg_largo_anclaje_detalle  WHERE " +
+										        " id_configuracion_largo_anclaje IN (  " +
+										        " SELECT t2.id_configuracion_largo_anclaje FROM rvt_cfg_largo_anclaje AS t2 WHERE t2.codigo_proyecto = ? ) " +
+										        "", [codigoProyectoBase]);
+										
+    let cabeceraAnclaje = await pool.query("DELETE FROM rvt_cfg_largo_anclaje  WHERE codigo_proyecto= ?",[codigoProyectoBase]);
+
+    let detalleEmpotramiento = await pool.query("DELETE FROM rvt_cfg_empotramiento_proyecto  WHERE "+
+										    " id_configuracion_empotramiento IN (  " +
+										    " SELECT t2.id_configuracion_empotramiento FROM rvt_cfg_empotramiento AS t2 WHERE t2.codigo_proyecto = ? ) " +
+										    " ", [codigoProyectoBase]);	
+										
+    let cabeceraEmpotramiento = await pool.query("DELETE FROM rvt_cfg_empotramiento  WHERE codigo_proyecto= ?", [codigoProyectoBase]);
+    
+    
+    let detallePatas = await pool.query("DELETE FROM rvt_cfg_largo_patas_detalle  WHERE " +
+										" id_largo_patas_detalle IN (  " +
+										" SELECT t2.id_configuracion_largo_patas FROM rvt_cfg_largo_patas AS t2 WHERE t2.codigo_proyecto = ? ) " +
+										"", [codigoProyectoBase]);	
+										
+    let cabeceraPatas = await pool.query("DELETE FROM rvt_cfg_largo_patas  WHERE codigo_proyecto= ? ", [codigoProyectoBase]);
+
+    let detalleLaterales = await pool.query(" DELETE FROM rvt_cfg_laterales_info  WHERE " +
+										" id_configuracion_empalme IN (  " +
+										" SELECT t2.id_cfg_laterales FROM rvt_cfg_laterales AS t2 WHERE t2.codigo_proyecto = ? ) " +
+										"", [codigoProyectoBase]);	
+										
+    let cabeceraLaterales = await pool.query("DELETE FROM rvt_cfg_laterales  WHERE codigo_proyecto= ? ", [codigoProyectoBase]);
+
+    let detalleLargoFierro = await pool.query(" DELETE FROM rvt_cfg_largo_fierro_detalle  WHERE " +
+										    " id_configuracion_largo_fierro IN (  " +
+										    " SELECT t2.id_configuracion_largo_fierro FROM rvt_cfg_largo_fierro AS t2 WHERE t2.codigo_proyecto = ? ) " +
+										    "", [codigoProyectoBase]);	
+										
+    let cabeceraLargoFierro = await pool.query(" DELETE FROM rvt_cfg_largo_fierro  WHERE codigo_proyecto = ?", [codigoProyectoBase]);
+
+    let detalleLargoFeVigas = await pool.query(" DELETE FROM rvt_cfg_fe_vigas_fierros  WHERE " +
+										        " id_configuracion_fe IN (  " +
+										        " SELECT t2.id_configuracion_fe  FROM rvt_cfg_fe AS t2 WHERE t2.codigo_proyecto = ? ) " +
+										        "", [codigoProyectoBase]);	
+										
+    let cabeceraFeVigas = await pool.query(" DELETE FROM rvt_cfg_fe_vigas  WHERE " +
+										        " id_configuracion_fe IN (  " +
+										        " SELECT t2.id_configuracion_fe  FROM rvt_cfg_fe AS t2 WHERE t2.codigo_proyecto = ? ) " +
+										        "", [codigoProyectoBase]);	
+										
+    let cabeceraFeVigas2 = await pool.query("DELETE FROM rvt_cfg_fe  WHERE codigo_proyecto= ? ",[codigoProyectoBase]);
+
+    // ingresar objetos. 
+
+    let empalmes = pool.query("SELECT  * FROM rvt_cfg_empalme  WHERE codigo_proyecto= ? ;",[codigoProyectoFind]);
+
+    empalmes.then(function(e) {
+            e.forEach( (info) =>{
+
+
+                let datoEmpalme = {
+                    login : req.user.login,
+                    fecha_ingreso : new Date(),
+                    estado : info.estado,
+                    esPredeterminada : info.esPredeterminada,
+                    codigo_proyecto : codigoProyectoBase,
+                    id_tipo_objeto : info.id_tipo_objeto,
+                    descripcion : info.descripcion
+                }
+            
+                const insertEmpalme = pool.query('INSERT INTO rvt_cfg_empalme  set ? ', [datoEmpalme]);
+        
+        
+                insertEmpalme.then( function(rest) {
+        
+                    let id = rest.insertId;
+        
+                        console.log(id);
+                        let detalleEmpalme = pool.query("SELECT  * FROM rvt_cfg_empalme_proyecto  WHERE id_configuracion_empalme= ? ;",[info.id_configuracion_empalme]);
+
+                        detalleEmpalme.then( function(infoRest) {
+                            infoRest.forEach( (detalle) =>{
+                                let datoDetalleEmpalme = {
+                                    id_configuracion_empalme : id,
+                                    id_fierros : detalle.id_fierros,
+                                    id_hormigon : detalle.id_hormigon,
+                                    valor : detalle.valor
+                                };
+                                const insertDetalleEmpalme = pool.query('INSERT INTO rvt_cfg_empalme_proyecto  set ? ', [datoDetalleEmpalme]);
+                            });
+                        });
+
+                    });  
+            });
+     });
+    
+//#####################################################################################################################################################
+    let empalmesMallas = pool.query("SELECT  * FROM rvt_cfg_empalme_malla_proyecto  WHERE codigo_proyecto= ? ;",[codigoProyectoFind]);
+
+    empalmesMallas.then(function(e) {
+        e.forEach( (info) =>{
+
+
+            let datoEmpalmeMalla = {
+                tipo_configuracion : 2,
+                codigo_proyecto : codigoProyectoBase,
+                numero_fi : "",
+                delta_suma : "",
+                nombre : info.nombre,
+                esPredeterminada : info.esPredeterminada
+            }
+        
+            const insertEmpalmeMalla = pool.query('INSERT INTO rvt_cfg_empalme_malla_proyecto  set ? ', [datoEmpalmeMalla]);
+    
+    
+            insertEmpalmeMalla.then( function(rest) {
+    
+                let id = rest.insertId;
+    
+                    let detalleEmpalmeMalla = pool.query("SELECT  * FROM rvt_cfg_empalme_malla_proyecto_detalle  WHERE id_empalme_malla = ? ;",[info.id_empalme_malla_proyecto]);
+
+                    detalleEmpalmeMalla.then( function(infoRest) {
+                        infoRest.forEach( (detalle) =>{
+
+                            let datoDetalleEmpalmeMalla = {
+                                id_empalme_malla : id,
+                                id_fierro : detalle.id_fierro,
+                                valor : detalle.valor
+                            };
+                            const insertDetalleEmpalmeMalla = pool.query('INSERT INTO rvt_cfg_empalme_malla_proyecto_detalle  set ? ', [datoDetalleEmpalmeMalla]);
+                        });
+                    });
+
+                });  
+        });
+ });
+
+//#####################################################################################################################################################
+// Anclaje
+
+let anclajes = pool.query("SELECT  * FROM rvt_cfg_largo_anclaje  WHERE codigo_proyecto= ? ;",[codigoProyectoFind]);
+
+anclajes.then(function(e) {
+    e.forEach( (info) =>{
+
+
+        let datoAnclaje = {
+            login : req.user.login,
+            fecha_ingreso : new Date(),
+            estado : info.estado,
+            codigo_proyecto : codigoProyectoBase,
+            id_tipo_objeto : info.id_tipo_objeto,
+            id_origen_fierro : info.id_origen_fierro
+        }
+    
+        const insertAnclaje = pool.query('INSERT INTO rvt_cfg_largo_anclaje  set ? ', [datoAnclaje]);
+
+
+        insertAnclaje.then( function(rest) {
+
+            let id = rest.insertId;
+
+                let detalleAnclaje = pool.query("SELECT  * FROM rvt_cfg_largo_anclaje_detalle  WHERE id_configuracion_largo_anclaje = ? ;",[info.id_configuracion_largo_anclaje]);
+
+                detalleAnclaje.then( function(infoRest) {
+                    infoRest.forEach( (detalle) =>{
+
+                        let datoDetalleAnclaje = {
+                            id_configuracion_largo_anclaje : id,
+                            id_fierro : detalle.id_fierro,
+                            largo : detalle.largo
+                        };
+                        const insertDetalleEmpalmeMalla = pool.query('INSERT INTO rvt_cfg_largo_anclaje_detalle  set ? ', [datoDetalleAnclaje]);
+                    });
+                });
+
+            });  
+    });
+});
+
+//#####################################################################################################################################################
+// Empotramiento
+let empotramiento = pool.query("SELECT  * FROM rvt_cfg_empotramiento  WHERE codigo_proyecto= ? ;",[codigoProyectoFind]);
+
+empotramiento.then(function(e) {
+    e.forEach( (info) =>{
+
+
+        let datoEmpotramiento = {
+            login : req.user.login,
+            fecha_ingreso : new Date(),
+            estado : info.estado,
+            esPredeterminada : info.esPredeterminada,
+            codigo_proyecto : codigoProyectoBase,
+            id_tipo_objeto : info.id_tipo_objeto,
+            descripcion : info.descripcion
+        }
+    
+        const insertEmpotramiento = pool.query('INSERT INTO rvt_cfg_empotramiento  set ? ', [datoEmpotramiento]);
+
+
+        insertEmpotramiento.then( function(rest) {
+
+            let id = rest.insertId;
+
+                let detalleEmpotramiento = pool.query("SELECT  * FROM rvt_cfg_empotramiento_proyecto  WHERE id_configuracion_empotramiento = ? ;",[info.id_configuracion_empotramiento]);
+
+                detalleEmpotramiento.then( function(infoRest) {
+                    infoRest.forEach( (detalle) =>{
+
+                        let datoDetalleEmpotramiento = {
+                            id_configuracion_empotramiento : id,
+                            id_fierros : detalle.id_fierros,
+                            id_hormigon :detalle. id_hormigon,
+                            valor : detalle.valor
+                        };
+                        const insertDetalleEmpotramiento = pool.query('INSERT INTO rvt_cfg_empotramiento_proyecto  set ? ', [datoDetalleEmpotramiento]);
+                    });
+                });
+
+            });  
+    });
+});
+
+//#####################################################################################################################################################
+// PATAS
+let patas = pool.query("SELECT  * FROM rvt_cfg_largo_patas  WHERE codigo_proyecto= ? ;",[codigoProyectoFind]);
+
+patas.then(function(e) {
+    e.forEach( (info) =>{
+
+
+        let datoPatas = {
+            login : req.user.login,
+            fecha_ingreso : new Date(),
+            estado : info.estado,
+            codigo_proyecto : codigoProyectoBase
+        }
+    
+        const insertPatas = pool.query('INSERT INTO rvt_cfg_largo_patas  set ? ', [datoPatas]);
+
+
+        insertPatas.then( function(rest) {
+
+            let id = rest.insertId;
+
+                let detallePatas = pool.query("SELECT  * FROM rvt_cfg_largo_patas_detalle  WHERE id_cfg_largo_patas = ? ;",[info.id_configuracion_largo_patas]);
+
+                detallePatas.then( function(infoRest) {
+                    infoRest.forEach( (detalle) =>{
+
+                        let datoDetallePatas = {
+                            id_cfg_largo_patas : id,
+                            id_fierro : detalle.id_fierro,
+                            largo : detalle.largo
+                        };
+                        const insertDetallePatas = pool.query('INSERT INTO rvt_cfg_largo_patas_detalle  set ? ', [datoDetallePatas]);
+                    });
+                });
+
+            });  
+    });
+});
+
+//#####################################################################################################################################################
+// Laterales 
+
+let laterales = pool.query("SELECT  * FROM rvt_cfg_laterales  WHERE codigo_proyecto= ? ;",[codigoProyectoFind]);
+
+laterales.then(function(e) {
+    e.forEach( (info) =>{
+
+
+        let datoLaterales = {
+            login : req.user.login,
+            fecha_ingreso : new Date(),
+            estado : info.estado,
+            codigo_proyecto : codigoProyectoBase
+        }
+    
+        const insertLaterales = pool.query('INSERT INTO rvt_cfg_laterales  set ? ', [datoLaterales]);
+
+
+        insertLaterales.then( function(rest) {
+
+            let id = rest.insertId;
+
+                let detalleLaterales = pool.query("SELECT  * FROM rvt_cfg_laterales_info  WHERE id_configuracion_empalme = ? ;",[info.id_cfg_laterales]);
+
+                detalleLaterales.then( function(infoRest) {
+                    infoRest.forEach( (detalle) =>{
+
+                        let datoDetalleLaterales = {
+                            id_configuracion_empalme : id,
+                            altura_inicial : detalle.altura_inicial,
+                            altura_final : detalle.altura_final,
+                            num_laterales : detalle.num_laterales,
+                            distancia : detalle.distancia
+                        };
+                        const insertDetalleLaterales = pool.query('INSERT INTO rvt_cfg_laterales_info  set ? ', [datoDetalleLaterales]);
+                    });
+                });
+
+            });  
+    });
+});
+
+//#####################################################################################################################################################
+// Largo Fierro 
+
+let largoFierros = pool.query("SELECT  * FROM rvt_cfg_largo_fierro  WHERE codigo_proyecto= ? ;",[codigoProyectoFind]);
+
+largoFierros.then(function(e) {
+    e.forEach( (info) =>{
+
+
+        let datoLargoFierros = {
+            login : req.user.login,
+            fecha_ingreso : new Date(),
+            estado : info.estado,
+            codigo_proyecto : codigoProyectoBase,
+            id_tipo_objeto : info.id_tipo_objeto,
+            id_origen_fierro : info.id_origen_fierro
+        }
+    
+        const insertLargoFierros = pool.query('INSERT INTO rvt_cfg_largo_fierro  set ? ', [datoLargoFierros]);
+
+
+        insertLargoFierros.then( function(rest) {
+
+            let id = rest.insertId;
+
+                let detalleLargoFierros = pool.query("SELECT  * FROM rvt_cfg_largo_fierro_detalle  WHERE id_configuracion_largo_fierro = ? ;",[info.id_configuracion_largo_fierro]);
+
+                detalleLargoFierros.then( function(infoRest) {
+                    infoRest.forEach( (detalle) =>{
+
+                        let datoDetalleLargoFierro = {
+                            id_configuracion_largo_fierro : id,
+                            id_fierro : detalle.id_fierro,
+                            largo : detalle.largo
+                        };
+                        const insertDetalleLaterales = pool.query('INSERT INTO rvt_cfg_largo_fierro_detalle  set ? ', [datoDetalleLargoFierro]);
+                    });
+                });
+
+            });  
+    });
+});
+
+//#####################################################################################################################################################
+// VIGAS FE
+
+let vigasFe = pool.query("SELECT  * FROM rvt_cfg_fe  WHERE codigo_proyecto= ? ;",[codigoProyectoFind]);
+
+vigasFe.then(function(e) {
+    e.forEach( (info) =>{
+
+
+        let datoLargoFeVigas = {
+            login : req.user.login,
+            fecha_ingreso : new Date(),
+            estado : info.estado,
+            esPredeterminada : info.esPredeterminada,
+            codigo_proyecto : codigoProyectoBase,
+            descripcion : info.descripcion,
+            id_tipo_objeto : info.id_tipo_objeto
+        }
+    
+        const insertLargoFeVigas = pool.query('INSERT INTO rvt_cfg_fe  set ? ', [datoLargoFeVigas]);
+
+
+        insertLargoFeVigas.then( function(rest) {
+
+            let id = rest.insertId;
+
+                let detalleLargoFeVigas = pool.query("SELECT  * FROM rvt_cfg_fe_vigas  WHERE id_configuracion_fe = ? ;",[info.id_configuracion_fe]);
+
+                detalleLargoFeVigas.then( function(infoRest) {
+                    infoRest.forEach( (detalle) =>{
+
+                        let datoDetalleLargoFeVigas = {
+                            id_configuracion_fe : id,
+                            pata_sup_izq_1 : detalle.pata_sup_izq_1,
+                            pata_sup_izq_2 : detalle.pata_sup_izq_2,
+                            tramo_sup_izq_1 : detalle.tramo_sup_izq_1,
+                            tramo_sup_izq_2 : detalle.tramo_sup_izq_2,
+                            tramo_sup_der_2 : detalle.tramo_sup_der_2,
+                            pata_sup_der_1 :  detalle.pata_sup_der_1,
+                            pata_sup_der_2 : detalle.pata_sup_der_2,
+                            pata_inf_izq_1 : detalle.pata_inf_izq_1,
+                            pata_inf_izq_2 : detalle.pata_inf_izq_2,
+                            tramo_inf_izq_1 : detalle.tramo_inf_izq_1,
+                            tramo_inf_izq_2 : detalle.tramo_inf_izq_2,
+                            tramo_inf_der_2 : detalle.tramo_inf_der_2,
+                            pata_inf_der_1 : detalle.pata_inf_der_1,
+                            pata_inf_der_2 : detalle.pata_inf_der_2,
+                            largo_l1 : detalle.largo_l1
+                        };
+                        const insertDetalleLaterales = pool.query('INSERT INTO rvt_cfg_fe_vigas  set ? ', [datoDetalleLargoFeVigas]);
+                    });
+                });
+                //######################################################################
+                let detalleLargoFeVigasFierros = pool.query("SELECT  * FROM rvt_cfg_fe_vigas_fierros  WHERE id_configuracion_fe = ? ;",[info.id_configuracion_fe]);
+
+                detalleLargoFeVigasFierros.then( function(infoRest2) {
+                    infoRest2.forEach( (detalle2) =>{
+
+                        let datoDetalleLargoFeVigasFierros = {
+                            id_configuracion_fe : id,
+                            id_fierro : detalle2.id_fierro,
+                            valor : detalle2.valor
+                        };
+
+                        const insertDetalleFeVigasFierros = pool.query('INSERT INTO rvt_cfg_fe_vigas_fierros  set ? ', [datoDetalleLargoFeVigasFierros]);
+                    });
+                });
+
+            });  
+    });
+});
+
+
+res.send("ok");
 
 
 });

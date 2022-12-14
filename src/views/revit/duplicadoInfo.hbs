@@ -1,0 +1,54 @@
+    <div class="col-md-4 col-sm-4  ">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Importar configuración de otro código</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                    <div class="form-group row">
+                        <label for="staticEmail" class="col-sm-2 col-form-label">Proyecto : </label>
+                        <label for="staticEmail" class="col-sm-8 col-form-label">{{informacion.nombre}} {{informacion.annio}}_{{informacion.code}}</label>
+                        <input type="hidden" name="idproorigen" id="idproorigen" value="{{informacion.id_origen_proyecto}}">
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="staticEmail" class="col-sm-2 col-form-label">Importar de : </label>
+                        <div class="col-sm-8">
+                            <select class="form-control" name="id_proyecto" id="id_proyecto" >
+                                    <option>Seleccione un proyecto</option>
+                                        {{#each codigos}}
+                                            <option value="{{id}}">{{annio}}_{{code}} {{nombre}}</option>
+                                        {{/each}}
+                                </select>
+                            </div>
+                    </div>
+                    <div class="form-group row">
+                    <button type="button" class="btn btn-success btn-block" onclick="ingresarImporte();">
+                                        cargar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function ingresarImporte()
+        {
+            let idBase      = $('#idproorigen').val();
+            let idEjemplo   = $('#id_proyecto').val();
+
+              let informacion = { idBase , idEjemplo}
+
+            $.ajax({
+                    type: 'post',
+                    url: '/revit/duplicaInformacion',
+                    data: informacion,
+                    dataType: 'text'
+                            })
+                            .done(function (data) {
+                                //location.reload();
+                                console.log(data);
+                            });
+            
+        }
+    </script>

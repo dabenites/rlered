@@ -103,6 +103,17 @@
                                         </select>
                                     </div>
                             </div>
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Moneda:</b></label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <select class="select2_single form-control" tabindex="1" name="id_monedaoc" id="id_monedaoc">
+                                            <option value="">Seleccione</option>
+                                                {{#each monedas}}
+                                                    <option value="{{id_moneda}}">{{descripcion}} </option>
+                                                {{/each}}
+                                        </select>
+                                    </div>
+                            </div>
                              <div class="form-group row">
                                 <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Incluye IVA:</b></label>
                                     <div class="col-md-6 col-sm-6">
@@ -1023,6 +1034,7 @@
     function ingresarOC()
     {
         let id_empresa         = $("#emisor").val();
+        let id_monedaoc        = $("#id_monedaoc").val();
         let id_tipo_proveedor  = $("#id_tipo_proveedor").val();
         let id_solicitante     = $("#id_solicitante").val();
         let id_director        = $("#id_director").val();
@@ -1034,6 +1046,8 @@
         let razonsocialpro      = $("#razonsocialpro").val();
         let conIVA              = $("#incluyeIVA").val();
         let observaciones       = $("#observaciones").val();
+
+
         //__________________________________________________
 
          let filas = $("#tableRequerimiento").find('tbody tr').length;
@@ -1087,6 +1101,7 @@
 
         let informacion = {
             id_empresa,
+            id_monedaoc,
             id_tipo_proveedor,
             id_solicitante,
             id_director,

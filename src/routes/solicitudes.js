@@ -2741,7 +2741,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
 
   try {
     
-    const {incluyeIVA,id_tipo_proveedor,observaciones,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias} = req.body
+    const {incluyeIVA,id_tipo_proveedor,observaciones,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias,id_monedaoc} = req.body
     let oc = {};
 
    // console.log(req.body);
@@ -2829,6 +2829,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
         id_tipo : id_tipo_proveedor,
         id_proveedor: emisor,
         id_razonsocialpro : razonsocialpro,
+        id_moneda : id_monedaoc,
         id_solicitante :  id_solicitante,
         id_director : id_director,
         id_centro_costo : id_centro_costo,
@@ -2850,6 +2851,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
         id_tipo : id_tipo_proveedor,
         id_proveedor: emisor,
         id_razonsocialpro : razonsocialpro,
+        id_moneda : id_monedaoc,
         id_solicitante :  id_solicitante,
         id_director : id_director,
         id_centro_costo : id_centro_costo,
@@ -2919,7 +2921,7 @@ router.get('/aordencompra',isLoggedIn,  async (req,res) => {
                                          " LEFT JOIN pro_proyectos AS t8 ON t1.id_proyecto = t8.id " +
                                          " WHERE t1.id_estado = 1 AND t1.recepcionado = 'N' AND t1.aprobacionSolicitante = 'Y'"); 
 
-    console.log(ordenCompra);
+   // console.log(ordenCompra);
 
     const verToask = {
       titulo : "Mensaje",
@@ -3237,6 +3239,8 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
 
   // buscar la informacion de la OC
   const oc = await pool.query('SELECT  ' +
+                              " t1e.id_moneda as ocMoneda," +
+                              " t1e.simbolo as desMoneda," +
                               " t1b.Nombre as nomSolicitante ," + 
                               " t1c.Nombre as nomRecepcionador ," +  
                               " t1c.Telefono as telRecepcionador ," + 
@@ -3245,6 +3249,7 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
                               "t1.conIVA,"+
                               "t1d.code," +
                               "t1d.nombre as nomProyecto," +
+                              "t1a.id as idRazonSocal," +
                               "t1a.razonsocial as razonSocialEmpresa," +
                               "t1a.direccion as direccion," +
                               "t1a.fono as fonoEmpresa, " +
@@ -3266,22 +3271,26 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
                               ' LEFT JOIN sys_empresa as t1a ON t1.id_proveedor = t1a.id ' +
                               ' LEFT JOIN sys_usuario as t1b ON t1.id_solicitante = t1b.idUsuario ' +
                               ' LEFT JOIN sys_usuario as t1c ON t1.id_recepcionador = t1c.idUsuario ' +
-                              ' LEFT JOIN pro_proyectos as t1d ON t1.id_proyecto = t1d.id, ' +
+                              ' LEFT JOIN pro_proyectos as t1d ON t1.id_proyecto = t1d.id ' +
+                              ' LEFT JOIN moneda_tipo as t1e ON t1.id_moneda = t1e.id_moneda, ' +
                               ' centro_costo as t2 ' +
                               ' WHERE t1.id = ? ' +
                               ' AND t1.id_centro_costo = t2.id',[id]); 
 
-  const requerimientos = await pool.query(" SELECT *, " + 
+  const requerimientos = await pool.query(" SELECT t1.*, " + 
                                           " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'),   " +
 											                    " if (t1.id_moneda = 4 , FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) *  cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE'), " +
 												                  " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'),0))) AS monto , " +
                                           " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') ,   " +
 												                  " if (t1.id_moneda = 4 , FORMAT(  (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) *  cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) *  cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) ),0,'de_DE') , " +
-												                  " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE'),0))) AS montopeso " +
-                                        " FROM orden_compra_requerimiento as t1 WHERE t1.id_solicitud = ?",[id] );
-  
+												                  " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE'),0))) AS montopeso, " +
+                                          " t1a.simbolo AS simbolo " +
+                                        " FROM orden_compra_requerimiento as t1" +
+                                        " LEFT JOIN moneda_tipo AS t1a ON t1.id_moneda = t1a.id_moneda" + 
+                                        " WHERE t1.id_solicitud = ?",[id] );
+   
 
-  //console.log(requerimientos);
+  
 
   const stream = res.writeHead(200, {
     'Content-Type': 'application/pdf',
@@ -3305,6 +3314,8 @@ router.get('/createPDFPre/:id', isLoggedIn, async (req,res) => {
 
   // buscar la informacion de la OC
   const oc = await pool.query('SELECT  ' +
+                              " t1e.id_moneda as ocMoneda," +
+                              "t1e.simbolo as desMoneda," +
                               " t1b.Nombre as nomSolicitante ," + 
                               " t1c.Nombre as nomRecepcionador ," +  
                               " t1c.Telefono as telRecepcionador ," + 
@@ -3313,6 +3324,7 @@ router.get('/createPDFPre/:id', isLoggedIn, async (req,res) => {
                               "t1.conIVA,"+
                               "t1d.code," +
                               "t1d.nombre as nomProyecto," +
+                              "t1a.id as idRazonSocal," +
                               "t1a.razonsocial as razonSocialEmpresa," +
                               "t1a.direccion as direccion," +
                               "t1a.fono as fonoEmpresa, " +
@@ -3334,22 +3346,26 @@ router.get('/createPDFPre/:id', isLoggedIn, async (req,res) => {
                               ' LEFT JOIN sys_empresa as t1a ON t1.id_proveedor = t1a.id ' +
                               ' LEFT JOIN sys_usuario as t1b ON t1.id_solicitante = t1b.idUsuario ' +
                               ' LEFT JOIN sys_usuario as t1c ON t1.id_recepcionador = t1c.idUsuario ' +
-                              ' LEFT JOIN pro_proyectos as t1d ON t1.id_proyecto = t1d.id, ' +
+                              ' LEFT JOIN pro_proyectos as t1d ON t1.id_proyecto = t1d.id ' +
+                              ' LEFT JOIN moneda_tipo as t1e ON t1.id_moneda = t1e.id_moneda, ' +
                               ' centro_costo as t2 ' +
                               ' WHERE t1.id = ? ' +
                               ' AND t1.id_centro_costo = t2.id',[id]); 
 
-  const requerimientos = await pool.query(" SELECT *, " + 
+  const requerimientos = await pool.query(" SELECT t1.*, " + 
                                           " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'),   " +
 											                    " if (t1.id_moneda = 4 , FORMAT((cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) *  cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2))),2,'de_DE'), " +
 												                  " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'),0))) AS monto , " +
                                           " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE') ,   " +
 												                  " if (t1.id_moneda = 4 , FORMAT(  (cast(replace(t1.cantidad, ',', '.') as decimal(9,2)) *  cast(replace(t1.precio_unitario, ',', '.') as decimal(9,2)) *  cast(replace(t1.tipo_cambio, ',', '.') as decimal(9,2)) ),0,'de_DE') , " +
-												                  " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE'),0))) AS montopeso " +
-                                        " FROM orden_compra_requerimiento as t1 WHERE t1.id_solicitud = ?",[id] );
+												                  " if (t1.id_moneda = 2 , FORMAT((t1.cantidad * t1.precio_unitario * t1.tipo_cambio),0,'de_DE'),0))) AS montopeso, " +
+                                          " t1a.simbolo AS simbolo " +
+                                        " FROM orden_compra_requerimiento as t1 "+
+                                        "LEFT JOIN moneda_tipo AS t1a ON t1.id_moneda = t1a.id_moneda" +
+                                        " WHERE t1.id_solicitud = ?",[id] );
   
 
-  //console.log(requerimientos);
+
 
   const stream = res.writeHead(200, {
     'Content-Type': 'application/pdf',

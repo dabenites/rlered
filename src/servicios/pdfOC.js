@@ -371,8 +371,9 @@ doc.table( table, {
         case 2:// Dolar
         break;
         case 4: // UF
+          doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio.toFixed(2)) ,465,valor_y  + 10 );
         break;
-        case 4: // S/
+        case 10: // S/
         break;
       }
       
@@ -627,6 +628,8 @@ doc.table( table, {
   
   precio = precio.toString();
   //doc.fontSize(tletra - 1 ).text( simbolo + new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y );
+  //console.log(precio);
+
   switch(oc.ocMoneda)
       {
         case 1:// Pesos
@@ -740,8 +743,9 @@ doc.table( table, {
         case 2:// Dolar
         break;
         case 4: // UF
+          doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio.toFixed(2)) ,465,valor_y  + 10 );
         break;
-        case 4: // S/
+        case 10: // S/
         break;
       }
       

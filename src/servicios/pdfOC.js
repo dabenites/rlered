@@ -369,11 +369,13 @@ doc.table( table, {
           doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio.replace(".","")) ,465,valor_y  + 10 );
         break;
         case 2:// Dolar
+          doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y  + 10 );
         break;
         case 4: // UF
-          doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio.toFixed(2)) ,465,valor_y  + 10 );
+          doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y  + 10 );
         break;
         case 10: // S/
+          doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio.replace(".","")) ,465,valor_y  + 10 );
         break;
       }
       
@@ -741,11 +743,13 @@ doc.table( table, {
           doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio.replace(".","")) ,465,valor_y  + 10 );
         break;
         case 2:// Dolar
+          doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y  + 10 );
         break;
         case 4: // UF
-          doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio.toFixed(2)) ,465,valor_y  + 10 );
+          doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y  + 10 );
         break;
         case 10: // S/
+          doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio.replace(".","")) ,465,valor_y  + 10 );
         break;
       }
       

@@ -10,7 +10,7 @@ passport.use('local.signin', new LocalStrategy({
   passwordField: 'password',
   passReqToCallback: true
 }, async (req, username, password, done) => {
-  const rows = await pool.query('SELECT * FROM sys_usuario as t0 , sys_password as t1 WHERE  t0.idUsuario = t1.idUsuario AND  login = ?', [username]);
+  const rows = await pool.query('SELECT * FROM sys_usuario as t0 , sys_password as t1 WHERE  t0.idUsuario = t1.idUsuario AND  t0.login = ? AND t0.id_estado = 1 ', [username]);
   if (rows.length > 0) {
     const user = rows[0];
     const validPassword = await helpers.matchPassword(password, user.password)
@@ -21,7 +21,7 @@ passport.use('local.signin', new LocalStrategy({
       return done(null, false, req.flash('message', 'Incorrect Password'));//MSJ CONTRASEÑA INVALIDA 
     }
   } else {
-    return done(null, false, req.flash('message', 'The Username does not exists.'));//MSJ USUARIO NO ENCONTRADO
+    return done(null, false, req.flash('message', 'Usuario no existe o no esta habilitado para ingresar'));//MSJ USUARIO NO ENCONTRADO
   }
 }));
 

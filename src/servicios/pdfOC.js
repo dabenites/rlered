@@ -123,7 +123,7 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
   let tipoCambio = "";
   requerimientos.forEach(element => {
 
-    console.log(element);
+    
 
     let sTable = [];
     switch(element.id_moneda)
@@ -132,31 +132,68 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
         sTable.push(element.cantidad);
         sTable.push(element.descripcion);
         sTable.push(element.simbolo);
-        precio += element.precio_unitario * element.cantidad;
-        sTable.push("$ " +  new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario) );
-        sTable.push("$ " + new Intl.NumberFormat(['ban', 'id']).format((element.precio_unitario * element.cantidad)));
+        sTable.push(new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario) );
+
+        if (oc.ocMoneda == element.id_moneda)
+        {
+          precio += element.precio_unitario * element.cantidad;
+          
+          sTable.push(new Intl.NumberFormat(['ban', 'id']).format((element.precio_unitario * element.cantidad)));
+        }
+        else
+        {
+          precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
+          element.montopeso = element.tipo_cambio * element.precio_unitario;
+          sTable.push( new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad * element.tipo_cambio));
+          tipoCambio =element.tipo_cambio;
+          esUF = true;
+        }
 
       break;
       case 4: // valores en UF
         sTable.push(element.cantidad);
         sTable.push(element.descripcion);
         sTable.push(element.simbolo);
-        precio += element.montopeso ;
+        //precio += element.montopeso ;
         sTable.push(element.precio_unitario);
-        sTable.push("$ " + element.montopeso);
-        esUF = true;
+        //sTable.push(element.montopeso);
+        //esUF = true;
         tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);
+        if (oc.ocMoneda == element.id_moneda)
+        {
+          sTable.push(new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad ));
+          precio += element.precio_unitario * element.cantidad;
+          esUF = false;
+        }
+        else
+        {
+          precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
+          element.montopeso = element.tipo_cambio * element.precio_unitario;
+          sTable.push( new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad * element.tipo_cambio));
+          tipoCambio =element.tipo_cambio;
+          esUF = true;
+        }
       break;
       case 2:
         sTable.push(element.cantidad);
         sTable.push(element.descripcion);
         sTable.push(element.simbolo);
-        //precio += element.montopeso ;
-        precio = parseInt( precio ) + parseInt(element.montopeso.replace(".","").replace(".",""));
         sTable.push(element.precio_unitario);
-        sTable.push("$ " + element.montopeso);
-        esUF = true;
-        tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);
+
+        
+
+        if (oc.ocMoneda == element.id_moneda)
+        {
+          sTable.push(new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad ));
+          precio += element.precio_unitario * element.cantidad;
+        }
+        else
+        {
+          precio = parseInt( precio ) + parseInt(element.montopeso.replace(".","").replace(".",""));
+          sTable.push(element.montopeso);
+          esUF = true;
+          tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);
+        }
       break;
       case 10:
         sTable.push(element.cantidad);
@@ -174,9 +211,11 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
        {
          precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
          element.montopeso = element.tipo_cambio * element.precio_unitario;
-         sTable.push("$ " + new Intl.NumberFormat(['ban', 'id']).format(element.montopeso));
+         //sTable.push("$ " + new Intl.NumberFormat(['ban', 'id']).format(element.montopeso));
+         sTable.push(new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad * element.tipo_cambio));
          
          tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);  
+         esUF = true;
        }
       break;
     }
@@ -225,8 +264,10 @@ doc.table( table, {
             doc.fontSize(tletra - 1 ).text(new Intl.NumberFormat(['ban', 'id']).format(precio.replace(".","")) ,465,valor_y );
         break;
         case 2:// Dolar
+            doc.fontSize(tletra - 1 ).text(new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y );
         break;
         case 4: // UF
+            doc.fontSize(tletra - 1 ).text(new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y );
         break;
         case 10: // S/
             doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y );
@@ -244,9 +285,24 @@ doc.table( table, {
   {
     if (oc.conIVA == "Y")
     {
-      valorIVA = precio * 1.18 - precio;
+      switch(oc.ocMoneda)
+      {
+        case 1:// Pesos
+        case 10: // S/
+            valorIVA = Math.round(Number(precio * 1.18 - precio));
+        break;
 
-      console.log();
+        case 2:// Dolar
+        case 4: // UF
+            
+            valorIVA =  (precio * 1.18 - precio).toFixed(2);
+            
+        break;
+        
+      }
+      
+
+      
 
       valorTotal = Number(precio) + Number( valorIVA);
 
@@ -275,8 +331,26 @@ doc.table( table, {
       //valorIVA  = precio * 1.19 - precio;
       //valorTotal = precio + valorIVA;
 
-      valorIVA = Math.round(Number(precio.toString().replace('.','').replace('.','')) * 1.19 - Number(precio.toString().replace('.','').replace('.','')));
-      valorTotal = Number(precio.toString().replace('.',''))  + valorIVA;
+      //valorIVA = Math.round(Number(precio.toString().replace('.','').replace('.','')) * 1.19 - Number(precio.toString().replace('.','').replace('.','')));
+
+      switch(oc.ocMoneda)
+      {
+        case 1:// Pesos
+        case 10: // S/
+            valorIVA = Math.round(Number(precio.toString().replace('.','').replace('.','')) * 1.19 - Number(precio.toString().replace('.','').replace('.','')));
+        break;
+
+        case 2:// Dolar
+        case 4: // UF
+            valorIVA =  (precio * 1.19 - precio).toFixed(2);
+        break;
+        
+      }
+
+      //console.log(precio);
+      //console.log(valorIVA);
+
+      valorTotal = parseFloat(precio) + parseFloat(valorIVA);
 
       doc.fontSize(tletra - 1 ).text(  new Intl.NumberFormat(['ban', 'id']).format(valorIVA) ,465,valor_y  + 10 ); 
       doc.fontSize(tletra - 1 ).text(  new Intl.NumberFormat(['ban', 'id']).format(valorTotal) ,465,valor_y  + 20 );
@@ -406,30 +480,9 @@ function  buildPDFPre(dataCallback, endCallback, oc, requerimientos) {
     doc.fontSize(tletra).text("2. Las facturas electrónicas deben ser enviadas en formato PDF y XML a la casilla de correo"+
                             " contabilidadlima@renelagos.com y trabajosexternos@renelagos.com"              , 50, 540);
   }
+ 
+ 
   
-  
-
-  /*
-if (fs.existsSync(__dirname+"/"+""+oc.id_solicitante+".png")) 
-{
-  doc.image(__dirname+"/"+""+oc.id_solicitante+".png", 10,610, {scale: 0.3});
-
-  doc.polygon([100, 685], [240, 685]);
-  doc.stroke();
-  doc.fontSize(tletra).text("Solicitante"  , 140, 692);
-  doc.fontSize(tletra).text(oc.nomSolicitante , 130, 702);
-}
-  
-if (fs.existsSync(__dirname+"/"+"114.png"))
-{
-  doc.image(__dirname+"/"+"114.png", 300,610, {scale: 0.3});
-  doc.polygon([380, 685], [520, 685]);
-  doc.stroke();
-  doc.fontSize(tletra).text("Aprobador"  , 420, 692);
-  doc.fontSize(tletra).text("Claudio Gahona", 410, 702);
-}
-*/
-   
   // Bloque dinamico con la informacion de la tabla 
   //let oTable = ["1.68", "1", "Informe Modelación", "$31,579.53", "$53.054"];
   let oTable = [];
@@ -439,7 +492,7 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
   let tipoCambio = "";
   requerimientos.forEach(element => {
 
-    console.log(element);
+    
 
     let sTable = [];
     switch(element.id_moneda)
@@ -448,31 +501,68 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
         sTable.push(element.cantidad);
         sTable.push(element.descripcion);
         sTable.push(element.simbolo);
-        precio += element.precio_unitario * element.cantidad;
-        sTable.push("$ " +  new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario) );
-        sTable.push("$ " + new Intl.NumberFormat(['ban', 'id']).format((element.precio_unitario * element.cantidad)));
+        sTable.push(new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario) );
+
+        if (oc.ocMoneda == element.id_moneda)
+        {
+          precio += element.precio_unitario * element.cantidad;
+          
+          sTable.push(new Intl.NumberFormat(['ban', 'id']).format((element.precio_unitario * element.cantidad)));
+        }
+        else
+        {
+          precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
+          element.montopeso = element.tipo_cambio * element.precio_unitario;
+          sTable.push( new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad * element.tipo_cambio));
+          tipoCambio =element.tipo_cambio;
+          esUF = true;
+        }
 
       break;
       case 4: // valores en UF
         sTable.push(element.cantidad);
         sTable.push(element.descripcion);
         sTable.push(element.simbolo);
-        precio += element.montopeso ;
+        //precio += element.montopeso ;
         sTable.push(element.precio_unitario);
-        sTable.push("$ " + element.montopeso);
-        esUF = true;
+        //sTable.push(element.montopeso);
+        //esUF = true;
         tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);
+        if (oc.ocMoneda == element.id_moneda)
+        {
+          sTable.push(new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad ));
+          precio += element.precio_unitario * element.cantidad;
+          esUF = false;
+        }
+        else
+        {
+          precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
+          element.montopeso = element.tipo_cambio * element.precio_unitario;
+          sTable.push( new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad * element.tipo_cambio));
+          tipoCambio =element.tipo_cambio;
+          esUF = true;
+        }
       break;
       case 2:
         sTable.push(element.cantidad);
         sTable.push(element.descripcion);
         sTable.push(element.simbolo);
-        //precio += element.montopeso ;
-        precio = parseInt( precio ) + parseInt(element.montopeso.replace(".","").replace(".",""));
         sTable.push(element.precio_unitario);
-        sTable.push("$ " + element.montopeso);
-        esUF = true;
-        tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);
+
+        
+
+        if (oc.ocMoneda == element.id_moneda)
+        {
+          sTable.push(new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad ));
+          precio += element.precio_unitario * element.cantidad;
+        }
+        else
+        {
+          precio = parseInt( precio ) + parseInt(element.montopeso.replace(".","").replace(".",""));
+          sTable.push(element.montopeso);
+          esUF = true;
+          tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);
+        }
       break;
       case 10:
         sTable.push(element.cantidad);
@@ -490,9 +580,11 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
        {
          precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
          element.montopeso = element.tipo_cambio * element.precio_unitario;
-         sTable.push("$ " + new Intl.NumberFormat(['ban', 'id']).format(element.montopeso));
+         //sTable.push("$ " + new Intl.NumberFormat(['ban', 'id']).format(element.montopeso));
+         sTable.push(new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad * element.tipo_cambio));
          
          tipoCambio =new Intl.NumberFormat(['ban', 'id']).format( element.tipo_cambio);  
+         esUF = true;
        }
       break;
     }
@@ -541,8 +633,10 @@ doc.table( table, {
             doc.fontSize(tletra - 1 ).text(new Intl.NumberFormat(['ban', 'id']).format(precio.replace(".","")) ,465,valor_y );
         break;
         case 2:// Dolar
+            doc.fontSize(tletra - 1 ).text(new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y );
         break;
         case 4: // UF
+            doc.fontSize(tletra - 1 ).text(new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y );
         break;
         case 10: // S/
             doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(precio) ,465,valor_y );
@@ -560,8 +654,26 @@ doc.table( table, {
   {
     if (oc.conIVA == "Y")
     {
-      valorIVA = Number(precio) * 1.18 - Number(precio);
-      valorTotal = precio + valorIVA;
+      switch(oc.ocMoneda)
+      {
+        case 1:// Pesos
+        case 10: // S/
+            valorIVA = Math.round(Number(precio * 1.18 - precio));
+        break;
+
+        case 2:// Dolar
+        case 4: // UF
+            
+            valorIVA =  (precio * 1.18 - precio).toFixed(2);
+            
+        break;
+        
+      }
+      
+
+      
+
+      valorTotal = Number(precio) + Number( valorIVA);
 
       doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(valorIVA) ,465,valor_y  + 10 );
       doc.fontSize(tletra - 1 ).text( new Intl.NumberFormat(['ban', 'id']).format(valorTotal) ,465,valor_y  + 20 );
@@ -569,7 +681,6 @@ doc.table( table, {
       doc.font('Times-Bold').fontSize(tletra - 1 ).text("SUBTOTAL :"       ,0,valor_y ,      {width: 455,align:'right'});
       doc.font('Times-Bold').fontSize(tletra - 1 ).text("IGV(18%):"        ,0,valor_y + 10 , {width: 455,align:'right'});
       doc.font('Times-Bold').fontSize(tletra - 1 ).text("TOTAL :"          ,0,valor_y + 20 , {width: 455,align:'right'});
-      
       
     }
     else
@@ -580,18 +691,35 @@ doc.table( table, {
       doc.font('Times-Bold').fontSize(tletra - 1 ).text("SUBTOTAL :"       ,0,valor_y , {width: 455,align:'right'});
       doc.font('Times-Bold').fontSize(tletra - 1 ).text("TOTAL :"          ,0,valor_y + 10 , {width: 455,align:'right'});
 
-      
-      
     }
   }
   else
   {
     if (oc.conIVA == "Y")
     {
-      //valorIVA = precio * 1.19 - precio;
+      //valorIVA  = precio * 1.19 - precio;
       //valorTotal = precio + valorIVA;
-      valorIVA = Math.round(Number(precio.toString().replace('.','').replace('.','')) * 1.19 - Number(precio.toString().replace('.','').replace('.','')));
-      valorTotal = Number(precio.toString().replace('.',''))  + valorIVA;
+
+      //valorIVA = Math.round(Number(precio.toString().replace('.','').replace('.','')) * 1.19 - Number(precio.toString().replace('.','').replace('.','')));
+
+      switch(oc.ocMoneda)
+      {
+        case 1:// Pesos
+        case 10: // S/
+            valorIVA = Math.round(Number(precio.toString().replace('.','').replace('.','')) * 1.19 - Number(precio.toString().replace('.','').replace('.','')));
+        break;
+
+        case 2:// Dolar
+        case 4: // UF
+            valorIVA =  (precio * 1.19 - precio).toFixed(2);
+        break;
+        
+      }
+
+      //console.log(precio);
+      //console.log(valorIVA);
+
+      valorTotal = parseFloat(precio) + parseFloat(valorIVA);
 
       doc.fontSize(tletra - 1 ).text(  new Intl.NumberFormat(['ban', 'id']).format(valorIVA) ,465,valor_y  + 10 ); 
       doc.fontSize(tletra - 1 ).text(  new Intl.NumberFormat(['ban', 'id']).format(valorTotal) ,465,valor_y  + 20 );

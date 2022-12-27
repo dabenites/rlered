@@ -1,4 +1,13 @@
 <div class="item form-group">
+    <label class="col-form-label col-md-2 label-align" for="titulo"> <b>Moneda</b></label>
+    <label class="col-form-label col-md-1" for="titulo" id="tipoMonedaPro">{{proyectos.simbolo}}</label>
+    <label class="col-form-label col-md-2 label-align" for="titulo"> <b>Valor m<sup>2</sup></b></label>
+    <label class="col-form-label col-md-2" for="titulo" id="valorm2pro">{{proyectos.valor_metro_cuadrado}}</label>
+    <label class="col-form-label col-md-3 label-align" for="titulo"><b>Valor Proyecto</b></label>
+    <label class="col-form-label col-md-2" for="titulo" id="valorpro">{{proyectos.valor_proyecto}}</label>
+</div>
+
+<div class="item form-group">
     <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Presupuesto</label>
             <div class="col-md-5">
 					<select class="form-control" name="presupuesto" id="presupuesto" onchange="cargaOpcionesPresupuesto(this.value);">
@@ -41,13 +50,13 @@
 <div class="item form-group">
     <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Porcentaje </label>
             <div class="col-md-5">
-					<input type="text" id="porcentaje" name="porcentaje" required="required" class="form-control">
+					<input type="number" id="porcentaje" name="porcentaje" required="required" class="form-control" onchange="cargaMonto(this.value);">
             </div>
 </div>
 <div class="item form-group">
     <label class="col-form-label col-md-5 col-sm-5 label-align" for="titulo">Monto </label>
             <div class="col-md-5">
-					<input type="text" id="monto" name="monto" required="required" class="form-control">
+					<input type="number" id="monto" name="monto" required="required" class="form-control">
             </div>
 </div>
 <div class="item form-group">

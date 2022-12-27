@@ -29,20 +29,48 @@ router.get('/download/:id', isLoggedIn, async (req, res) => {
 
     let informacionDownload =  example(id); // function tiene que dejar el archivo de forma temporal en el servidor en alguna carpeta temporal 
 
+    
 
     informacionDownload.then((informacion)=>{
 
-            //console.log(nombreArchivo);
-
-                 res.setHeader('Content-Type', 'application/pdf');
-                 res.setHeader('Content-Disposition', 'inline;filename='+informacion.nombreSalida+''); 
-                 
-                 var file = fs.createReadStream(''+informacion.cadena+'.pdf');
-                 var stat = fs.statSync(''+informacion.cadena+'.pdf');
-                 res.setHeader('Content-Length', stat.size);
-                 res.setHeader('Content-Type', 'application/pdf');
-                 res.setHeader('Content-Disposition', 'attachment; filename='+informacion.nombreSalida+'');
-                file.pipe(res);
+            
+                switch(informacion.extension)
+                {
+                    case "pdf":
+                    case "PDF":
+                        res.setHeader('Content-Type', 'application/pdf');
+                        res.setHeader('Content-Disposition', 'inline;filename='+informacion.nombreSalida+''); 
+                        
+                        var file = fs.createReadStream(''+informacion.cadena+'.pdf');
+                        var stat = fs.statSync(''+informacion.cadena+'.pdf');
+                        res.setHeader('Content-Length', stat.size);
+                        res.setHeader('Content-Type', 'application/pdf');
+                        res.setHeader('Content-Disposition', 'attachment; filename='+informacion.nombreSalida+'');
+                        file.pipe(res);
+                    break;
+                    case "docx":
+                        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                        res.setHeader('Content-Disposition', 'inline;filename='+informacion.nombreSalida+''); 
+                        
+                        var file = fs.createReadStream(''+informacion.cadena+'.docx');
+                        var stat = fs.statSync(''+informacion.cadena+'.docx');
+                        res.setHeader('Content-Length', stat.size);
+                        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                        res.setHeader('Content-Disposition', 'attachment; filename='+informacion.nombreSalida+'');
+                        file.pipe(res);
+                    break;
+                    case "doc":
+                        res.setHeader('Content-Type', 'application/msword');
+                        res.setHeader('Content-Disposition', 'inline;filename='+informacion.nombreSalida+''); 
+                        
+                        var file = fs.createReadStream(''+informacion.cadena+'.doc');
+                        var stat = fs.statSync(''+informacion.cadena+'.doc');
+                        res.setHeader('Content-Length', stat.size);
+                        res.setHeader('Content-Type', 'application/msword');
+                        res.setHeader('Content-Disposition', 'attachment; filename='+informacion.nombreSalida+'');
+                        file.pipe(res);
+                    break;
+                }
 
 
     });
@@ -83,6 +111,9 @@ async function example( iId) {
     let opciones = await pool.query("SELECT * FROM servicios_ftp as t1 where t1.estado = 'Y' "); // informacion vigente del FTP 
     let informacionDocumento = await pool.query("SELECT * FROM contrato_documento as t1 WHERE t1.id = ? ", [iId]);
 
+
+    //console.log(informacionDocumento);
+
     let cadenaSalida = getCadenaAletoria();
     let informacionSalida = {};
     const client = new ftp.Client()
@@ -95,14 +126,11 @@ async function example( iId) {
                                 secure: false
             });
 
-      await client.cd(informacionDocumento[0].path_file);
-     /*
-      await client.downloadTo ( fs.createWriteStream("LpTBPxZ.pdf"), "prueba.pdf", 0).then(()=> { let casst = "dsadas";})
-                                                                            .catch(err=>{
-                                                                                console.log(err);
-                                                                            });
-                                                                            */
-         await client.downloadTo ( cadenaSalida +".pdf", informacionDocumento[0].nombre_servidor+".pdf",0);
+         //console.log(informacionSalida);
+
+         await client.cd(informacionDocumento[0].path_file);
+         await client.downloadTo ( cadenaSalida +"."+informacionDocumento[0].ext_archivo, 
+                                   informacionDocumento[0].nombre_servidor+"."+informacionDocumento[0].ext_archivo,0);
 
          informacionSalida = {
                                 cadena : cadenaSalida,
@@ -110,11 +138,11 @@ async function example( iId) {
                                 nombreSalida : informacionDocumento[0].nombre_real
          };
 
-         console.log(informacionSalida);
+         
 
     }
     catch(err) {
-      console.log(err)
+      console.log("ERROR EN FUNCION example")
     }
     client.close();
 
@@ -1235,6 +1263,7 @@ router.post('/cargaPagoAdiocional', isLoggedIn, async (req, res) => {
 
     const { idProyecto , tipoCobro,numero, motivo, porcentaje , monto , moneda , observacion , edificiotorre} = req.body;
 
+    let fechaIngreso = dateFormat(new Date(), "yyyy-mm-dd");
     let registro = {
         id_proyecto : idProyecto,
         id_substructura : edificiotorre,
@@ -1244,7 +1273,8 @@ router.post('/cargaPagoAdiocional', isLoggedIn, async (req, res) => {
         numero : numero,
         porcentaje : porcentaje,
         monto : monto,
-        observacion : observacion
+        observacion : observacion,
+        fecha_ingreso :fechaIngreso
     }
 
     const infoSubStructura = await pool.query('INSERT INTO contrato_pago_adicional  set ? ', [registro]);
@@ -1304,6 +1334,8 @@ router.post('/cargaFormIngreso', isLoggedIn, async (req, res) => {
     let presupuestos =await pool.query("SELECT * FROM ppto_presupuesto as t1 where t1.id_proyecto = ? ", [idProyecto]);
     let tipoCobro = await pool.query("SELECT * FROM contrato_tipo_cobro_adicional as t1  ");
 
+    // informacion del proyecto. 
+    let proyectos =await pool.query("SELECT * FROM pro_proyectos as t1 LEFT JOIN moneda_tipo AS t2 ON t1.id_tipo_moneda = t2.id_moneda where t1.id = ? ", [idProyecto]);
     
     
 
@@ -1311,7 +1343,7 @@ router.post('/cargaFormIngreso', isLoggedIn, async (req, res) => {
     {
         case 1:
         case "1":
-            res.render('finanzas/formMetodologia', { req,substructura,presupuestos, tipoCobro , hitos, motivos, monedas, layout: 'blanco'}); 
+            res.render('finanzas/formMetodologia', { proyectos:proyectos[0], req,substructura,presupuestos, tipoCobro , hitos, motivos, monedas, layout: 'blanco'}); 
             break;
         case 2:
         case "2":
@@ -1510,7 +1542,8 @@ router.get('/proyecto/:id', isLoggedIn, async (req, res) => {
                     " LEFT JOIN metod_subestructura AS t3 ON t1.id_substructura = t3.id " +
                     " LEFT JOIN fact_tipo_cobro AS t4 ON t1.id_hitopago = t4.id " +
                     " LEFT JOIN moneda_tipo AS t5 ON t1.id_moneda = t5.id_moneda " +
-                    " where t1.id_proyecto = "+id+" ";
+                    " where t1.id_proyecto = "+id+" "
+                    " ORDER BY t1.id ASC";
 
         let sql2 = " SELECT  " +
                     " t3a.descripcion AS substructura," +
@@ -1550,22 +1583,26 @@ router.get('/proyecto/:id', isLoggedIn, async (req, res) => {
         let substructura =await pool.query("SELECT * FROM metod_subestructura as t1 where t1.id_proyecto = ? ", [id]);
 
         //console.log(substructura);
-
+        let totalMonto = 0;
+        let totalPorc = 0;
         metodologia_pago.forEach(element => {
-            element.monto = new Intl.NumberFormat('de-DE').format(parseInt( element.monto));
+            
+            totalMonto = totalMonto + parseFloat(element.monto);
+            totalPorc = totalPorc + parseFloat(element.porcentaje);
+            element.monto = new Intl.NumberFormat('de-DE').format(parseFloat( element.monto));
         });
 
         pago_adicional.forEach(element => {
-            element.monto = new Intl.NumberFormat('de-DE').format(parseInt( element.monto));
+            element.monto = new Intl.NumberFormat('de-DE').format(parseFloat( element.monto));
         });
 
         respaldo_doc.forEach(element => {
-            element.monto = new Intl.NumberFormat('de-DE').format(parseInt( element.monto));
+            element.monto = new Intl.NumberFormat('de-DE').format(parseFloat( element.monto));
         });
 
-        
+        //console.log(totalMonto);
 
-        res.render('finanzas/proyecto', { req ,proyecto:proyecto[0] ,presupuestos,substructura, tipoDocumentos,  metodologia_pago, pago_adicional,respaldo_doc, layout: 'template'}); 
+        res.render('finanzas/proyecto', { totalMonto, totalPorc, req ,proyecto:proyecto[0] ,presupuestos,substructura, tipoDocumentos,  metodologia_pago, pago_adicional,respaldo_doc, layout: 'template'}); 
         
 
     } catch (error) {

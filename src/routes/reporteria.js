@@ -267,10 +267,12 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                   " t1b.Nombre AS nomDire, t1c.Nombre AS nomJefe, t3.descripcion AS tipologia,t1.superficie_pre,t1.id, t4.descripcion AS tipoServicio," +
                                                   " t1.valor_proyecto, t3.porcentaje_costo, t3.limite_rojo, t3.limite_amarillo, " +
                                                   " t1e.valor AS valorDolar, "+
-                                                  " t1e2.valor AS valorUF " +
+                                                  " t1e2.valor AS valorUF, " +
+                                                  " t1e3.valor AS valorS " +
                                                   " FROM pro_proyectos as t1 " +
                                                   " LEFT JOIN moneda_valor AS t1e ON t1.fecha_inicio = t1e.fecha_valor AND t1e.id_moneda = 2  " +
                                                   " LEFT JOIN moneda_valor AS t1e2 ON t1.fecha_inicio = t1e2.fecha_valor AND t1e2.id_moneda = 4 " +
+                                                  " LEFT JOIN moneda_valor AS t1e3 ON t1.fecha_inicio = t1e3.fecha_valor AND t1e3.id_moneda = 10 " +
                                                   " LEFT JOIN contacto AS t1a ON t1.id_cliente = t1a.id "+
                                                   " LEFT JOIN sys_usuario AS t1b ON t1.id_director = t1b.idUsuario" +
                                                   " LEFT JOIN sys_usuario AS t1c ON t1.id_jefe = t1c.idUsuario ,"+
@@ -279,9 +281,9 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                   " AND t1.id_estado = t2.id" +
                                                   " AND t1.id_tipo_servicio = t4.id" +
                                                   " AND t1.id_tipo_proyecto = t3.id", [id]);
-                
+               
             
-                const facturas = await pool.query("SELECT *, t5.descripcion AS tipoCobro, if(t1.es_roc = 1 ,'SI','No' ) as roc, t4.descripcion AS moneda, t2.descripcion AS estadoFac,  " +
+                const facturas = await pool.query("SELECT *, t1.id_estado as estadoFAC , t5.descripcion AS tipoCobro, if(t1.es_roc = 1 ,'SI','No' ) as roc, t4.descripcion AS moneda, t2.descripcion AS estadoFac,  " +
                                                         " ( " +
                                                         " SELECT format(t1a.valor,2, 'de_DE') " +
                                                         " FROM " +
@@ -312,7 +314,6 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                     " AND " +
                                                             "t1.id_tipo_cobro = t5.id",[id]);
                 
-
 
                 const cexternos = await pool.query("SELECT " +
                                                             " 3200 AS valorUFAux," +
@@ -410,9 +411,25 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         switch(moneda) // moneda visualizacion por defecto UF
                                         {
                                                 case "S/":
+                                                        
                                                         switch(element.simbolo)
                                                         {
+                                                                case "$":
+                                                                        if (element.pcambio === "1") // no es una OC
+                                                                        {
+                                                                           element.totPro = (costoIngresado / element.sol_valor).toFixed(2);  
+                                                                        }
+                                                                break;
                                                                 case "UF":
+                                                                        element.totPro =    ((element.punitario *   element.numhh *  element.pcambio) /   element.sol_valor ).toFixed(2); 
+                                                                break;
+                                                                case "US$":
+                                                                        if (element.pcambio === "1")
+                                                                        {
+                                                                                element.dolar_valor = element.dolar_valor.replace(".", "").replace(",",".");
+                                                                                element.sol_valor = element.sol_valor.replace(".", "").replace(",",".")
+                                                                                element.totPro =    ((costoIngresado * element.dolar_valor) /   element.sol_valor ).toFixed(2);
+                                                                        } 
                                                                 break;
                                                         }
                                                 break;
@@ -898,17 +915,23 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                     }
             );
 
+            // 
             centroCostoHH.forEach(
                     
                 element => {
                     const containsCentro = !!colaboradoresCentroCostoGeneral.find(centro => {return centro.nombre === element.nombre });
                     if (containsCentro === false) 
                     {
+                        // Si no existe lo agrego. 
+                        //console.log(element);
                             const centroCostoExterno = centroCostoHH.find(centro => {return centro.nombre === element.nombre });
                             colaboradoresCentroCostoGeneral.push({nombre : element.nombre,
                                     horas : 0,
                                     externo :centroCostoExterno.horas,
                                     costoUFExterno : parseFloat(centroCostoExterno.totPro).toFixed(2),
+                                    horasCosto : 0,
+                                    horasCostoDolar : 0,
+                                    horasCostoSol : 0,
                                     total :0});    
                     }
                 }
@@ -946,7 +969,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         costoSol = costoSol + centro.horasCostoSol;
                 });
 
-        
+
            colaboradoresCentroCostoGeneral.forEach(
                         element => {
                                 const centro = colaboradoresCentroCostoGeneral.find(centro => {return centro.nombre === element.nombre });
@@ -1017,9 +1040,12 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         col.horasCostoDolar = parseFloat( col.horasCostoDolar ).toFixed(2);
                         });
 
-                        
+         
 
-        colaboradoresCentroCostoGeneral.forEach(element => {  
+         colaboradoresCentroCostoGeneral.forEach(element => {  
+
+
+
                                 
                                 const col = colaboradoresCentroCostoGeneral.find(centro => {return centro.nombre === element.nombre });
                                 col.horas = parseFloat( col.horas ).toFixed(2);
@@ -1037,8 +1063,10 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                 else {col.costoUFExterno = parseFloat( col.costoUFExterno ).toFixed(2);}
                                 
                                 let costoUfLinea = parseFloat(col.costoUFExterno) + parseFloat(col.horasCosto);
-                                let costoDolarLinea = parseFloat(col.costoUFExterno) + parseFloat(col.horasCostoDolar);
+                                let costoDolarLinea = parseFloat(col.horasCostoDolar) + parseFloat(col.horasCostoDolar);
                                 let costoSolLinea = parseFloat(col.costoUFExterno) + parseFloat(col.horasCostoSol);
+
+                                
 
                                 col.costoTotal = parseFloat( costoUfLinea).toFixed(2);
 
@@ -1049,6 +1077,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
                                 });
 
+        
         
         
             let porcentaje = proyecto[0].porcentaje_costo / 100;
@@ -1064,20 +1093,27 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             let totalPagado = 0;
             let totalPagadoDolar = 0;
             let totalRocPagado = 0;
+        
+            
+           
 
             facturas.forEach(element => {  
-
+                
                 if (element.simbolo !== moneda) // la moneda de pago de la factura es distinta a la que se esta viendo en pantalla revisar los montos.
                 {
                         let montoFacturar = 0;
                         let valorUF = 0;
                         let valorDolar = 0;
-                        
+                        let valorSol = 0;
 
-                        if (element.estadoFac == "Ingresado")
+
+                        if ((element.estadoFac == "Ingresado") ||
+                           (element.estadoFac == "Para Cobro"))
+
                         {
-                                
                                 let fechaBuscar = dateFormat(element.fecha_solicitud, "yyyy-mm");
+
+                               
 
                                 let containsFechaSol = !!valorSolMensual.find(fecha => {return fecha.fecha === fechaBuscar});
                                 let containsFechaUf = !!valorUfMensual.find(fecha => {return fecha.fecha === fechaBuscar});
@@ -1102,6 +1138,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         if (element.monto_a_facturar !== null){ montoFacturar = parseFloat(element.monto_a_facturar.replace(".",""));}else{ montoFacturar =element.monto_a_facturar;}
                         if (element.uf_valor !== null){valorUF = parseFloat(element.uf_valor.replace(".","")); }else{valorUF =element.uf_valor; }
                         if (element.dolar_valor !== null){valorDolar = parseFloat(element.dolar_valor.replace(".",""));}else {valorDolar = element.dolar_valor;}
+                        if (element.sol_valor !== null){valorSol = parseFloat(element.sol_valor.replace(".",""));}else {valorSol = element.sol_valor;}
                         // intentar traer el valor del dolar 
 
 
@@ -1115,6 +1152,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         switch(moneda) // de salida en pantalla 
                         {
                                 case "UF":
+                                        
                                         let montoUSD_UF = montoFacturar * valorDolar / valorUF;
                                         element.monto_a_facturar = parseFloat(montoUSD_UF).toFixed(2); // cambiar los DOLARES A UF 
                                 break;
@@ -1127,6 +1165,9 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         element.monto_a_facturar = parseFloat(PESO_SOL).toFixed(2); // cambiar los DOLARES A SOL 
                                         element.sol_valor = parseFloat(PESO_SOL) / parseFloat(montoFacturar);
                                 break;
+                                case "US$":
+
+                                break;
                         }
                        break;
 
@@ -1137,6 +1178,12 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         // Notificar que no tengo el valor del dolar. 
                                         let montoUF_USD = montoFacturar * valorUF / valorDolar;
                                         element.monto_a_facturar = parseFloat(montoUF_USD).toFixed(2); // cambiar los DOLARES A UF 
+                                break;
+                                case "S/":
+                                        
+                                        let montoUF_SOL = montoFacturar * valorUF / valorSol;
+                                        element.monto_a_facturar = parseFloat(montoUF_SOL).toFixed(2); // cambiar los DOLARES A UF 
+
                                 break;
                         } 
                         break;   
@@ -1175,6 +1222,10 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         element.dolar_valor = 1;
                         element.uf_valor = 1;
                 }
+
+                
+                
+
                 if (element.estadoFac === "Pagada")
                 {
                         // ___
@@ -1191,13 +1242,13 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                 }
                 else
                 {
-                        //console.log(element.monto_a_facturar);
+                        
                         totalFacturadoIngresado = parseFloat(totalFacturadoIngresado) + parseFloat( element.monto_a_facturar);
                 }
                 
             });
 
-            
+
 
             totalFacturado = parseFloat(totalFacturado).toFixed(2);
             totalFacturadoIngresado = parseFloat(totalFacturadoIngresado).toFixed(2);
@@ -1224,28 +1275,67 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             let costoEsperadoDolar = "";
             let costoEsperadoSol = "";
             //(parseFloat(proGeneral.valorUSD) * porcentaje).toFixed(2);
+           
 
-            switch(proyecto[0].id_tipo_moneda)
+            //switch(proyecto[0].id_tipo_moneda)
+            
+            switch(moneda)
             {
                 case 0:
                 case "0":
                 case "4":
+                case "UF":
                 case 4:
-                        proGeneral.valorUSD =  parseFloat(proGeneral.valor_proyecto * proGeneral.valorUF / proGeneral.valorDolar).toFixed(2);
+                        proGeneral.valorUSD =  parseFloat(proGeneral.valor_proyecto * proGeneral.valorUF / proGeneral.valorDolar).toFixed(2); 
                         costoEsperadoDolar = (parseFloat(proGeneral.valorUSD) * porcentaje).toFixed(2);
+
+                        switch(proyecto[0].id_tipo_moneda)
+                        {
+                                case 2:
+                                    proyecto[0].valor_proyecto   = parseFloat(proGeneral.valor_proyecto * proGeneral.valorDolar / proGeneral.valorUF).toFixed(2);
+                                    proyecto[0].valor_metro_cuadrado   =parseFloat(proGeneral.valor_metro_cuadrado * proGeneral.valorDolar / proGeneral.valorUF).toFixed(2);
+                                break;
+                        }
+
                 break;
                 case 2:
                 case "2":
+                case "US$":
                         proGeneral.valorUSD = parseFloat(proGeneral.valor_proyecto).toFixed(2);
                         costoEsperadoDolar = (parseFloat(proGeneral.valorUSD) * porcentaje).toFixed(2);
+                        
+                        switch(proyecto[0].id_tipo_moneda)
+                        {
+                                case 4:
+                                case 1:
+                                    proyecto[0].valor_proyecto   = parseFloat(proGeneral.valor_proyecto * proGeneral.valorUF / proGeneral.valorDolar).toFixed(2);
+                                    proyecto[0].valor_metro_cuadrado   =parseFloat(proGeneral.valor_metro_cuadrado * proGeneral.valorUF / proGeneral.valorDolar).toFixed(2);
+                                break;
+                        }
                 break;
                 /**
                  * REVISAR LA OPCION DE SOL
                  */
                 case 10:
                 case "10":
+                case "S/":
+                        
                         proGeneral.valorSOL = parseFloat(proGeneral.valor_proyecto).toFixed(2);
                         costoEsperadoSol = (parseFloat(proGeneral.valorSOL) * porcentaje).toFixed(2);
+                        switch(proyecto[0].id_tipo_moneda)
+                        {
+                                case 2: /// USD
+                                    proyecto[0].valor_metro_cuadrado   =parseFloat(proGeneral.valor_metro_cuadrado * proGeneral.valorDolar / proGeneral.valorS).toFixed(2);
+                                    proGeneral.valorSOL = parseFloat(proGeneral.valor_proyecto * proGeneral.valorDolar / proGeneral.valorS).toFixed(2);
+                                    proyecto[0].valor_proyecto  = parseFloat(proGeneral.valor_proyecto * proGeneral.valorDolar / proGeneral.valorS).toFixed(2);
+                                break;
+                                case 4: // UF
+                                case 1: // PESO
+                                    proyecto[0].valor_metro_cuadrado   =parseFloat(proGeneral.valor_metro_cuadrado * proGeneral.valorUF / proGeneral.valorS).toFixed(2);
+                                    proGeneral.valorSOL = parseFloat(proGeneral.valor_proyecto * proGeneral.valorUF / proGeneral.valorS).toFixed(2);   
+                                    proyecto[0].valor_proyecto  = parseFloat(proGeneral.valor_proyecto * proGeneral.valorUF / proGeneral.valorS).toFixed(2); 
+                                break;
+                        }
                 break;
             }
             
@@ -1261,11 +1351,183 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                 datos : ArregloErroresFormateados
             };
 
+
+            ///////////// REVISION 21/12/2022
+            let adicionalesIngresadosv2  =0; // Esto incluira :
+                                             // Finanzas - Cobro Adcional (TODOS)
+                                             // Facturas - ROC (Ingresada )
+
+            let adicionalesPagadosv2 = 0;// Esto Incluira :
+                                         // Facturas - ROC (PAGADAS)
+
+            // facturas ingresadas en modulo de facuracion
+
+           facturas.forEach(element => {  
+                if (element.estadoFAC == 0 || element.estadoFAC == 1 || element.estadoFAC == 2) // estados filtrados 
+                                                                                                // Para cobro // En adminitracion // En cobranza
+                {
+                        if (element.es_roc == 1) // Solo las roc
+                                {
+                                        if (element.simbolo == moneda)  // misma moneda de presentacion.
+                                        {
+                                                adicionalesIngresadosv2 = adicionalesIngresadosv2 +  parseFloat(element.monto_a_facturar);
+                                        }
+                                        else
+                                        {       /*
+                                                switch(moneda) // presentando 
+                                                {
+                                                        case "US$":
+                                                                
+                                                        break;
+                                                        case "UF":
+                                                                adicionalesIngresadosv2 = parseFloat(element.monto_a_facturar);
+                                                        break;
+                                                        case "S/":
+                                                                
+                                                        break;
+                                                }*/
+                                                adicionalesIngresadosv2 = parseFloat(element.monto_a_facturar);
+                                        }
+                                        
+                                }
+                }
+                else if (element.estadoFAC == 3)
+                {
+                        if (element.es_roc == 1) // Solo las roc
+                        {
+                                if (element.simbolo == moneda)  // misma moneda de presentacion.
+                                {
+                                        adicionalesPagadosv2 = parseFloat(element.monto_a_facturar);
+                                }
+                                else
+                                {
+                                        adicionalesPagadosv2 = parseFloat(element.monto_a_facturar);
+                                }
+                                // expandir a las otras monedas en cuestion. 
+                        } 
+                }
+           });
+           // contrato_pago_adicional
+           const pagosAdiocionalesDATA = await pool.query("SELECT * , "  +
+                                                        " (SELECT format(t1a.valor,2, 'de_DE')  " +
+                                                        " FROM  " +
+                                                                " moneda_valor AS t1a  " +
+                                                        " WHERE   " +
+                                                                " t1a.id_moneda = 4  " +
+                                                        " AND  " +
+                                                                " t1a.fecha_valor = t1.fecha_ingreso  " +
+                                                        " LIMIT 1 )  AS 'valorUF'," +
+                                                        " (SELECT format(t1a.valor,2, 'de_DE') " +
+                                                        " FROM  " +
+                                                                " moneda_valor AS t1a " +
+                                                        " WHERE  " +
+                                                                " t1a.id_moneda = 10  " +
+                                                        " AND  " +
+                                                                " t1a.fecha_valor = t1.fecha_ingreso  " +
+                                                        " LIMIT 1 )  AS 'valorSOL', " +
+                                                        " (SELECT format(t1a.valor,2, 'de_DE') " +
+                                                        " FROM  " +
+                                                                " moneda_valor AS t1a  " +
+                                                        " WHERE   " +
+                                                                " t1a.id_moneda = 2  " +
+                                                        " AND  " +
+                                                                " t1a.fecha_valor = t1.fecha_ingreso " +
+                                                        " LIMIT 1 )  AS 'valorDolar' "+
+                                                          " FROM contrato_pago_adicional as t1, moneda_tipo as t2  " +
+                                                          "WHERE t1.id_proyecto = ? " +
+                                                          " AND t1.id_moneda = t2.id_moneda", [id] );
+
+        pagosAdiocionalesDATA.forEach(element => {  
+                if (element.simbolo == moneda)
+                {       
+                        adicionalesIngresadosv2 =parseFloat( adicionalesIngresadosv2) + parseFloat(element.monto);  
+                }
+                else
+                {
+                        element.monto = element.monto.replace(".","");
+                        element.valorDolar = element.valorDolar.replace(".","");
+                        element.valorUF = element.valorUF.replace(".","");
+                        let aux = 0;
+
+                        switch(moneda)
+                        {
+                                case "US$":
+                                        
+                                break;
+                                case "UF":
+                                        switch(element.simbolo)
+                                        {
+                                                case "US$":
+                                                aux =  parseFloat( element.monto)  * parseFloat( element.valorDolar) / parseFloat( element.valorUF);
+                                                aux = aux.toFixed(2);
+                                                adicionalesIngresadosv2 = parseFloat( adicionalesIngresadosv2 ) + parseFloat(aux);                    
+                                                break;
+                                                case "S/":
+                                                break;
+                                        }
+                                break;
+                                case "S/":
+                                        
+                                break;
+                        }
+                }
+        });
+
+
+           let totalProyectov2 = 0; // Es valor del proyecto + Adicionales ingresados + Adicionales Pagados
+           
+           totalProyectov2 = adicionalesIngresadosv2 + adicionalesPagadosv2;
+           
+           /* 
+           switch(moneda)
+           {
+                case "US$":
+                        totalProyectov2 = parseFloat( totalProyectov2 ) + parseFloat( proGeneral.valorUSD );
+                        
+                break;
+                case "UF":
+                        totalProyectov2 = parseFloat( totalProyectov2 ) + parseFloat( proGeneral.valor_proyecto);
+                        
+                break;
+                case "S/":
+                        totalProyectov2 = parseFloat( totalProyectov2 ) + parseFloat( proGeneral.valorSOL);
+                        
+                break;
+           }
+           */
+           totalProyectov2 = adicionalesIngresadosv2 + adicionalesPagadosv2 + parseFloat( proGeneral.valor_proyecto);
+
+           let sql2 = " SELECT  " +
+                    " t3a.descripcion AS substructura," +
+                    "  t4a.descripcion AS  motivohito, "+
+                    " t1a.numero AS numero, " +
+                    " t5a.descripcion AS moneda, " +
+                    " t1a.porcentaje AS porcentaje, " +
+                    " t1a.monto AS monto, " +
+                    " t1a.observacion AS observacion, " +
+                    " 2 AS tiporegistro, " + 
+                    " t1a.id AS id, " + 
+                    " t6a.descripcion as tipoCobro " + 
+            " FROM contrato_pago_adicional as t1a  " +
+                " LEFT JOIN metod_subestructura AS t3a ON t1a.id_substructura = t3a.id "+
+                " LEFT JOIN contrato_motivo_del_cobro AS t4a ON t1a.id_motivo = t4a.id " +
+                " LEFT JOIN moneda_tipo AS t5a ON t1a.id_moneda = t5a.id_moneda " +
+                " LEFT JOIN contrato_tipo_cobro_adicional AS t6a ON t1a.id_tipo_cobro = t6a.id " +
+                " where t1a.id_proyecto = "+id+" ";
+
+            let pago_adicional   = await pool.query(sql2); 
+
+            pago_adicional.forEach(element => {
+                element.monto = new Intl.NumberFormat('de-DE').format(parseInt( element.monto));
+            });
+
+
             
+            let costoEsperadov2 = (totalProyectov2 * porcentaje).toFixed(2);
 
             if (mensaje === "")
             {
-                    res.render('reporteria/dashboard', {totalFacturadoIngresado, costoAdiocionales, registros, selectUF,selectUSD,selectSOL ,proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado, 
+                    res.render('reporteria/dashboard', { costoEsperadov2, pago_adicional, totalProyectov2, adicionalesPagadosv2, adicionalesIngresadosv2, totalFacturadoIngresado, costoAdiocionales, registros, selectUF,selectUSD,selectSOL ,proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado, 
                                                         modificaciones:modificaciones[0], costoEsperado,costoEsperadoDolar,costoEsperadoSol, colaboradoresCentroCostoGeneral, 
                                                         colaboradoresCentroCosto, colaboradores, erroresCosto, varTotalProyecto, numHH, 
                                                         centro_costo, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template', helpers : {
@@ -1274,7 +1536,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             }
             else
             {
-                    res.render('reporteria/dashboard', {totalFacturadoIngresado, costoAdiocionales, registros, selectUF,selectUSD,selectSOL , proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado,
+                    res.render('reporteria/dashboard', { costoEsperadov2, pago_adicional, totalProyectov2, adicionalesPagadosv2, adicionalesIngresadosv2, totalFacturadoIngresado, costoAdiocionales, registros, selectUF,selectUSD,selectSOL , proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado,
                                                         modificaciones:modificaciones[0], costoEsperado,
                                                         colaboradoresCentroCosto, colaboradores, erroresCosto, mensaje, varTotalProyecto, numHH, centro_costo, 
                                                         costoEsperadoDolar, cexternos,facturas, proyecto:proyecto[0], req , layout: 'template', helpers : {
@@ -2261,7 +2523,7 @@ router.get('/analisisProyectos',  async (req, res) => {
                 
                 
                 let data_facturacion_proyecto = await getDataFacturacionProyecto(p.id);
-                //console.log(data_facturacion_proyecto);
+                
                 //let valorUfMensual = []; 
                 //let valorUsdMensual = [];
                 //let valorSolMensual = [];
@@ -3077,7 +3339,6 @@ router.get('/analisisProyectos',  async (req, res) => {
                 facturacion["total_pagado"]             = totalFacturadoPagado;
                 facturacion["adicional_ingresado"]      = totalfacturadoIngresado;
                 
-                ///console.log(facturacion);
 
                 return facturacion;
         }

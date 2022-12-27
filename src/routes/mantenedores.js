@@ -2366,7 +2366,10 @@ router.get('/equipoTrabajo',isLoggedIn, async (req, res) => {
                                                         " LEFT JOIN sys_usuario AS t1b ON t1b.idUsuario = t1.id_colaborador ");
 
     const colaborador_pendiente =  await pool.query(" SELECT * FROM sys_usuario AS t1a WHERE t1a.idUsuario NOT IN " +
-                                                    " (SELECT t1.id_colaborador FROM sys_usuario_equipo AS t1 GROUP BY t1.id_colaborador) AND t1a.id_estado = 1");
+                                                    " (SELECT t1.id_colaborador FROM sys_usuario_equipo AS t1 GROUP BY t1.id_colaborador) AND t1a.id_estado = 1 "+
+                                                    " AND t1a.idUsuario NOT IN (223 , 176 , 173,167,127,121,96,54,2,1)");
+
+    console.log(colaborador_pendiente);
 
 
     if (req.query.a === undefined)

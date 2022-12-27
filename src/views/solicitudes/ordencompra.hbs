@@ -109,7 +109,12 @@
                                         <select class="select2_single form-control" tabindex="1" name="id_monedaoc" id="id_monedaoc">
                                             <option value="">Seleccione</option>
                                                 {{#each monedas}}
-                                                    <option value="{{id_moneda}}">{{descripcion}} </option>
+                                                      {{#if (if_equal 1 id_moneda) }}
+                                                        <option value="{{id_moneda}}" selected>{{descripcion}} </option>
+                                                      {{else}}
+                                                        <option value="{{id_moneda}}">{{descripcion}} </option>
+                                                      {{/if}}
+                                                    
                                                 {{/each}}
                                         </select>
                                     </div>

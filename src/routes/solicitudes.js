@@ -1685,16 +1685,6 @@ router.get('/horaextras', isLoggedIn, async (req, res) => {
         " t1.idIngreso = "+req.user.idUsuario+"" +
     " ORDER BY id DESC"); 
    
-    console.log("SELECT " +
-    " t1.numhh,t1.comentario,t1.id, t2.Nombre AS nomSol,t3.nombre AS nomPro,t3.year,t3.code, t4.descripcion ,  " +
-    " DATE_FORMAT(t1.fecha_solicitante, '%Y-%m-%d')  as fecha "+
-    "  FROM sol_horaextra AS t1  "+
-    "  LEFT JOIN sys_usuario AS t2 ON t1.idSolicitante = t2.idUsuario  "+
-    "  LEFT JOIN pro_proyectos AS t3 ON t1.idProyecto = t3.id"+
-    "  LEFT JOIN sol_estado AS t4 ON t1.idEstado = t4.id"+
-    " WHERE "+
-        " t1.idIngreso = "+req.user.idUsuario+"" +
-    " ORDER BY id DESC");
      //res.render('solicitudes/horasextras', {  horasExtras,req ,layout: 'template'});
     var mensaje = -1;
     if (req.query.a !== undefined)

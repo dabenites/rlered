@@ -167,11 +167,25 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
         }
         else
         {
-          precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
-          element.montopeso = element.tipo_cambio * element.precio_unitario;
-          sTable.push( new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad * element.tipo_cambio));
-          tipoCambio =element.tipo_cambio;
-          esUF = true;
+          switch(oc.ocMoneda)
+          {
+            case 1:
+            case "1":
+              precio +=  parseInt(element.precio_unitario * element.cantidad * element.tipo_cambio);
+              element.montopeso = parseInt(element.tipo_cambio * element.precio_unitario);
+              sTable.push( new Intl.NumberFormat(['ban', 'id']).format(parseInt(element.precio_unitario * element.cantidad * element.tipo_cambio)));
+              tipoCambio =element.tipo_cambio;
+              esUF = true;
+            break;
+            default:
+              precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
+              element.montopeso = element.tipo_cambio * element.precio_unitario;
+              sTable.push( new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad * element.tipo_cambio));
+              tipoCambio =element.tipo_cambio;
+              esUF = true;
+            break;
+          }
+          
         }
       break;
       case 2:

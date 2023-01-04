@@ -1,0 +1,40 @@
+ <table class="table table-striped" name="tablaEmpalmes" id="tablaEmpalmes" style="width: 100%;">
+    <thead>
+        <tr>
+            <th> Nombre Proyecto</th>
+            <th> Cod Proyecto</th>
+            <th> Director </th>
+            <th> Servicio </th>
+            <th> Cliente </th>
+            <th> Presupuesto </th>
+            <th> Valor Presupuesto</th>
+            <th> Adicionales</th>
+            <th> Total Contratado</th>
+            <th> Facturado</th>
+            <th> Pend. de Pago</th>
+            <th> Inconbrable</th>
+            <th> Pend. de Facturación</th>
+            <th> Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each proyectos}}
+        <tr>
+            <td>{{nombre}}</td>
+            <td>{{year}}-{{code}}</td>
+            <td>{{nomDirector}}</td>
+            <td>{{tipoServicio}}</td>
+            <td>{{nomCliente}}</td>
+            <td></td>
+            <td>{{valor_proyecto}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{estado}}</td>
+        </tr>
+        {{/each}}
+    </tbody>       
+ </table>

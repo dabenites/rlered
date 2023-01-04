@@ -12,6 +12,9 @@ var Excel = require('exceljs');
 const { parse } = require('path');
 const { tpu_v1 } = require('googleapis');
 
+const CC = require('currency-converter-lt')
+
+
 router.get('/proyectos',isLoggedIn,  async (req, res) => {
     
         try {
@@ -29,6 +32,47 @@ router.get('/proyectos',isLoggedIn,  async (req, res) => {
 
                 const proyectos = await pool.query(sql);
 
+
+                // Preguntar la informacion de las monedas. para la UF 
+                let sqlUF = "SELECT * FROM moneda_valor AS t1 WHERE t1.id_moneda = 4";
+                const valoresUF = await pool.query(sqlUF);
+
+                let valoresUFBD = [];
+                valoresUF.forEach(datoBD => {
+                    
+                let existeValor = valoresUFBD.find(valor => {return valor.fecha === datoBD.fecha_valor });
+                
+                if (existeValor == undefined)
+                {
+                        let valorFecha = {
+                                fecha : datoBD.fecha_valor,
+                                valor : datoBD.valor
+                        }
+                        valoresUFBD.push(valorFecha);
+                }              
+                });
+
+                //console.log(valoresUFBD);
+
+                const inicio = new Date("2009-09-01");
+                const fin = new Date("2009-12-31");
+                const UN_DIA_EN_MILISEGUNDOS = 1000 * 60 * 60 * 24;
+                const INTERVALO = UN_DIA_EN_MILISEGUNDOS * 1; // Cada dia
+                
+
+                //#################################################################################
+                for (let i = inicio; i <= fin; i = new Date(i.getTime() + INTERVALO)) {
+
+                        let fechaFind = dateFormat(i, "yyyy-mm-dd");
+                        let existeValorUF = valoresUFBD.find(valor => {return valor.fecha === fechaFind});
+
+                        if (existeValorUF == undefined)
+                        {
+                            console.log(fechaFind);
+                        }
+                }
+                //#################################################################################
+
                 res.render('reporteria/buscarProyecto2', { proyectos, req, layout: 'template' });
 
         } catch (error) {
@@ -42,6 +86,20 @@ router.get('/proyectos',isLoggedIn,  async (req, res) => {
         }
 
 });
+
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
 
 router.post('/buscarAnnio',isLoggedIn,  async (req, res) => {
 
@@ -3342,4 +3400,257 @@ router.get('/analisisProyectos',  async (req, res) => {
 
                 return facturacion;
         }
-        module.exports = router;
+
+
+//finanzas
+router.get('/finanzas',isLoggedIn,  async (req, res) => {
+
+        
+
+        let monedas = await pool.query("SELECT * FROM moneda_tipo AS t1 WHERE t1.id_moneda IN (2,4,10)");
+
+        let estadoProyectos = await pool.query("SELECT * FROM proyecto_estado AS t1");
+
+        let directorProyectos = await pool.query(" SELECT * FROM " +
+	                                         " sys_usuario AS t2  " +
+                                                 " WHERE  " +
+		                                        " t2.idUsuario IN ( SELECT t1.id_director FROM pro_proyectos AS t1 GROUP BY t1.id_director) " +
+                                                 " AND " +
+		                                        " t2.idUsuario != 1 " );
+        
+        res.render('reporteria/finanzas', {directorProyectos , estadoProyectos,  monedas, res, req, layout: 'template' });
+
+
+});
+
+router.post('/buscarListadoProyectos',isLoggedIn,  async (req, res) => {
+
+        
+
+        let {moneda,estado,director,desde,hasta} = req.body;
+        let sqlDirector = "";
+
+        // verificamos valores desde y hasta 
+        if (desde === ""){ desde = 1000;} //
+        if (hasta === ""){ hasta = 3000;} //
+
+
+        if ( director != 0)
+        {
+                sqlDirector = " AND t1.id_director = "+director+"";
+        }
+
+        let sql = "SELECT " +
+                        " t1.nombre, " +
+                        " t1.id, " +
+                        " t1.`year`, " +
+                        " t1.code, " +
+                        " t1.id_director, " +
+                        " t2.Nombre  as nomDirector," +
+                        " t3.descripcion as tipoServicio," +
+                        " t4.name AS nomCliente, " +
+                        " t5.descripcion AS estado, " +
+                        " t1.superficie_pre ,"+
+                        " t1.valor_metro_cuadrado ,"+
+                        " t1.valor_proyecto "+
+                   " FROM  " +
+                        " pro_proyectos AS t1, " +
+                        " sys_usuario AS t2, " +
+                        " proyecto_servicio AS t3," +
+                        " contacto AS t4, " +
+                        " proyecto_estado AS t5 " + 
+                   " WHERE  " +
+                        " t1.`year` BETWEEN "+ desde +" AND "+hasta +" "+
+                        " AND   t1.id_director = t2.idUsuario " +
+                        " AND   t1.id_tipo_servicio = t3.id  " +
+                        " AND   t1.id_cliente = t4.id " +
+                        " AND 	t1.id_estado = t5.id " +
+                        sqlDirector;
+
+
+
+        //console.log(sql);
+
+        let proyectos = await pool.query(sql);
+
+     
+
+        
+        res.render('reporteria/tablaproyectos', { proyectos, req , layout: 'blanco'});   
+});
+
+//analisisMoneda
+router.post('/analisisMoneda',isLoggedIn,  async (req, res) => {
+
+        // variable donde almaceno los errores 
+        let errores = [];
+        //#region VALORES DE LAS MONEDAS 
+        let valorUfMensual = []; 
+        let valorUsdMensual = [];
+        let valorSolMensual = [];
+
+        const valorUFMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");
+        
+        const valorUSDMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 2 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");
+
+        const valorSOLMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 10 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");                                         
+                            
+        valorUFMes.forEach(element => {    
+                                        const containsFecha = !!valorUfMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                                if (containsFecha === false)
+                                                        {
+                                                                valorUfMensual.push({ 
+                                                                                            fecha : element.fecha,
+                                                                                            valor : element.valor
+                                                                                    });
+                                                        }
+                                        }
+                           );
+
+        valorUSDMes.forEach(element => {    
+                                const containsFecha = !!valorUsdMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                        if (containsFecha === false)
+                                                {
+                                                        valorUsdMensual.push({ 
+                                                                                    fecha : element.fecha,
+                                                                                    valor : element.valor
+                                                                            });
+                                                }
+                                }
+                   );
+
+        valorSOLMes.forEach(element => {    
+                        const containsFecha = !!valorSolMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                if (containsFecha === false)
+                                        {
+                                                valorSolMensual.push({ 
+                                                                            fecha : element.fecha,
+                                                                            valor : element.valor
+                                                                    });
+                                        }
+                        }
+           );
+
+
+
+        //#endregion
+        
+
+        
+
+        // bloque Facturas 
+        let sqlFacturas = " SELECT * " +
+                          " FROM  " +
+                                        " fact_facturas AS t2 " +
+                           " WHERE  " +
+                                        " t2.id NOT IN ( " +
+                                                            "    SELECT  " +
+                                                                        " t1.id_factura " +
+                                                                " FROM  " +
+                                                                        " fact_facturas_equivalencias AS t1 "+
+                                                          ")";
+
+        let listadoProyectosAnalisisFactura = await pool.query(sqlFacturas);
+
+        
+        listadoProyectosAnalisisFactura.forEach(factura => {
+                
+                //console.log(factura);
+
+                let monedaBase = factura.id_tipo_moneda;
+
+                let fechaAnalisisFactura = "";
+                let fechaFactura = factura.fecha_factura;
+                let fechaCobro   = factura.fecha_cobro;
+                let fechaIngreso   = dateFormat(factura.fecha_solicitud, "yyyy-mm-dd");
+
+                // orden de las fechas para sacar las equivalencias de las monedas. 
+                if (fechaFactura != ""){fechaAnalisisFactura = fechaFactura;}
+                else if (fechaCobro != ""){fechaAnalisisFactura = fechaCobro;}
+                else if (fechaIngreso != ""){fechaAnalisisFactura = fechaIngreso;}
+
+
+                 // VALORES UF
+
+                 let valorUF = "";
+                 let valorUSD = "";
+                 let valorSOL = "";
+                
+                 //#region VALORES DE UF // USD // SOL SEGUN FECHA ANALISIS 
+                 const colUF = valorUfMensual.find(fecha => {return fecha.fecha === fechaAnalisisFactura});
+                 const colUSD = valorUsdMensual.find(fecha => {return fecha.fecha === fechaAnalisisFactura});
+                 const colSOL = valorSolMensual.find(fecha => {return fecha.fecha === fechaAnalisisFactura});
+                if (colUF === undefined) {
+                        errores.push(
+                                {
+                                        tipo : "Factura",
+                                        id : factura.id,
+                                        fecha : fechaAnalisisFactura,
+                                        desc : "No se encontro el valor UF"
+                                }
+                        )
+                }
+                else{valorUF =   colUF.valor; }
+                if (colUSD === undefined) {
+                        errores.push(
+                                {
+                                        tipo : "Factura",
+                                        id : factura.id,
+                                        fecha : fechaAnalisisFactura,
+                                        desc : "No se encontro el valor USD"
+                                }
+                        )
+                }
+                else{valorUSD =   colUSD.valor; }
+                if (colSOL === undefined) {
+                        errores.push(
+                                {
+                                        tipo : "Factura",
+                                        id : factura.id,
+                                        fecha : fechaAnalisisFactura,
+                                        desc : "No se encontro el valor SOL"
+                                }
+                        )
+                }
+                else{valorSOL =   colSOL.valor; }
+                 //#endregion
+                 
+
+                let registroEquivalencia = {
+                        id_factura : factura.id,
+                        id_proyecto : factura.id_proyecto,
+                        id_moneda_base :factura.id_tipo_moneda,
+                        monto_base : factura.monto_a_facturar,
+                        fecha : fechaAnalisisFactura,
+                        valor_uf :valorUF,
+                        valor_usd :valorUSD,
+                        valor_sol :valorSOL
+
+                }
+
+                const insertEquivalencia =  pool.query('INSERT INTO fact_facturas_equivalencias set ?', [registroEquivalencia]);
+
+        });
+
+        // Bloque OC 
+
+        // COSTO EXTERNO
+
+        // BITACORA
+
+});
+
+
+module.exports = router;

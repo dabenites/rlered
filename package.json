@@ -27,6 +27,8 @@
     "buffer": "^6.0.3",
     "colors": "^1.4.0",
     "connect-flash": "^0.1.1",
+    "currency-converter-lt": "^2.0.0-beta.0",
+    "currency.js": "^2.0.4",
     "datatables.net": "^1.11.2",
     "datatables.net-bs": "^1.11.2",
     "datatables.net-buttons": "^2.0.0",

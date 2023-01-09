@@ -12,9 +12,11 @@
             <th> Total Contratado</th>
             <th> Facturado</th>
             <th> Pend. de Pago</th>
-            <th> Inconbrable</th>
+            <!-- <th> Inconbrable</th> -->
             <th> Pend. de Facturación</th>
             <th> Estado</th>
+            <!-- <th> PAGADO</th>
+            <th> EN COBRANZA</th>-->
         </tr>
     </thead>
     <tbody>
@@ -27,14 +29,29 @@
             <td>{{nomCliente}}</td>
             <td></td>
             <td>{{valor_proyecto}}</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>{{adicional}}</td>
+            <td>{{contratado}}</td>
+            <td>{{facturado}}</td>
+            <td>{{pendientePago}}</td>
+            <!-- <td></td> -->
+            <td>{{pendienteFacturacion}}</td>
             <td>{{estado}}</td>
+            <!--<td>{{pagado}}</td>
+            <td>{{cobranza}}</td>-->
         </tr>
         {{/each}}
-    </tbody>       
+    </tbody>  
+    <tfoot>
+        <tr>
+            <td colspan="5"></td>
+            <td>TOTALES</td>
+            <td>{{infoAnalisis.vpresupuesto}}</td>
+            <td>{{infoAnalisis.adicional}}</td>
+            <td>{{infoAnalisis.totalcontrado}}</td>
+            <td>{{infoAnalisis.facturadao}}</td>
+            <td>{{infoAnalisis.penPago}}</td>
+            <td>{{infoAnalisis.pendFact}}</td>
+            <td></td>
+        </tr>
+    </tfoot>     
  </table>

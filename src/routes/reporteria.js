@@ -12,8 +12,6 @@ var Excel = require('exceljs');
 const { parse } = require('path');
 const { tpu_v1 } = require('googleapis');
 
-const CC = require('currency-converter-lt')
-
 
 router.get('/proyectos',isLoggedIn,  async (req, res) => {
     
@@ -3406,6 +3404,8 @@ router.get('/analisisProyectos',  async (req, res) => {
 router.get('/finanzas',isLoggedIn,  async (req, res) => {
 
         
+        
+        let servicioProyectos = await pool.query("SELECT * FROM proyecto_servicio AS t1");
 
         let monedas = await pool.query("SELECT * FROM moneda_tipo AS t1 WHERE t1.id_moneda IN (2,4,10)");
 
@@ -3418,7 +3418,7 @@ router.get('/finanzas',isLoggedIn,  async (req, res) => {
                                                  " AND " +
 		                                        " t2.idUsuario != 1 " );
         
-        res.render('reporteria/finanzas', {directorProyectos , estadoProyectos,  monedas, res, req, layout: 'template' });
+        res.render('reporteria/finanzas', {servicioProyectos, directorProyectos , estadoProyectos,  monedas, res, req, layout: 'template' });
 
 
 });
@@ -3427,8 +3427,10 @@ router.post('/buscarListadoProyectos',isLoggedIn,  async (req, res) => {
 
         
 
-        let {moneda,estado,director,desde,hasta} = req.body;
+        let {servicio,moneda,estado,director,desde,hasta} = req.body;
         let sqlDirector = "";
+        let sqlEstado = "";
+        let sqlServicio = "";
 
         // verificamos valores desde y hasta 
         if (desde === ""){ desde = 1000;} //
@@ -3439,7 +3441,15 @@ router.post('/buscarListadoProyectos',isLoggedIn,  async (req, res) => {
         {
                 sqlDirector = " AND t1.id_director = "+director+"";
         }
-
+        if ( estado != 0)
+        {
+                sqlEstado = " AND t1.id_estado = "+estado+"";
+        }
+        if ( servicio != 0)
+        {
+                sqlServicio = " AND t1.id_tipo_servicio = "+servicio+"";
+        }
+        
         let sql = "SELECT " +
                         " t1.nombre, " +
                         " t1.id, " +
@@ -3454,30 +3464,235 @@ router.post('/buscarListadoProyectos',isLoggedIn,  async (req, res) => {
                         " t1.valor_metro_cuadrado ,"+
                         " t1.valor_proyecto "+
                    " FROM  " +
-                        " pro_proyectos AS t1, " +
+                        " pro_proyectos AS t1 " +
+                        " LEFT JOIN contacto AS t4 ON t1.id_cliente = t4.id," +
                         " sys_usuario AS t2, " +
                         " proyecto_servicio AS t3," +
-                        " contacto AS t4, " +
+                        //" contacto AS t4, " +
                         " proyecto_estado AS t5 " + 
                    " WHERE  " +
                         " t1.`year` BETWEEN "+ desde +" AND "+hasta +" "+
                         " AND   t1.id_director = t2.idUsuario " +
                         " AND   t1.id_tipo_servicio = t3.id  " +
-                        " AND   t1.id_cliente = t4.id " +
+                       // " AND   t1.id_cliente = t4.id " +
                         " AND 	t1.id_estado = t5.id " +
-                        sqlDirector;
+                        sqlDirector +
+                        sqlEstado + 
+                        sqlServicio +
+                        " ";
 
 
 
         //console.log(sql);
 
+        let infoProyectos = [];
         let proyectos = await pool.query(sql);
 
-     
+        let infoAnalisis ={
+                vpresupuesto : 0,
+                adicionales : 0,
+                totalcontrado : 0,
+                facturadao :0,
+                penPago : 0,
+                pendFact : 0
+        };
 
+        for (let p of proyectos) {
+                let facturacion = await getFacturasProyecto(p.id); 
+                
+                //#region VARIABLES PARA SUMATORIAS
+                let paraCobro_uf = 0;
+                let cobranza_uf = 0;
+                let pagada_uf = 0;
+
+                let paraCobro_clp = 0;
+                let cobranza_clp = 0;
+                let pagada_clp = 0;
+
+                let paraCobro_usd = 0;
+                let cobranza_usd = 0;
+                let pagada_usd = 0;
+
+                let paraCobro_sol = 0;
+                let cobranza_sol = 0;
+                let pagada_sol = 0;
+
+
+                let adicional_uf = 0;
+                let adicional_clp = 0;
+                let adicional_usd = 0;
+                let adicional_sol = 0;
+                //#endregion
+
+                facturacion.forEach(factura => {
+                        //console.log(factura.esroc);
+                        switch(factura.id_estado)
+                        {
+                            case 0: // 
+                                if (factura.esroc === 1)
+                                {
+                                        adicional_uf = adicional_uf + parseFloat(factura.monto_uf);
+                                        adicional_clp = adicional_clp + parseFloat(factura.monto_clp);
+                                        adicional_usd = adicional_usd + parseFloat(factura.monto_dolar);
+                                        adicional_sol = adicional_sol + parseFloat(factura.monto_sol);
+                                }
+                                else
+                                {
+                                        paraCobro_uf = paraCobro_uf + parseFloat(factura.monto_uf);
+                                        paraCobro_clp = paraCobro_clp + parseFloat(factura.monto_clp);
+                                        paraCobro_usd = paraCobro_usd + parseFloat(factura.monto_dolar);
+                                        paraCobro_sol = paraCobro_sol + parseFloat(factura.monto_sol);
+                                }
+                            break;
+                            case 2:
+                                if (factura.esroc === 1)
+                                {
+                                        adicional_uf = adicional_uf + parseFloat(factura.monto_uf);
+                                        adicional_clp = adicional_clp + parseFloat(factura.monto_clp);
+                                        adicional_usd = adicional_usd + parseFloat(factura.monto_dolar);
+                                        adicional_sol = adicional_sol + parseFloat(factura.monto_sol);
+                                }
+                                else
+                                {
+                                        cobranza_uf = cobranza_uf + parseFloat(factura.monto_uf);
+                                        cobranza_clp = cobranza_clp + parseFloat(factura.monto_clp);
+                                        cobranza_usd = cobranza_usd + parseFloat(factura.monto_dolar);
+                                        cobranza_sol = cobranza_sol + parseFloat(factura.monto_sol);       
+                                }
+                            break;
+                            case 3:
+                                if (factura.esroc === 1)
+                                {
+                                        adicional_uf = adicional_uf + parseFloat(factura.monto_uf);
+                                        adicional_clp = adicional_clp + parseFloat(factura.monto_clp);
+                                        adicional_usd = adicional_usd + parseFloat(factura.monto_dolar);
+                                        adicional_sol = adicional_sol + parseFloat(factura.monto_sol);
+                                }
+                                else
+                                {
+                                        pagada_uf = pagada_uf + parseFloat(factura.monto_uf);
+                                        pagada_clp = pagada_clp + parseFloat(factura.monto_uf);
+                                        pagada_usd = pagada_usd + parseFloat(factura.monto_dolar);
+                                        pagada_sol = pagada_sol + parseFloat(factura.monto_sol);
+                                }
+                                
+                            break;
+                        }   
+                });
+                p.facturado_uf = cobranza_uf + pagada_uf;
+                p.facturado_clp = cobranza_clp + pagada_clp;
+                p.facturado_usd = cobranza_usd + pagada_usd;
+                p.facturado_sol = cobranza_sol + pagada_sol;
+
+                //#region ASIGNACION FACTURADO
+                if (p.valor_proyecto === ""){p.valor_proyecto = 0;}
+
+                switch(moneda)
+                {
+                        case 1:
+                        case "1":
+                          p.facturado =  Intl.NumberFormat('de-DE').format(p.facturado_clp.toFixed(0));
+                          p.adicional = Intl.NumberFormat('de-DE').format(adicional_clp.toFixed(0));
+                          p.valor_proyecto = Intl.NumberFormat('de-DE').format( parseFloat(p.valor_proyecto).toFixed(0));
+                          p.cobranza = cobranza_clp;
+                          p.pagado = pagada_clp;
+                        break;
+                        case 2:
+                        case "2":
+                          p.facturado =  Intl.NumberFormat('de-DE').format(p.facturado_usd.toFixed(2));
+                          p.adicional = Intl.NumberFormat('de-DE').format(adicional_usd.toFixed(2));
+                          p.valor_proyecto = Intl.NumberFormat('de-DE').format(parseFloat(p.valor_proyecto).toFixed(2));
+                          p.cobranza = cobranza_usd;
+                          p.pagado = pagada_usd;
+                        break;
+                        case 4:
+                        case "4":
+                          p.facturado =  Intl.NumberFormat('de-DE').format(p.facturado_uf.toFixed(2));
+                          p.adicional = Intl.NumberFormat('de-DE').format(adicional_uf.toFixed(2));
+                          p.valor_proyecto = Intl.NumberFormat('de-DE').format(parseFloat(p.valor_proyecto).toFixed(2));
+                          p.contratado = p.valor_proyecto + p.adicional ;
+                          p.cobranza = cobranza_uf;
+                          p.pagado = pagada_uf;
+                        break;
+                        case 10:
+                        case "10":
+                          p.facturado =  Intl.NumberFormat('de-DE').format(p.facturado_sol.toFixed(2));
+                          p.adicional = Intl.NumberFormat('de-DE').format(adicional_sol.toFixed(2));
+                          p.valor_proyecto = Intl.NumberFormat('de-DE').format(parseFloat(p.valor_proyecto).toFixed(2));
+                          p.cobranza = cobranza_sol;
+                          p.pagado = pagada_sol;
+                        break;
+                        default:
+                          
+                          p.facturado =  Intl.NumberFormat('de-DE').format(p.facturado_uf.toFixed(2));
+                          p.adicional = Intl.NumberFormat('de-DE').format(adicional_uf.toFixed(2));
+                          p.valor_proyecto = Intl.NumberFormat('de-DE').format(parseFloat(p.valor_proyecto).toFixed(2));
+                          p.cobranza = cobranza_uf;
+                          p.pagado = pagada_uf;
+                        break;
+                }
+                //#endregion
+                
+                let aux =  parseFloat(p.adicional.replace(".","").replace(",",".")) + 
+                           parseFloat(p.valor_proyecto.replace(".","").replace(",","."));
+                
+
+                let pendPago =   aux -  p.pagado;        
+                let pendienteFacturacion =aux - p.pagado - p.cobranza;
+
+                p.contratado = Intl.NumberFormat('de-DE').format(aux.toFixed(2));
+                p.pendientePago = Intl.NumberFormat('de-DE').format(pendPago.toFixed(2));
+                p.pendienteFacturacion = Intl.NumberFormat('de-DE').format(pendienteFacturacion.toFixed(2));
+
+
+                //#region Analisis general.
+                infoAnalisis.vpresupuesto = infoAnalisis.vpresupuesto + parseFloat(p.valor_proyecto.replace(".","").replace(".","").replace(".","").replace(",","."));
+                infoAnalisis.adicionales = infoAnalisis.adicionales + parseFloat(p.adicional.replace(".","").replace(".","").replace(".","").replace(",","."));
+                infoAnalisis.totalcontrado = infoAnalisis.totalcontrado + parseFloat(p.contratado.replace(".","").replace(".","").replace(".","").replace(",","."));
+                infoAnalisis.facturadao = infoAnalisis.facturadao + parseFloat(p.facturado.replace(".","").replace(".","").replace(".","").replace(",","."));
+                infoAnalisis.penPago = infoAnalisis.penPago + parseFloat(p.pendientePago.replace(".","").replace(".","").replace(".","").replace(",","."));
+                infoAnalisis.pendFact = infoAnalisis.pendFact + parseFloat(p.pendienteFacturacion.replace(".","").replace(".","").replace(".","").replace(",","."));
+
+
+                //#endregion
+                 
+        }
         
-        res.render('reporteria/tablaproyectos', { proyectos, req , layout: 'blanco'});   
+        infoAnalisis.vpresupuesto = Intl.NumberFormat('de-DE').format(infoAnalisis.vpresupuesto.toFixed(2));
+        infoAnalisis.adicionales = Intl.NumberFormat('de-DE').format(infoAnalisis.adicionales.toFixed(2));
+        infoAnalisis.totalcontrado = Intl.NumberFormat('de-DE').format(infoAnalisis.totalcontrado.toFixed(2));
+        infoAnalisis.facturadao = Intl.NumberFormat('de-DE').format(infoAnalisis.facturadao.toFixed(2));
+        infoAnalisis.penPago = Intl.NumberFormat('de-DE').format(infoAnalisis.penPago.toFixed(2));
+        infoAnalisis.pendFact = Intl.NumberFormat('de-DE').format(infoAnalisis.pendFact.toFixed(2));
+
+        res.render('reporteria/tablaproyectos', { infoAnalisis, proyectos, req , layout: 'blanco'});   
 });
+
+
+const formatNumberES = (n, d=0) => {
+        n=new Intl.NumberFormat("es-ES").format(parseFloat(n).toFixed(d))
+        if (d>0) {
+            // Obtenemos la cantidad de decimales que tiene el numero
+            const decimals=n.indexOf(",")>-1 ? n.length-1-n.indexOf(",") : 0;
+     
+            // añadimos los ceros necesios al numero
+            n = (decimals==0) ? n+","+"0".repeat(d) : n+"0".repeat(d-decimals);
+        }
+        return n;
+    }
+
+function getFacturasProyecto(id) // sacar las Horas del proyecto. 
+{
+  
+        let factProyecto = pool.query("SELECT * FROM fact_facturas_equivalencias as t1 WHERE t1.id_proyecto = ? AND t1.id_estado IN (2,3)", [id]);
+
+        return new Promise((resolve,reject)=>{
+                setTimeout(()=>{
+                        resolve(factProyecto);
+                },100);
+        });
+
+}
 
 //analisisMoneda
 router.post('/analisisMoneda',isLoggedIn,  async (req, res) => {
@@ -3563,7 +3778,7 @@ router.post('/analisisMoneda',isLoggedIn,  async (req, res) => {
                                                           ")";
 
         let listadoProyectosAnalisisFactura = await pool.query(sqlFacturas);
-
+ 
         
         listadoProyectosAnalisisFactura.forEach(factura => {
                 
@@ -3588,7 +3803,7 @@ router.post('/analisisMoneda',isLoggedIn,  async (req, res) => {
                  let valorUSD = "";
                  let valorSOL = "";
                 
-                 //#region VALORES DE UF // USD // SOL SEGUN FECHA ANALISIS 
+                //#region VALORES DE UF // USD // SOL SEGUN FECHA ANALISIS 
                  const colUF = valorUfMensual.find(fecha => {return fecha.fecha === fechaAnalisisFactura});
                  const colUSD = valorUsdMensual.find(fecha => {return fecha.fecha === fechaAnalisisFactura});
                  const colSOL = valorSolMensual.find(fecha => {return fecha.fecha === fechaAnalisisFactura});
@@ -3626,24 +3841,77 @@ router.post('/analisisMoneda',isLoggedIn,  async (req, res) => {
                 }
                 else{valorSOL =   colSOL.valor; }
                  //#endregion
+                
                  
-
-                let registroEquivalencia = {
-                        id_factura : factura.id,
-                        id_proyecto : factura.id_proyecto,
-                        id_moneda_base :factura.id_tipo_moneda,
-                        monto_base : factura.monto_a_facturar,
-                        fecha : fechaAnalisisFactura,
-                        valor_uf :valorUF,
-                        valor_usd :valorUSD,
-                        valor_sol :valorSOL
-
+                let equiUF = "";
+                let equiUSD = "";
+                let equiSOL = "";
+                let equiCPL = "";
+                //console.log(factura.id_tipo_moneda);
+                factura.monto_a_facturar = factura.monto_a_facturar.replace(",",".");
+                switch(factura.id_tipo_moneda)
+                {
+                     // INGRESO DE LA FACTURA ES EN PESOS 
+                     case 1: 
+                     case "1":
+                        equiUF  = parseInt(factura.monto_a_facturar) / valorUF;
+                        equiUSD = parseInt(factura.monto_a_facturar) / valorUSD;
+                        equiSOL = parseInt(factura.monto_a_facturar) / valorSOL;
+                        equiCPL = parseInt(factura.monto_a_facturar);
+                     break;
+                     case 2:
+                     case "2":
+                        equiUSD = factura.monto_a_facturar;
+                        equiUF  = factura.monto_a_facturar * valorUSD / valorUF;
+                        equiSOL = factura.monto_a_facturar * valorUSD / valorSOL;
+                        equiCPL = parseInt(factura.monto_a_facturar * valorUSD);
+                     break;
+                     case 4:
+                     case "4":
+                        equiUF  = factura.monto_a_facturar;
+                        equiUSD = factura.monto_a_facturar * valorUF / valorUSD;
+                        equiSOL = factura.monto_a_facturar * valorUF / valorSOL;
+                        equiCPL = parseInt(factura.monto_a_facturar * valorUF);
+                     break;
+                     case 10:
+                     case "10":
+                        equiSOL = factura.monto_a_facturar;
+                        equiUSD = factura.monto_a_facturar * valorSOL / valorUSD;
+                        equiUF  = factura.monto_a_facturar * valorSOL / valorUF;
+                        equiCPL = parseInt(factura.monto_a_facturar * valorSOL);
+                     break;
+                }
+                
+                
+                if (valorUF === '' || valorUSD === '' || valorSOL === '')
+                {
+                        
+                }
+                else
+                {
+                        let registroEquivalencia = {
+                                id_factura : factura.id,
+                                id_proyecto : factura.id_proyecto,
+                                id_moneda_base :factura.id_tipo_moneda,
+                                esroc :factura.es_roc,
+                                monto_base : factura.monto_a_facturar,
+                                monto_uf :equiUF,
+                                monto_dolar:equiUSD,
+                                monto_sol:equiSOL,
+                                monto_clp : equiCPL,
+                                id_estado : factura.id_estado,
+                                fecha : fechaAnalisisFactura,
+                                valor_uf :valorUF,
+                                valor_usd :valorUSD,
+                                valor_sol :valorSOL
+                        }
+                        const insertEquivalencia =  pool.query('INSERT INTO fact_facturas_equivalencias set ?', [registroEquivalencia]);
                 }
 
-                const insertEquivalencia =  pool.query('INSERT INTO fact_facturas_equivalencias set ?', [registroEquivalencia]);
 
-        });
+                
 
+        });   
         // Bloque OC 
 
         // COSTO EXTERNO

@@ -1,8 +1,9 @@
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <div class="col-md-3">
         <div class="x_panel">
             <div class="x_title">
-                <h2>Ingresar Configuración Inicial - Criterios de Armado</h2>
+                <h2>Ingresar Conf. Inicial - Criterios de Armado</h2>
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
@@ -11,8 +12,9 @@
                         <label for="staticEmail" class="col-sm-8 col-form-label">{{informacion.year}}_{{informacion.code}} {{informacion.nombre}} </label>
                   </div>
                   <div class="form-group row">
-                     <label for="staticEmail" class="col-sm-3 col-form-label"> <b>Código :</b></label>
-                      <label for="staticEmail" class="col-sm-8 col-form-label">{{informacion.codigo}} </label>
+                       <label for="staticEmail" class="col-sm-3 col-form-label"> <b>Código :</b></label>
+                       <label for="staticEmail" class="col-sm-8 col-form-label">{{informacion.codigo}} </label>
+                       <input type="hidden" id="idCodigo" name="idCodigo" value="{{id}}">
                   </div>
                 
                   <table class="table table-hover" name="tablaLicencias" id="tablaLicencias" style="width: 100%;">
@@ -116,6 +118,7 @@
 <script src="../../../template/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script> 
 <script src="../../../template/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 
 
 <script>
@@ -374,7 +377,14 @@
                         dataType: 'text'
                         })
                         .done(function (data) {
-                            location.reload();
+                            //location.reload();
+                            
+
+                                toastr.success('Criterio de Empalme Malla ingresado.', 'Información', {
+                                    "progressBar": true
+                                });
+                                let opt = $("#idCodigo").val();
+                                cargaCriterioRevision(opt , 2);
                         });
 
     }
@@ -458,6 +468,7 @@
                         dataType: 'text'
                         })
                         .done(function (data) {
+                            alert("Carga de anclajes, completa.");
                             location.reload();
                         });
 
@@ -496,7 +507,11 @@
                         dataType: 'text'
                         })
                         .done(function (data) {
-                            location.reload();
+                            //alert("Carga realizada correctamente.")
+                            //location.reload();
+                            toastr.success('Criterio de Patas del proyecto ingresado.', 'Información', {
+                                    "progressBar": true
+                                });
                         });
 
     }
@@ -556,6 +571,7 @@
                         dataType: 'text'
                         })
                         .done(function (data) {
+                            alert("Carga de largos de fierros completada.")
                             location.reload();
                         });
 
@@ -635,6 +651,9 @@
                         dataType: 'text'
                         })
                         .done(function (data) {
+                             toastr.success('Criterio de Empotramiento ingresado', 'Información', {
+                                    "progressBar": true
+                                });
                             cargaOpcionesObjetoEmpotramiento(tipo)
                         });
 
@@ -691,7 +710,11 @@
                         dataType: 'text'
                         })
                         .done(function (data) {
-                            location.reload();
+                            //alert("Carga de informacion completada.")
+                            //location.reload();
+                            toastr.success('Criterio de Laterales ingresado', 'Información', {
+                                    "progressBar": true
+                                });
                         });
 
     }
@@ -743,7 +766,12 @@
                 dataType: 'text'
                         })
                         .done(function (data) {
-                            location.reload();
+                            //location.reload();
+                            toastr.success('Criterio de Fe vigas ingresado', 'Información', {
+                                    "progressBar": true
+                                });
+                            let opt = $("#idCodigo").val();
+                            cargaCriterioRevision(opt , 2);
                         });
     
 
@@ -751,7 +779,7 @@
 
     function EliminarRegistroEmpalme( id , nombre)
     {
-        if (confirm("Esta seguro de elminar el empalme " + nombre))
+        if (confirm("¿ Está seguro de elminar el empalme " + nombre + "?"))
         {
             let informacion = { id}
             $.ajax({
@@ -771,7 +799,7 @@
 
     function EliminarRegistroFeVigas( id , nombre)
     {
-        if (confirm("Esta seguro de elminar la configuracion de vigas :  " + nombre))
+        if (confirm("¿ Está seguro de elminar la configuracion de vigas :  " + nombre + " ?"))
         {
             let informacion = { id}
             $.ajax({
@@ -792,7 +820,7 @@
 
     function EliminarRegistroEmpotramiento( id , nombre)
     {
-        if (confirm("Esta seguro de elminar el empotramiento " + nombre))
+        if (confirm("¿ Está seguro de elminar el empotramiento " + nombre + " ?"))
         {
             let informacion = { id}
             $.ajax({
@@ -813,7 +841,7 @@
     function EliminarRegistroMallaEmpalme(id, nombre)
     {
 
-        if (confirm("Esta seguro de elminar la Malla Empalme " + nombre))
+        if (confirm("¿ Está seguro de elminar la Malla Empalme " + nombre + " ?"))
         {
             let informacion = { id}
             $.ajax({
@@ -832,7 +860,7 @@
 
     function MarcaPredeterminadaEmpalme(id , nombre, codigo)
     {
-        if (confirm("Esta seguro de marcar como predeterminada el empalme " + nombre))
+        if (confirm("¿ Está seguro de marcar como predeterminada el empalme " + nombre+ "?"))
             {
                 let informacion = { id , codigo}
                 $.ajax({
@@ -842,7 +870,13 @@
                     dataType: 'text'
                             })
                             .done(function (data) {
-                                location.reload();
+                                //location.reload();
+                                let opt = $("#presupuesto").val();
+
+                                toastr.success('Criterio de empalme Predeterminado asignado', 'Información', {
+                                    "progressBar": true
+                                });
+                                cargaOpcionesObjeto(opt);
                             });
 
             }
@@ -850,7 +884,7 @@
     
     function MarcaPredeterminadaEmpotramiento(id , nombre, codigo)
     {
-        if (confirm("Esta seguro de marcar como predeterminada el empotramiento " + nombre))
+        if (confirm("¿ Está seguro de marcar como predeterminada el empotramiento " + nombre + " ?"))
             {
                 let informacion = { id , codigo}
                 $.ajax({
@@ -860,7 +894,13 @@
                     dataType: 'text'
                             })
                             .done(function (data) {
-                                location.reload();
+                                //location.reload();
+                                let opt = $("#presupuesto").val();
+
+                                toastr.success('Criterio de Empotramiento Predeterminado asignado', 'Información', {
+                                    "progressBar": true
+                                });
+                                cargaOpcionesObjetoEmpotramiento(opt);
                             });
 
             }
@@ -869,7 +909,7 @@
 
     function MarcaPredeterminadaMallaEmpalme(id , nombre, codigo)
     {
-        if (confirm("Esta seguro de marcar como predeterminada la Malla Empalme " + nombre))
+        if (confirm("¿ Está seguro de marcar como predeterminada la Malla Empalme " + nombre + " ? "))
             {
                 let informacion = { id , codigo}
                 $.ajax({
@@ -879,7 +919,12 @@
                     dataType: 'text'
                             })
                             .done(function (data) {
-                                location.reload();
+                                //location.reload();
+                                toastr.success('Criterio de Empalme Malla predeterminado asignado.', 'Información', {
+                                    "progressBar": true
+                                });
+                                let opt = $("#idCodigo").val();
+                                cargaCriterioRevision(opt , 2);
                             });
 
             }
@@ -887,7 +932,7 @@
 
     function MarcaPredeterminadaFeVigas(id , nombre, codigo)
     {
-        if (confirm("Esta seguro de marcar como predeterminada la configuracion Fe Vigas " + nombre))
+        if (confirm("¿ Está seguro de marcar como predeterminada la configuracion Fe Vigas " + nombre + " ?"))
             {
                 let informacion = { id , codigo}
                 $.ajax({
@@ -897,7 +942,12 @@
                     dataType: 'text'
                             })
                             .done(function (data) {
-                                location.reload();
+                                //location.reload();
+                                toastr.success('Criterio de Fe Vigas Predeterminado asignado', 'Información', {
+                                    "progressBar": true
+                                });
+                                let opt = $("#idCodigo").val();
+                                cargaCriterioRevision(opt , 8);
                             });
 
             }
@@ -921,6 +971,25 @@
                                 //location.reload();
                                 let info = JSON.parse(data);
                                 // cargar las variables. 
+
+                                if (info.detalle.length === 0)
+                                {
+                                        let elementos = document.querySelectorAll("input[type=text]");
+
+                                        let datos = [];
+
+                                        elementos.forEach((elemento) => {
+                                               
+                                               //console.log(elemento);
+                                               //console.log(elemento.id);
+                                               let aux = elemento.id.split('_');
+                                               
+                                               if (aux.length === 2)
+                                               {
+                                                elemento.value = '';
+                                               }
+                                            });
+                                }
                                 
                                 $("#as1").val(info.general.pata_sup_izq_1);
                                 $("#as2").val(info.general.pata_sup_izq_2);

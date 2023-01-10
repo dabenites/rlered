@@ -32,12 +32,12 @@
     </div>
 
     <script>
-        function ingresarImporte()
+    function ingresarImporte()
         {
             let idBase      = $('#idproorigen').val();
             let idEjemplo   = $('#id_proyecto').val();
 
-              let informacion = { idBase , idEjemplo}
+            let informacion = { idBase , idEjemplo};
 
             $.ajax({
                     type: 'post',
@@ -46,8 +46,9 @@
                     dataType: 'text'
                             })
                             .done(function (data) {
-                                //location.reload();
-                                console.log(data);
+                                alert("Información Cargada.");
+                                location.reload();
+                                //console.log(data);
                             });
             
         }

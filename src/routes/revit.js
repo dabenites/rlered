@@ -1054,7 +1054,7 @@ router.get('/seteoProyecto/:id', isLoggedIn, async (req, res) => {
 
     
 
-    res.render('revit/configuracionProyecto', { informacion:informacion[0], req ,res, layout: 'template'});
+    res.render('revit/configuracionProyecto', { id, informacion:informacion[0], req ,res, layout: 'template'});
 
     
 });
@@ -1561,7 +1561,7 @@ router.post('/cargaOpcionesEmpalmeMallaTablaDatos', isLoggedIn, async (req, res)
 
             data.forEach(element => {
         
-                console.log(element.id );
+                
                 if (element.id == "fnombre" || element.id == "veces" || element.id == "suma")
                 {
 
@@ -1684,7 +1684,7 @@ router.post('/cargaOpcionesAnclajeTablaDatos', isLoggedIn, async (req, res) => {
     }
 
 
-    const updateCabecera = pool.query("UPDATE  rvt_cfg_largo_anclaje  set  estado = 'NO' WHERE  codigo_proyecto = ? ", [codigo]);
+    const updateCabecera = pool.query("UPDATE  rvt_cfg_largo_anclaje  set  estado = 'NO' WHERE  codigo_proyecto = ?  AND  id_tipo_objeto = ? ", [codigo,ftipo]);
 
     const insertCabecera = pool.query('INSERT INTO rvt_cfg_largo_anclaje  set ? ', [registro]);
 
@@ -1697,7 +1697,6 @@ router.post('/cargaOpcionesAnclajeTablaDatos', isLoggedIn, async (req, res) => {
 
             data.forEach(element => {
         
-                console.log(element.id );
                 if (element.id == "fnombre" || element.id == "veces" || element.id == "suma")
                 {
 
@@ -1816,7 +1815,7 @@ router.post('/cargaOpcionesLargoFe', isLoggedIn, async (req, res) => {
                                                 " t1.id_origen = ?", [codigo, opt, origen]);
                                     
         let msjBoton = "";
-        console.log(infoFierros);
+        
 
         if (infoFierros[0].largo == "" || infoFierros[0].largo == null){ msjBoton = "Ingresar";}
         else { msjBoton = "Actualizar";}
@@ -1842,7 +1841,7 @@ router.post('/cargaOpcionLargosFe', isLoggedIn, async (req, res) => {
         id_origen_fierro : forigen,
     }
 
-    const updateCabecera = pool.query("UPDATE  rvt_cfg_largo_fierro  set  estado = 'NO' WHERE  codigo_proyecto = ? ", [codigo]);
+    const updateCabecera = pool.query("UPDATE  rvt_cfg_largo_fierro  set  estado = 'NO' WHERE  codigo_proyecto = ? AND  id_tipo_objeto = ? ", [codigo , ftipo]);
 
     const insertCabecera = pool.query('INSERT INTO rvt_cfg_largo_fierro  set ? ', [registro]);
 
@@ -1895,7 +1894,7 @@ router.post('/cargaOpcionesEmpotramiento', isLoggedIn, async (req, res) => {
 
     let opcionesCargadas = await pool.query("SELECT *, if(t1.esPredeterminada = 'SI','green','currentColor') AS esPre FROM rvt_cfg_empotramiento as t1 WHERE t1.codigo_proyecto = ? AND t1.id_tipo_objeto = ? ", [codigo,opt]); 
 
-   // console.log(opcionesCargadas);
+   
 
    let optPrede = await pool.query("SELECT * FROM rvt_cfg_empotramiento as t1 WHERE t1.codigo_proyecto = ? AND id_tipo_objeto = ? AND esPredeterminada = 'SI' ", [codigo , opt]); 
 
@@ -2136,7 +2135,6 @@ router.post('/cargaInformacionLaterales', isLoggedIn, async (req, res) => {
 
         let informacion =   element.id.split("_");
 
-        console.log(informacion[1]);
 
         const containsKey = !!registros.find(dato => {return dato.id === informacion[1]});
 
@@ -2215,7 +2213,7 @@ router.post('/cargaInformacionLaterales', isLoggedIn, async (req, res) => {
 
     const upt = pool.query("UPDATE  rvt_cfg_laterales  set  estado = 'SI' WHERE  id_cfg_laterales = ? ", [idInsertCabecera]);
 
-    //console.log(registros);
+    
 
     res.send("OK");
 
@@ -2235,7 +2233,6 @@ router.post('/cargaFeVigas', isLoggedIn, async (req, res) => {
 
         let informacion =   element.id.split("_");
 
-        //console.log(informacion.length);
         if (informacion.length == 2)
         {
             registros.push({
@@ -2318,13 +2315,16 @@ router.post('/cargaFeVigas', isLoggedIn, async (req, res) => {
 
 router.post('/cargaValoresFeVigas', isLoggedIn, async (req, res) => {
 
-    const { id} = req.body;
+    const { id } = req.body;
 
 
     let feVigas = await pool.query("SELECT * FROM rvt_cfg_fe_vigas as t1 WHERE t1.id_configuracion_fe = ? ", [id]);
     let feVigasDetalle = await pool.query("SELECT * FROM rvt_cfg_fe_vigas_fierros as t1 WHERE t1.id_configuracion_fe = ? ", [id]);
 
+    //console.log(id);
+    //console.log(feVigasDetalle);
 
+    
     let informacion = {
         general : feVigas[0],
         detalle : feVigasDetalle
@@ -2345,7 +2345,7 @@ router.get('/cargoInfoProyecto/:id', isLoggedIn, async (req, res) => {
     let informacion = await pool.query("SELECT t1.*, t2.nombre FROM rvt_origen_proyecto as t1 " +
                                         " LEFT JOIN pro_proyectos as t2 on t1.id_proyecto = t2.id WHERE t1.id_origen_proyecto = ? ", [id]);
 
-    //console.log( informacion );
+    
 
     let codigos = await pool.query(" SELECT "+
                                     " t1.id_origen_proyecto AS id," +
@@ -2476,7 +2476,7 @@ router.post('/duplicaInformacion', isLoggedIn, async (req, res) => {
         
                     let id = rest.insertId;
         
-                        console.log(id);
+                        
                         let detalleEmpalme = pool.query("SELECT  * FROM rvt_cfg_empalme_proyecto  WHERE id_configuracion_empalme= ? ;",[info.id_configuracion_empalme]);
 
                         detalleEmpalme.then( function(infoRest) {

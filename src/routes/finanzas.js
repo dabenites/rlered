@@ -1601,6 +1601,7 @@ router.get('/proyecto/:id', isLoggedIn, async (req, res) => {
         });
 
         //console.log(totalMonto);
+        totalMonto = new Intl.NumberFormat('de-DE').format(parseFloat(totalMonto).toFixed(2)); 
 
         res.render('finanzas/proyecto', { totalMonto, totalPorc, req ,proyecto:proyecto[0] ,presupuestos,substructura, tipoDocumentos,  metodologia_pago, pago_adicional,respaldo_doc, layout: 'template'}); 
         

@@ -6,7 +6,7 @@
         </div>
         <div class="x_content">
             <div class="form-group row">
-                <label for="staticEmail" class="col-sm-3 col-form-label">Moneda</label>
+                <label for="staticEmail" class="col-sm-3 col-form-label">Moneda Presentación</label>
                     <div class="col-sm-8">
                         <select class="form-control" name="id_moneda" id="id_moneda">
                                     <option value="0">Seleccione una opción</option>
@@ -63,7 +63,7 @@
                 <div class="col-sm-4"></div>
                 <div class="col-sm-5">
                     <button type="submit" class="btn btn-success" onclick="cargarListadoProyectos()">Buscar</button>
-                     <button type="submit" class="btn btn-success" onclick="AnalisisFacturas()">Analizar Facturas</button>  
+                    
                 </div>
             </div>
         </div>
@@ -85,6 +85,8 @@
         let informacion = {
             servicio,moneda,estado,director,desde,hasta
         };
+        
+        $('#cargaResultado').html('<div class="col-md-4"></div><div class="col-md-4"><button class="btn btn-primary" type="button" disabled> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...</button></div><div class="col-md-4"></div>');
 
          $.ajax({
                 method:'POST',
@@ -97,24 +99,6 @@
                 });
 
 
-
-    }
-
-    function AnalisisFacturas()
-    {
-        let informacion = {
-          
-        };
-
-        $.ajax({
-                method:'POST',
-                url : '/reporteria/analisisMoneda',
-                data : informacion,
-                success : function(result)
-                    {
-                        //$( "#cargaResultado" ).html(result); 
-                    }
-                });
 
     }
 </script>

@@ -3694,8 +3694,524 @@ function getFacturasProyecto(id) // sacar las Horas del proyecto.
 
 }
 
+
+function getRequerimientosOC(id)
+{
+
+        let requerimientos = pool.query("SELECT * FROM orden_compra_requerimiento as t1 WHERE t1.id_solicitud = ? ", [id]);
+
+
+        return new Promise((resolve,reject)=>{
+                setTimeout(()=>{
+                        resolve(requerimientos);
+                },100);
+        });
+
+}
+
+// mostrar información para chequeos. 
+router.get('/chequeos',isLoggedIn,  async (req, res) => {
+
+
+  res.render('reporteria/chequeos', {  req, layout: 'template' });
+
+});
+
+//analisisMonedaCostoExternoPlanner
+router.post('/analisisMonedaCostoExternoPlanner',isLoggedIn,  async (req, res) => {
+
+        //#region VALORES DE LAS MONEDAS 
+        let valorUfMensual = []; 
+        let valorUsdMensual = [];
+        let valorSolMensual = [];
+
+        const valorUFMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");
+        
+        const valorUSDMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 2 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");
+
+        const valorSOLMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 10 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");                                         
+                            
+        valorUFMes.forEach(element => {    
+                                        const containsFecha = !!valorUfMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                                if (containsFecha === false)
+                                                        {
+                                                                valorUfMensual.push({ 
+                                                                                            fecha : element.fecha,
+                                                                                            valor : element.valor
+                                                                                    });
+                                                        }
+                                        }
+                           );
+
+        valorUSDMes.forEach(element => {    
+                                const containsFecha = !!valorUsdMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                        if (containsFecha === false)
+                                                {
+                                                        valorUsdMensual.push({ 
+                                                                                    fecha : element.fecha,
+                                                                                    valor : element.valor
+                                                                            });
+                                                }
+                                }
+                   );
+
+        valorSOLMes.forEach(element => {    
+                        const containsFecha = !!valorSolMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                if (containsFecha === false)
+                                        {
+                                                valorSolMensual.push({ 
+                                                                            fecha : element.fecha,
+                                                                            valor : element.valor
+                                                                    });
+                                        }
+                        }
+           );
+
+
+
+        //#endregion
+
+        let sql = " SELECT * "  +
+                " FROM  " +
+                        " pro_costo_externo AS t1 " +
+                " WHERE  " +
+                        " t1.costo != 0 ";
+
+        let costoExternos = await pool.query(sql);
+
+
+        costoExternos.forEach(ce => {
+                let fechaAnalisis = dateFormat(ce.fecha_ingreso, "yyyy-mm-dd");
+                const colUSD = valorUsdMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+                const colUF = valorUfMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+                const colSOL = valorSolMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+
+                if (colUSD === undefined || colUF === undefined || colSOL === undefined )
+                {
+                        console.log("ERROR EN LA CARGA DE ALGUN VALOR DE MONEDA");
+                }
+                else
+                {
+                        let registro;
+                        let ist;
+                        switch(ce.id_moneda)
+                        {
+                                case 1:
+                                registro = {
+                                                
+                                                id_proyecto : ce.id_proyecto,
+                                                id_moneda_base : ce.id_tipo_moneda,
+                                                fecha : fechaAnalisis,
+                                                monto_base : ce.costo,
+                                                monto_uf : ce.costo / colUF.valor,
+                                                monto_clp : ce.costo,
+                                                monto_usd : ce.costo / colUSD.valor,
+                                                monto_sol : ce.costo / colSOL.valor,
+                                                valor_uf : colUF.valor,
+                                                valor_usd : colUSD.valor,
+                                                valor_sol : colSOL.valor
+                
+                                        }
+                                //console.log(registro);
+                                ist =  pool.query('INSERT INTO pro_costo_externo_equivalencias set ?', [registro]);
+                                break;
+                        }
+                }
+
+        });
+
+        res.send('ok');
+
+});
+
+
+router.post('/analisisMonedaCostoExterno',isLoggedIn,  async (req, res) => {
+
+        //#region VALORES DE LAS MONEDAS 
+        let valorUfMensual = []; 
+        let valorUsdMensual = [];
+        let valorSolMensual = [];
+
+        const valorUFMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");
+        
+        const valorUSDMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 2 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");
+
+        const valorSOLMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 10 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");                                         
+                            
+        valorUFMes.forEach(element => {    
+                                        const containsFecha = !!valorUfMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                                if (containsFecha === false)
+                                                        {
+                                                                valorUfMensual.push({ 
+                                                                                            fecha : element.fecha,
+                                                                                            valor : element.valor
+                                                                                    });
+                                                        }
+                                        }
+                           );
+
+        valorUSDMes.forEach(element => {    
+                                const containsFecha = !!valorUsdMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                        if (containsFecha === false)
+                                                {
+                                                        valorUsdMensual.push({ 
+                                                                                    fecha : element.fecha,
+                                                                                    valor : element.valor
+                                                                            });
+                                                }
+                                }
+                   );
+
+        valorSOLMes.forEach(element => {    
+                        const containsFecha = !!valorSolMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                if (containsFecha === false)
+                                        {
+                                                valorSolMensual.push({ 
+                                                                            fecha : element.fecha,
+                                                                            valor : element.valor
+                                                                    });
+                                        }
+                        }
+           );
+
+
+
+        //#endregion
+
+       
+        let sql = " SELECT * "  +
+                " FROM  " +
+                        " proyecto_costo_externo AS t1 " +
+                " WHERE  " +
+                        " t1.costo != 0 ";
+
+        let costoExternos = await pool.query(sql);
+
+        costoExternos.forEach(ce => {
+
+                let fechaAnalisis = dateFormat(ce.fecha_carga, "yyyy-mm-dd");
+                const colUSD = valorUsdMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+                const colUF = valorUfMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+                const colSOL = valorSolMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+
+                if (colUSD === undefined || colUF === undefined || colSOL === undefined )
+                        {
+                                console.log("ERROR EN LA CARGA DE ALGUN VALOR DE MONEDA");
+                        }
+                        else
+                        {
+                                let registro;
+                                let ist;
+                                switch(ce.id_moneda)
+                                {
+                                        case 1: // Pesos
+                                        registro = {
+                                                
+                                                id_proyecto : ce.id_proyecto,
+                                                id_moneda_base : ce.id_moneda,
+                                                fecha : fechaAnalisis,
+                                                monto_base : ce.costo,
+                                                monto_uf : ce.costo / colUF.valor,
+                                                monto_clp : ce.costo,
+                                                monto_usd : ce.costo / colUSD.valor,
+                                                monto_sol : ce.costo / colSOL.valor,
+                                                valor_uf : colUF.valor,
+                                                valor_usd : colUSD.valor,
+                                                valor_sol : colSOL.valor
+                
+                                        }
+                                        ist =  pool.query('INSERT INTO proyecto_costo_externo_equivalencias set ?', [registro]);
+                                        break;
+                                        case 2: // USD
+                                        registro = {
+                                                
+                                                id_proyecto : ce.id_proyecto,
+                                                id_moneda_base : ce.id_moneda,
+                                                fecha : fechaAnalisis,
+                                                monto_base : ce.costo,
+                                                monto_uf : ce.costo * colUSD.valor / colUF.valor,
+                                                monto_clp : ce.costo * colUSD.valor,
+                                                monto_usd : ce.costo,
+                                                monto_sol : ce.costo * colUSD.valor / colSOL.valor,
+                                                valor_uf : colUF.valor,
+                                                valor_usd : colUSD.valor,
+                                                valor_sol : colSOL.valor
+                
+                                        }
+                                        ist =  pool.query('INSERT INTO proyecto_costo_externo_equivalencias set ?', [registro]);
+                                        break;
+                                        case 4: // UF
+                                        registro = {
+                                                id_proyecto : ce.id_proyecto,
+                                                id_moneda_base : ce.id_moneda,
+                                                fecha : fechaAnalisis,
+                                                monto_base : ce.costo,
+                                                monto_uf : ce.costo,
+                                                monto_clp : ce.costo * colUF.valor,
+                                                monto_usd : ce.costo * colUF.valor / colUSD.valor,
+                                                monto_sol : ce.costo * colUF.valor / colSOL.valor,
+                                                valor_uf : colUF.valor,
+                                                valor_usd : colUSD.valor,
+                                                valor_sol : colSOL.valor
+                
+                                        }
+                                        ist =  pool.query('INSERT INTO proyecto_costo_externo_equivalencias set ?', [registro]);
+                                        break;
+                
+                                }
+                                
+                        }
+                
+                
+        });
+
+
+        res.send('');
+
+});
+//analisisMonedaOC
+router.post('/analisisMonedaOC',isLoggedIn,  async (req, res) => {
+
+
+        //#region VALORES DE LAS MONEDAS 
+let valorUfMensual = []; 
+let valorUsdMensual = [];
+let valorSolMensual = [];
+
+const valorUFMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                    " MAX(t1.valor) as valor" +
+                                    " FROM " + 
+                                    " moneda_valor AS t1 " +
+                                    " WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");
+
+const valorUSDMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                    " MAX(t1.valor) as valor" +
+                                    " FROM " + 
+                                    " moneda_valor AS t1 " +
+                                    " WHERE t1.id_moneda = 2 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");
+
+const valorSOLMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                    " MAX(t1.valor) as valor" +
+                                    " FROM " + 
+                                    " moneda_valor AS t1 " +
+                                    " WHERE t1.id_moneda = 10 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");                                         
+                    
+valorUFMes.forEach(element => {    
+                                const containsFecha = !!valorUfMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                        if (containsFecha === false)
+                                                {
+                                                        valorUfMensual.push({ 
+                                                                                    fecha : element.fecha,
+                                                                                    valor : element.valor
+                                                                            });
+                                                }
+                                }
+                   );
+
+valorUSDMes.forEach(element => {    
+                        const containsFecha = !!valorUsdMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                if (containsFecha === false)
+                                        {
+                                                valorUsdMensual.push({ 
+                                                                            fecha : element.fecha,
+                                                                            valor : element.valor
+                                                                    });
+                                        }
+                        }
+           );
+
+valorSOLMes.forEach(element => {    
+                const containsFecha = !!valorSolMensual.find(fecha => {return fecha.fecha === element.fecha });
+                        if (containsFecha === false)
+                                {
+                                        valorSolMensual.push({ 
+                                                                    fecha : element.fecha,
+                                                                    valor : element.valor
+                                                            });
+                                }
+                }
+   );
+//#endregion
+
+                let sql = " SELECT * "  +
+                        " FROM  " +
+                                " orden_compra AS t1 " +
+                        " WHERE  " +
+                                " t1.id_proyecto != 0 " +
+                        " AND  " +
+                                " t1.id_estado IN (2,3,5)";
+                        //" AND " +
+                        //        " t1.id = 122";
+        
+
+        let orden_compra = await pool.query(sql);
+        //console.log(sql);
+
+        //let oc = [];
+        let info = [];
+        for (let oc of orden_compra) {
+
+                let detOC = [];
+                let req_oc = await getRequerimientosOC(oc.id); 
+
+                let id_moneda = 0;
+                let monto_base = 0; 
+                let cambio = 0;
+
+                let bmoneda = true;
+
+                req_oc.forEach(infoReq => {
+                        id_moneda = infoReq.id_moneda;
+                        monto_base = parseFloat(infoReq.precio_unitario) * parseFloat(infoReq.cantidad);
+                        cambio = infoReq.tipo_cambio;
+
+                        if (id_moneda != 0)
+                        {
+                              if (id_moneda != infoReq.id_moneda)  
+                              {
+                                bmoneda = false;
+                              }
+                        }
+                });
+
+                if (bmoneda === true)
+                {
+                        let fechaAnalisis = dateFormat(oc.fecha, "yyyy-mm-dd");
+			const colUSD = valorUsdMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+                        const colUF = valorUfMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+                        const colSOL = valorSolMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+
+                        if (colUSD === undefined || colUF === undefined || colSOL === undefined )
+                        {
+                                console.log("ERROR EN LA CARGA DE ALGUN VALOR DE MONEDA");
+                        }
+                        else
+                        {
+                                let registro;
+                                let ist;
+                                switch(id_moneda)
+                                {
+                                        case 4:
+                                                registro ={
+                                                        id_proyecto :oc.id_proyecto,
+                                                        fecha : fechaAnalisis,
+                                                        moneda_base : id_moneda,
+                                                        monto : monto_base,
+                                                        cambio : cambio,
+                                                        odid : oc.id,
+                                                        monto_uf : monto_base,
+                                                        monto_cpl : parseInt(monto_base * cambio),
+                                                        monto_usd : ((monto_base * cambio) / colUSD.valor),
+                                                        monto_sol : ((monto_base * cambio) / colSOL.valor),
+                                                        valor_uf : cambio,
+                                                        valor_usd :colUSD.valor,
+                                                        valor_sol :colSOL.valor
+                                                };
+                                                info.push(registro);
+                                                ist =  pool.query('INSERT INTO orden_compra_equivalencias set ?', [registro]);
+                                        break;
+                                        case 2:
+                                                registro ={
+                                                        id_proyecto :oc.id_proyecto,
+                                                        fecha : fechaAnalisis,
+                                                        moneda_base : id_moneda,
+                                                        monto : monto_base,
+                                                        cambio : cambio,
+                                                        odid : oc.id,
+                                                        monto_uf : ((monto_base * cambio) / colUF.valor),
+                                                        monto_cpl : parseInt(monto_base * cambio),
+                                                        monto_usd : monto_base,
+                                                        monto_sol : ((monto_base * cambio) / colSOL.valor) ,
+                                                        valor_uf : colUF.valor,
+                                                        valor_usd :cambio,
+                                                        valor_sol :colSOL.valor
+                                                }
+                                                info.push(registro);
+                                                ist =  pool.query('INSERT INTO orden_compra_equivalencias set ?', [registro]);
+                                                
+                                        break;
+                                        case 10:
+                                                registro ={
+                                                        id_proyecto :oc.id_proyecto,
+                                                        fecha : fechaAnalisis,
+                                                        moneda_base : id_moneda,
+                                                        monto : monto_base,
+                                                        cambio : cambio,
+                                                        odid : oc.id,
+                                                        monto_uf : ((monto_base * cambio) / colUF.valor),
+                                                        monto_cpl : parseInt(monto_base * cambio),
+                                                        monto_usd : ((monto_base * cambio) / colUSD.valor) ,
+                                                        monto_sol : monto_base,
+                                                        valor_uf : colUF.valor,
+                                                        valor_usd :colUSD.valor,
+                                                        valor_sol :cambio
+                                                };
+                                                info.push(registro);
+                                                ist =  pool.query('INSERT INTO orden_compra_equivalencias set ?', [registro]);
+                                        break;
+                                        case 1:
+                                                registro ={
+                                                        id_proyecto :oc.id_proyecto,
+                                                        fecha : fechaAnalisis,
+                                                        moneda_base : id_moneda,
+                                                        monto : monto_base,
+                                                        cambio : cambio,
+                                                        odid : oc.id,
+                                                        monto_uf : ((monto_base * cambio) / colUF.valor),
+                                                        monto_cpl : parseInt(monto_base * cambio),
+                                                        monto_usd : ((monto_base * cambio) / colUSD.valor) ,
+                                                        monto_sol : ((monto_base * cambio) / colSOL.valor),
+                                                        valor_uf : colUF.valor,
+                                                        valor_usd :colUSD.valor,
+                                                        valor_sol :colSOL.valor
+                                                };
+                                                info.push(registro); 
+                                                ist =  pool.query('INSERT INTO orden_compra_equivalencias set ?', [registro]);
+                                        break;
+                                        default:
+                                        break;
+                                }
+                        }
+                        
+                }
+                else{
+                        console.log("ERROR " + oc.id_proyecto);
+                }
+
+        }
+
+        //oc.log();
+       // console.log(info);
+
+        res.send('ok');
+});
+
 //analisisMoneda
-router.post('/analisisMoneda',isLoggedIn,  async (req, res) => {
+router.post('/analisisMonedaFactura',isLoggedIn,  async (req, res) => {
 
         // variable donde almaceno los errores 
         let errores = [];
@@ -3912,12 +4428,8 @@ router.post('/analisisMoneda',isLoggedIn,  async (req, res) => {
                 
 
         });   
-        // Bloque OC 
 
-        // COSTO EXTERNO
-
-        // BITACORA
-
+        res.send("ok");
 });
 
 

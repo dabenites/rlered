@@ -1422,10 +1422,11 @@ router.get('/usuario/crear/', isLoggedIn, async (req, res) => {
 
 router.post('/editarUsuarios', isLoggedIn, async (req, res) => {
     try{
-        const { idUsuario,Nombre,Email,Telefono,login,idCategoria,idSucursal,titulo,idEstado } = req.body;
+        const { idUsuario,Nombre,Email,Telefono,login,idCategoria,idSucursal,titulo,idEstado ,rut} = req.body;
 
         const newUsario  ={ //Se gurdaran en un nuevo objeto
          Nombre:Nombre,
+         rut : rut,
          Email:Email,
          Telefono:Telefono,
          login:login,
@@ -1468,10 +1469,11 @@ router.post('/editarUsuarios', isLoggedIn, async (req, res) => {
 router.post('/addUsuario',isLoggedIn, async (req, res) => {
 
     try {
-        const { Nombre,Email,Telefono,login,idCategoria,idSucursal, titulo } = req.body;
+        const { Nombre,Email,Telefono,login,idCategoria,idSucursal, titulo , rut} = req.body;
 
         const newUsario  ={ //Se gurdaran en un nuevo objeto
          Nombre:Nombre,
+         rut : rut,
          Email:Email,
          Telefono:Telefono,
          login:login,

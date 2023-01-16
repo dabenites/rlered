@@ -2119,14 +2119,15 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
                                            ' FROM orden_compra_requerimiento  as t1, moneda_tipo as t2 '+
                                            ' WHERE t1.id_ingreso = ? AND (t1.id_solicitud = 0 OR t1.id_solicitud is null) AND t1.id_moneda = t2.id_moneda',[req.user.idUsuario]); 
 
+
+
   const ordenCompra = await pool.query(" SELECT "+
                                            " t1.observaciones as obs," +
                                            " SUM(t10.precio_unitario * t10.cantidad) AS montoTotal, t11.simbolo, t1.num_documento, t1.id_solicitante, t1.id,t1.folio,t1.id_estado, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
                                            " , t8.nombre AS proyecto,t9.descripcion as estado , t8.year,t8.code," +
-                                           " if (t1.id_tipo = 3 ,  " +
-                                           " (SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro) "+
-                                           "  , (SELECT t9b.nombre FROM prov_externo AS t9b WHERE t9b.id = t1.id_razonsocialpro) " +
-                                           " ) AS nomProoveedor, " +
+                                           " if (t1.id_tipo = 3 ,(SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro)  , " +
+                                           " if (t1.id_tipo = 1 ,(SELECT t9d.Nombre FROM sys_usuario AS t9d WHERE t9d.idUsuario = t1.id_razonsocialpro),  " +
+	                                         " (SELECT t9b.nombre FROM prov_externo AS t9b WHERE t9b.id = t1.id_razonsocialpro))) AS nomProoveedor, " +
                                            " DATE_FORMAT(t1.fecha , '%Y-%m-%d %H:%i') as fechaIngreso, " +
                                            " DATE_FORMAT(t1.fecha_aprobacion , '%Y-%m-%d %H:%i') as fechaAProbacion, " +
                                            " DATE_FORMAT(t1.fecha_recepcion , '%Y-%m-%d %H:%i') as fechaRecepcion, " +
@@ -2398,7 +2399,8 @@ router.post('/editarOC', isLoggedIn, async (req, res) => {
   {
     case "1":
     case 1:
-      opciones = await pool.query('SELECT t1.id, t1.nombre as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[oc[0].id_tipo]); 
+      //opciones = await pool.query('SELECT t1.id, t1.nombre as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[oc[0].id_tipo]); 
+      opciones = await pool.query('SELECT t1.idUsuario AS id , t1.Nombre AS descripcion FROM sys_usuario AS t1 WHERE t1.id_estado = 1 ORDER BY t1.Nombre ASC');
     break;
     case "2":
     case 2:
@@ -2491,7 +2493,8 @@ router.post('/buscaProveedor', isLoggedIn, async (req, res) => {
     switch(id)
     {
       case "1":
-        opciones = await pool.query('SELECT t1.id, t1.nombre as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
+        //opciones = await pool.query('SELECT t1.id, t1.nombre as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
+        opciones = await pool.query('SELECT t1.idUsuario AS id , t1.Nombre AS descripcion FROM sys_usuario AS t1 WHERE t1.id_estado = 1 ORDER BY t1.Nombre ASC');
       break;
       case "2":
         opciones = await pool.query('SELECT t1.id, t1.razon_social as descripcion FROM prov_externo  as t1 WHERE t1.id_tipo_proveedor = ?',[id]); 
@@ -2897,10 +2900,9 @@ router.get('/aordencompra',isLoggedIn,  async (req,res) => {
 
     const ordenCompra = await pool.query(" SELECT t1.id,t1.folio, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
                                          " , t8.nombre AS proyecto, t8.year,t8.code,t1.folio, DATE_FORMAT(t1.fecha , '%Y-%m-%d %H:%i') as fechaIngreso, " +
-                                         " if (t1.id_tipo = 3 ,  " +
-                                         " (SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro) "+
-                                         "  , (SELECT t9b.nombre FROM prov_externo AS t9b WHERE t9b.id = t1.id_razonsocialpro) " +
-                                         " ) AS nomProoveedor " +
+                                         " if (t1.id_tipo = 3 ,(SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro)  , " +
+                                         " if (t1.id_tipo = 1 ,(SELECT t9d.Nombre FROM sys_usuario AS t9d WHERE t9d.idUsuario = t1.id_razonsocialpro), " +
+                                         " (SELECT t9b.nombre FROM prov_externo AS t9b WHERE t9b.id = t1.id_razonsocialpro))) AS nomProoveedor " +
                                          " FROM orden_compra as t1  " +
                                          " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
                                          " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
@@ -2911,7 +2913,6 @@ router.get('/aordencompra',isLoggedIn,  async (req,res) => {
                                          " LEFT JOIN pro_proyectos AS t8 ON t1.id_proyecto = t8.id " +
                                          " WHERE t1.id_estado = 1 AND t1.recepcionado = 'N' AND t1.aprobacionSolicitante = 'Y'"); 
 
-   // console.log(ordenCompra);
 
     const verToask = {
       titulo : "Mensaje",
@@ -2966,10 +2967,9 @@ router.get('/rordencompra', isLoggedIn, async (req,res) => {
 
     const ordenCompra = await pool.query(" SELECT t1.id,t1.folio, t2.razonsocial, t3.descripcion AS tipo, t4.Nombre AS solicitante, t5.Nombre AS recepcionador, t6.Nombre AS director, t7.centroCosto" +
                                          " , t8.nombre AS proyecto, t8.year,t8.code,t1.folio, DATE_FORMAT(t1.fecha_aprobacion , '%Y-%m-%d %H:%i') as fechaAprobacion," +
-                                         " if (t1.id_tipo = 3 ,  " +
-                                         " (SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro) "+
-                                         "  , (SELECT t9b.nombre FROM prov_externo AS t9b WHERE t9b.id = t1.id_razonsocialpro) " +
-                                         " ) AS nomProoveedor " +
+                                         " if (t1.id_tipo = 3 ,(SELECT t9a.razon_social FROM orden_compra_proveedor AS t9a WHERE t9a.id = t1.id_razonsocialpro)  , " +
+                                         " if (t1.id_tipo = 1 ,(SELECT t9d.Nombre FROM sys_usuario AS t9d WHERE t9d.idUsuario = t1.id_razonsocialpro), " +
+	                                       " (SELECT t9b.nombre FROM prov_externo AS t9b WHERE t9b.id = t1.id_razonsocialpro))) AS nomProoveedor " +
                                          " FROM orden_compra as t1  " +
                                          " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
                                          " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
@@ -3032,9 +3032,12 @@ router.post('/verDetalleOrdenCompra',isLoggedIn, async (req,res) => {
     " if (t3.id = 1 , 'Nombre', " +
     " if (t3.id = 2 , 'Razon Social', " +
     " if (t3.id = 3 , 'Empresa',0))) AS nombreProv,"  +
-    " if (t3.id = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
-    " if (t3.id = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
-    " if (t3.id = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro " +
+    //" if (t3.id = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
+    //" if (t3.id = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
+    //" if (t3.id = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro " +
+    " if (t1.id_tipo = 1 , (SELECT tx.Nombre FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro),  " +
+	  " if (t1.id_tipo = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),  " +
+	  " if (t1.id_tipo = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro " +
     " FROM orden_compra as t1  " +
     " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
     " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
@@ -3096,9 +3099,9 @@ router.post('/verDetalleOrdenCompraRecepcion', isLoggedIn, async (req,res) => {
     " if (t3.id = 1 , 'Nombre', " +
     " if (t3.id = 2 , 'Razon Social', " +
     " if (t3.id = 3 , 'Empresa',0))) AS nombreProv,"  +
-    " if (t3.id = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
-    " if (t3.id = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
-    " if (t3.id = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro " +
+    " if (t1.id_tipo = 1 , (SELECT tx.Nombre FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro),   " +
+    " if (t1.id_tipo = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),   "+
+    " if (t1.id_tipo = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro "+
     " FROM orden_compra as t1  " +
     " LEFT JOIN sys_empresa AS t2 ON t1.id_proveedor = t2.id " +
     " LEFT JOIN orden_compra_tipo AS t3 ON t1.id_tipo = t3.id " +
@@ -3248,14 +3251,14 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
                               " t1.id_solicitante, " +
                               " t1.numdiapago, " +
                               " t2.centroCosto, " +
-                              " if (t1.id_tipo = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
-                              " if (t1.id_tipo = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
-                              " if (t1.id_tipo = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro, " +
-                              " if (t1.id_tipo = 1 , (SELECT tx.direccion FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
-                              " if (t1.id_tipo = 2 , (SELECT tx2.direccion FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
-                              " if (t1.id_tipo = 3 , (SELECT tx3.direccion FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS dirPro, " +
-                              " if (t1.id_tipo = 1 , (SELECT tx.rut FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
-                              " if (t1.id_tipo = 2 , (SELECT tx2.rut FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
+                              " if (t1.id_tipo = 1 , (SELECT tx.Nombre FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro),  "+
+                              " if (t1.id_tipo = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),  "+
+                              " if (t1.id_tipo = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro,  "+
+                              " if (t1.id_tipo = 1 , (SELECT tx.direccion FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro), "+ 
+                              " if (t1.id_tipo = 2 , (SELECT tx2.direccion FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),  "+
+                              " if (t1.id_tipo = 3 , (SELECT tx3.direccion FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS dirPro,  "+
+                              " if (t1.id_tipo = 1 , (SELECT tx.rut FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro), "+ 
+                              " if (t1.id_tipo = 2 , (SELECT tx2.rut FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),  "+
                               " if (t1.id_tipo = 3 , (SELECT tx3.rut FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS rutPro " +
                               ' FROM orden_compra as t1' +
                               ' LEFT JOIN sys_empresa as t1a ON t1.id_proveedor = t1a.id ' +
@@ -3266,6 +3269,7 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
                               ' centro_costo as t2 ' +
                               ' WHERE t1.id = ? ' +
                               ' AND t1.id_centro_costo = t2.id',[id]); 
+
 
   const requerimientos = await pool.query(" SELECT t1.*, " + 
                                           " if (t1.id_moneda = 1 , FORMAT((t1.cantidad * t1.precio_unitario ),0,'de_DE'),   " +
@@ -3323,15 +3327,15 @@ router.get('/createPDFPre/:id', isLoggedIn, async (req,res) => {
                               " t1.id_solicitante, " +
                               " t1.numdiapago, " +
                               " t2.centroCosto, " +
-                              " if (t1.id_tipo = 1 , (SELECT tx.nombre FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
-                              " if (t1.id_tipo = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
-                              " if (t1.id_tipo = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro, " +
-                              " if (t1.id_tipo = 1 , (SELECT tx.direccion FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
-                              " if (t1.id_tipo = 2 , (SELECT tx2.direccion FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
-                              " if (t1.id_tipo = 3 , (SELECT tx3.direccion FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS dirPro, " +
-                              " if (t1.id_tipo = 1 , (SELECT tx.rut FROM prov_externo AS tx WHERE tx.id = t1.id_razonsocialpro), " +
-                              " if (t1.id_tipo = 2 , (SELECT tx2.rut FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro), " +
-                              " if (t1.id_tipo = 3 , (SELECT tx3.rut FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS rutPro " +
+                              " if (t1.id_tipo = 1 , (SELECT tx.Nombre FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro),  "+
+                              " if (t1.id_tipo = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),  "+
+                              " if (t1.id_tipo = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro,  "+
+                              " if (t1.id_tipo = 1 , (SELECT tx.direccion FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro), "+ 
+                              " if (t1.id_tipo = 2 , (SELECT tx2.direccion FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),  "+
+                              " if (t1.id_tipo = 3 , (SELECT tx3.direccion FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS dirPro,  "+
+                              " if (t1.id_tipo = 1 , (SELECT tx.rut FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro), "+ 
+                              " if (t1.id_tipo = 2 , (SELECT tx2.rut FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),  "+
+                              " if (t1.id_tipo = 3 , (SELECT tx3.rut FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS rutPro  " +
                               ' FROM orden_compra as t1' +
                               ' LEFT JOIN sys_empresa as t1a ON t1.id_proveedor = t1a.id ' +
                               ' LEFT JOIN sys_usuario as t1b ON t1.id_solicitante = t1b.idUsuario ' +

@@ -58,7 +58,7 @@
                 <small style="align-content: flex-end;">Estado : <b> {{factura.descripcion}}</b>              
                 </small>
             </h2>
-              {{#if (if_equal 54 req.user.idCategoria) }}
+              {{#if (if_equal 38 req.user.idCategoria) }}
                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg3" style="float: right;" onclick="CargaFacturaEdit({{factura.id_facturacion}});">
                                                 <i class="fa fa-edit"></i>
                     </button>
@@ -154,6 +154,7 @@
                                 <option value="0">Seleccione</option>
                                 <option value="1">76.442.860-9</option>
                                 <option value="2">78.956.640-2</option>
+                                <option value="3">20550724694</option>
                             </select>
                         </div>
                         <label for="staticEmail" class="col-sm-2 col-form-label">Nº Factura</label>

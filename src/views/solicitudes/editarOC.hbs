@@ -1,3 +1,24 @@
+<script>
+    $( document ).ready(function() {
+    let id_tipo_proveedor  = $("#id_tipo_proveedor2").val();
+    
+     switch(id_tipo_proveedor)
+     {
+        case 1:
+        case "1":
+            $("#contactoEmpresa2").css("visibility", "hidden");
+            $("#contactoEmpresa2").hide();
+        break;
+        case 2:
+        case "2": 
+        case 3:
+        case "3":
+            $("#contactoEmpresa2").css("visibility", "visible");
+            $("#contactoEmpresa2").show();
+        break;
+     }
+    });
+</script>  
             <div class="form-group row">
                                 <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"> <b>Emisor:</b></label>
                                     <div class="col-md-6 col-sm-6">
@@ -63,6 +84,12 @@
                     <div class="col-md-6 col-sm-6">
                         <input type="text" id="rutproveedor" name="rutproveedor"  class="form-control" readonly>
                         <input type="hidden" id="idproveedor" name="rutproidproveedorveedor"  class="form-control">
+                    </div>
+            </div>
+             <div class="form-group row" id="contactoEmpresa2" >
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Contacto:</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <input type="text" id="contactoe2" name="contactoe2"  value="{{oc.contacto}}" class="form-control">
                     </div>
             </div>
             <div class="form-group row">
@@ -345,11 +372,14 @@
          let incluyeIVA     = $("#incluyeIVA2").val();
          let observaciones     = $("#observaciones2").val();
 
+         let contactoe     = $("#contactoe2").val();
+         
 
 
-        let informacion = {emisor,tipo_proveedor,contacto,solicitante,recepcionador,numpago,director,centrocosto,proyecto,etapa,id,incluyeIVA,observaciones};
 
-        console.log(informacion);
+        let informacion = {contactoe,emisor,tipo_proveedor,contacto,solicitante,recepcionador,numpago,director,centrocosto,proyecto,etapa,id,incluyeIVA,observaciones};
+
+        //console.log(informacion);
 
          $.ajax({
                     type: 'post',

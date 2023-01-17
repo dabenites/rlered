@@ -47,7 +47,11 @@ function  buildPDF(dataCallback, endCallback, oc, requerimientos) {
   doc.fontSize(tletra).text("RUT/RUC"               , 50, 160); doc.fontSize(tletra).text(":"  , puntoPrimer, 160); doc.fontSize(tletra).text(oc.rutPro  , puntoPrimer + 10, 160);
 
   doc.fontSize(tletra).text("Contacto"           , 400, 140); doc.fontSize(tletra).text(":"  , puntoSegundo, 140);
-  doc.fontSize(tletra).text("Teléfono"           , 400, 150); doc.fontSize(tletra).text(":"  , puntoSegundo, 150);
+  if (oc.contacto != '')
+  {
+    doc.fontSize(tletra).text(oc.contacto  , puntoSegundo + 10, 140);
+  }
+  doc.fontSize(tletra).text("Teléfono"           , 400, 150); doc.fontSize(tletra).text(":"  , puntoSegundo, 150);doc.fontSize(tletra).text(oc.fonoPro  , puntoSegundo + 10, 150);
   //doc.fontSize(tletra).text("Teléfonos"          , 400, 160); doc.fontSize(tletra).text(":"  , puntoSegundo, 160);
 
   // Tercer Bloque
@@ -453,7 +457,12 @@ function  buildPDFPre(dataCallback, endCallback, oc, requerimientos) {
   doc.fontSize(tletra).text("RUT/RUC"               , 50, 160); doc.fontSize(tletra).text(":"  , puntoPrimer, 160); doc.fontSize(tletra).text(oc.rutPro  , puntoPrimer + 10, 160);
 
   doc.fontSize(tletra).text("Contacto"           , 400, 140); doc.fontSize(tletra).text(":"  , puntoSegundo, 140);
-  doc.fontSize(tletra).text("Teléfono"           , 400, 150); doc.fontSize(tletra).text(":"  , puntoSegundo, 150);
+  if (oc.contacto != '')
+  {
+    doc.fontSize(tletra).text(oc.contacto  , puntoSegundo + 10, 140);
+  }
+  
+  doc.fontSize(tletra).text("Teléfono"           , 400, 150); doc.fontSize(tletra).text(":"  , puntoSegundo, 150);doc.fontSize(tletra).text(oc.fonoPro  , puntoSegundo + 10, 150);
   //doc.fontSize(tletra).text("Teléfonos"          , 400, 160); doc.fontSize(tletra).text(":"  , puntoSegundo, 160);
 
   // Tercer Bloque

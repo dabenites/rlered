@@ -170,6 +170,12 @@
                         <input type="hidden" id="idproveedor" name="rutproidproveedorveedor"  class="form-control">
                     </div>
             </div>
+            <div class="form-group row" id="contactoEmpresa" style="visibility: hidden; display:none;">
+                <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Contacto:</b></label>
+                    <div class="col-md-6 col-sm-6">
+                        <input type="text" id="contactoe" name="contactoe"  class="form-control">
+                    </div>
+            </div>
             <div class="form-group row">
                 <label class="col-form-label col-md-3 col-sm-3 label-align"	for="Emisor"><b>Solicitante:</b></label>
                     <div class="col-md-6 col-sm-6">
@@ -877,18 +883,24 @@
                     $("#rnombrepro").html("<b>Nombre</b>");
                     $("#razonsocialProv").css("visibility", "visible");
                     $("#razonsocialProv").show();
+                     $("#contactoEmpresa").css("visibility", "hidden");
+                    $("#contactoEmpresa").hide();
                 break;
                 case 2:
                 case "2":
                     $("#rnombrepro").html("<b>Nombre/ Razon Social</b>");
                     $("#razonsocialProv").css("visibility", "visible");
                     $("#razonsocialProv").show();
+                    $("#contactoEmpresa").css("visibility", "visible");
+                    $("#contactoEmpresa").show();
                 break;
                 case 3:
                 case "3":
-                    $("#rnombrepro").html("<b>Contacto</b>");
+                    $("#rnombrepro").html("<b>Empresa</b>");
                     $("#razonsocialProv").css("visibility", "visible");
                     $("#razonsocialProv").show();
+                    $("#contactoEmpresa").css("visibility", "visible");
+                    $("#contactoEmpresa").show();
                 break;
             }
 
@@ -1057,6 +1069,11 @@
 
          let filas = $("#tableRequerimiento").find('tbody tr').length;
 
+        if (id_solicitante == "")
+        {
+            alert("Ingresar Solicitante.");
+             return false;
+        }
 
         if (filas == 0)
         {

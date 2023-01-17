@@ -1091,7 +1091,7 @@ router.post('/cargaCriterio', isLoggedIn, async (req, res) => {
             let predeterminada = "";
                                                       
             if (optPrede.length == 1){predeterminada = optPrede[0].nombre;}
-            else { predeterminada = "No existe una opcion predeterminada";}
+            else { predeterminada = "No existe una opción predeterminada";}
 
             res.render('revit/empalmesMallas', { predeterminada, empalmeMallasCargadas, codigo,fierros, id,  req ,res, layout: 'blanco'});
         break;
@@ -1185,7 +1185,7 @@ router.post('/cargaCriterio', isLoggedIn, async (req, res) => {
             let predeterminada2 = "";
                                                       
             if (optPrede2.length == 1){predeterminada2 = optPrede2[0].descripcion;}
-            else { predeterminada2 = "No existe una opcion predeterminada";}
+            else { predeterminada2 = "No existe una opción predeterminada";}
 
 
             res.render('revit/FeVigas', {  predeterminada2, cargadas, fierros,codigo, id, req ,res, layout: 'blanco'});
@@ -1226,7 +1226,7 @@ router.post('/cargaOpcionesEmpalme', isLoggedIn, async (req, res) => {
     }
     else
     {
-        predeterminada = "No existe una opcion predeterminada";
+        predeterminada = "No existe una opción predeterminada";
     }
 
 
@@ -1901,7 +1901,7 @@ router.post('/cargaOpcionesEmpotramiento', isLoggedIn, async (req, res) => {
             let predeterminada = "";
                                                       
             if (optPrede.length == 1){predeterminada = optPrede[0].descripcion;}
-            else { predeterminada = "No existe una opcion predeterminada";}
+            else { predeterminada = "No existe una opción predeterminada";}
 
 
     res.render('revit/optDefectoCargadasEmpotramiento', { predeterminada, idCodigo, codigo, opt, opcionesDefecto,opcionesCargadas,  req ,res, layout: 'blanco'});

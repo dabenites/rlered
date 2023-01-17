@@ -2359,7 +2359,7 @@ router.post('/editarOC', isLoggedIn, async (req, res) => {
     const oc =   await pool.query('SELECT *, '+
                                     "  if(t1.id_tipo = 1 , 'Nombre' ," +
                                     "  if (t1.id_tipo = 2 , 'Razon Social', " +
-                                    "  if (t1.id_tipo = 3, 'Contacto', ''))) AS nomTipo " +
+                                    "  if (t1.id_tipo = 3, 'Empresa', ''))) AS nomTipo " +
                                   ' FROM orden_compra as t1 where t1.id = ?',[id]);
 
     const empresas = await pool.query('SELECT * FROM sys_empresa'); 
@@ -2734,7 +2734,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
 
   try {
     
-    const {incluyeIVA,id_tipo_proveedor,observaciones,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias,id_monedaoc} = req.body
+    const {contactoe, incluyeIVA,id_tipo_proveedor,observaciones,id_proveedor,id_director,id_centro_costo,id_solicitante,id_proyecto,id_etapa,razonsocialpro,id_recepcionador,emisor,numdias,id_monedaoc} = req.body
     let oc = {};
 
    // console.log(req.body);
@@ -2778,7 +2778,7 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
       fecha : new Date() 
     };
 
-    const ingresoSolFolio = await pool.query('INSERT INTO orden_compra_folio  set ? ', [folio]);
+   const ingresoSolFolio = await pool.query('INSERT INTO orden_compra_folio  set ? ', [folio]);
 
     // preguntar si la persona que ingresa la informacion y el id del solicitante son iguales.
     let aprobacionSolicitante = "Y";
@@ -2809,10 +2809,19 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
        folio : numFormateado+'-'+annio
       };
 
-      mensajeria.NotificacionOCClaudio(checkClaudio);
+     mensajeria.NotificacionOCClaudio(checkClaudio);
     }
     
-
+    let contacto = '';
+    
+    if (contactoe === '' || contactoe === undefined)
+    {
+      contacto = '';
+    }
+    else
+    {
+      contacto =contactoe; 
+    }
 
     
     if (id_proyecto == '')
@@ -2834,7 +2843,8 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
         numdiapago: numdias,
         folio : numFormateado+'-'+annio,
         aprobacionSolicitante : aprobacionSolicitante,
-        observaciones: observaciones
+        observaciones: observaciones,
+        contacto : contacto
       };
     }
     else
@@ -2858,7 +2868,8 @@ router.post('/addOC', isLoggedIn, async (req, res) => {
         numdiapago: numdias,
         folio : numFormateado+'-'+annio,
         aprobacionSolicitante : aprobacionSolicitante,
-        observaciones: observaciones
+        observaciones: observaciones,
+        contacto : contacto
       };
     }
 
@@ -3232,6 +3243,7 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
 
   // buscar la informacion de la OC
   const oc = await pool.query('SELECT  ' +
+                              " t1.contacto as contacto ,"+
                               " t1e.id_moneda as ocMoneda," +
                               " t1e.simbolo as desMoneda," +
                               " t1b.Nombre as nomSolicitante ," + 
@@ -3251,6 +3263,9 @@ router.get('/createPDF/:id', isLoggedIn, async (req,res) => {
                               " t1.id_solicitante, " +
                               " t1.numdiapago, " +
                               " t2.centroCosto, " +
+                              " if (t1.id_tipo = 1 , (SELECT tx.Telefono FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro),  "+
+                              " if (t1.id_tipo = 2 , (SELECT tx2.fono FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),  "+
+                              " if (t1.id_tipo = 3 , (SELECT tx3.fono FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS fonoPro,  "+
                               " if (t1.id_tipo = 1 , (SELECT tx.Nombre FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro),  "+
                               " if (t1.id_tipo = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),  "+
                               " if (t1.id_tipo = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro,  "+
@@ -3308,6 +3323,7 @@ router.get('/createPDFPre/:id', isLoggedIn, async (req,res) => {
 
   // buscar la informacion de la OC
   const oc = await pool.query('SELECT  ' +
+                              "t1.contacto as contacto ,"+
                               " t1e.id_moneda as ocMoneda," +
                               "t1e.simbolo as desMoneda," +
                               " t1b.Nombre as nomSolicitante ," + 
@@ -3327,6 +3343,9 @@ router.get('/createPDFPre/:id', isLoggedIn, async (req,res) => {
                               " t1.id_solicitante, " +
                               " t1.numdiapago, " +
                               " t2.centroCosto, " +
+                              " if (t1.id_tipo = 1 , (SELECT tx.Telefono FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro),  "+
+                              " if (t1.id_tipo = 2 , (SELECT tx2.fono FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),  "+
+                              " if (t1.id_tipo = 3 , (SELECT tx3.fono FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS fonoPro,  "+
                               " if (t1.id_tipo = 1 , (SELECT tx.Nombre FROM sys_usuario AS tx WHERE tx.idUsuario = t1.id_razonsocialpro),  "+
                               " if (t1.id_tipo = 2 , (SELECT tx2.razon_social FROM prov_externo AS tx2 WHERE tx2.id = t1.id_razonsocialpro),  "+
                               " if (t1.id_tipo = 3 , (SELECT tx3.razon_social FROM orden_compra_proveedor AS tx3 WHERE tx3.id = t1.id_razonsocialpro),0))) AS nomPro,  "+
@@ -3404,7 +3423,7 @@ router.post('/terminoOCRechazo',isLoggedIn, async (req,res) => {
 //editarOCIngresada
 router.post('/editarOCIngresada',isLoggedIn, async (req,res) => {
 
-  let {emisor, observaciones, tipo_proveedor,  contacto,  solicitante,  recepcionador,  numpago,  director,  centrocosto,  proyecto,  etapa, id,incluyeIVA} = req.body;
+  let {emisor, observaciones, tipo_proveedor,  contacto,  solicitante,  recepcionador,  numpago,  director,  centrocosto,  proyecto,  etapa, id,incluyeIVA,contactoe} = req.body;
   
   if (proyecto === "")
   {
@@ -3427,8 +3446,9 @@ router.post('/editarOCIngresada',isLoggedIn, async (req,res) => {
                                   " id_etapa = ?, " + 
                                   " numdiapago = ?, " +
                                   " conIVA = ?, " +
-                                  " observaciones = ? " +
-                                   " WHERE id = ? ", [tipo_proveedor,emisor,contacto,solicitante,director,recepcionador,centrocosto,proyecto,etapa,numpago,incluyeIVA,observaciones,id]);
+                                  " observaciones = ?, " +
+                                  " contacto = ? " +
+                                   " WHERE id = ? ", [tipo_proveedor,emisor,contacto,solicitante,director,recepcionador,centrocosto,proyecto,etapa,numpago,incluyeIVA,observaciones,id,contactoe]);
   
   
 

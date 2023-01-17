@@ -784,7 +784,7 @@ router.post('/validarCodigo', isLoggedIn, async (req, res) => {
     else
     {
         respuesta.error = 1;
-        respuesta.tipo = "El codigo del proyecto ya esta en uso";
+        respuesta.tipo = "El código del proyecto ya está en uso";
     }
 
 
@@ -1234,6 +1234,18 @@ router.post('/cargaOpcionesEmpalme', isLoggedIn, async (req, res) => {
    
 
 });
+
+
+router.post('/eliminarConfiguracionGeneral', isLoggedIn, async (req, res) => {
+
+    const { id} = req.body;
+
+    let cab = await pool.query('DELETE FROM rvt_origen_proyecto WHERE id_origen_proyecto = ? LIMIT 1;', [id]);
+
+
+    res.send("ok");
+});
+
 //eliminarEmpalme
 router.post('/eliminarEmpalme', isLoggedIn, async (req, res) => {
     

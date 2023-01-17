@@ -94,6 +94,13 @@
                                             <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
                                             </svg>
                                             </a>
+
+                                            <a href="#" onclick="EliminarConfiguracionGeneral({{id}})"> 
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                                            </svg>
+                                            </a>
+
                                         </td>
                                 </tr>
                                  {{/each}} 
@@ -199,7 +206,7 @@ function validarIngresoCodigo()
 
      if (infoCodigo.length != 2)
      {
-        alert("El codigo tiene que tener un Guion Bajo para que sea válido. Ejemplo 2016_02C ");
+        alert("El código tiene que tener un guión bajo para que sea válido. Ejemplo 2016_02C ");
         return false;
      }
 
@@ -262,5 +269,24 @@ function validarIngresoCodigo()
 
 
 
+}
+
+
+function EliminarConfiguracionGeneral(id)
+{
+
+    if (confirm("¿Estas seguro que deseas eliminar todos los criterios de la configuración general?"))
+    {
+        let informacion = { id}
+            $.ajax({
+                type: 'post',
+                url: '/revit/eliminarConfiguracionGeneral',
+                data: informacion,
+                dataType: 'text'
+                        })
+                        .done(function (data) {
+                            location.reload();
+                        });
+    }
 }
 </script>

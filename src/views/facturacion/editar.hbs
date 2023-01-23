@@ -58,7 +58,7 @@
                 <small style="align-content: flex-end;">Estado : <b> {{factura.descripcion}}</b>              
                 </small>
             </h2>
-              {{#if (if_equal 38 req.user.idCategoria) }}
+                {{#if (if_equal 38 req.user.idCategoria) }}
                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg3" style="float: right;" onclick="CargaFacturaEdit({{factura.id_facturacion}});">
                                                 <i class="fa fa-edit"></i>
                     </button>
@@ -82,9 +82,9 @@
                             </div>
                         </div>
                     </div>
-              {{/if}}
-              {{#if (if_equal factura.id_estado 0) }}
-                {{#if (if_equal req.user.idUsuario factura.id_solicitante) }}
+                {{/if}}
+                {{#if (if_equal factura.id_estado 0) }}
+                    {{#if (if_equal req.user.idUsuario factura.id_solicitante) }}
                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg4" style="float: right;" onclick="CargaFacturaEditIngreso({{factura.id_facturacion}});">
                                                 <i class="fa fa-edit"></i>
                     </button>
@@ -108,8 +108,8 @@
                             </div>
                         </div>
                     </div>
+                    {{/if}}
                 {{/if}}
-              {{/if}}
             <div class="clearfix"></div>
         </div>
         <div class="x_content">

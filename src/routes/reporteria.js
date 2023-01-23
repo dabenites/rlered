@@ -50,7 +50,7 @@ router.get('/proyectos',isLoggedIn,  async (req, res) => {
                 }              
                 });
 
-                //console.log(valoresUFBD);
+                
 
                 const inicio = new Date("2009-09-01");
                 const fin = new Date("2009-12-31");
@@ -66,7 +66,7 @@ router.get('/proyectos',isLoggedIn,  async (req, res) => {
 
                         if (existeValorUF == undefined)
                         {
-                            console.log(fechaFind);
+                            
                         }
                 }
                 //#################################################################################
@@ -979,7 +979,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                     if (containsCentro === false) 
                     {
                         // Si no existe lo agrego. 
-                        //console.log(element);
+                        
                             const centroCostoExterno = centroCostoHH.find(centro => {return centro.nombre === element.nombre });
                             colaboradoresCentroCostoGeneral.push({nombre : element.nombre,
                                     horas : 0,
@@ -3483,7 +3483,7 @@ router.post('/buscarListadoProyectos',isLoggedIn,  async (req, res) => {
 
 
 
-        //console.log(sql);
+        
 
         let infoProyectos = [];
         let proyectos = await pool.query(sql);
@@ -3525,7 +3525,7 @@ router.post('/buscarListadoProyectos',isLoggedIn,  async (req, res) => {
                 //#endregion
 
                 facturacion.forEach(factura => {
-                        //console.log(factura.esroc);
+                        
                         switch(factura.id_estado)
                         {
                             case 0: // 
@@ -3717,6 +3717,203 @@ router.get('/chequeos',isLoggedIn,  async (req, res) => {
 
 });
 
+// mostrar información para chequeos. 
+router.get('/pruebas',isLoggedIn,  async (req, res) => {
+
+        //#region  SQL PARA INFORMACION DE LAS PRUEBAS 
+        let sqlFacCob = " SELECT  "+
+        " t1.id_proyecto,"+
+        " SUM(t1.monto_clp) AS c_clp,"+
+        " SUM(t1.monto_uf)  AS c_uf,"+
+        " SUM(t1.monto_sol) AS c_sol,"+
+        " SUM(t1.monto_dolar) AS c_usd"+
+        " FROM "+
+        "        fact_facturas_equivalencias AS t1"+
+        " WHERE "+
+        "        t1.id_proyecto IN (SELECT "+
+        "        t1c.id_proyecto"+
+        " FROM "+
+        "       bita_horas_equivalencia AS t1c"+
+        " WHERE "+
+        "        t1c.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
+        " GROUP BY t1c.id_proyecto) "+
+        " AND t1.id_estado IN(2,3) " +
+        " GROUP BY t1.id_proyecto ";
+
+
+    let sqlFacPag = " SELECT  "+
+        " t1.id_proyecto,"+
+        " SUM(t1.monto_clp) AS c_clp,"+
+        " SUM(t1.monto_uf)  AS c_uf,"+
+        " SUM(t1.monto_sol) AS c_sol,"+
+        " SUM(t1.monto_dolar) AS c_usd"+
+        " FROM "+
+        "        fact_facturas_equivalencias AS t1"+
+        " WHERE "+
+        "        t1.id_proyecto IN (SELECT "+
+        "        t1c.id_proyecto"+
+        " FROM "+
+        "       bita_horas_equivalencia AS t1c"+
+        " WHERE "+
+        "        t1c.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
+        " GROUP BY t1c.id_proyecto) "+
+        " AND t1.id_estado = 3 " +
+        " GROUP BY t1.id_proyecto ";
+
+
+   let sqlcep = " SELECT  "+
+        " t1.id_proyecto,"+
+        " SUM(t1.monto_clp) AS c_clp,"+
+        " SUM(t1.monto_uf)  AS c_uf,"+
+        " SUM(t1.monto_sol) AS c_sol,"+
+        " SUM(t1.monto_usd) AS c_usd"+
+        " FROM "+
+        "        pro_costo_externo_equivalencias AS t1"+
+        " WHERE "+
+        "        t1.id_proyecto IN (SELECT "+
+        "        t1c.id_proyecto"+
+        " FROM "+
+        "       bita_horas_equivalencia AS t1c"+
+        " WHERE "+
+        "        t1c.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
+        " GROUP BY t1c.id_proyecto) "+
+        " GROUP BY t1.id_proyecto ";
+
+   
+     let sqlce = " SELECT  "+
+        " t1.id_proyecto,"+
+        " SUM(t1.monto_clp) AS c_clp,"+
+        " SUM(t1.monto_uf)  AS c_uf,"+
+        " SUM(t1.monto_sol) AS c_sol,"+
+        " SUM(t1.monto_usd) AS c_usd"+
+        " FROM "+
+        "        proyecto_costo_externo_equivalencias AS t1"+
+        " WHERE "+
+        "        t1.id_proyecto IN (SELECT "+
+        "        t1c.id_proyecto"+
+        " FROM "+
+        "       bita_horas_equivalencia AS t1c"+
+        " WHERE "+
+        "        t1c.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
+        " GROUP BY t1c.id_proyecto) "+
+        " GROUP BY t1.id_proyecto ";
+
+   let sqlOC = " SELECT  "+
+                        " t1.id_proyecto,"+
+                        " SUM(t1.monto_cpl) AS c_clp,"+
+                        " SUM(t1.monto_uf)  AS c_uf,"+
+                        " SUM(t1.monto_sol) AS c_sol,"+
+                        " SUM(t1.monto_usd) AS c_usd"+
+                        " FROM "+
+                        "        orden_compra_equivalencias AS t1"+
+                        " WHERE "+
+                        "        t1.id_proyecto IN (SELECT "+
+                        "        t1c.id_proyecto"+
+                        " FROM "+
+                        "       bita_horas_equivalencia AS t1c"+
+                        " WHERE "+
+                        "        t1c.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
+                        " GROUP BY t1c.id_proyecto) "+
+                        " GROUP BY t1.id_proyecto ";
+
+   let sql = " SELECT  " +
+                "  t1b.Nombre AS director, "+
+                " t1a.nombre,"+
+	        " t1a.`year`," +
+	        " t1a.code, " +
+                " t1.id_proyecto," +
+                " SUM(t1.costo_clp) AS c_clp," +
+                " SUM(t1.costo_uf)  AS c_uf," +
+                " SUM(t1.costo_sol) AS c_sol,"+
+                " SUM(t1.costo_usd) AS c_usd"+
+                " FROM "+
+                "                bita_horas_equivalencia AS t1"+
+                " LEFT JOIN pro_proyectos AS t1a ON t1.id_proyecto = t1a.id " +
+                " LEFT JOIN sys_usuario AS t1b ON t1a.id_director = t1b.idUsuario " +
+                " WHERE "+
+               // "                t1.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
+                " t1.id_proyecto IN (SELECT  "+
+                                        " t1c.id_proyecto " +
+                                " FROM  " +
+                                           "     bita_horas_equivalencia AS t1c "+
+                                " WHERE  "+
+                                           "     t1c.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
+                                " GROUP BY t1c.id_proyecto) "+
+                " GROUP BY t1.id_proyecto "; 
+        //#endregion
+
+    //console.log(sql);
+
+        const proyectos = await pool.query(sql);
+        const infoOc = await pool.query(sqlOC);
+        const infoCE = await pool.query(sqlce);
+        const infoCEP = await pool.query(sqlcep); 
+        const infoFacP = await pool.query(sqlFacPag);
+        const infoFacC = await pool.query(sqlFacCob);
+
+        
+        proyectos.forEach(p => {
+
+                let bOrdenCompra = infoOc.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
+                let valorOC = 0;
+                if (bOrdenCompra != undefined){valorOC = Intl.NumberFormat('de-DE').format(bOrdenCompra.c_uf.toFixed(2));}
+
+                let bCostoExterno = infoCE.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
+                let valorCE = 0;
+                if (bCostoExterno != undefined){valorCE = Intl.NumberFormat('de-DE').format(bCostoExterno.c_uf.toFixed(2));}
+
+                let bCostoExternoP = infoCEP.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
+                let valorCEP = 0;
+                if (bCostoExternoP != undefined){valorCEP = Intl.NumberFormat('de-DE').format(bCostoExternoP.c_uf.toFixed(2));}
+
+                let bFacturaPagada = infoFacP.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
+                let valorFacPagada = 0;
+                if (bFacturaPagada != undefined){valorFacPagada = Intl.NumberFormat('de-DE').format(bFacturaPagada.c_uf.toFixed(2));}
+
+                let bFacturaCobranza = infoFacC.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
+                let valorFacCobranza = 0;
+                if (bFacturaCobranza != undefined){valorFacCobranza = Intl.NumberFormat('de-DE').format(bFacturaCobranza.c_uf.toFixed(2));}
+
+                p.oc = valorOC;
+                p.ce = valorCE;
+                p.cep = valorCEP;
+                p.fp = valorFacPagada;
+                p.fc = valorFacCobranza;
+                p.tote = sumaFormateada(valorOC,valorCE,valorCEP);
+                p.c_uf = Intl.NumberFormat('de-DE').format(p.c_uf.toFixed(2));
+
+                p.totp = sumaFormateada(p.tote,p.c_uf);
+                p.df = restaFormateada(valorFacCobranza , valorFacPagada);
+
+        });
+
+
+        res.render('reporteria/pruebas', { proyectos, req, layout: 'template' });
+      
+      });
+
+      function sumaFormateada(n1=0,n2=0,n3=0)
+      {
+
+        let n01 = parseFloat( n1.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
+        let n02 = parseFloat( n2.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
+        let n03 = parseFloat( n3.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
+        //console.log(n01 + "////" + n02 + "/////" +n03);
+        let total = n01 + n02 + n03;
+        return   Intl.NumberFormat('de-DE').format(total.toFixed(2));
+
+      }
+      function restaFormateada(n1=0,n2=0)
+      {
+
+        let n01 = parseFloat( n1.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
+        let n02 = parseFloat( n2.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
+        
+        //console.log(n01 + "////" + n02 + "/////" +n03);
+        let total = n01 - n02;
+        return   Intl.NumberFormat('de-DE').format(total.toFixed(2));
+
+      }
 //analisisMonedaCostoExternoPlanner
 router.post('/analisisMonedaCostoExternoPlanner',isLoggedIn,  async (req, res) => {
 
@@ -3806,7 +4003,7 @@ router.post('/analisisMonedaCostoExternoPlanner',isLoggedIn,  async (req, res) =
                 {
                         let registro;
                         let ist;
-                        switch(ce.id_moneda)
+                        switch(ce.id_tipo_moneda)
                         {
                                 case 1:
                                 registro = {
@@ -3824,7 +4021,7 @@ router.post('/analisisMonedaCostoExternoPlanner',isLoggedIn,  async (req, res) =
                                                 valor_sol : colSOL.valor
                 
                                         }
-                                //console.log(registro);
+                                
                                 ist =  pool.query('INSERT INTO pro_costo_externo_equivalencias set ?', [registro]);
                                 break;
                         }
@@ -3835,6 +4032,221 @@ router.post('/analisisMonedaCostoExternoPlanner',isLoggedIn,  async (req, res) =
         res.send('ok');
 
 });
+//bitacatoraPlanner
+router.post('/bitacoraPlanner',isLoggedIn,  async (req, res) => {
+
+       const valorUFMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
+       const valorDolarMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 2 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
+       const valorSolMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 10 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
+
+       const costoUsuario =await pool.query(" SELECT " +
+                                                " CONCAT(t1.annio,'-',t1.mes) AS fecha, " +
+                                                " t1.costo, " +
+                                                " t1.idUsuario " +
+                                                " FROM  " +
+                                                                " sys_usuario_costo AS t1 " +
+                                                " GROUP BY t1.idUsuario, fecha ");
+
+        let bitacora = await pool.query("SELECT "+
+                                        " t1.id_project , "+
+                                        " t1.id_session AS id_usuario,"+
+                                        " SUBSTRING(t1.ini_time,1,7) AS fecha,"+
+                                        " SUM(TIME_TO_SEC(timediff(t1.fin_time, t1.ini_time))/ 3600) AS numHH "+
+                                        " FROM "+
+                                        "                bita_horas AS t1 "+
+                                        " WHERE "+
+                                        "                t1.id_project != 0 AND t1.id_project > 0 AND t1.id_session not in (1 )"+
+                                        " GROUP BY fecha, id_usuario	");
+
+                                                
+        
+        let errores = [];
+        bitacora.forEach(b => {
+                let fechaAnalisis = b.fecha;
+                const colUSD = valorDolarMes.find(fecha => {return fecha.fecha === fechaAnalisis});
+                const colUF = valorUFMes.find(fecha => {return fecha.fecha === fechaAnalisis});
+                const colSOL = valorSolMes.find(fecha => {return fecha.fecha === fechaAnalisis});
+
+                        if (colUSD === undefined || colUF === undefined || colSOL === undefined)
+                        {
+                               
+                                errores.push({
+                                        tipo : "Valor moneda",
+                                        fecha : fechaAnalisis,
+                                        usuario : usuarioID
+                                });
+                        }
+                        else
+                        {
+                                let usuarioID = b.id_usuario;
+                                let bValorUsuario = costoUsuario.find(fecha => {return fecha.fecha === fechaAnalisis && fecha.idUsuario === usuarioID}); 
+
+
+                                if (bValorUsuario === undefined)
+                                {
+                                        errores.push({
+                                                tipo : "Costo Usuario",
+                                                fecha : fechaAnalisis,
+                                                usuario : usuarioID
+                                        });   
+                                        
+                                        registro = {   
+                                                id_user : usuarioID,
+                                                fecha : fechaAnalisis,
+                                                }
+
+                                        
+                                }
+                                else
+                                {
+                                        let costo = bValorUsuario.costo;
+
+                                        let valorMes = b.numHH * costo;
+                                        let costo_cpl = parseInt(valorMes);
+                                        let costo_uf = costo_cpl / colUF.valor ;
+                                        let costo_sol = costo_cpl / colSOL.valor ;
+                                        let costo_usd = costo_cpl / colUSD.valor ;
+
+                                        registro = {   
+                                                id_user : usuarioID,
+                                                id_proyecto : b.id_project,
+                                                fecha : fechaAnalisis,
+                                                hh : b.numHH,
+                                                costo_hh : costo,
+                                                costo_clp : costo_cpl,
+                                                costo_uf : costo_uf,
+                                                costo_sol : costo_sol,
+                                                costo_usd : costo_usd,
+                                                valor_uf : colUF.valor,
+                                                valor_sol : colSOL.valor,
+                                                valor_usd : colUSD.valor,
+                                                }
+                                
+                                        let ist =  pool.query('INSERT INTO bita_horas_equivalencia set ?', [registro]);
+
+                                }
+
+                                
+                        }
+
+                });
+
+        res.send('ok');
+});
+
+// bitacatoraAnterior
+router.post('/bitacatoraAnterior',isLoggedIn,  async (req, res) => {
+
+       // VALORES MAXIMOS DE LAS MONEDAS 
+
+       const valorUFMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
+       const valorDolarMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 2 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
+       const valorSolMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,7) AS fecha, MAX(t1.valor) as valor FROM moneda_valor AS t1 WHERE t1.id_moneda = 10 GROUP BY SUBSTRING(t1.fecha_valor,1,7)");
+
+       let sql = " SELECT " +
+                                " t1.owner AS idUser, " +
+                                " t1.project AS proyecto, " +
+                                " DATE_FORMAT(t1.date,'%Y-%m') AS mes, "+
+                                " SUM(t1.nHH) / 6 AS hh, " +
+                                " SUM(t1.nHE) / 6 AS he, " +
+                                " t1.costoHH " +
+                " FROM  " +
+                                " bitacora AS t1 " +
+                " WHERE  " +
+                                " t1.project != 0 AND t1.owner != 0" +
+                " GROUP BY mes,idUser  " +
+                " ORDER BY t1.id ASC"; 
+
+        const costoUsuario =await pool.query(" SELECT " +
+                                                " CONCAT(t1.annio,'-',t1.mes) AS fecha, " +
+                                                " t1.costo, " +
+                                                " t1.idUsuario " +
+                                                " FROM  " +
+                                                                " sys_usuario_costo AS t1 " +
+                                                " GROUP BY t1.idUsuario, fecha "); 
+
+        let bitacora = await pool.query(sql);
+        let errores = [];
+        bitacora.forEach(b => {
+
+                //let fechaAnalisis = '2100-10';
+                let fechaAnalisis = b.mes;
+                const colUSD = valorDolarMes.find(fecha => {return fecha.fecha === fechaAnalisis});
+                const colUF = valorUFMes.find(fecha => {return fecha.fecha === fechaAnalisis});
+                const colSOL = valorSolMes.find(fecha => {return fecha.fecha === fechaAnalisis});
+
+                
+
+                
+                if (colUSD === undefined || colUF === undefined || colSOL === undefined)
+                {
+                       
+                        errores.push({
+                                tipo : "Valor moneda",
+                                fecha : fechaAnalisis,
+                                usuario : usuarioID
+                        });
+                }
+                else
+                {
+                        let usuarioID = b.idUser;
+                        let bValorUsuario = costoUsuario.find(fecha => {return fecha.fecha === fechaAnalisis && fecha.idUsuario === usuarioID}); 
+
+                        if (bValorUsuario === undefined)
+                        {
+                                errores.push({
+                                        tipo : "Costo Usuario",
+                                        fecha : fechaAnalisis,
+                                        usuario : usuarioID
+                                });   
+                                
+                                registro = {   
+                                        id_user : b.idUser,
+                                        fecha : fechaAnalisis,
+                                        }
+
+                                let ist =  pool.query('INSERT INTO bitacora_equivalencia_error set ?', [registro]);
+                        }
+                        else
+                        {
+                                /// CARGA de valores. 
+
+                                let costo = bValorUsuario.costo;
+
+                                let valorMes = b.hh * costo + b.he * costo * 1.5;
+                                let costo_cpl = parseInt(valorMes);
+                                let costo_uf = costo_cpl / colUF.valor ;
+                                let costo_sol = costo_cpl / colSOL.valor ;
+                                let costo_usd = costo_cpl / colUSD.valor ;
+
+
+                                registro = {   
+                                        id_user : b.idUser,
+                                        id_proyecto : b.proyecto,
+                                        fecha : fechaAnalisis,
+                                        hh : b.hh,
+                                        he : b.he,
+                                        costo_hh : costo,
+                                        costo_clp : costo_cpl,
+                                        costo_uf : costo_uf,
+                                        costo_sol : costo_sol,
+                                        costo_usd : costo_usd,
+                                        valor_uf : colUF.valor,
+                                        valor_sol : colSOL.valor,
+                                        valor_usd : colUSD.valor,
+                                        }
+                        
+                        let ist =  pool.query('INSERT INTO bitacora_equivalencia set ?', [registro]);
+
+                        }
+                }
+        });
+
+       
+
+        res.send("ok");
+});
+
 
 
 router.post('/analisisMonedaCostoExterno',isLoggedIn,  async (req, res) => {
@@ -4069,7 +4481,7 @@ valorSOLMes.forEach(element => {
         
 
         let orden_compra = await pool.query(sql);
-        //console.log(sql);
+        
 
         //let oc = [];
         let info = [];
@@ -4205,7 +4617,7 @@ valorSOLMes.forEach(element => {
         }
 
         //oc.log();
-       // console.log(info);
+       
 
         res.send('ok');
 });
@@ -4298,7 +4710,7 @@ router.post('/analisisMonedaFactura',isLoggedIn,  async (req, res) => {
         
         listadoProyectosAnalisisFactura.forEach(factura => {
                 
-                //console.log(factura);
+                
 
                 let monedaBase = factura.id_tipo_moneda;
 
@@ -4363,7 +4775,7 @@ router.post('/analisisMonedaFactura',isLoggedIn,  async (req, res) => {
                 let equiUSD = "";
                 let equiSOL = "";
                 let equiCPL = "";
-                //console.log(factura.id_tipo_moneda);
+                
                 factura.monto_a_facturar = factura.monto_a_facturar.replace(",",".");
                 switch(factura.id_tipo_moneda)
                 {

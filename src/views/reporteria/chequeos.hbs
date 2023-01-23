@@ -60,6 +60,15 @@ En el caso que falte una fecha para una factura será reportada.
 En el caso que falte una fecha para una factura será reportada.
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                <button type="button" class="btn btn-success" onclick="BitacoraNueva()">Bitacora Planner</button>
+                            </td>                    
+                            <td>
+                                Bitacora Planner,  se crean registros con sus equivalencias en las monedas definidas en planner. 
+En el caso que falte una fecha para una factura será reportada.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -169,5 +178,53 @@ En el caso que falte una fecha para una factura será reportada.
                         $('#cargaInformacion').html('');
                     }
                 });
+    }
+function BitacoraNueva()
+    {
+        $('#cargaInformacion').html('<div class="col-md-4"></div><div class="col-md-4"><button class="btn btn-primary" type="button" disabled> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...</button></div><div class="col-md-4"></div>');
+        
+        let informacion = {
+          
+        };
+
+    $.ajax({
+                method:'POST',
+                url : '/reporteria/bitacoraPlanner',
+                data : informacion,
+                success : function(result)
+                    {
+                        
+                         toastr.success('Análisis de bitacora Planner terminada', 'Información', {
+                                    "progressBar": true
+                                });
+                        $('#cargaInformacion').html('');
+                    }
+                });
+
+
+    }
+    function BitacoraAntigua()
+    {
+        $('#cargaInformacion').html('<div class="col-md-4"></div><div class="col-md-4"><button class="btn btn-primary" type="button" disabled> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...</button></div><div class="col-md-4"></div>');
+        
+        let informacion = {
+          
+        };
+
+        $.ajax({
+                method:'POST',
+                url : '/reporteria/bitacatoraAnterior',
+                data : informacion,
+                success : function(result)
+                    {
+                        
+                         toastr.success('Análisis de bitacora anterior terminada', 'Información', {
+                                    "progressBar": true
+                                });
+                        $('#cargaInformacion').html('');
+                    }
+                });
+
+
     }
 </script>

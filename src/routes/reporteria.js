@@ -370,6 +370,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                     " AND " +
                                                             "t1.id_tipo_cobro = t5.id",[id]);
                 
+                //console.log("test");
+
 
                 const cexternos = await pool.query("SELECT " +
                                                             " 3200 AS valorUFAux," +
@@ -419,7 +421,10 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                             " t1.folio AS numoc,"+
                                                             " t3.cantidad AS numhh,"+
                                                             " if (t3.id_moneda = 4,FORMAT( t3.precio_unitario * t3.tipo_cambio,0,'de_DE'), 0) AS costo, "+
-                                                            " if (t1.id_tipo = 3 , 'Empresa' , (SELECT t1c.nombre FROM prov_externo AS t1c WHERE t1c.id = t1.id_razonsocialpro)) as nNombre , "+
+                                                            //" if (t1.id_tipo = 3 , 'Empresa' , (SELECT t1c.nombre FROM prov_externo AS t1c WHERE t1c.id = t1.id_razonsocialpro)) as nNombre , "+
+                                                            " if (t1.id_tipo = 3 , 'Empresa' , "+
+                                                            " if (t1.id_tipo = 2 , (SELECT t1c.nombre FROM prov_externo AS t1c WHERE t1c.id = t1.id_razonsocialpro)," +
+                                                            " if (t1.id_tipo = 1 , (SELECT t1d.nombre FROM sys_usuario AS t1d WHERE t1d.idUsuario = t1.id_razonsocialpro), '2'))) as nNombre ,  " +
                                                             " if (t3.id_moneda = 4, t3.cantidad * t3.precio_unitario,0) AS totPro, " +
                                                             " 1 AS 'uf_valor'," +
                                                             " (  SELECT format(t1b.valor,2, 'de_DE')   " +
@@ -443,6 +448,9 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                             " t1.id_centro_costo = t2.id " +
                                                       " AND  " +
                                                             " t1.id = t3.id_solicitud  ",[id, id]);
+        
+
+
       
                 var numHH = 0;
                 let centroCostoHH = [];
@@ -1580,6 +1588,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
             
             let costoEsperadov2 = (totalProyectov2 * porcentaje).toFixed(2);
+
+            
 
             if (mensaje === "")
             {
@@ -2832,7 +2842,10 @@ router.get('/analisisProyectos',  async (req, res) => {
                                                             " t1.folio AS numoc,"+
                                                             " t3.cantidad AS numhh,"+
                                                             " if (t3.id_moneda = 4,FORMAT( t3.precio_unitario * t3.tipo_cambio,0,'de_DE'), 0) AS costo, "+
-                                                            " if (t1.id_tipo = 3 , 'Empresa' , (SELECT t1c.nombre FROM prov_externo AS t1c WHERE t1c.id = t1.id_razonsocialpro)) as nNombre , "+
+                                                            //" if (t1.id_tipo = 3 , 'Empresa' , (SELECT t1c.nombre FROM prov_externo AS t1c WHERE t1c.id = t1.id_razonsocialpro)) as nNombre , "+
+                                                            " if (t1.id_tipo = 3 , 'Empresa' , "+
+                                                            " if (t1.id_tipo = 2 , (SELECT t1c.nombre FROM prov_externo AS t1c WHERE t1c.id = t1.id_razonsocialpro)," +
+                                                            " if (t1.id_tipo = 1 , (SELECT t1d.nombre FROM sys_usuario AS t1d WHERE t1d.idUsuario = t1.id_razonsocialpro), '2'))) as nNombre ,  " +
                                                             " if (t3.id_moneda = 4, t3.cantidad * t3.precio_unitario,0) AS totPro, " +
                                                             " 1 AS 'uf_valor'," +
                                                             " (  SELECT format(t1b.valor,2, 'de_DE')   " +
@@ -3065,7 +3078,10 @@ router.get('/analisisProyectos',  async (req, res) => {
                                                 " t1.folio AS numoc,"+
                                                 " t3.cantidad AS numhh,"+
                                                 " if (t3.id_moneda = 4,FORMAT( t3.precio_unitario * t3.tipo_cambio,0,'de_DE'), 0) AS costo, "+
-                                                " if (t1.id_tipo = 3 , 'Empresa' , (SELECT t1c.nombre FROM prov_externo AS t1c WHERE t1c.id = t1.id_razonsocialpro)) as nNombre , "+
+                                                //" if (t1.id_tipo = 3 , 'Empresa' , (SELECT t1c.nombre FROM prov_externo AS t1c WHERE t1c.id = t1.id_razonsocialpro)) as nNombre , "+
+                                                " if (t1.id_tipo = 3 , 'Empresa' , "+
+                                                            " if (t1.id_tipo = 2 , (SELECT t1c.nombre FROM prov_externo AS t1c WHERE t1c.id = t1.id_razonsocialpro)," +
+                                                            " if (t1.id_tipo = 1 , (SELECT t1d.nombre FROM sys_usuario AS t1d WHERE t1d.idUsuario = t1.id_razonsocialpro), '2'))) as nNombre ,  " +
                                                 " if (t3.id_moneda = 4, t3.cantidad * t3.precio_unitario,0) AS totPro, " +
                                                 " 1 AS 'uf_valor'," +
                                                 " (  SELECT format(t1b.valor,2, 'de_DE')   " +
@@ -3842,7 +3858,7 @@ router.get('/pruebas',isLoggedIn,  async (req, res) => {
                 " GROUP BY t1.id_proyecto "; 
         //#endregion
 
-    //console.log(sql);
+    
 
         const proyectos = await pool.query(sql);
         const infoOc = await pool.query(sqlOC);
@@ -3898,7 +3914,7 @@ router.get('/pruebas',isLoggedIn,  async (req, res) => {
         let n01 = parseFloat( n1.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
         let n02 = parseFloat( n2.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
         let n03 = parseFloat( n3.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
-        //console.log(n01 + "////" + n02 + "/////" +n03);
+        
         let total = n01 + n02 + n03;
         return   Intl.NumberFormat('de-DE').format(total.toFixed(2));
 
@@ -3909,7 +3925,7 @@ router.get('/pruebas',isLoggedIn,  async (req, res) => {
         let n01 = parseFloat( n1.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
         let n02 = parseFloat( n2.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
         
-        //console.log(n01 + "////" + n02 + "/////" +n03);
+        
         let total = n01 - n02;
         return   Intl.NumberFormat('de-DE').format(total.toFixed(2));
 

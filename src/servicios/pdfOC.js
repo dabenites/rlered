@@ -118,6 +118,9 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
   doc.fontSize(tletra).text("Claudio Gahona", 410, 702);
 }
    
+
+//console.log(requerimientos);
+
   // Bloque dinamico con la informacion de la tabla 
   //let oTable = ["1.68", "1", "Informe Modelación", "$31,579.53", "$53.054"];
   let oTable = [];
@@ -140,9 +143,9 @@ if (fs.existsSync(__dirname+"/"+"114.png"))
 
         if (oc.ocMoneda == element.id_moneda)
         {
-          precio += element.precio_unitario * element.cantidad;
+          precio += parseInt(element.precio_unitario * element.cantidad);
           
-          sTable.push(new Intl.NumberFormat(['ban', 'id']).format((element.precio_unitario * element.cantidad)));
+          sTable.push(new Intl.NumberFormat(['ban', 'id']).format(parseInt(element.precio_unitario * element.cantidad)));
         }
         else
         {
@@ -518,7 +521,7 @@ function  buildPDFPre(dataCallback, endCallback, oc, requerimientos) {
   let tipoCambio = "";
   requerimientos.forEach(element => {
 
-    
+   // console.log(element); 
 
     let sTable = [];
     switch(element.id_moneda)
@@ -531,9 +534,9 @@ function  buildPDFPre(dataCallback, endCallback, oc, requerimientos) {
 
         if (oc.ocMoneda == element.id_moneda)
         {
-          precio += element.precio_unitario * element.cantidad;
+          precio +=  parseInt( element.precio_unitario * element.cantidad);
           
-          sTable.push(new Intl.NumberFormat(['ban', 'id']).format((element.precio_unitario * element.cantidad)));
+          sTable.push(new Intl.NumberFormat(['ban', 'id']).format(parseInt(element.precio_unitario * element.cantidad)));
         }
         else
         {
@@ -562,11 +565,24 @@ function  buildPDFPre(dataCallback, endCallback, oc, requerimientos) {
         }
         else
         {
-          precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
-          element.montopeso = element.tipo_cambio * element.precio_unitario;
-          sTable.push( new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad * element.tipo_cambio));
-          tipoCambio =element.tipo_cambio;
-          esUF = true;
+          switch(oc.ocMoneda)
+          {
+            case 1:
+            case "1":
+              precio +=  parseInt(element.precio_unitario * element.cantidad * element.tipo_cambio);
+              element.montopeso = parseInt(element.tipo_cambio * element.precio_unitario);
+              sTable.push( new Intl.NumberFormat(['ban', 'id']).format(parseInt(element.precio_unitario * element.cantidad * element.tipo_cambio)));
+              tipoCambio =element.tipo_cambio;
+              esUF = true;
+            break;
+            default:
+              precio += element.precio_unitario * element.cantidad * element.tipo_cambio ;
+              element.montopeso = element.tipo_cambio * element.precio_unitario;
+              sTable.push( new Intl.NumberFormat(['ban', 'id']).format(element.precio_unitario * element.cantidad * element.tipo_cambio));
+              tipoCambio =element.tipo_cambio;
+              esUF = true;
+            break;
+          }
         }
       break;
       case 2:
@@ -685,6 +701,9 @@ doc.table( table, {
       switch(oc.ocMoneda)
       {
         case 1:// Pesos
+        precio = parseInt(precio);
+        valorIVA = parseInt((precio * 1.19) - precio);
+        break;
         case 10: // S/
             valorIVA = Math.round(Number(precio * 1.18 - precio));
         break;
@@ -733,8 +752,13 @@ doc.table( table, {
       switch(oc.ocMoneda)
       {
         case 1:// Pesos
+        precio = parseInt(precio);
+        valorIVA = parseInt((precio * 1.19) - precio);
+        
+        break;
         case 10: // S/
-            valorIVA = Math.round(Number(precio.toString().replace('.','').replace('.','')) * 1.19 - Number(precio.toString().replace('.','').replace('.','')));
+            valorIVA = Math.round(Number(precio.toString().replace('.','').replace('.','')) * 1.18 - 
+                                  Number(precio.toString().replace('.','').replace('.','')));
         break;
 
         case 2:// Dolar

@@ -951,6 +951,7 @@
                                         <th>Nº [hrs]</th>
                                         <th>Costo [$]</th>
                                         <th>Costo [{{moneda}}]</th>
+                                        <th>Fecha Carga</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -963,6 +964,7 @@
                                             <td>{{numhh}}</td>
                                             <td>{{costo}}</td>
                                             <td>{{totPro}}</td>
+                                            <td>{{fecha_carga}}</td>
                                         </tr>
                                     {{/each}}
                                 </tbody>
@@ -1192,7 +1194,7 @@ var dataTable2a = $('#example2a').DataTable({
       });
 
      var dataTable3 =  $('#tablaCexternos').DataTable({
-           "dom": "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'>>" +
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
                 columnDefs: [
@@ -1738,7 +1740,7 @@ $(document).ready(function(){
                  $("#margenPro").css("color","green");
             }
 
-            console.log(margenPro);
+            //console.log(margenPro);
 
             $("#margenPro").html(new Intl.NumberFormat('de-DE').format((parseFloat(margenPro).toFixed(2)).replace(",",".")));
 

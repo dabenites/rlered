@@ -2182,6 +2182,19 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
         } 
     };
 
+
+
+ordenCompra.forEach(element => {
+  
+  if (element.simbolo == '$')
+  {
+    element.montoTotal = parseInt(element.montoTotal)
+
+  }
+
+});
+
+
   if (requerimientos.length > 0)
   {
     if (req.query.a !== undefined)

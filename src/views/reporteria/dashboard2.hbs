@@ -1,0 +1,1301 @@
+<!doctype html>
+<html lang="en">
+<style>
+    .highcharts-figure .chart-container {
+  width: 300px; 
+  height: 200px;
+  float: left;
+}
+
+.highcharts-figure,
+.highcharts-data-table table {
+  margin: 0 auto;
+}
+
+.highcharts-data-table table {
+  font-family: Verdana, sans-serif;
+  border-collapse: collapse;
+  border: 1px solid #ebebeb;
+  margin: 10px auto;
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+.highcharts-data-table caption {
+  padding: 1em 0;
+  font-size: 1.2em;
+  color: #555;
+}
+
+.highcharts-data-table th {
+  font-weight: 600;
+  padding: 0.5em;
+}
+
+.highcharts-data-table td,
+.highcharts-data-table th,
+.highcharts-data-table caption {
+  padding: 0.5em;
+}
+
+.highcharts-data-table thead tr,
+.highcharts-data-table tr:nth-child(even) {
+  background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+  background: #f1f7ff;
+}
+
+@media (max-width: 600px) {
+  .highcharts-figure,
+  .highcharts-data-table table {
+    width: 100%;
+  }
+
+  .highcharts-figure .chart-container {
+    width: 300px;
+    float: none;
+    margin: 0 auto;
+  }
+}
+    .panel-primary {
+                        border-color: #000000;
+                    }
+
+    .panel {
+    margin-bottom: 20px;
+    background-color: #fff;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+    box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+}
+
+    .panel-primary>.panel-heading {
+    color: #fff;
+    background-color: #000000;
+    border-color: #000000;
+    }
+    .panel-heading {
+        padding: 10px 15px;
+        border-bottom: 1px solid transparent;
+        border-top-right-radius: 3px;
+        border-top-left-radius: 3px;
+    }
+
+    .col-form-label {
+    padding-top: calc(0.2rem + 1px);
+    padding-bottom: calc(0.2rem + 1px);
+    margin-bottom: 0;
+    font-size: inherit;
+    line-height: 1.5;
+}
+.close {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+        }
+        .close:not(:disabled):not(.disabled) {
+            cursor: pointer;
+        }
+        button.close {
+            padding: 0;
+            background-color: transparent;
+            border: 0;
+            -webkit-appearance: none;
+        }
+</style>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap-theme.min.css"> -->
+    
+    <!-- <link rel="stylesheet" href="/resources/demos/style.css"> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/solid-gauge.js"> </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
+
+
+</head>
+<body>
+    
+    <div class="col-md-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>{{info.year}}-{{info.code}} : {{info.nombre}}</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <a type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#cargaExtra"> <i class="fa fa-plus" aria-hidden="true"> Costo Adicional</i> </a> 
+
+                            <div class="modal fade" id="cargaExtra" tabindex="3" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title" id="exampleModalLongTitle">Costo Adicional</h6>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <ul class="nav nav-tabs" id="myTab2" role="tablist">
+                                                <li class="nav-item" role="presentation">
+                                                    <a class="nav-link active" id="ingresoCosto-tab" data-toggle="tab" href="#ingresoCosto" role="tab" aria-controls="ingresoCosto" aria-selected="true">Ingresar Costo</a>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <a class="nav-link" id="listadoCosto-tab" data-toggle="tab" href="#listadoCosto" role="tab" aria-controls="listadoCosto" aria-selected="false">Listado Costo</a>
+                                                </li>
+                                            </ul>
+                                            <div class="tab-content" id="myTabContent">
+                                                    <div class="tab-pane fade show active" id="ingresoCosto" role="tabpanel" aria-labelledby="ingresoCosto-tab"> 
+                                                        <br>
+                                                          <button class="btn btn-success btn-sm" onclick="irCobroAdicional({{proyecto.id}});"> Ingresar Costo Adicional </button>
+                                       
+                                                    </div>
+                                                <div class="tab-pane fade" id="listadoCosto" role="tabpanel" aria-labelledby="listadoCosto-tab">
+                                                    <br>
+                                                   
+                                                    <table class="table table-hover" >
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Sub-Estructura</th>
+                                                                <th>Tipo cobro</th>
+                                                                <th>Número</th>
+                                                                <th>Motivo</th>
+                                                                <th>Moneda</th>
+                                                                <th>%</th>
+                                                                <th>Monto</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        
+                                                        {{#each pago_adicional}}
+                                                            <tr>
+                                                                <td>{{substructura}}</td>
+                                                                <td>{{tipoCobro}}</td>
+                                                                <td>{{numero}}</td>
+                                                                <td>{{motivohito}}</td>
+                                                                <td>{{moneda}}</td>
+                                                                <td>{{porcentaje}}</td>
+                                                                <td>{{monto}}</td>
+                                                            </tr>
+                                                            {{/each}}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                         {{#if (if_equal registros.cantidad 1)}}
+                            
+                            <a type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#errores"> <i class="fa fa-close" aria-hidden="true"> Alertas </i> </a>
+
+                            <div class="modal fade" id="errores" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title" id="exampleModalLongTitle">Listado falta de datos</h6>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <table id="listadoErrores" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                <thead>
+                                                    <tr>
+                                                            <th>Tipo</th>
+                                                            <th>Dato</th>
+                                                            <th>Fecha</th>
+                                                            <th>Valor Ocupado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                        {{#each registros.datos}}
+                                                        <tr>
+                                                            <td>{{tipo}} </td>
+                                                            <td>{{dato}} </td>
+                                                            <td>{{fecha}} </td>
+                                                            <td>{{valor_ref}}</td>
+                                                        </tr>   
+                                                         {{/each}}  
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         {{/if}}
+                        <a type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#ingresar"> <i class="fa fa-archive" aria-hidden="true">Avance Proyecto</i> </a> 
+
+                        <div class="modal fade" id="ingresar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h6 class="modal-title" id="exampleModalLongTitle">Ingresar % Avance</h6>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group row">
+                                            <label for="staticEmail" class="col-sm-2 col-form-label">Porcentaje</label>
+                                            <div class="col-sm-10">
+                                                <input type="text"  class="form-control" id="porcentajeAvances" name="porcentajeAvances" value="" onchange="cargaValoresAvance();">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="staticEmail" class="col-sm-2 col-form-label">Comentario</label>
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" id="comentario" name="comentario" rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                        <table id="exampleIndicadoresEconomicosAvance" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Moneda</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                        <input type="text" readonly class="form-control" id="costoAvanceMoneda" name="costoAvanceMoneda" value="">
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costos Estimados Según Avance</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                        <input type="text" readonly class="form-control" id="costoAvanceUF" name="costoAvanceUF" value="">
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Desviacion Costo</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                        <input type="text" readonly class="form-control" id="desvCostoAvanceUF" name="desvCostoAvanceUF" value="">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">% Desviación</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                        <input type="text" readonly class="form-control" id="porcAvanceDesv" name="porcAvanceDesv" value="">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="modal-footer">
+                                            <button class="btn btn-success btn-sm" onclick="cargarAvanceProyecto({{proyecto.id}});"> Ingresar </button>          
+                                    </div>
+                                </div>
+                             </div>
+                        </div>
+                    </ul>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="resultados-tab" data-toggle="tab" href="#resultados" role="tab" aria-controls="resultados" aria-selected="true">Resultados</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="cinterno-tab" data-toggle="tab" href="#cinterno" role="tab" aria-controls="cinterno" aria-selected="false">Costo Interno</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="cexterno-tab" data-toggle="tab" href="#cexterno" role="tab" aria-controls="cexterno" aria-selected="false">Costo Externo</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="facturacion-tab" data-toggle="tab" href="#facturacion" role="tab" aria-controls="facturacion" aria-selected="false">Facturación</a>
+                </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="resultados" role="tabpanel" aria-labelledby="resultados-tab">
+                    &nbsp;
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="panel  panel-primary">
+                                <div class="panel-heading"> <i class="fa fa-university" aria-hidden="true"> Datos Generales </i></div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                                <label class="col-form-label col-md-5 label-align" for="moneda">
+                                                        <b> Moneda</b>
+                                                </label>
+                                                <select class="col-form-label col-md-4" name="idMoneda" id="idMoneda" onchange="ActualizaMonedas(this.value);">
+                                                         <option value="4" {{selectUF}}>UF</option>
+                                                         <option value="2" {{selectUSD}}>USD</option>
+                                                         <option value="10"{{selectSOL}}>SOL</option>
+
+                                                </select>
+                                                <input type="hidden" name="idProyecto" id="idProyecto" value="{{info.id}}">
+                                        </div>
+
+                                        <div class="row">
+                                                <label class="col-form-label col-md-5 label-align" for="Estado">
+                                                    
+                                                        <b> Estado</b>
+                                                    
+                                                </label>
+                                                <label class="col-form-label col-md-7" for="nombre">{{info.estado}}</label>
+                                        </div>
+                                        <div class="row">
+                                                <label class="col-form-label col-md-5 label-align" for="cliente">
+                                                    
+                                                        <b> Cliente</b>
+                                                </label>
+                                                <label class="col-form-label col-md-7 " for="nombre">{{info.cliente}}</label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="tipologia">
+                                                        
+                                                            <b> Tipología</b>
+                                                        </label> 
+                                                    <label class="col-form-label col-md-7 " for="nombre">{{info.tipologia}}</label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="servicio">
+                                                         
+                                                             <b> Servicio</b>
+                                                         
+                                                         </label> 
+                                                    <label class="col-form-label col-md-7 " for="nombre">{{info.servicio}}</label>
+                                        </div>
+                                        <div class="row">
+                                                <label class="col-form-label col-md-5 label-align" for="director">
+                                                    
+                                                        <b> Director</b>
+                                                        </label> 
+                                                <label class="col-form-label col-md-7 " for="nombre">{{info.director}}</label>
+                                            </div>
+                                        <div class="row">
+                                                <label class="col-form-label col-md-5 label-align" for="jdp">
+                                                    
+                                                        <b> Jefe Proyecto</b></label>
+                                                <label class="col-form-label col-md-7 " for="nombre">{{info.jefe}}</label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="tipologia">
+                                                        
+                                                            <b> Superficie m<sup>2</sup></b>
+                                                    </label>
+                                                    <label class="col-form-label col-md-7 " for="superficie" id="superficie">{{info.superficie_pre}}</label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="tarifa">
+                                                        
+                                                            <b> Tarifa [{{info.simbolo}}]/m<sup>2</sup></b>
+                                                            </label>
+                                                    <label class="col-form-label col-md-7 " for="nombre" id="tarifaMetroCuadrado">{{info.valor_metro_cuadrado}}</label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="numplanos">
+                                                        
+                                                            <b> Nº Planos</b>
+                                                            </label>
+                                                    <label class="col-form-label col-md-7 " for="planos" id="planos">{{info.num_plano_estimado}}</label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="totalProyecto">
+                                                            <b>Valor Total Proyecto [{{info.simbolo}}]</b>
+                                                            </label>
+                                                    <label class="col-form-label col-md-7 " for="planos" id="totalProyecto2">
+                                                         {{info.valor_proyecto}}
+                                                    </label>
+                                        </div>
+                                        <div class="row">
+                                                    <label class="col-form-label col-md-5 label-align" for="numplanos">
+                                                            <b>Costo Esperado[{{info.simbolo}}]</b>
+                                                            </label>
+                                                    <label class="col-form-label col-md-7 " for="planos" id="costoTotalEsp">
+                                                        {{info.costo_esperado}}
+                                                    </label>
+                                        </div>
+                                        
+                                        <div class="row">
+                                          <div class="col-3">
+
+                                          </div>
+                                          <div class="col-4">
+                                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#completar">Completar</button>
+                                                <div class="modal fade" id="completar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h6 class="modal-title" id="exampleModalLongTitle">Completar Campos</h6>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                            
+                                                            <table id="completar" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Superficie</td>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                                            <input type="text"  class="form-control" id="uptSuperficie" name="uptSuperficie" value="{{proyecto.superficie_pre}}">
+                                                                            </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Tarifa UF/m2</td>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                                            <input type="text"  class="form-control" id="uptTarifa" name="uptTarifa" value="{{proyecto.valor_metro_cuadrado}}">
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Nº Planos</td>
+                                                                        <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                                            <input type="text"  class="form-control" id="uptPlanos" name="uptPlanos" value="{{proyecto.num_plano_estimado}}">
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                    <button class="btn btn-success btn-sm" onclick="ActualizarProyecto({{proyecto.id}});"> Actualizar </button>          
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                          </div>
+                                          <div class="col-4">
+
+                                          </div>
+                                           
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="panel  panel-primary">
+                                        <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true"> Indicadores de Productividad </i></div>
+                                            <div class="panel-body">
+                                                 <table id="iproductividad" class="table table-striped table-bordered" style="width:100%;padding: 0.1rem 0.1rem;">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style=" text-align: right;"> Costo {{moneda}} / m<sup>2</sup></td>
+                                                            <td id="costo_m2"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right;">Costo {{moneda}} / plano</td>
+                                                            <td  id="costo_plano"></td>
+                                                            <input type="hidden" value="" name="dato0" id="dato0">
+                                                            <input type="hidden" value="" name="dato1" id="dato1">
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right;">Hrs Dib/ plano</td>
+                                                            <td id="hrsDibPlano"></td>
+                                                        </tr>
+                                                         <tr>
+                                                            <td style="text-align: right;">m<sup>2</sup> / plano</td>
+                                                            <td  id="m2_plano"></td>
+                                                         </tr>
+                                                          <tr>
+                                                            <td style="text-align: right;">Nº Hrs Mod.</td>
+                                                            <td>{{modificaciones.horas}}</td>
+                                                          </tr>
+                                                    </tbody>
+                                                 </table>
+                                            </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+              
+                                    <div class="panel  panel-primary">
+                                        <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true"> Indicadores Económicos </i></div>
+                                        <div class="panel-body">
+                                            <table id="ieconomicos" class="table table-striped table-bordered" style="width:100%;padding: 0.1rem 0.1rem;">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="text-align: right;">Valor del Proyecto [{{info.simbolo}}]</td>
+                                                            <td id="valorProyecto">
+                                                                 {{info.valor_proyecto}}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right;">Adicionales Ingresados [{{info.simbolo}}]</td>
+                                                            <td id="adicionalesIngresados">{{info.RocFacturado}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right;">Adicionales Pagados [{{info.simbolo}}]</td>
+                                                            <td id="adicionalesProyecto">{{adicionalesPagadosv2}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: right;">Total Proyecto [{{info.simbolo}}]</td>
+                                                            <td id="totalProyecto">{{totalProyectov2}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                                <td style="text-align: right;">Costo Total [{{info.simbolo}}]</td>
+                                                                <td  id="costoTotalPro"></td>
+                                                        </tr>
+                                                        <tr>
+                                                                <td style="text-align: right;">Margen [{{info.simbolo}}] (Valor Total Proyecto)</td>
+                                                                <td  id="margenPro"></td>
+                                                        </tr>
+                                                    </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="panel  panel-primary">
+                                        <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true"> Indicadores Financieros  </i></div>
+                                            <table id="ifinancieros" class="table table-striped table-bordered" style="width:100%;padding: 0.1rem 0.1rem;">
+                                                    <tbody>
+                                                        <tr>
+                                                           <td style="text-align: right;">Total Fact. [{{info.simbolo}}]</td>
+                                                            <td id="totalFacturado">{{info.facturado}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                           <td style="text-align: right;">Total Pagado [{{info.simbolo}}]</td>
+                                                            <td id="totalPagado">{{info.facturadoPagado}}</td>
+                                                        </tr>
+                                                        
+                                                        
+                                                         <tr>
+                                                            <td style="text-align: right;">Margen [{{info.simbolo}}] (Fact.)</td>
+                                                            <td id="margenProFac"></td>
+                                                         </tr>
+                                                         
+                                                          <tr>
+                                                               
+                                                          </tr>
+                                                    </tbody>
+                                            </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">
+                                 
+                                    <div class="col-6">
+                                        <figure class="highcharts-figure">
+                                        <div id="container-speed" class="chart-container"></div>
+                                        </figure>
+                                    </div>
+                                    <div class="col-6">
+                                        <figure class="highcharts-figure">
+                                        <div id="container-rpm" class="chart-container"></div>
+                                        </figure>
+                                    </div>
+                            </div>
+                            <div class="row">
+                                                            <br>
+                            <table id="example2a" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                        <thead>
+                                            <tr>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;"></th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Interno [hrs]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">C. Int. [{{moneda}}]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Externo [hrs]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">C. Ext. [{{moneda}}]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Totales [hrs]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Totales [{{moneda}}]</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{#each colaboradoresCentroCostoGeneral}}
+                                             <tr>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{nombre}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horas}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                    {{#if (if_equal ../moneda "UF") }}
+                                                        {{horasCosto}}
+                                                    {{/if}}
+                                                    {{#if (if_equal ../moneda "US$") }}
+                                                        {{horasCostoDolar}}
+                                                    {{/if}}
+                                                    {{#if (if_equal ../moneda "S/") }}
+                                                        {{horasCostoSol}}
+                                                    {{/if}}
+                                                    </td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{externo}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{costoUFExterno}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{total}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                                     {{#if (if_equal ../moneda "UF") }}
+                                                        {{costoTotal}}
+                                                    {{/if}}
+                                                    {{#if (if_equal ../moneda "US$") }}
+                                                        {{costoTotalDolar}}
+                                                    {{/if}}
+                                                    {{#if (if_equal ../moneda "S/") }}
+                                                        {{costoTotalSol}}
+                                                    {{/if}}
+
+                                                </td>
+                                            </tr>
+                                             {{/each}}
+                                         </tbody>
+                                    </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                        </div>
+                        <div class="col-6">
+                        </div>
+                    </div>
+
+                     <div class="row">
+                        <div class="col-6">
+                            <div class="panel  panel-primary">
+                                <div class="panel-heading"><i class="fa fa-pie-chart" aria-hidden="true">  Marcas de Avance </i></div>
+                                    <div class="panel-body">
+                                        <table id="exampleIndicadoresAvances" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Moneda</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Fecha</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Avance [%]</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Uso Costo Esperado [%]</th>
+                                                    
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Margen Pagado [%]</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo Estimado s/avance [{{moneda}}]</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo Real [{{moneda}}]</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Desv Costo [{{moneda}}]</th>
+                                                    <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Desviación [%]</th>
+                                                    
+                                                    
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {{#each indicadoresAvancesUser}}
+                                                <tr>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{moneda}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{fecha}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{porcentaje_avance}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{costo_esperado}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{margen_pagado}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{costoEstAvance}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{costo}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{desvCosto}}</td>
+                                                    <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{porcDev}}</td>
+                                                    
+                                                </tr>
+                                                 {{/each}}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="row">
+                                <div class="col-1">
+
+                                </div>
+                                <div class="col-5">
+                                        <div class="chart-container">
+                                                <canvas id="barChartA"></canvas>
+                                            </div>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="chart-container">
+                                                <canvas id="barChartB"></canvas>
+                                            </div>
+                                    </div>
+                                  
+                            </div>
+                        </div>
+                     </div>
+                </div>
+                <div class="tab-pane fade" id="cinterno" role="tabpanel" aria-labelledby="cinterno-tab">
+                   &nbsp;
+                   <div class="row">
+                       <div class="col-5">
+                           <table id="costoInternoUsuario" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Colaborador</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Nº   [hrs]</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Nº Extras [hrs]</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Total    [hrs]</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo [{{info.simbolo}}]</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Part. [hrs] [%]</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Part. [Costo] [%]</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    {{#each costoInterno}}
+                                        <tr>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{nombre}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{numHH}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{numHE}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{total}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{monto}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{part_hrs}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{part_costo}}</td>
+                                        </tr>
+                                    {{/each}}
+                                 </tbody>
+                           </table>
+                           <br>
+                            <table id="cinternoCentro" class="table table-striped table-bordered" style="width:100%;padding-top: 0.3rem;padding-bottom: 0.3rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;"></th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Color</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Interno [hrs]</th>
+                                        <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Costo [{{info.simbolo}}]</th>
+                                    </tr>
+                                </thead>
+                                 <tbody>
+                                    {{#each costoInternoCentro}}
+                                        <tr>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{centroCosto}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{color}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{total}}</td>
+                                            <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{monto}}</td>
+                                        </tr>
+                                    {{/each}}
+                                
+                                 </tbody>
+                           </table>
+                       </div>
+                       <div class="col-7">
+                           <div class="row">
+                                <div class="chart-container">
+                                    <canvas id="myChart"></canvas>
+                                </div>
+                           </div>
+                           <div class="row">
+                               <div class="col-2">
+
+                               </div>
+                               <div class="col-4">
+                                    <div class="chart-container">
+                                        <canvas id="barChart"></canvas>
+                                    </div>
+                               </div>
+                               <div class="col-4">
+                                    <div class="chart-container">
+                                        <canvas id="barChart2"></canvas>
+                                    </div>
+                               </div>
+                                <div class="col-2">
+
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+                </div>
+                <div class="tab-pane fade" id="cexterno" role="tabpanel" aria-labelledby="cexterno-tab">
+                                        &nbsp;
+                    <div class="row">
+                            <div class="col-9">
+                                <table class="table table-striped table-bordered" id="tablaCexternos">
+                                <thead>
+                                    <tr>
+                                        <!-- <th>Origen</th> -->
+                                        <th>Proveedor</th>
+                                        <th>Especialidad</th>
+                                        <th>Orden de Compra</th>
+                                        <th>Descripción</th>
+                                        <th>Nº [hrs]</th>
+                                        <th>Costo [$]</th>
+                                        <th>Costo [{{info.simbolo}}]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each costosExternos}}
+                                        <tr>
+                                            <!-- <td>{{origen}}</td> -->
+                                            <td>{{proveedor}}</td>
+                                            <td>{{centroCosto}}</td>
+                                            <td>{{numOC}}</td>
+                                            <td>{{descripcion}}</td>
+                                            <td>{{numHH}}</td>
+                                            <td>{{montoPeso}}</td>
+                                            <td>{{monto}}</td>
+                                        </tr>
+                                    {{/each}}
+                                </tbody>
+                                </table>
+                                <br>
+                                <table class="table table-striped table-bordered" id="tablaCexternosResumen">
+                                <thead>
+                                    <tr>
+                                        <!-- <th>Origen</th> -->
+                                        <th>Centro Costo</th>
+                                        <th>Color</th>
+                                        <th>HH</th>
+                                        <th>Costo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each CE_Resumen}}
+                                        <tr>
+                                            <td>{{centroCosto}}</td>
+                                            <td>{{color}}</td>
+                                            <td>{{numHH}}</td>
+                                            <td>{{monto}}</td>
+                                        </tr>
+                                    {{/each}}
+                                </tbody>
+                                </table>
+                            </div>
+                            <div class="col-3">
+                                 &nbsp;
+                                     <div class="row">
+                                         <div class="col-11">
+                                            <div class="chart-container">
+                                                <canvas id="barChart3"></canvas>
+                                            </div>
+                                         </div>
+                                     </div>
+                                     <div class="row">
+                                         <div class="col-11">
+                                            <div class="chart-container">
+                                                <canvas id="barChart4"></canvas>
+                                            </div>
+                                         </div>
+                                     </div>
+                            </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="facturacion" role="tabpanel" aria-labelledby="facturacion-tab">
+                    &nbsp;
+                        <table class="table table-striped table-bordered" id="tablaFacturas">
+                                <thead>
+                                    <tr>
+                                        <th>Solicitó</th>
+                                        <th>Moneda Factura</th>
+                                        <th>Monto Factura</th>
+                                        <th>Monto [{{info.simbolo}}]</th>
+                                        <th>Facturación [%]</th>
+                                        <th>Hito</th>
+                                        <th>Nº Documento</th>
+                                        <th>Fecha Factura</th>
+                                        <th>Fecha Depósito</th>
+                                        <th>ROC</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each facturas}}
+                                        <tr>
+                                            <td>{{solicitante}}</td>
+                                            <td>{{simboloBase}}</td>
+                                            <td>{{monto_base}}</td>
+                                            <td>{{monto}}</td>
+                                            <td>{{porc_ppto}}</td>
+                                            <td>{{tipoCobro}}</td>
+                                            <td>{{num_factura}}</td>
+                                            <td>{{fecha_factura}}</td>
+                                            <td>{{fecha_pago}}</td>
+                                            <td>{{roc}}</td>
+                                            <td>{{estado}}</td>
+                                        </tr>
+                                    {{/each}}
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+ 
+ <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+ <script src="../../../template/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+ <script src="../../../template/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script> 
+ <script src="../../../template/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+
+<script>
+    var tablaCICentro =  $('#cinternoCentro').DataTable({
+                                "dom": "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'>>" +
+                                        "<'row'<'col-sm-12'tr>>" +
+                                        "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
+                                        columnDefs: [
+                                                { className: 'text-center', targets: [0,1,2,3] },
+                                            ],
+                                language: {
+                                "decimal": "",
+                                "emptyTable": "No hay información",
+                                "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                                "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                                "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                                "infoPostFix": "",
+                                "thousands": ",",
+                                "lengthMenu": "Mostrar _MENU_ Entradas",
+                                "loadingRecords": "Cargando...",
+                                "processing": "Procesando...",
+                                "search": "Buscar:",
+                                "zeroRecords": "Sin resultados encontrados",
+                                "paginate": {
+                                    "first": "Primero",
+                                    "last": "Ultimo",
+                                    "next": "Siguiente",
+                                    "previous": "Anterior"
+                                }
+                                }
+                            });
+
+    
+    var tablaCIUsuario =  $('#costoInternoUsuario').DataTable({
+           "dom": "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
+                columnDefs: [
+                        { className: 'text-center', targets: [0,1,2,3,4,5] },
+                    ],
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        }
+      });
+
+
+         var tablaResumenCE =  $('#tablaCexternosResumen').DataTable({
+           "dom": "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
+                columnDefs: [
+                        { className: 'text-center', targets: [0,1,2,3] },
+                    ],
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        }
+      });
+
+      
+      var dataTableCostoExterno = $('#tablaCexternos').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        }
+      }); 
+
+     var dataTableFact = $('#tablaFacturas').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        }
+      }); 
+
+    $(document).ready(function(){
+
+      /// GRAFICOS 
+      $.ajax({
+            url: "horas/{{info.id}}",
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            method: "GET",
+            success: function(data) {
+            let fechas = [];
+            let dataset = [];
+            let labelsCentros = [];
+            let labelsColor = [];
+            let coloresCentro = [];
+            let estado = false;
+                for (var i in data) {
+                    fechas.push(data[i].fecha);
+                    for (var i2 in data[i].centro)
+                    {
+                        let containsCentro = !!dataset.find(centro => {return centro.label === data[i].centro[i2].centro});
+                        if (containsCentro === false)
+                        {
+                            dataset.push({
+                                label : data[i].centro[i2].centro,
+                                borderWidth: 1,
+                                data : [],
+                                backgroundColor:data[i].centro[i2].color
+                            });
+                            labelsCentros.push(data[i].centro[i2].centro);
+                            labelsColor.push(data[i].centro[i2].color);
+
+                            
+                        }
+                    }
+                    if(estado === false)
+                            {
+                                coloresCentro = data[i].centroColores;
+                                estado = true;
+                            }
+
+                }
+
+                for (let c in dataset)
+                {
+                    for (var i in data) {
+                        let valor = 0;
+                        for (var i2 in data[i].centro){
+                            let containsCentro = !!data[i].centro.find(centro => {return centro.centro === dataset[c].label});
+
+                            if (containsCentro === true)
+                            {
+                                let centro = data[i].centro.find(centro => {return centro.centro === dataset[c].label});
+                                valor = centro.horas;
+                            }
+                        }
+                        dataset[c].data.push(valor);
+                    }
+                }
+
+      /// COSTO INTERNO 
+      var costo_interno_esfuerzo_mes = $("#myChart");
+       
+       const chart_costo_interno_esfuerzo_mes = new Chart(costo_interno_esfuerzo_mes, {
+                type: 'bar',
+                data: {
+                    labels: fechas,
+                    datasets: dataset
+                },
+                options: {
+                            plugins: {
+                            title: {
+                                display: true,
+                                text: 'Distribución Esfuerzo Por Mes'
+                            },
+                            },
+                            responsive: true,
+                            scales: {
+                            x: {
+                                stacked: true,
+                            },
+                            y: {
+                                stacked: true
+                            }
+                            }
+                        }
+                });
+
+            }
+    });
+
+
+      /// COSTOS EXTERNO 
+      let labelsCentrosExterno = [];
+      let labelsColorExterno = [];
+      let labelsHHExterno = [];
+      let labelsCostoExterno = [];
+
+       tablaResumenCE.rows().iterator('row', function(context, index){
+                var node = $(this.row(index).node());
+                
+                labelsCentrosExterno.push(node.context.children[0].innerText);
+                labelsColorExterno.push(node.context.children[1].innerText);
+                labelsHHExterno.push(node.context.children[2].innerText.replace(".","").replace(".","").replace(".","").replace(".",""));
+                labelsCostoExterno.push(node.context.children[3].innerText.replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
+       });
+
+      var costo_externo_horas = $("#barChart3");
+      var costo_externo_costos = $("#barChart4");
+      
+     var dataCostoExternoHH = {
+                        labels: labelsCentrosExterno,
+                        datasets: [
+                            {
+                                fill: true,
+                                backgroundColor: labelsColorExterno,
+                                data: labelsHHExterno
+                            }
+                        ]
+                    };
+
+    var dataCostoExternoCosto = {
+                        labels: labelsCentrosExterno,
+                        datasets: [
+                            {
+                                fill: true,
+                                backgroundColor: labelsColorExterno,
+                                data: labelsCostoExterno
+                            }
+                        ]
+                    };
+
+    
+      const chart_costo_externo_horas = new Chart(costo_externo_horas, {
+                                                    type: 'pie',
+                                                    data: dataCostoExternoHH,
+                                                    options: {
+                                                                plugins: {
+                                                                title: {
+                                                                    display: true,
+                                                                    text: 'C. Externo Distribución HORAS [hrs]'
+                                                                },
+                                                                },
+                                                                responsive: true
+                                                            }
+                                                    });
+
+    const chart_costo_externo_costos = new Chart(costo_externo_costos, {
+                    type: 'pie',
+                    data: dataCostoExternoCosto,
+                    options: {
+                                plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'C. Externo Distribución COSTOS [{{moneda}}]'
+                                },
+                                },
+                                responsive: true
+                            }
+                    });
+
+    });
+
+    var costo_interno_horas     = $("#barChart");
+    var costo_interno_costos    = $("#barChart2");
+
+    let labelsCI_Centro = [];
+    let labelsCI_Color  = [];
+    let labelsCI_HH     = [];
+    let labelsCI_Costo  = [];
+    
+    tablaCICentro.rows().iterator('row', function(context, index){
+                    var nodeCI = $(this.row(index).node()); 
+                    if (nodeCI[0].children[0].innerText != "TOTALES")
+                    {
+                        labelsCI_Centro.push(nodeCI[0].children[0].innerText);
+                        labelsCI_Color.push(nodeCI[0].children[1].innerText);
+                        labelsCI_HH.push(parseInt( nodeCI[0].children[2].innerText.replace(".","").replace(".","").replace(".","").replace(".","")));
+                        labelsCI_Costo.push(parseInt(nodeCI[0].children[3].innerText.replace(".","").replace(".","").replace(".","").replace(".","").replace(",",".")));
+                    }
+                    
+                });
+
+    var dataCostoInternoHoras = {
+                                    labels: labelsCI_Centro,
+                                    datasets: [
+                                        {
+                                            fill: true,
+                                            backgroundColor: labelsCI_Color,
+                                            data: labelsCI_HH
+                                        }
+                                    ]
+                                };
+
+    var dataCostoInternoCosto = {
+                        labels: labelsCI_Centro,
+                        datasets: [
+                            {
+                                fill: true,
+                                backgroundColor: labelsCI_Color,
+                                data: labelsCI_Costo
+                            }
+                        ]
+                    };
+
+
+    const chart_costo_interno_horas = new Chart(costo_interno_horas, {
+                                    type: 'pie',
+                                    data: dataCostoInternoHoras,
+                                    options: {
+                                                plugins: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'C.Interno Distribución TIEMPO [hrs]'
+                                                },
+                                                },
+                                                responsive: true
+                                            }
+                                    });
+
+    const chart_costo_interno_costos = new Chart(costo_interno_costos, {
+                type: 'pie',
+                data: dataCostoInternoCosto,
+                options: {
+                            plugins: {
+                            title: {
+                                display: true,
+                                text: 'C. Interno Distribución COSTOS [{{moneda}}]'
+                            },
+                            },
+                            responsive: true
+                        }
+                });
+
+</script>
+
+</html>

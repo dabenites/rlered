@@ -1,0 +1,236 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<div class="col-md-12">
+    <div class="col-md-7">
+        <div class="row">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Periodo a buscar <small>Fecha</small></h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <form name="buscador" action="/mantenedores/vmonedas" method="GET">
+                                <div class="col-md-1">Moneda</div>
+                                <div class="col-md-2">
+                                    <select class="form-control" name="moneda">
+                                        {{#each monedas}}
+                                            {{#if (if_equal id_moneda ../actual.moneda) }}
+                                                <option value="{{id_moneda}}" selected>{{simbolo}}</option>
+                                            {{else}}
+                                                <option value="{{id_moneda}}">{{simbolo}}</option>
+                                            {{/if}}
+                                        {{/each}}
+                                    </select>
+                                </div>
+                                <div class="col-md-1">Año</div>
+                                <div class="col-md-2">
+                                    <select class="form-control" name="annio">
+                                        {{#each annios}}
+                                            {{#if (if_equal annio ../actual.annio) }}
+                                                <option value="{{annio}}" selected>{{annio}}</option>
+                                            {{else}}
+                                                <option value="{{annio}}">{{annio}}</option>
+                                            {{/if}}
+                                        {{/each}}
+                                    </select>
+                                </div>
+                                <div class="col-md-1">Mes</div>
+                                <div class="col-md-2">
+                                    <select class="form-control" name="mes">
+                                        {{#each meses}}
+                                            {{#if (if_equal id ../actual.mes) }}
+                                                <option value="{{id}}" selected>{{nombre}} </option>
+                                            {{else}}
+                                                <option value="{{id}}">{{nombre}}</option>
+                                            {{/if}}
+                                        {{/each}}
+                                    </select>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="submit" onclick=""  class="btn btn-success btn-block">
+                                                    Revisar
+                                                </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-3">
+                            
+                                <div class="col-md-6">
+                                    <form name="buscador" action="/mantenedores/descargarmonedas" method="GET">
+                                        <button type="submit" onclick=""  class="btn btn-secondary btn-block">
+                                                            Descargar Excel
+                                        </button>    
+                                    </form>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="submit" onclick=""  class="btn btn-success btn-block" data-toggle="modal" data-target=".bs-example-modal-sm">
+                                                            Subir Excel
+                                    </button> 
+                                    <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                                        <div class="modal-content">
+
+                                                            <div class="modal-header">
+                                                            <h4 class="modal-title" id="myModalLabel2">Cargar Archivo</h4>
+                                                            <form action="/mantenedores/fileupload" method="post" enctype="multipart/form-data">
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                                                                </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    
+                                                                        <input type="file" name="filetoupload">
+                                                                        <!-- <input type="submit"> -->
+                                                                    
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                <button type="submit" class="btn btn-primary">Enviar</button>
+                                                                </div>
+                                                            </form>
+                                                            
+
+                                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="cargaValorMes">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2> Fecha Búsqueda : <small>{{fechaBusqueda}}</small></h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-hover" id="tablaCategoria">
+                                <thead>
+                                    <tr>
+                                        <th>Moneda</th>
+                                        <th>Fecha</th>
+                                        <th>Valor</th>
+                                        <th>Opciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                        {{#each valoresmonedas}}
+                                        <tr style="padding-top: 0.15rem;padding-bottom: 0.15rem;">
+                                            <td style="padding-top: 0.15rem;padding-bottom: 0.15rem;">{{simbolo}}</td>
+                                            <td style="padding-top: 0.15rem;padding-bottom: 0.15rem;">{{fecha}}</td>
+                                            <td style="padding-top: 0.15rem;padding-bottom: 0.15rem;">
+                                                <input style="padding-top: 0.15rem;padding-bottom: 0.15rem;" type="text" id="monedaValor_{{moneda}}_{{fecha}}" class="form-control" name="monedaValor_{{moneda}}_{{fecha}}"  value="{{valor}}"/>
+                                            </td>
+                                            <td style="padding-top: 0.15rem;padding-bottom: 0.15rem;">
+                                                <button style="padding-top: 0.15rem;padding-bottom: 0.15rem;" type="buttom" onclick="cargaValorMoneda({{moneda}},'{{fecha}}')"  class="btn btn-success btn-block">
+                                                        Actualizar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <table class="table table-hover" id="tablaInfoErrores">
+                                <thead>
+                                    <tr>
+                                        <th>Moneda</th>
+                                        <th>Simbolo</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                        {{#each errores}}
+                                        <tr style="padding-top: 0.15rem;padding-bottom: 0.15rem;">
+                                            <td style="padding-top: 0.15rem;padding-bottom: 0.15rem;">{{moneda}}</td>
+                                            <td style="padding-top: 0.15rem;padding-bottom: 0.15rem;">{{simbolo}}</td>
+                                            <td style="padding-top: 0.15rem;padding-bottom: 0.15rem;">{{fecha}}</td>
+                                        </tr>
+                                        {{/each}}
+                                </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+<script src="../../../template/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="../../../template/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script> 
+<script src="../../../template/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+      $('#tablaInfoErrores').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        }
+      });
+
+    function cargaValorMoneda(moneda , fecha)
+    {
+        // cargar valor en la base de datos. 
+        //alert(fecha);
+        if (moneda !== "" && fecha !== "")
+            {
+                  
+                let valor       = parseFloat($("#monedaValor_"+moneda+"_"+fecha).val());
+                let infomacion = {moneda,
+                                      fecha,
+                                      valor};
+        
+                 $.ajax({
+				async: false,
+				type : 'POST', 
+				url	 : "/mantenedores/vmonedas_dato", 
+				data : infomacion,
+					success : function (resultado) 
+						{ 
+                            toastr.success('Valor de moneda Actualizados.', 'Información', {
+                                    "progressBar": true
+                                });
+                            location.reload();
+                            // ---> mejorar este proceso con la carga automatica del Div
+                            // 
+						} 
+				});
+            }
+            else
+            {
+                 toastr.warning('warning', 'No se pueden cargar la informacion faltan datos', {
+                        "progressBar": true
+                            });
+            }
+    }
+</script>

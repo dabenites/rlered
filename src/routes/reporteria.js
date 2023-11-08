@@ -16,7 +16,8 @@ const { tpu_v1 } = require('googleapis');
 router.get('/proyectos',isLoggedIn,  async (req, res) => {
     
         try {
-                
+                //new Boolean(objeto == null)
+                //Objects.isNull(objeto)
                 // const paises = await pool.query('SELECT * FROM pais as t1 ORDER BY t1.pais ASC');
                 // res.render('reporteria/buscarProyecto', {paises,  req , layout: 'template'});
                 
@@ -176,6 +177,476 @@ function getSimboloByIdMoneda( idMoneda)
 
         return moneda;
 }
+// Costos externos Planner esta funcionalidad duro 6 meses.
+// tiene que estar en estado2
+
+
+router.get('/proyectos2/:id',isLoggedIn,  async (req, res) => {
+        try {
+                let { id } = req.params; // ID PROYECTO 
+
+                let informacionProyecto = await pool.query(" SELECT t1.id_tipo_moneda as id_moneda ," +
+                                                           " t1.year, t1.code, t1.nombre ,"+
+                                                           " t1.superficie_pre, t1.valor_metro_cuadrado, t1.valor_proyecto,"+
+                                                           " t1.num_plano_estimado, t1d.porcentaje_costo,"+
+                                                           " t1.id,t1a.simbolo,t1b.descripcion AS estado, "+
+                                                           " t1c.name AS cliente, t1d.descripcion AS tipologia ,"+
+                                                           " t1e.descripcion AS servicio, t1f.Nombre AS director,t1g.Nombre AS jefe, t1.id"+
+                                                           " FROM pro_proyectos as t1 "+
+                                                           " LEFT JOIN moneda_tipo AS t1a ON t1.id_tipo_moneda = t1a.id_moneda " +
+                                                           " LEFT JOIN proyecto_estado AS t1b ON t1.id_estado = t1b.id " +
+                                                           " LEFT JOIN contacto AS t1c ON t1.id_cliente = t1c.id  "+
+                                                           " LEFT JOIN proyecto_tipo AS t1d ON t1.id_tipo_proyecto = t1d.id "+
+                                                           " LEFT JOIN proyecto_servicio AS t1e ON t1.id_tipo_servicio = t1e.id "+
+                                                           " LEFT JOIN sys_usuario AS t1f ON t1.id_director = t1f.idUsuario"+
+                                                           " LEFT JOIN sys_usuario AS t1g ON t1.id_jefe = t1g.idUsuario"+
+                                                           " WHERE t1.id = ? ", [id]);
+                
+
+                // informacion del proyecto 
+                
+                let info = informacionProyecto[0];
+                
+                info.costo_esperado = info.valor_proyecto * ( info.porcentaje_costo / 100);
+
+                if (info.simbolo === '' || info.simbolo === null || info.simbolo === undefined)
+                {
+                        info.simbolo ="UF";
+                        info.id_moneda = 4;
+                }
+
+                //  Consultas para costo Exteno 
+                //#region   COSTOS EXTERNOS     
+                let CostoExternoPlanner = await pool.query(" SELECT " + 
+                                                        " 'pro_costo_externo_equivalencias' AS origen," +
+                                                        " t2.nombre AS proveedor," +
+                                                        " t3.centroCosto AS centroCosto," + 
+                                                        " t3.color as colorCentro,"+
+                                                        " t1.numOC as numOC,"+
+                                                        " t1.descripcion as descripcion,"+
+                                                        " t1.numHH as numHH,"+
+                                                        " t1.monto_clp,"+
+                                                        " t1.monto_uf,"+
+                                                        " t1.monto_usd,"+
+                                                        " t1.monto_sol " +
+                                                        " FROM " +
+                                                        " pro_costo_externo_equivalencias as t1 " +
+                                                        " LEFT JOIN prov_externo AS t2 ON t1.id_prov_externo = t2.id "+
+                                                        " LEFT JOIN centro_costo AS t3 ON t1.id_centro_costo = t3.id " +
+                                                        " WHERE t1.id_proyecto = ? AND t1.id_estado IN (1,2) ", [id]); 
+
+                let costoExternoNetoffice = await pool.query( " SELECT "+
+                                        " 'proyecto_costo_externo_equivalencias' AS origen," +
+                                        " t2.nombre AS proveedor,"+
+                                        " t1.cc_a_pagar AS centroCosto,"+
+                                        " t3.color AS colorCentro,"+
+                                        " t1.num_occ AS numOC,"+
+                                        " t1.def_trabajo AS descripcion,"+
+                                        " t1.num_hh AS numHH,"+
+                                        " t1.monto_clp,"+
+                                        " t1.monto_uf,"+
+                                        " t1.monto_usd,"+
+                                        " t1.monto_sol " +
+                                " FROM  " +     
+                                        " proyecto_costo_externo_equivalencias as t1 "+
+                                        " LEFT JOIN prov_externo AS t2 ON t1.id_prob_externo = t2.id "+
+                                        " LEFT JOIN centro_costo AS t3 ON t1.cc_a_pagar = t3.centroCosto " +
+                                " WHERE " +
+                                        "  t1.id_proyecto = ?" , [id]);
+
+                        let costoExternoOC =  await pool.query( " SELECT " +
+                                        " 'orden_compra_equivalencias' AS origen," +
+                                        " if (t2.id_tipo = 1, " +
+                                        " ( SELECT t1a.Nombre FROM sys_usuario AS t1a WHERE t2.id_razonsocialpro = t1a.idUsuario), "+
+                                        " if(t2.id_tipo = 2, "+
+                                        " ( SELECT t1b.nombre FROM prov_externo AS t1b WHERE t2.id_razonsocialpro = t1b.id), "+
+                                        " if(t2.id_tipo = 3,( SELECT t1c.razon_social FROM orden_compra_proveedor AS t1c WHERE t2.id_razonsocialpro = t1c.id),0))) AS proveedor, "+
+                                        " t3.centroCosto AS centroCosto, "+
+                                        " t3.color as colorCentro,"+
+                                        " t1.numOC AS numOC,"+
+                                        " t1.obs_req AS descripcion,"+
+                                        " t1.numHH AS numHH,"+
+                                        " t1.monto_uf,"+
+                                        " t1.monto_cpl,"+
+                                        " t1.monto_usd, "+
+                                        " t1.monto_sol " +
+                                " FROM "+
+                                        " orden_compra_equivalencias AS t1 "+
+                                " LEFT JOIN orden_compra AS t2 ON t1.odid = t2.id "+
+                                " LEFT JOIN centro_costo AS t3 ON t2.id_centro_costo = t3.id " +
+                                " WHERE  "+
+                                        " t1.id_proyecto = ? ", [id]);
+
+                        let informacion=[];
+                        if (costoExternoOC.length > 0){informacion.push(costoExternoOC);}
+                        if (costoExternoNetoffice.length > 0){informacion.push(costoExternoNetoffice);}
+                        if (CostoExternoPlanner.length > 0){informacion.push(CostoExternoPlanner);}
+
+                        let costosExternos = [];
+                        let CE_Resumen = [];
+                        informacion.forEach(infoCE => {
+                        infoCE.forEach(infoDetalle => {
+
+                        let montoPeso= new Intl.NumberFormat('de-DE').format(parseFloat(infoDetalle.monto_clp).toFixed(0));
+                        let monto = 0;
+                        switch(info.id_moneda)
+                        {
+                                        case 1:
+                                        monto= new Intl.NumberFormat('de-DE').format(parseFloat(infoDetalle.monto_clp).toFixed(0));
+                                        break;
+                                        case 2:
+                                        monto = new Intl.NumberFormat('de-DE').format(parseFloat(infoDetalle.monto_dolar).toFixed(2)); 
+                                        break;
+                                        case 4:
+                                        monto = new Intl.NumberFormat('de-DE').format(parseFloat(infoDetalle.monto_uf).toFixed(2)); 
+                                        break;
+                                        case 10:
+                                        monto = new Intl.NumberFormat('de-DE').format(parseFloat(infoDetalle.monto_sol).toFixed(2)); 
+                                        break;
+                        }
+                        costosExternos.push({
+                                        origen : infoDetalle.origen,
+                                        proveedor: infoDetalle.proveedor,
+                                        centroCosto: infoDetalle.centroCosto,
+                                        numOC: infoDetalle.numOC,
+                                        descripcion: infoDetalle.descripcion,
+                                        numHH: infoDetalle.numHH,
+                                        montoPeso: montoPeso,
+                                        monto: monto 
+                        });
+
+                let existeValor = CE_Resumen.find(c => {return c.centroCosto === infoDetalle.centroCosto });
+                
+                if (existeValor === undefined)
+                {
+                CE_Resumen.push({
+                centroCosto : infoDetalle.centroCosto,
+                color : infoDetalle.colorCentro,
+                numHH : infoDetalle.numHH,
+                monto : sumaFormateada(monto,0),
+                montoPeso : 0
+                });   
+                }
+                else
+                {
+                existeValor.numHH = sumaFormateada(existeValor.numHH ,infoDetalle.numHH);  
+                existeValor.monto = sumaFormateada(existeValor.monto ,monto);
+                existeValor.montoPeso = 0;
+                }
+
+
+                });
+                });
+                //#endregion
+
+                // buscar informacion de las facturas. 
+                //#region FACTURAS  
+                const facturas = await pool.query("SELECT  " +
+                                                        " t2.Nombre AS solicitante, "  +
+                                                        " t1.monto_base AS monto_base, "  +
+                                                        " t3.simbolo AS simboloBase, " +
+                                                        " t1.monto_clp AS monto_clp, " +
+                                                        " t1.monto_sol AS monto_sol, " +
+                                                        " t1.monto_dolar AS monto_dolar, " +
+                                                        " t1.monto_uf AS monto_uf, " +
+                                                        " t4.porc_ppto, " +
+                                                        " t4.fecha_cobro, " +
+                                                        " t4.fecha_factura, " +
+                                                        " t4.fecha_pago, " +
+                                                        " t4.num_factura, " +
+                                                        " t1.id_estado,"+
+                                                        " t1.esroc,"+
+                                                        " if (t1.esroc = 1,'SI','NO') AS roc, " +
+                                                        " t5.descripcion AS tipoCobro, " +
+                                                        " t6.descripcion AS estado " +
+                                                 " FROM "+
+                                                        " fact_facturas_equivalencias AS t1 " +
+                                                        " LEFT JOIN sys_usuario AS t2 ON t1.id_solicitante = t2.idUsuario " +
+                                                        " LEFT JOIN moneda_tipo AS t3 ON t1.id_moneda_base = t3.id_moneda " +
+                                                        " LEFT JOIN fact_facturas AS t4 ON t1.id_factura = t4.id "+
+                                                        " LEFT JOIN fact_tipo_cobro AS t5 ON t4.id_tipo_cobro = t5.id " +
+                                                        " LEFT JOIN fact_estados AS t6 ON t1.id_estado = t6.id " +
+                                                 " WHERE " +
+                                                        " t1.id_proyecto = ? " +
+                                                " AND  " +
+                                                        " t1.id_estado IN (0,1,2,3)", [id]);
+
+               let facturadoCLP = 0;
+               let facturadoUSD = 0;
+               let facturadoUF  = 0;
+               let facturadoSOL = 0;
+
+               let facturadoPagadoCLP = 0;
+               let facturadoPagadoUSD = 0;
+               let facturadoPagadoUF  = 0;
+               let facturadoPagadoSOL = 0;
+
+               let facturadoROCCLP = 0;
+               let facturadoROCUSD = 0;
+               let facturadoROCUF  = 0;
+               let facturadoROCSOL = 0;
+
+
+               facturas.forEach(f => {
+                                switch(info.id_moneda)
+                                        {
+                                                case 1:
+                                                        f.monto = new Intl.NumberFormat('de-DE').format(parseFloat(f.monto_clp).toFixed(0));
+                                                        facturadoCLP = sumaFormateada(facturadoCLP,f.monto);
+                                                break;
+                                                case 2:
+                                                        f.monto = new Intl.NumberFormat('de-DE').format(parseFloat(f.monto_dolar).toFixed(2)); 
+                                                        facturadoUSD = sumaFormateada(facturadoUSD,f.monto);
+                                                break;
+                                                case 4:
+                                                        f.monto = new Intl.NumberFormat('de-DE').format(parseFloat(f.monto_uf).toFixed(2)); 
+                                                        facturadoUF = sumaFormateada(facturadoUF,f.monto);
+                                                break;
+                                                case 10:
+                                                        f.monto = new Intl.NumberFormat('de-DE').format(parseFloat(f.monto_sol).toFixed(2)); 
+                                                        facturadoSOL = sumaFormateada(facturadoSOL,f.monto);
+                                                break;
+                                        }
+                                if (f.id_estado === 3)                               
+                                {
+                                        switch(info.id_moneda)
+                                        {
+                                                case 1:
+                                                        facturadoPagadoCLP = sumaFormateada(facturadoPagadoCLP,f.monto);
+                                                break;
+                                                case 2: 
+                                                        facturadoPagadoUSD = sumaFormateada(facturadoPagadoUSD,f.monto);
+                                                break;
+                                                case 4:
+                                                        facturadoPagadoUF = sumaFormateada(facturadoPagadoUF,f.monto);
+                                                break;
+                                                case 10:
+                                                        facturadoPagadoSOL = sumaFormateada(facturadoPagadoSOL,f.monto);
+                                                break;
+                                        }
+                                }
+
+                                if (f.esroc === 1)                               
+                                {
+                                        switch(info.id_moneda)
+                                        {
+                                                case 1:
+                                                        facturadoROCCLP = sumaFormateada(facturadoROCCLP,f.monto);
+                                                break;
+                                                case 2: 
+                                                        facturadoROCUSD = sumaFormateada(facturadoROCUSD,f.monto);
+                                                break;
+                                                case 4:
+                                                        facturadoROCUF = sumaFormateada(facturadoROCUF,f.monto);
+                                                break;
+                                                case 10:
+                                                        facturadoROCSOL = sumaFormateada(facturadoROCSOL,f.monto);
+                                                break;
+                                        }
+                                }
+
+
+
+                                });
+
+                switch(info.id_moneda)
+                                {
+                                        case 1:
+                                                info.facturado =   facturadoCLP; 
+                                                info.facturadoPagado =   facturadoPagadoCLP;
+                                                info.RocFacturado =   facturadoROCCLP;
+                                        break;
+                                        case 2:
+                                                info.facturado =   facturadoUSD; 
+                                                info.facturadoPagado =   facturadoPagadoUSD;
+                                                info.RocFacturado =   facturadoROCUSD;
+                                        break;
+                                        case 4:
+                                                info.facturado =   facturadoUF;
+                                                info.facturadoPagado =   facturadoPagadoUF;
+                                                info.RocFacturado =   facturadoROCUF;
+                                        break;
+                                        case 10:
+                                                info.facturado =   facturadoSOL;
+                                                info.facturadoPagado =   facturadoPagadoSOL;
+                                                info.RocFacturado =   facturadoROCSOL;
+                                        break;      
+                                }
+                //#endregion
+
+                // COSTOS INTERNOS 
+                //#region 
+                const costoInterno_Anterior = await pool.query("        SELECT " +
+                                                                        " t2.idUsuario AS idUsuario,"+
+                                                                        " t2.Nombre AS nombre, "+
+                                                                        " t4.centroCosto, "+
+	                                                                " t4.color, "+
+                                                                        " SUM(t1.hh) AS numHH, " +
+                                                                        " SUM(t1.he) AS numHE, "+
+                                                                        " SUM(t1.hh + t1.he) AS total, "+
+                                                                        " SUM(t1.costo_clp) AS costo_clp, "+
+                                                                        " SUM(t1.costo_uf) AS costo_uf, "+
+                                                                        " SUM(t1.costo_usd) AS costo_usd, "+
+                                                                        " SUM(t1.costo_sol) AS costo_sol "+
+                                                                " FROM  " +
+                                                                        "        bitacora_equivalencia AS t1"+
+                                                                        "        LEFT JOIN sys_usuario AS t2 ON t1.id_user = t2.idUsuario"+
+                                                                        "        LEFT JOIN categorias AS t3 ON t2.idCategoria = t3.id " +
+		                                                        "        LEFT JOIN centro_costo AS t4 ON t3.idCentroCosto = t4.id " +
+                                                                " WHERE  "+
+                                                                        "        t1.id_proyecto = ? "+
+                                                                " GROUP BY t1.id_user " , [id]);
+
+                const costoInterno_Nuevo = await pool.query(" SELECT " +
+                                                                " t2.idUsuario AS idUsuario,"+
+                                                                " t2.Nombre AS nombre,"+
+                                                                " t4.centroCosto, "+
+                                                                " t4.color, "+
+                                                                " SUM(t1.hh) AS numHH, "+
+                                                                " 0 AS numHE, "+
+                                                                " SUM(t1.hh + 0) AS total, "+
+                                                                " SUM(t1.costo_clp) AS costo_clp, "+
+                                                                " SUM(t1.costo_uf) AS costo_uf, "+
+                                                                " SUM(t1.costo_usd) AS costo_usd,"+
+                                                                " SUM(t1.costo_sol) AS costo_sol"+
+                                                        " FROM  "+
+                                                                "        bita_horas_equivalencia AS t1"+
+                                                                "        LEFT JOIN sys_usuario AS t2 ON t1.id_user = t2.idUsuario"+
+                                                                "        LEFT JOIN categorias AS t3 ON t2.idCategoria = t3.id"+
+                                                                "        LEFT JOIN centro_costo AS t4 ON t3.idCentroCosto = t4.id"+
+                                                        " WHERE "+
+                                                                "        t1.id_proyecto = ? "+
+                                                        " GROUP BY t1.id_user ",[id]);
+
+                let info_Bitacora =[];
+                if (costoInterno_Anterior.length > 0){info_Bitacora.push(costoInterno_Anterior);}
+                if (costoInterno_Nuevo.length > 0){info_Bitacora.push(costoInterno_Nuevo);}
+
+                let costoInterno = [];
+                let costoInternoCentro = [];
+                info_Bitacora.forEach(infoBita => {
+                        infoBita.forEach(bita => {
+                                let monto = 0;
+                                switch(info.id_moneda)
+                                {
+                                                case 1:
+                                                monto= new Intl.NumberFormat('de-DE').format(parseFloat(bita.costo_clp).toFixed(0));
+                                                break;
+                                                case 2:
+                                                monto = new Intl.NumberFormat('de-DE').format(parseFloat(bita.costo_usd).toFixed(2)); 
+                                                break;
+                                                case 4:
+                                                monto = new Intl.NumberFormat('de-DE').format(parseFloat(bita.costo_uf).toFixed(2)); 
+                                                break;
+                                                case 10:
+                                                monto = new Intl.NumberFormat('de-DE').format(parseFloat(bita.costo_sol).toFixed(2)); 
+                                                break;
+                                }
+
+                                let existeValor = costoInterno.find(ci => {return ci.idUsuario === bita.idUsuario });
+                                let existeValorCentro = costoInternoCentro.find(ci => {return ci.centroCosto === bita.centroCosto });
+                                
+
+                                if (existeValorCentro === undefined)
+                                {
+                                        costoInternoCentro.push({
+                                                centroCosto : bita.centroCosto,
+                                                color: bita.color,
+                                                total : bita.total,
+                                                monto: sumaFormateada( monto,0) 
+                                        });
+                                }
+                                else{
+                                        
+                                        existeValorCentro.total = existeValorCentro.total + bita.total;
+                                        
+                                        existeValorCentro.monto = sumaFormateada(existeValorCentro.monto , monto);
+                                }
+
+                                
+                                if (existeValor === undefined)
+                                { 
+                                        costoInterno.push({
+                                                idUsuario : bita.idUsuario,
+                                                nombre : bita.nombre,
+                                                centroCosto: bita.centroCosto,
+                                                color: bita.color,
+                                                numHH: bita.numHH,
+                                                numHE: bita.numHE,
+                                                total: bita.total,
+                                                monto: monto,
+                                                part_hrs : 0,
+                                                part_costo : 0 
+                                                 }); 
+                                }
+                                else
+                                {
+                                        existeValor.numHH = existeValor.numHH + bita.numHH;   
+                                        existeValor.numHE = existeValor.numHE + bita.numHE;
+                                        existeValor.total = existeValor.total + bita.total;
+                                }
+
+                                 
+                        });
+                });
+
+                let costinInternoTotalHrs = 0;
+                let costinInternoTotalCosto = 0;
+
+                costoInternoCentro.forEach(element => {
+                        costinInternoTotalHrs = costinInternoTotalHrs + element.total;
+                        costinInternoTotalCosto = sumaFormateada(costinInternoTotalCosto, element.monto);
+                        element.total = Intl.NumberFormat('de-DE').format(element.total.toFixed(2)); 
+
+                        //element.part_hrs =  Intl.NumberFormat('de-DE').format((costinInternoTotalHrs / element.total).toFixed(2));
+                });
+
+                //#endregion
+
+                costoInterno.forEach(element => {
+                        
+                        element.part_hrs = Intl.NumberFormat('de-DE').format( parseFloat( ( element.total /costinInternoTotalHrs)  * 100).toFixed(2)); 
+                        element.part_costo = divFormateada(element.monto,costinInternoTotalCosto,100) ; 
+                });
+
+                costoInternoCentro.push({
+                        centroCosto : "TOTALES",
+                        color: "",
+                        total :Intl.NumberFormat('de-DE').format( parseFloat(costinInternoTotalHrs).toFixed(2)), 
+                        monto: costinInternoTotalCosto
+                });
+
+               
+
+
+                const isEqualHelperHandlerbar = function(a, b, opts) {
+                        if (a == b) {
+                            return true
+                        } else { 
+                            return false
+                        } 
+                    };
+                
+                 
+                    console.log(info);
+
+                res.render('reporteria/dashboard2', {costoInternoCentro, costoInterno, CE_Resumen, costosExternos, facturas, info, req , layout: 'template', helpers : {
+                                if_equal : isEqualHelperHandlerbar
+                            }});
+
+        } catch (error) {
+           
+                mensajeria.MensajerErrores("\n\n Archivo : reporteria.js \n Error en el directorio: /proyectos/:id \n" + error + "\n Generado por : " + req.user.login);
+                                res.redirect(   url.format({
+                                        pathname:'/dashboard',
+                                                query: {
+                                                "a": 1
+                                                }
+                                        })); 
+
+        }
+
+});
 
 router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
 
@@ -1620,6 +2091,93 @@ function search(user){
         return Object.keys(this).every((key) => user[key] === this[key]);
       }
       
+
+router.get('/proyectos2/horas/:id',isLoggedIn,  async (req, res) => {
+
+
+        try {
+                const { id } = req.params;
+
+                let sqlInterno = " SELECT " +
+                "        t1.fecha AS fecha,"+
+                "        SUM(t1.hh + t1.he) AS t,"+
+                "        t4.centroCosto AS centroCosto,"+
+                "        t4.color AS color "+
+                "        FROM " +
+                " bitacora_equivalencia AS t1" +
+                " LEFT JOIN sys_usuario AS t2 ON t1.id_user = t2.idUsuario "+
+                " LEFT JOIN sys_categoria AS t3 ON t2.idCategoria = t3.id "+
+                " LEFT JOIN centro_costo AS t4 ON t3.idCentroCosto = t4.id " +
+                " WHERE  " +
+                        "  t1.id_proyecto =? "+
+                " GROUP BY t1.fecha ,centroCosto " +
+                " UNION "+
+                " SELECT  " +
+                        " t1.fecha AS fecha,"+
+                        " t1.hh AS  t,"+
+                        " t4.centroCosto AS centroCosto,"+
+                        " t4.color AS color " +
+                " FROM " +
+                               " bita_horas_equivalencia AS t1"+
+                                " LEFT JOIN sys_usuario AS t2 ON t1.id_user = t2.idUsuario" +
+                                " LEFT JOIN sys_categoria AS t3 ON t2.idCategoria = t3.id "+
+                                " LEFT JOIN centro_costo AS t4 ON t3.idCentroCosto = t4.id " +
+                " WHERE "+
+                                " t1.id_proyecto = ? "+
+                " GROUP BY t1.fecha,centroCosto ";
+
+
+                let  detalleInterno = await pool.query(sqlInterno,[id,id]);
+
+                let cinternos= [];
+
+                const centrosCosto = await pool.query("  SELECT * FROM centro_costo");
+
+                detalleInterno.forEach(element => {
+                        const containsFecha = !!cinternos.find(fecha => {return fecha.fecha === element.fecha });
+
+                        if (containsFecha ===false)
+                        {
+                                cinternos.push({
+                                        fecha :element.fecha,
+                                        centro : [],
+                                        color : element.color,
+                                        centroColores : centrosCosto
+                                });
+                                
+                                let colCentroCosto = cinternos.find(fecha => {return fecha.fecha === element.fecha });
+                                colCentroCosto.centro.push({
+                                        centro : element.centroCosto,
+                                        horas : element.t,
+                                        color : element.color
+                                });
+
+                        }
+                        else
+                        {
+                                let colCentroCosto = cinternos.find(fecha => {return fecha.fecha === element.fecha });
+                                colCentroCosto.centro.push({
+                                        centro : element.centroCosto,
+                                        horas : element.t,
+                                        color : element.color
+                                }); 
+                        }
+                });               
+                
+                res.send(JSON.stringify(cinternos)); 
+        } catch (error) {
+                mensajeria.MensajerErrores("\n\n Archivo : reporteria.js \n Error en el directorio: /proyectos/horas/:id \n" + error + "\n Generado por : " + req.user.login);
+                res.redirect(   url.format({
+                    pathname:'/dashboard',
+                            query: {
+                            "a": 1
+                            }
+                        }));   
+        }
+
+        
+});
+
 router.get('/proyectos/horas/:id',isLoggedIn,  async (req, res) => {
 
 
@@ -1661,24 +2219,6 @@ router.get('/proyectos/horas/:id',isLoggedIn,  async (req, res) => {
                 " GROUP BY fecha, centroCosto " +
                 " ORDER BY fecha ASC",[id,id]);
                 
-                /*const detalleInterno = await pool.query("SELECT " +
-                " SUBSTRING(t1.date,1,7) AS fecha, " +
-                " (SUM(t1.nHH) / 6 + SUM(t1.nHE) / 6) AS t, " +	 
-                " t2b.centroCosto AS centroCosto, " +
-                " t2b.color AS color " +
-                " FROM  " +
-                " bitacora AS t1, " +
-                " sys_usuario AS t2 " +
-                        " LEFT JOIN sys_categoria AS t2a ON t2.idCategoria = t2a.id " +
-                        " LEFT JOIN centro_costo AS t2b ON t2a.idCentroCosto = t2b.id " +
-                " WHERE  " +
-                " t1.project = ? " +
-                " AND  " +
-                " t1.owner = t2.idUsuario " +
-                " GROUP BY fecha, centroCosto " +
-                " ORDER BY fecha ASC",[id]);*/
-
-
                 let informacion = [];
                 let cinternos= [];
 
@@ -1713,10 +2253,7 @@ router.get('/proyectos/horas/:id',isLoggedIn,  async (req, res) => {
                                         color : element.color
                                 }); 
                         }
-                });
-
-                //informacion.push(cinternos);
-                
+                });               
                        
                 res.send(JSON.stringify(cinternos)); 
         } catch (error) {
@@ -3054,7 +3591,7 @@ router.get('/analisisProyectos',  async (req, res) => {
                                                 " moneda_tipo AS t2 " +
                                         " WHERE  " +
                                                 " t1.id_proyecto = ? " +
-                                        " AND  " +
+                                        " AND  " + 
                                                 "t1.id_moneda = t2.id_moneda"+
                                         " UNION " +
                                         " SELECT  " +
@@ -3720,8 +4257,68 @@ router.get('/chequeos',isLoggedIn,  async (req, res) => {
 // mostrar información para chequeos. 
 router.get('/pruebas',isLoggedIn,  async (req, res) => {
 
-        //#region  SQL PARA INFORMACION DE LAS PRUEBAS 
-        let sqlFacCob = " SELECT  "+
+     //#region  Monedas
+        let valorUfMensual = []; 
+        let valorUsdMensual = [];
+        let valorSolMensual = [];
+
+        const valorUFMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 4 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");
+        
+        const valorUSDMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 2 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");
+
+        const valorSOLMes = await pool.query("SELECT SUBSTRING(t1.fecha_valor,1,10) AS fecha," +
+                                            " MAX(t1.valor) as valor" +
+                                            " FROM " + 
+                                            " moneda_valor AS t1 " +
+                                            " WHERE t1.id_moneda = 10 GROUP BY SUBSTRING(t1.fecha_valor,1,10)");                                         
+                            
+        valorUFMes.forEach(element => {    
+                                        const containsFecha = !!valorUfMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                                if (containsFecha === false)
+                                                        {
+                                                                valorUfMensual.push({ 
+                                                                                            fecha : element.fecha,
+                                                                                            valor : element.valor
+                                                                                    });
+                                                        }
+                                        }
+                           );
+
+        valorUSDMes.forEach(element => {    
+                                const containsFecha = !!valorUsdMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                        if (containsFecha === false)
+                                                {
+                                                        valorUsdMensual.push({ 
+                                                                                    fecha : element.fecha,
+                                                                                    valor : element.valor
+                                                                            });
+                                                }
+                                }
+                   );
+
+        valorSOLMes.forEach(element => {    
+                        const containsFecha = !!valorSolMensual.find(fecha => {return fecha.fecha === element.fecha });
+                                if (containsFecha === false)
+                                        {
+                                                valorSolMensual.push({ 
+                                                                            fecha : element.fecha,
+                                                                            valor : element.valor
+                                                                    });
+                                        }
+                        }
+           );
+           //#endregion
+
+    //#region  SQL PARA INFORMACION DE LAS PRUEBAS 
+   let sqlFacROC = " SELECT  "+
         " t1.id_proyecto,"+
         " SUM(t1.monto_clp) AS c_clp,"+
         " SUM(t1.monto_uf)  AS c_uf,"+
@@ -3737,7 +4334,46 @@ router.get('/pruebas',isLoggedIn,  async (req, res) => {
         " WHERE "+
         "        t1c.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
         " GROUP BY t1c.id_proyecto) "+
-        " AND t1.id_estado IN(2,3) " +
+        " AND t1.id_estado IN(0,1,2,3) " +
+        " AND t1.esroc = 1 " +
+        " GROUP BY t1.id_proyecto ";
+
+  let sqlFacPobro = " SELECT  "+
+        " t1.id_proyecto,"+
+        " SUM(t1.monto_clp) AS c_clp,"+
+        " SUM(t1.monto_uf)  AS c_uf,"+
+        " SUM(t1.monto_sol) AS c_sol,"+
+        " SUM(t1.monto_dolar) AS c_usd"+
+        " FROM "+
+        "        fact_facturas_equivalencias AS t1"+
+        " WHERE "+
+        "        t1.id_proyecto IN (SELECT "+
+        "        t1c.id_proyecto"+
+        " FROM "+
+        "       bita_horas_equivalencia AS t1c"+
+        " WHERE "+
+        "        t1c.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
+        " GROUP BY t1c.id_proyecto) "+
+        " AND t1.id_estado IN(0) " +
+        " GROUP BY t1.id_proyecto ";
+
+   let sqlFacCob = " SELECT  "+
+        " t1.id_proyecto,"+
+        " SUM(t1.monto_clp) AS c_clp,"+
+        " SUM(t1.monto_uf)  AS c_uf,"+
+        " SUM(t1.monto_sol) AS c_sol,"+
+        " SUM(t1.monto_dolar) AS c_usd"+
+        " FROM "+
+        "        fact_facturas_equivalencias AS t1"+
+        " WHERE "+
+        "        t1.id_proyecto IN (SELECT "+
+        "        t1c.id_proyecto"+
+        " FROM "+
+        "       bita_horas_equivalencia AS t1c"+
+        " WHERE "+
+        "        t1c.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
+        " GROUP BY t1c.id_proyecto) "+
+        " AND t1.id_estado IN(2) " +
         " GROUP BY t1.id_proyecto ";
 
 
@@ -3817,7 +4453,12 @@ router.get('/pruebas',isLoggedIn,  async (req, res) => {
                         " GROUP BY t1.id_proyecto ";
 
    let sql = " SELECT  " +
-                "  t1b.Nombre AS director, "+
+                " t1a.fecha_inicio AS fecha_inicio, "+
+                " t1b.Nombre AS director, "+
+                " t1a.valor_proyecto," +
+                " t1a.valor_metro_cuadrado," +
+                " t1a.superficie_pre," +
+                " t1a.id_tipo_moneda," +
                 " t1a.nombre,"+
 	        " t1a.`year`," +
 	        " t1a.code, " +
@@ -3825,11 +4466,36 @@ router.get('/pruebas',isLoggedIn,  async (req, res) => {
                 " SUM(t1.costo_clp) AS c_clp," +
                 " SUM(t1.costo_uf)  AS c_uf," +
                 " SUM(t1.costo_sol) AS c_sol,"+
-                " SUM(t1.costo_usd) AS c_usd"+
+                " SUM(t1.costo_usd) AS c_usd,"+
+                " t1ab.descripcion AS servicio, " +
+                " t1abc.simbolo AS simbolo" +
                 " FROM "+
                 "                bita_horas_equivalencia AS t1"+
                 " LEFT JOIN pro_proyectos AS t1a ON t1.id_proyecto = t1a.id " +
+                " LEFT JOIN proyecto_servicio AS t1ab ON t1a.id_tipo_servicio = t1ab.id " +
                 " LEFT JOIN sys_usuario AS t1b ON t1a.id_director = t1b.idUsuario " +
+                " LEFT JOIN moneda_tipo AS t1abc ON t1a.id_tipo_moneda = t1abc.id_moneda " +
+                " WHERE "+
+               // "                t1.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
+               // " t1.id_proyecto = 1985 AND " +
+                " t1.id_proyecto IN (SELECT  "+
+                                        " t1c.id_proyecto " +
+                                " FROM  " +
+                                           "     bita_horas_equivalencia AS t1c "+
+                                " WHERE  "+
+                                           "     t1c.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
+                                " GROUP BY t1c.id_proyecto) "+
+                " GROUP BY t1.id_proyecto "; 
+
+
+        let sqlBitacoraAnterior = " SELECT  " +
+                " t1.id_proyecto," +
+                " SUM(t1.costo_clp) AS c_clp," +
+                " SUM(t1.costo_uf)  AS c_uf," +
+                " SUM(t1.costo_sol) AS c_sol,"+
+                " SUM(t1.costo_usd) AS c_usd"+
+                " FROM "+
+                "                bitacora_equivalencia AS t1"+
                 " WHERE "+
                // "                t1.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
                 " t1.id_proyecto IN (SELECT  "+
@@ -3840,50 +4506,292 @@ router.get('/pruebas',isLoggedIn,  async (req, res) => {
                                            "     t1c.fecha BETWEEN DATE_FORMAT((date_add(now(), INTERVAL -1 YEAR)),'%Y-%m') AND DATE_FORMAT( NOW(),'%Y-%m') "+
                                 " GROUP BY t1c.id_proyecto) "+
                 " GROUP BY t1.id_proyecto "; 
+
         //#endregion
 
-    //console.log(sql);
+    
 
-        const proyectos = await pool.query(sql);
-        const infoOc = await pool.query(sqlOC);
-        const infoCE = await pool.query(sqlce);
-        const infoCEP = await pool.query(sqlcep); 
-        const infoFacP = await pool.query(sqlFacPag);
-        const infoFacC = await pool.query(sqlFacCob);
+        const proyectos  = await pool.query(sql);
+        const infoOc     = await pool.query(sqlOC);
+        const infoCE     = await pool.query(sqlce);
+        const infoCEP    = await pool.query(sqlcep); 
+        const infoFacP   = await pool.query(sqlFacPag);
+        const infoFacC   = await pool.query(sqlFacCob);
+        const infoFacPco = await pool.query(sqlFacPobro);
+        const infoFacROC = await pool.query(sqlFacROC);
 
+        const infobitaAnterior = await pool.query(sqlBitacoraAnterior);
         
         proyectos.forEach(p => {
 
                 let bOrdenCompra = infoOc.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
                 let valorOC = 0;
-                if (bOrdenCompra != undefined){valorOC = Intl.NumberFormat('de-DE').format(bOrdenCompra.c_uf.toFixed(2));}
+                if (bOrdenCompra != undefined){
+                        //#region VALOR OC 
+                        switch(p.id_tipo_moneda)
+                        {
+                                case 1: // CLP
+                                   valorOC = Intl.NumberFormat('de-DE').format(bOrdenCompra.c_clp.toFixed(0));
+                                break;
+                                case 2: // USD
+                                   valorOC = Intl.NumberFormat('de-DE').format(bOrdenCompra.c_usd.toFixed(2));
+                                break;
+                                case 4: // UF
+                                   valorOC = Intl.NumberFormat('de-DE').format(bOrdenCompra.c_uf.toFixed(2));
+                                break;
+                                case 10: // SOL
+                                   valorOC = Intl.NumberFormat('de-DE').format(bOrdenCompra.c_sol.toFixed(2));
+                                break;
+                                default:
+                                    valorOC = Intl.NumberFormat('de-DE').format(bOrdenCompra.c_uf.toFixed(2));
+                                break;
+
+                        }
+                        //#endregion
+                }
 
                 let bCostoExterno = infoCE.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
                 let valorCE = 0;
-                if (bCostoExterno != undefined){valorCE = Intl.NumberFormat('de-DE').format(bCostoExterno.c_uf.toFixed(2));}
+                if (bCostoExterno != undefined){
+                        //#region VALOR COSTO EXTERNO NETOFFICE 
+                        switch(p.id_tipo_moneda)
+                        {
+                                case 1: // CLP
+                                        valorCE = Intl.NumberFormat('de-DE').format(bCostoExterno.c_clp.toFixed(0));
+                                break;
+                                case 2: // USD
+                                        valorCE = Intl.NumberFormat('de-DE').format(bCostoExterno.c_usd.toFixed(2));
+                                break;
+                                case 4: // UF
+                                        valorCE = Intl.NumberFormat('de-DE').format(bCostoExterno.c_uf.toFixed(2));
+                                break;
+                                case 10: // SOL
+                                        valorCE = Intl.NumberFormat('de-DE').format(bCostoExterno.c_sol.toFixed(2));
+                                break;
+                                default:
+                                        valorCE = Intl.NumberFormat('de-DE').format(bCostoExterno.c_uf.toFixed(2));
+                                break;
+
+                        }
+                        //#endregion
+                }
 
                 let bCostoExternoP = infoCEP.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
                 let valorCEP = 0;
-                if (bCostoExternoP != undefined){valorCEP = Intl.NumberFormat('de-DE').format(bCostoExternoP.c_uf.toFixed(2));}
+                if (bCostoExternoP != undefined){
+                        //#region VALOR COSTO EXTERNO NETOFFICE 
+                        switch(p.id_tipo_moneda)
+                        {
+                                case 1: // CLP
+                                        valorCEP = Intl.NumberFormat('de-DE').format(bCostoExternoP.c_clp.toFixed(0));
+                                break;
+                                case 2: // USD
+                                        valorCEP = Intl.NumberFormat('de-DE').format(bCostoExternoP.c_usd.toFixed(2));
+                                break;
+                                case 4: // UF
+                                        valorCEP = Intl.NumberFormat('de-DE').format(bCostoExternoP.c_uf.toFixed(2));
+                                break;
+                                case 10: // SOL
+                                        valorCEP = Intl.NumberFormat('de-DE').format(bCostoExternoP.c_sol.toFixed(2));
+                                break;
+                                default:
+                                        valorCEP = Intl.NumberFormat('de-DE').format(bCostoExternoP.c_uf.toFixed(2));
+                                break;
+
+                        }
+                        //#endregion
+                        //valorCEP = Intl.NumberFormat('de-DE').format(bCostoExternoP.c_uf.toFixed(2));
+                }
 
                 let bFacturaPagada = infoFacP.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
                 let valorFacPagada = 0;
-                if (bFacturaPagada != undefined){valorFacPagada = Intl.NumberFormat('de-DE').format(bFacturaPagada.c_uf.toFixed(2));}
+                if (bFacturaPagada != undefined){
+                        switch(p.id_tipo_moneda)
+                        {
+                                case 1: // CLP
+                                        valorFacPagada = Intl.NumberFormat('de-DE').format(bFacturaPagada.c_clp.toFixed(0));
+                                break;
+                                case 2: // USD
+                                        valorFacPagada = Intl.NumberFormat('de-DE').format(bFacturaPagada.c_usd.toFixed(2));
+                                break;
+                                case 4: // UF
+                                        valorFacPagada = Intl.NumberFormat('de-DE').format(bFacturaPagada.c_uf.toFixed(2));
+                                break;
+                                case 10: // SOL
+                                        valorFacPagada = Intl.NumberFormat('de-DE').format(bFacturaPagada.c_sol.toFixed(2));
+                                break;
+                                default:
+                                        valorFacPagada = Intl.NumberFormat('de-DE').format(bFacturaPagada.c_uf.toFixed(2));
+                                break;
+
+                        }
+                       // valorFacPagada = Intl.NumberFormat('de-DE').format(bFacturaPagada.c_uf.toFixed(2));
+                }
 
                 let bFacturaCobranza = infoFacC.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
                 let valorFacCobranza = 0;
-                if (bFacturaCobranza != undefined){valorFacCobranza = Intl.NumberFormat('de-DE').format(bFacturaCobranza.c_uf.toFixed(2));}
+                if (bFacturaCobranza != undefined){
+
+                        switch(p.id_tipo_moneda)
+                        {
+                                case 1: // CLP
+                                        valorFacCobranza = Intl.NumberFormat('de-DE').format(bFacturaCobranza.c_clp.toFixed(0));
+                                break;
+                                case 2: // USD
+                                        valorFacCobranza = Intl.NumberFormat('de-DE').format(bFacturaCobranza.c_usd.toFixed(2));
+                                break;
+                                case 4: // UF
+                                        valorFacCobranza = Intl.NumberFormat('de-DE').format(bFacturaCobranza.c_uf.toFixed(2));
+                                break;
+                                case 10: // SOL
+                                        valorFacCobranza = Intl.NumberFormat('de-DE').format(bFacturaCobranza.c_sol.toFixed(2));
+                                break;
+                                default:
+                                        valorFacCobranza = Intl.NumberFormat('de-DE').format(bFacturaCobranza.c_uf.toFixed(2));
+                                break;
+
+                        }
+
+                        //valorFacCobranza = Intl.NumberFormat('de-DE').format(bFacturaCobranza.c_uf.toFixed(2));
+                }
+
+                let bFacturaParaCobro = infoFacPco.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
+                let valorFacParaCobro = 0;
+                if (bFacturaParaCobro != undefined){
+
+                        switch(p.id_tipo_moneda)
+                        {
+                                case 1: // CLP
+                                        valorFacParaCobro = Intl.NumberFormat('de-DE').format(bFacturaParaCobro.c_clp.toFixed(0));
+                                break;
+                                case 2: // USD
+                                        valorFacParaCobro = Intl.NumberFormat('de-DE').format(bFacturaParaCobro.c_usd.toFixed(2));
+                                break;
+                                case 4: // UF
+                                        valorFacParaCobro = Intl.NumberFormat('de-DE').format(bFacturaParaCobro.c_uf.toFixed(2));
+                                break;
+                                case 10: // SOL
+                                        valorFacParaCobro = Intl.NumberFormat('de-DE').format(bFacturaParaCobro.c_sol.toFixed(2));
+                                break;
+                                default:
+                                        valorFacParaCobro = Intl.NumberFormat('de-DE').format(bFacturaParaCobro.c_uf.toFixed(2));
+                                break;
+
+                        }
+
+
+                        //valorFacParaCobro = Intl.NumberFormat('de-DE').format(bFacturaParaCobro.c_uf.toFixed(2));
+                }
+
+                let bFacturaROC = infoFacROC.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
+                let valorFacROC = 0;
+                if (bFacturaROC != undefined){
+                        switch(p.id_tipo_moneda)
+                        {
+                                case 1: // CLP
+                                        valorFacROC = Intl.NumberFormat('de-DE').format(bFacturaROC.c_clp.toFixed(0));
+                                break;
+                                case 2: // USD
+                                        valorFacROC = Intl.NumberFormat('de-DE').format(bFacturaROC.c_usd.toFixed(2));
+                                break;
+                                case 4: // UF
+                                        valorFacROC = Intl.NumberFormat('de-DE').format(bFacturaROC.c_uf.toFixed(2));
+                                break;
+                                case 10: // SOL
+                                        valorFacROC = Intl.NumberFormat('de-DE').format(bFacturaROC.c_sol.toFixed(2));
+                                break;
+                                default:
+                                        valorFacROC = Intl.NumberFormat('de-DE').format(bFacturaROC.c_uf.toFixed(2));
+                                break;
+
+                        }
+
+                        //valorFacROC = Intl.NumberFormat('de-DE').format(bFacturaROC.c_uf.toFixed(2));
+                }
+
+                let bBitacoraAnterior = infobitaAnterior.find(oc => {return oc.id_proyecto === p.id_proyecto }); 
+                let costoBitacoraAnterior = 0;
+
+                if (bBitacoraAnterior != undefined){
+                        switch(p.id_tipo_moneda)
+                        {
+                                case 1: // CLP
+                                        costoBitacoraAnterior = Intl.NumberFormat('de-DE').format(bBitacoraAnterior.c_clp.toFixed(0));
+                                break;
+                                case 2: // USD
+                                        costoBitacoraAnterior = Intl.NumberFormat('de-DE').format(bBitacoraAnterior.c_usd.toFixed(2));
+                                break;
+                                case 4: // UF
+                                        costoBitacoraAnterior = Intl.NumberFormat('de-DE').format(bBitacoraAnterior.c_uf.toFixed(2));
+                                break;
+                                case 10: // SOL
+                                        costoBitacoraAnterior = Intl.NumberFormat('de-DE').format(bBitacoraAnterior.c_sol.toFixed(2));
+                                break;
+                                default:
+                                        costoBitacoraAnterior = Intl.NumberFormat('de-DE').format(bBitacoraAnterior.c_uf.toFixed(2));
+                                break;
+
+                        }
+
+                }
+
+                //bitaAnterior
+                let fechaAnalisis = p.fecha_inicio;
+
+                const colUSD = valorUsdMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+                const colUF = valorUfMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+                const colSOL = valorSolMensual.find(fecha => {return fecha.fecha === fechaAnalisis});
+
+                p.valorP = p.valor_proyecto;
+
+                
 
                 p.oc = valorOC;
                 p.ce = valorCE;
                 p.cep = valorCEP;
                 p.fp = valorFacPagada;
                 p.fc = valorFacCobranza;
+                p.pc = valorFacParaCobro;
+                p.a = valorFacROC;
                 p.tote = sumaFormateada(valorOC,valorCE,valorCEP);
-                p.c_uf = Intl.NumberFormat('de-DE').format(p.c_uf.toFixed(2));
+                //p.c_uf = Intl.NumberFormat('de-DE').format(p.c_uf.toFixed(2));
 
-                p.totp = sumaFormateada(p.tote,p.c_uf);
+                let costoBitacoraNueva = 0;
+                
+                //#region 
+                switch(p.id_tipo_moneda)
+                        {
+                                case 1: // CLP
+                                        costoBitacoraNueva = Intl.NumberFormat('de-DE').format(p.c_clp.toFixed(0));
+                                break;
+                                case 2: // USD
+                                        costoBitacoraNueva = Intl.NumberFormat('de-DE').format(p.c_usd.toFixed(2));
+                                break;
+                                case 4: // UF
+                                        costoBitacoraNueva = Intl.NumberFormat('de-DE').format(p.c_uf.toFixed(2));
+                                break;
+                                case 10: // SOL
+                                        costoBitacoraNueva = Intl.NumberFormat('de-DE').format(p.c_sol.toFixed(2));
+                                break;
+                                default:
+                                        costoBitacoraNueva = Intl.NumberFormat('de-DE').format(p.c_uf.toFixed(2));
+                                break;
+
+                        }
+                //#endregion
+                
+                if (p.valorP != undefined)
+                {
+                        p.valorP = Intl.NumberFormat('de-DE').format(parseFloat(p.valorP).toFixed(2));
+                }
+
+                //p.totp = sumaFormateada(p.tote,costoBitacoraNueva);
+                p.costointerno = sumaFormateada(costoBitacoraNueva , costoBitacoraAnterior);
                 p.df = restaFormateada(valorFacCobranza , valorFacPagada);
+                p.tp = sumaFormateada(p.valorP , valorFacROC);
+
+
+
 
         });
 
@@ -3892,14 +4800,44 @@ router.get('/pruebas',isLoggedIn,  async (req, res) => {
       
       });
 
+      function divFormateada(n1=0,n2=0, n3=1)
+      {
+
+        let n01 = parseFloat( n1.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
+        let n02 = parseFloat( n2.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
+        
+        
+        let total = ( n01 / n02) * n3;
+
+        
+        return   Intl.NumberFormat('de-DE').format(total.toFixed(2));
+
+      }
+
+      function sumaFormateada2(n1=0,n2=0,n3=0)
+      {
+
+        let n01 = parseFloat( n1.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
+        let n02 = parseFloat( n2.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
+        let n03 = parseFloat( n3.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
+        
+        let total = n01 + n02 + n03;
+
+        
+        return   Intl.NumberFormat('de-DE').format(total.toFixed(2));
+
+      }
+
       function sumaFormateada(n1=0,n2=0,n3=0)
       {
 
         let n01 = parseFloat( n1.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
         let n02 = parseFloat( n2.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
         let n03 = parseFloat( n3.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
-        //console.log(n01 + "////" + n02 + "/////" +n03);
+        
         let total = n01 + n02 + n03;
+
+        
         return   Intl.NumberFormat('de-DE').format(total.toFixed(2));
 
       }
@@ -3909,7 +4847,7 @@ router.get('/pruebas',isLoggedIn,  async (req, res) => {
         let n01 = parseFloat( n1.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
         let n02 = parseFloat( n2.toString().replace(".","").replace(".","").replace(".","").replace(".","").replace(",","."));
         
-        //console.log(n01 + "////" + n02 + "/////" +n03);
+        
         let total = n01 - n02;
         return   Intl.NumberFormat('de-DE').format(total.toFixed(2));
 
@@ -4009,7 +4947,13 @@ router.post('/analisisMonedaCostoExternoPlanner',isLoggedIn,  async (req, res) =
                                 registro = {
                                                 
                                                 id_proyecto : ce.id_proyecto,
+                                                id_prov_externo : ce.id_prov_externo,
                                                 id_moneda_base : ce.id_tipo_moneda,
+                                                id_estado : ce.id_estado,
+                                                id_centro_costo : ce.id_centro_costo,
+                                                numHH : ce.numHH,
+                                                numOC : ce.numOC,
+                                                descripcion : ce.descripcion,
                                                 fecha : fechaAnalisis,
                                                 monto_base : ce.costo,
                                                 monto_uf : ce.costo / colUF.valor,
@@ -4021,7 +4965,6 @@ router.post('/analisisMonedaCostoExternoPlanner',isLoggedIn,  async (req, res) =
                                                 valor_sol : colSOL.valor
                 
                                         }
-                                
                                 ist =  pool.query('INSERT INTO pro_costo_externo_equivalencias set ?', [registro]);
                                 break;
                         }
@@ -4056,7 +4999,7 @@ router.post('/bitacoraPlanner',isLoggedIn,  async (req, res) => {
                                         "                bita_horas AS t1 "+
                                         " WHERE "+
                                         "                t1.id_project != 0 AND t1.id_project > 0 AND t1.id_session not in (1 )"+
-                                        " GROUP BY fecha, id_usuario	");
+                                        " GROUP BY id_project , id_usuario,  fecha 	");
 
                                                 
         
@@ -4090,11 +5033,12 @@ router.post('/bitacoraPlanner',isLoggedIn,  async (req, res) => {
                                                 usuario : usuarioID
                                         });   
                                         
+                                        /*
                                         registro = {   
                                                 id_user : usuarioID,
                                                 fecha : fechaAnalisis,
                                                 }
-
+                                                        */
                                         
                                 }
                                 else
@@ -4131,9 +5075,12 @@ router.post('/bitacoraPlanner',isLoggedIn,  async (req, res) => {
 
                 });
 
+
         res.send('ok');
 });
-
+function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 // bitacatoraAnterior
 router.post('/bitacatoraAnterior',isLoggedIn,  async (req, res) => {
 
@@ -4154,9 +5101,11 @@ router.post('/bitacatoraAnterior',isLoggedIn,  async (req, res) => {
                                 " bitacora AS t1 " +
                 " WHERE  " +
                                 " t1.project != 0 AND t1.owner != 0" +
-                " GROUP BY mes,idUser  " +
+                //                " AND t1.project = 1985 " +
+                " GROUP BY proyecto,idUser, mes  " +
                 " ORDER BY t1.id ASC"; 
 
+        
         const costoUsuario =await pool.query(" SELECT " +
                                                 " CONCAT(t1.annio,'-',t1.mes) AS fecha, " +
                                                 " t1.costo, " +
@@ -4167,80 +5116,79 @@ router.post('/bitacatoraAnterior',isLoggedIn,  async (req, res) => {
 
         let bitacora = await pool.query(sql);
         let errores = [];
-        bitacora.forEach(b => {
 
-                //let fechaAnalisis = '2100-10';
-                let fechaAnalisis = b.mes;
-                const colUSD = valorDolarMes.find(fecha => {return fecha.fecha === fechaAnalisis});
-                const colUF = valorUFMes.find(fecha => {return fecha.fecha === fechaAnalisis});
-                const colSOL = valorSolMes.find(fecha => {return fecha.fecha === fechaAnalisis});
-
-                
-
-                
-                if (colUSD === undefined || colUF === undefined || colSOL === undefined)
-                {
-                       
-                        errores.push({
-                                tipo : "Valor moneda",
-                                fecha : fechaAnalisis,
-                                usuario : usuarioID
-                        });
-                }
-                else
-                {
-                        let usuarioID = b.idUser;
-                        let bValorUsuario = costoUsuario.find(fecha => {return fecha.fecha === fechaAnalisis && fecha.idUsuario === usuarioID}); 
-
-                        if (bValorUsuario === undefined)
-                        {
-                                errores.push({
-                                        tipo : "Costo Usuario",
-                                        fecha : fechaAnalisis,
-                                        usuario : usuarioID
-                                });   
+        bitacora.forEach( async function(b){
+                                //let fechaAnalisis = '2100-10';
+                                let fechaAnalisis = b.mes;
+                                const colUSD = valorDolarMes.find(fecha => {return fecha.fecha === fechaAnalisis});
+                                const colUF = valorUFMes.find(fecha => {return fecha.fecha === fechaAnalisis});
+                                const colSOL = valorSolMes.find(fecha => {return fecha.fecha === fechaAnalisis});
                                 
-                                registro = {   
-                                        id_user : b.idUser,
-                                        fecha : fechaAnalisis,
+                                if (colUSD === undefined || colUF === undefined || colSOL === undefined)
+                                {
+                                        
+                                       
+                                        errores.push({
+                                                tipo : "Valor moneda",
+                                                fecha : fechaAnalisis,
+                                                usuario : usuarioID
+                                        });
+                                }
+                                else
+                                {
+                                        let usuarioID = b.idUser;
+                                        let bValorUsuario = costoUsuario.find(fecha => {return fecha.fecha === fechaAnalisis && fecha.idUsuario === usuarioID}); 
+                
+                                        if (bValorUsuario === undefined)
+                                        {
+                                                errores.push({
+                                                        tipo : "Costo Usuario",
+                                                        fecha : fechaAnalisis,
+                                                        usuario : usuarioID
+                                                });   
+                                                
+                                                registro = {   
+                                                        id_user : b.idUser,
+                                                        fecha : fechaAnalisis,
+                                                        }
+                
+                                                let ist = await pool.query('INSERT INTO bitacora_equivalencia_error set ?', [registro]);
                                         }
-
-                                let ist =  pool.query('INSERT INTO bitacora_equivalencia_error set ?', [registro]);
-                        }
-                        else
-                        {
-                                /// CARGA de valores. 
-
-                                let costo = bValorUsuario.costo;
-
-                                let valorMes = b.hh * costo + b.he * costo * 1.5;
-                                let costo_cpl = parseInt(valorMes);
-                                let costo_uf = costo_cpl / colUF.valor ;
-                                let costo_sol = costo_cpl / colSOL.valor ;
-                                let costo_usd = costo_cpl / colUSD.valor ;
-
-
-                                registro = {   
-                                        id_user : b.idUser,
-                                        id_proyecto : b.proyecto,
-                                        fecha : fechaAnalisis,
-                                        hh : b.hh,
-                                        he : b.he,
-                                        costo_hh : costo,
-                                        costo_clp : costo_cpl,
-                                        costo_uf : costo_uf,
-                                        costo_sol : costo_sol,
-                                        costo_usd : costo_usd,
-                                        valor_uf : colUF.valor,
-                                        valor_sol : colSOL.valor,
-                                        valor_usd : colUSD.valor,
+                                        else
+                                        {
+                                                /// CARGA de valores. 
+                
+                                                let costo = bValorUsuario.costo;
+                
+                                                let valorMes = b.hh * costo + b.he * costo * 1.5;
+                                                let costo_cpl = parseInt(valorMes);
+                                                let costo_uf = costo_cpl / colUF.valor ;
+                                                let costo_sol = costo_cpl / colSOL.valor ;
+                                                let costo_usd = costo_cpl / colUSD.valor ;
+                
+                
+                                                registro = {   
+                                                        id_user : b.idUser,
+                                                        id_proyecto : b.proyecto,
+                                                        fecha : fechaAnalisis,
+                                                        hh : b.hh,
+                                                        he : b.he,
+                                                        costo_hh : costo,
+                                                        costo_clp : costo_cpl,
+                                                        costo_uf : costo_uf,
+                                                        costo_sol : costo_sol,
+                                                        costo_usd : costo_usd,
+                                                        valor_uf : colUF.valor,
+                                                        valor_sol : colSOL.valor,
+                                                        valor_usd : colUSD.valor,
+                                                        }
+                                        
+                                        let ist =  await pool.query('INSERT INTO bitacora_equivalencia set ?', [registro]);
+                
                                         }
-                        
-                        let ist =  pool.query('INSERT INTO bitacora_equivalencia set ?', [registro]);
-
-                        }
-                }
+                                }
         });
+
 
        
 
@@ -4345,6 +5293,11 @@ router.post('/analisisMonedaCostoExterno',isLoggedIn,  async (req, res) => {
                                                 
                                                 id_proyecto : ce.id_proyecto,
                                                 id_moneda_base : ce.id_moneda,
+                                                id_prob_externo : ce.id_prob_externo,
+                                                cc_a_pagar : ce.cc_a_pagar,
+                                                def_trabajo : ce.def_trabajo,
+                                                num_occ : ce.num_occ,
+                                                num_hh : ce.num_hh,
                                                 fecha : fechaAnalisis,
                                                 monto_base : ce.costo,
                                                 monto_uf : ce.costo / colUF.valor,
@@ -4363,6 +5316,11 @@ router.post('/analisisMonedaCostoExterno',isLoggedIn,  async (req, res) => {
                                                 
                                                 id_proyecto : ce.id_proyecto,
                                                 id_moneda_base : ce.id_moneda,
+                                                id_prob_externo : ce.id_prob_externo,
+                                                cc_a_pagar : ce.cc_a_pagar,
+                                                def_trabajo : ce.def_trabajo,
+                                                num_occ : ce.num_occ,
+                                                num_hh : ce.num_hh,
                                                 fecha : fechaAnalisis,
                                                 monto_base : ce.costo,
                                                 monto_uf : ce.costo * colUSD.valor / colUF.valor,
@@ -4380,6 +5338,11 @@ router.post('/analisisMonedaCostoExterno',isLoggedIn,  async (req, res) => {
                                         registro = {
                                                 id_proyecto : ce.id_proyecto,
                                                 id_moneda_base : ce.id_moneda,
+                                                id_prob_externo : ce.id_prob_externo,
+                                                cc_a_pagar : ce.cc_a_pagar,
+                                                def_trabajo : ce.def_trabajo,
+                                                num_occ : ce.num_occ,
+                                                num_hh : ce.num_hh,
                                                 fecha : fechaAnalisis,
                                                 monto_base : ce.costo,
                                                 monto_uf : ce.costo,
@@ -4469,7 +5432,7 @@ valorSOLMes.forEach(element => {
    );
 //#endregion
 
-                let sql = " SELECT * "  +
+              let sql = " SELECT * "  +
                         " FROM  " +
                                 " orden_compra AS t1 " +
                         " WHERE  " +
@@ -4495,11 +5458,16 @@ valorSOLMes.forEach(element => {
                 let cambio = 0;
 
                 let bmoneda = true;
+                let cantidadHH = 0;
+                let req_obs = "";
+
 
                 req_oc.forEach(infoReq => {
                         id_moneda = infoReq.id_moneda;
                         monto_base = parseFloat(infoReq.precio_unitario) * parseFloat(infoReq.cantidad);
                         cambio = infoReq.tipo_cambio;
+                        cantidadHH = cantidadHH + parseFloat(infoReq.cantidad);
+                        req_obs = req_obs + infoReq.descripcion + "\n";
 
                         if (id_moneda != 0)
                         {
@@ -4519,7 +5487,7 @@ valorSOLMes.forEach(element => {
 
                         if (colUSD === undefined || colUF === undefined || colSOL === undefined )
                         {
-                                console.log("ERROR EN LA CARGA DE ALGUN VALOR DE MONEDA");
+                                console.log("ERROR EN LA CARGA DE ALGUN VALOR DE MONEDA" + fechaAnalisis);
                         }
                         else
                         {
@@ -4530,6 +5498,10 @@ valorSOLMes.forEach(element => {
                                         case 4:
                                                 registro ={
                                                         id_proyecto :oc.id_proyecto,
+                                                        numOC : oc.folio,
+                                                        numHH : cantidadHH,
+                                                        obs_g :oc.observaciones,
+                                                        obs_req :req_obs,
                                                         fecha : fechaAnalisis,
                                                         moneda_base : id_moneda,
                                                         monto : monto_base,
@@ -4549,6 +5521,10 @@ valorSOLMes.forEach(element => {
                                         case 2:
                                                 registro ={
                                                         id_proyecto :oc.id_proyecto,
+                                                        numOC : oc.folio,
+                                                        numHH : cantidadHH,
+                                                        obs_g :oc.observaciones,
+                                                        obs_req :req_obs,
                                                         fecha : fechaAnalisis,
                                                         moneda_base : id_moneda,
                                                         monto : monto_base,
@@ -4569,6 +5545,10 @@ valorSOLMes.forEach(element => {
                                         case 10:
                                                 registro ={
                                                         id_proyecto :oc.id_proyecto,
+                                                        numOC : oc.folio,
+                                                        numHH : cantidadHH,
+                                                        obs_g :oc.observaciones,
+                                                        obs_req :req_obs,
                                                         fecha : fechaAnalisis,
                                                         moneda_base : id_moneda,
                                                         monto : monto_base,
@@ -4588,6 +5568,10 @@ valorSOLMes.forEach(element => {
                                         case 1:
                                                 registro ={
                                                         id_proyecto :oc.id_proyecto,
+                                                        numOC : oc.folio,
+                                                        numHH : cantidadHH,
+                                                        obs_g :oc.observaciones,
+                                                        obs_req :req_obs,
                                                         fecha : fechaAnalisis,
                                                         moneda_base : id_moneda,
                                                         monto : monto_base,
@@ -4813,12 +5797,13 @@ router.post('/analisisMonedaFactura',isLoggedIn,  async (req, res) => {
                 
                 if (valorUF === '' || valorUSD === '' || valorSOL === '')
                 {
-                        
+                        console.log("Error" + factura.id);
                 }
                 else
                 {
                         let registroEquivalencia = {
                                 id_factura : factura.id,
+                                id_solicitante : factura.id_solicitante,
                                 id_proyecto : factura.id_proyecto,
                                 id_moneda_base :factura.id_tipo_moneda,
                                 esroc :factura.es_roc,
@@ -4840,6 +5825,9 @@ router.post('/analisisMonedaFactura',isLoggedIn,  async (req, res) => {
                 
 
         });   
+
+
+        
 
         res.send("ok");
 });

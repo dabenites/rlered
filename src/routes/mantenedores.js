@@ -7,12 +7,21 @@ var url = require('url');
 const helpers = require('../lib/helpers');
 const bcrypt = require('bcryptjs');
 
+const Excel = require('exceljs');
+
+
 //importar una conexión a DB
 const pool = require('../database');
 const { isLoggedIn } = require('../lib/auth');
 const { chdir } = require('process');
 
 const mensajeria = require('../mensajeria/mail');
+const { file } = require('pdfkit');
+const { exists } = require('fs');
+var vfs = require('fs');
+const pathR = require('path');
+var formidable = require('formidable');
+const { Console } = require('console');
 
 router.get('/ocproveedor/delete/:id',isLoggedIn, async (req, res) => {
     try{
@@ -1778,7 +1787,7 @@ router.post('/actualizarUF', isLoggedIn, async (req, ress) => {
 router.get('/valoruf', isLoggedIn, async (req, ress) => {
     
     try {
-        var fecha = new Date();
+    var fecha = new Date();
     var year = fecha.getFullYear();
     const annios = [];
 
@@ -2605,6 +2614,356 @@ router.post('/cambioContrasena', isLoggedIn, async (req, res) => {
 });
 
 
+// cambios 25-10-2023
+//monedas
+router.get('/vmonedas', isLoggedIn, async (req, res) => {
 
+    try {
+
+            var meses = [{id : 1, nombre : "Enero"},{id : 2, nombre : "Febrero"},{id : 3, nombre : "Marzo"},{id : 4, nombre : "Abril"},
+                        {id : 5, nombre : "Mayo"},{id : 6, nombre : "Junio"},{id : 7, nombre : "Julio"},{id : 8, nombre : "Agosto"},
+                        {id : 9, nombre : "Septiembre"},{id : 10, nombre : "Octubre"},{id : 11, nombre : "Noviembre"},{id : 12, nombre : "Diciembre"} ];
+
+
+            //console.log(req.query);
+            //moneda_tipo
+            const monedas = await pool.query("SELECT * FROM moneda_tipo as t1 WHERE t1.factura= 'Y' ORDER BY t1.descripcion");
+
+            var fechaActual = new Date();
+            var year = fechaActual.getFullYear();
+            var mes = fechaActual.getMonth() + 1;
+            const annios = [];
+
+            for (let step = 0; step < 10; step++) {
+
+                annios.push({annio : year - step});
+            }
+
+           //console.log(req.query);
+           var actual;
+           if (req.query.moneda === undefined)
+           {
+            actual ={annio :year, mes:mes , moneda : 4} ;
+           }else{
+
+            actual ={annio :req.query.annio, mes:req.query.mes , moneda : req.query.moneda} ;
+           }
+
+           let aux = "";
+           if (actual.mes < 10)
+           {
+            aux = '0'+actual.mes;
+           }else {
+            aux = mes;
+           }
+
+           // actual moneda 
+           const monedasActual = await pool.query("SELECT * FROM moneda_tipo as t1 WHERE t1.factura= 'Y' AND t1.id_moneda = ?  ORDER BY t1.descripcion" ,[actual.moneda]);
+
+           //console.log(monedasActual[0]);
+
+           const valorMonedasCargadas = await pool.query("SELECT " +
+                                                 " * FROM " +
+                                                 " moneda_valor AS t1 " +
+                                                 " WHERE " +
+                                                        " t1.fecha_valor LIKE '"+ actual.annio +"-"+actual.mes+"%' AND id_moneda = "+actual.moneda+"");
+
+
+        const infoMoneda = {};
+
+        valorMonedasCargadas.forEach(function(elemento, indice, array) {
+                if (infoMoneda[elemento.fecha_valor] === undefined)
+                {
+                    infoMoneda[elemento.fecha_valor] = elemento.valor;
+                }
+            });
+
+       // console.log(infoMoneda);
+
+
+            var diasMes = new Date(actual.annio, actual.mes, 0).getDate();
+
+            
+            var valoresmonedas = [];
+            for (let step = 1; step <= diasMes; step++) {
+                let aux2 = "";
+
+                if (step < 10){aux2 ='0'+step;}
+                else { aux2 = step; }
+
+                let aux3 = 0;
+
+                if (infoMoneda[actual.annio +"-"+actual.mes+"-"+aux2] === undefined)
+                {
+                    aux3 = 0;
+                }
+                else{
+                    aux3 = infoMoneda[actual.annio +"-"+actual.mes+"-"+aux2]; 
+                }
+                
+                valoresmonedas.push(
+                    {
+                        fecha :  actual.annio +"-"+actual.mes+"-"+aux2, 
+                        valor : aux3,
+                        dia : step,
+                        simbolo : monedasActual[0].simbolo,
+                        moneda : actual.moneda }
+                    
+                    );
+            }
+
+            
+            // ERRORES 3 MESES ANTERIORES
+            //errores
+
+            
+            
+            let errores = [];
+
+            var todayDate = new Date();
+            var todayDate_2 = new Date();
+            todayDate.setMonth(todayDate.getMonth() - 2);
+            let fechax = todayDate.toISOString().slice(0, 10);
+            let fechax_2 = todayDate_2.toISOString().slice(0, 10);
+            const bd_busca_error = await pool.query("SELECT * FROM moneda_valor AS t1 WHERE t1.fecha_valor BETWEEN '"+fechax+"' AND '2100-12-31'");
+
+            const infoMonedasError = {};
+
+            bd_busca_error.forEach(function(elemento, indice, array) {
+                if (infoMonedasError[elemento.id_moneda +"_"+elemento.fecha_valor] === undefined)
+                {
+                    infoMonedasError[elemento.id_moneda +"_"+elemento.fecha_valor] = elemento.valor;
+                }
+            });
+
+            const inicio = new Date(fechax);
+            const fin = new Date(fechax_2);
+            const UN_DIA_EN_MILISEGUNDOS = 1000 * 60 * 60 * 24;
+            const INTERVALO = UN_DIA_EN_MILISEGUNDOS; // Cada semana
+            const formateadorFecha = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', });
+
+            const monedas_id_validos = [{id_moneda:4 , simbolo : "UF", descripcion : "Unidad de Fomento"},
+                                        {id_moneda:2 , simbolo : "US$", descripcion : "Dolar Americano"},
+                                        {id_moneda:10 , simbolo : "S/", descripcion : "Sol"}];
+            for (let i = inicio; i <= fin; i = new Date(i.getTime() + INTERVALO)) {
+                //console.log(i.toISOString().slice(0, 10));
+                monedas_id_validos.forEach(element => {
+                    let find = element.id_moneda + "_" + i.toISOString().slice(0, 10);
+                    if (infoMonedasError[find] === undefined)
+                    {
+                        errores.push({fecha : i.toISOString().slice(0, 10), moneda : element.descripcion, simbolo : element.simbolo });
+                    }
+                });
+            }            
+
+            const isEqualHelperHandlerbar = function(a, b, opts) {
+                if (a == b) {
+                    return true
+                } else { 
+                    return false
+                } 
+            };
+
+            let fechaBusqueda = actual.annio + "-" + actual.mes;
+            res.render('mantenedores/vmonedas', {  req , monedas,annios,meses,actual,valoresmonedas, fechaBusqueda, errores, layout: 'template', 
+            helpers : {
+                        if_equal : isEqualHelperHandlerbar
+                    }});
+  
+        } catch (error) {
+            
+           /*
+            mensajeria.MensajerErrores("\n\n Error en el directorio: /monedas \n" + error + "\n Generado por : " + req.user.login);
+            res.redirect(url.format({
+                pathname:'/dashboard',
+                        query: {
+                        "a": 1
+                        }
+                    }));  
+                    */
+            console.log(error);
+        }
+});
+
+router.post('/vmonedas_dato', isLoggedIn, async (req, res) => {
+
+    let moneda = req.body["moneda"] ;
+    let fecha = req.body["fecha"] ;
+    let valor = req.body["valor"] ;
+
+    //  Se elimina la anterior.
+    // carga valor nuevo 
+    const result_0 =  pool.query("DELETE FROM moneda_valor WHERE id_moneda = '"+moneda+"' AND fecha_valor = '"+fecha+"' LIMIT 1;");
+
+    
+    const result = await pool.query('INSERT into moneda_valor ( id_moneda,fecha_valor,valor) values (?,?,?)', [moneda,
+        fecha,
+        valor]);
+    
+
+    res.send("1");
+});
+
+router.get('/descargarmonedas', isLoggedIn, async (req, res) => {
+    try {
+
+        var year = "Template";
+        var mes = "monedas";
+    
+        const workbook = new Excel.Workbook();
+        const worksheet = workbook.addWorksheet("Costo Mensual");
+      
+        worksheet.getCell('B7').value = "Moneda";
+        worksheet.getCell('C7').value = "Fecha";
+        worksheet.getCell('D7').value = "Valor";
+
+        worksheet.getCell('I3').value = "Id";
+        worksheet.getCell('J3').value = "Simbolo";
+        worksheet.getCell('K3').value = "Descripcion";
+
+        worksheet.getCell('I2').value = "Monedas";
+
+        worksheet.getCell('B2').value = "Importante moneda es el ID de monedas";
+        worksheet.getCell('B3').value = "Fecha con formato : YYYY-MM-DD, Ejemplo:  2023-10-02";
+        worksheet.getCell('B4').value = "Valor: Sin separacion de miles y decimales con . Ej : 36199.9400 ";
+        
+        worksheet.mergeCells('B2:G2');
+
+
+
+        const monedas  = await pool.query(" SELECT * FROM moneda_tipo ");
+         
+        monedas.forEach((element, i) => {
+            worksheet.getCell('I'+ (i + 4)).value = element.id_moneda;
+            worksheet.getCell('J'+ (i + 4)).value = element.simbolo;
+            worksheet.getCell('K'+ (i + 4)).value = element.descripcion;
+        });
+
+      
+      // save under export.xlsx
+      await workbook.xlsx.writeFile(''+year+'_'+mes+'.xlsx');
+    
+      //_____________________________________________________________________________________
+      res.set({
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': `attachment; filename="`+year+`_`+mes+`.xlsx"`,
+      });
+      //_____________________________________________________________________________________
+      
+      // write into response
+      workbook.xlsx.write(res);
+        
+    } catch (error) {
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /descargarPlanilla \n" + error + "\n Generado por : " + req.user.login);
+            res.redirect(   url.format({
+                pathname:'/dashboard',
+                        query: {
+                        "a": 1
+                        }
+                    }));  
+    }
+});
+
+router.post('/fileupload',isLoggedIn, async (req,res) => {
+    
+   
+    try {
+
+        /*
+        var form = new formidable.IncomingForm();
+        let archivo = "";
+        form.parse(req, function (err, fields, files) {
+            var oldpath = files.filetoupload.path;
+            var name =  "src\\uploads\\planillaMonedas\\"+files.filetoupload.name;
+           // cargarArchivoFTPbyArchivo(oldpath,name,req);
+           vfs.rename(oldpath, name, function (err) {
+            if (err) throw err;
+            res.write('File uploaded and moved!');
+            res.end();
+            archivo = name;
+          })
+        });
+*/
+
+        var form = new formidable.IncomingForm();
+        new Promise((resolve, reject) => {
+           /*
+            fs.readFile('../dir/file1.txt', (err, data) => {
+                if (err) {
+                    reject(err);
+                } else{
+                    resolve(data.toString());
+                }
+            })*/
+            form.parse(req, function (err, fields, files) {
+                var oldpath = files.filetoupload.path;
+                var name =  "src\\uploads\\planillaMonedas\\"+files.filetoupload.name;
+               // cargarArchivoFTPbyArchivo(oldpath,name,req);
+               vfs.rename(oldpath, name,  (err) => {
+                if (err) {
+                    reject(err);
+                } else{
+                    resolve(name);
+                }
+              })
+            });
+        }).then(data => {
+            
+            var workbook = new Excel.Workbook(); 
+
+            let datos = [];
+            workbook.xlsx.readFile(data)
+                .then(function() {
+                    var worksheet = workbook.getWorksheet(1);
+                    worksheet.eachRow({ includeEmpty: true }, async function(row, rowNumber) {
+                        //console.log(rowNumber);
+                        let moneda  =  row.values[2];
+                        let fecha   =  row.values[3];
+                        let valor   =  row.values[4];
+
+                        //console.log(valor);
+                        if (rowNumber >= 8)
+                        {
+                            if (moneda != "" && fecha != "" && valor != "" && moneda != undefined && fecha != undefined)
+                            {
+                                const result =  pool.query("DELETE FROM moneda_valor WHERE id_moneda = '"+moneda+"' AND fecha_valor = '"+fecha+"' LIMIT 1;"); 
+
+                                const monedaDia  ={ //Se gurdaran en un nuevo objeto
+                                    id_moneda :moneda, 
+                                    fecha_valor : fecha,
+                                    valor : valor
+                                    };
+                                
+                                //const result2 = pool.query('INSERT INTO moneda_valor set ?', [monedaDia]);
+                                datos.push(monedaDia);
+                            }
+                        }
+
+                    })
+                    //const result2 = pool.query('INSERT INTO moneda_valor set ?', [datos]);
+
+                    datos.forEach(element => {
+                        //console.log(element);
+                        const result2 = pool.query('INSERT INTO moneda_valor set ?', [element]);
+                    });
+                })
+        }).catch(err => {
+            console.log(err);
+        });
+
+
+        res.redirect("../mantenedores/vmonedas");
+        
+    } catch (error) {
+        mensajeria.MensajerErrores("\n\n Archivo : costos.js \n Error en el directorio: /fileupload \n" + error + "\n Generado por : " + req.user.login);
+        res.redirect(   url.format({
+            pathname:'/dashboard',
+                    query: {
+                    "a": 1
+                    }
+                }));  
+    }
+
+});
 
 module.exports = router;

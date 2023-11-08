@@ -18,7 +18,12 @@
                             <tr>
                                 <th>Nombre Proyecto</th>
                                 <th>Director</th>
+                                <th>Servicio</th>
                                 <th>Moneda</th>
+                                <th>Valor Proyecto</th>
+                                <th>Adicionales</th>
+                                <th>Total Proyecto</th>
+                                <!-- <th>Moneda</th> -->
                                 <th>Costo Interno</th>
                                 <th>Cst. Ext. OC</th>
                                 <th>Cst. Ext. Netoffice</th>
@@ -28,9 +33,10 @@
                                                     <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
                                                     </svg></th>
                                 <th>Costo Total</th>
-                                <th>Factura Pagada</th>
-                                <th>Factura Cobranza</th>
-                                <th>Delta Facturas</th>
+                                <th>Fact. Pagada</th>
+                                <th>Fact. Cobranza</th>
+                                <th>Fact. Para Cobro</th>
+                                <!-- <th>Delta Facturas</th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -38,8 +44,13 @@
                                 <tr>
                                     <td>{{year}}-{{code}} : {{nombre}}</td>
                                     <td>{{director}}</td>
-                                    <td>UF</td>
-                                    <td>{{c_uf}}</td>
+                                    <td>{{servicio}}</td>
+                                    <td>{{simbolo}}</td>
+                                    <td>{{valorP}}</td>
+                                    <td>{{a}}</td>
+                                    <td>{{tp}}</td>
+                                    <!-- <td>UF</td> -->
+                                    <td>{{costointerno}}</td>
                                     <td>{{oc}}</td>
                                     <td>{{ce}}</td>
                                     <td>{{cep}}</td>
@@ -47,7 +58,8 @@
                                     <td>{{totp}}</td>
                                     <td>{{fp}}</td>
                                     <td>{{fc}}</td>
-                                    <td>{{df}}</td>
+                                    <td>{{pc}}</td>
+                                    <!-- <td>{{df}}</td> -->
                                 </tr>
                             {{/each}}
                         </tbody>
@@ -101,15 +113,17 @@
  
         // Get the column API object
         
-        var column4 = table.column(4);
-        var column5 = table.column(5);
-        var column6 = table.column(6);
+        
+        var column8 = table.column(8);
+        var column9 = table.column(9);
+        var column10 = table.column(10);
  
         // Toggle the visibility
         
-        column4.visible(!column4.visible());
-        column5.visible(!column5.visible());
-        column6.visible(!column6.visible());
+        
+        column8.visible(!column8.visible());
+        column9.visible(!column9.visible());
+        column10.visible(!column10.visible());
     });
 
     

@@ -628,7 +628,7 @@ router.get('/proyectos2/:id',isLoggedIn,  async (req, res) => {
                     };
                 
                  
-                    console.log(info);
+                    //console.log(info);
 
                 res.render('reporteria/dashboard2', {costoInternoCentro, costoInterno, CE_Resumen, costosExternos, facturas, info, req , layout: 'template', helpers : {
                                 if_equal : isEqualHelperHandlerbar
@@ -942,18 +942,19 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         element.sol_valor = "240";
                                 }
 
-
                                         switch(moneda) // moneda visualizacion por defecto UF
                                         {
                                                 case "S/":
-                                                        
                                                         switch(element.simbolo)
                                                         {
                                                                 case "$":
                                                                         if (element.pcambio === "1") // no es una OC
                                                                         {
-                                                                           element.totPro = (costoIngresado / element.sol_valor).toFixed(2);  
+                                                                           //console.log(element.pcambio + "____" + costoIngresado);
+                                                                           let aux = element.sol_valor.replace(",",".");
+                                                                           element.totPro = (costoIngresado / aux).toFixed(2);  
                                                                         }
+                                                                        
                                                                 break;
                                                                 case "UF":
                                                                         element.totPro =    ((element.punitario *   element.numhh *  element.pcambio) /   element.sol_valor ).toFixed(2); 
@@ -1076,7 +1077,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                         }
                                 });
                                 
-
+                
+                
                  const centro_costo = await pool.query("SELECT " +
                                                         " t2.Nombre AS nombre, " +
                                                         " SUBSTRING(t1.date,1,7) AS fecha, " +

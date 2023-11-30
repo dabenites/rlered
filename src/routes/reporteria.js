@@ -628,7 +628,6 @@ router.get('/proyectos2/:id',isLoggedIn,  async (req, res) => {
                     };
                 
                  
-                    //console.log(info);
 
                 res.render('reporteria/dashboard2', {costoInternoCentro, costoInterno, CE_Resumen, costosExternos, facturas, info, req , layout: 'template', helpers : {
                                 if_equal : isEqualHelperHandlerbar
@@ -841,7 +840,6 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                     " AND " +
                                                             "t1.id_tipo_cobro = t5.id",[id]);
                 
-                //console.log("test");
 
 
                 const cexternos = await pool.query("SELECT " +
@@ -914,7 +912,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                      " WHERE  " +
                                                             " t1.id_proyecto = ? " +
                                                      " AND  " +
-                                                            " t1.id_estado > 2 " +
+                                                            " t1.id_estado IN (2,3,5) " +
                                                      " AND  " +
                                                             " t1.id_centro_costo = t2.id " +
                                                       " AND  " +
@@ -950,7 +948,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                                                 case "$":
                                                                         if (element.pcambio === "1") // no es una OC
                                                                         {
-                                                                           //console.log(element.pcambio + "____" + costoIngresado);
+
                                                                            let aux = element.sol_valor.replace(",",".");
                                                                            element.totPro = (costoIngresado / aux).toFixed(2);  
                                                                         }
@@ -1506,6 +1504,7 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                         costoSol = costoSol + centro.horasCostoSol;
                 });
 
+           //console.log(colaboradoresCentroCostoGeneral);
 
            colaboradoresCentroCostoGeneral.forEach(
                         element => {
@@ -1566,7 +1565,8 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                 });
 
         
-                
+       //console.log(colaboradoresCentroCostoGeneral);
+       console.log("###############");         
 
         colaboradoresCentroCosto.forEach(element => {  
                         const col = colaboradoresCentroCosto.find(centro => {return centro.nombre === element.nombre });
@@ -1599,8 +1599,11 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
                                 if (col.costoUFExterno === undefined){ col.costoUFExterno = parseFloat( 0 ).toFixed(2);}
                                 else {col.costoUFExterno = parseFloat( col.costoUFExterno ).toFixed(2);}
                                 
+                                console.log(col);
+                                //console.log("#################");
+
                                 let costoUfLinea = parseFloat(col.costoUFExterno) + parseFloat(col.horasCosto);
-                                let costoDolarLinea = parseFloat(col.horasCostoDolar) + parseFloat(col.horasCostoDolar);
+                                let costoDolarLinea = parseFloat(col.costoUFExterno) + parseFloat(col.horasCostoDolar);
                                 let costoSolLinea = parseFloat(col.costoUFExterno) + parseFloat(col.horasCostoSol);
 
                                 
@@ -2063,7 +2066,6 @@ router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
             let costoEsperadov2 = (totalProyectov2 * porcentaje).toFixed(2);
 
             
-
             if (mensaje === "")
             {
                     res.render('reporteria/dashboard', { costoEsperadov2, pago_adicional, totalProyectov2, adicionalesPagadosv2, adicionalesIngresadosv2, totalFacturadoIngresado, costoAdiocionales, registros, selectUF,selectUSD,selectSOL ,proGeneral, moneda, indicadoresAvancesUser, totalPagado, totalFacturado, 
@@ -4212,6 +4214,8 @@ router.post('/buscarListadoProyectos',isLoggedIn,  async (req, res) => {
                 //#endregion
                  
         }
+
+        //console.log(infoAnalisis);
         
         infoAnalisis.vpresupuesto = Intl.NumberFormat('de-DE').format(infoAnalisis.vpresupuesto.toFixed(2));
         infoAnalisis.adicionales = Intl.NumberFormat('de-DE').format(infoAnalisis.adicionales.toFixed(2));
@@ -5815,7 +5819,7 @@ router.post('/analisisMonedaFactura',isLoggedIn,  async (req, res) => {
                 
                 if (valorUF === '' || valorUSD === '' || valorSOL === '')
                 {
-                        console.log("Error" + factura.id);
+                        console.log("Error : " + factura.id);
                 }
                 else
                 {

@@ -295,7 +295,7 @@ router.get('/facturas', isLoggedIn, async (req, res) => {
                                         " ORDER BY fechaSolicitante DESC");
 
 
-   // console.log(facturacion);
+    console.log(facturacion);
 
     const isEqualHelperHandlerbar = function(a, b, opts) {
         // console.log(a + "----" + b);

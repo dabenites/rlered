@@ -2133,7 +2133,7 @@ router.get('/ordencompra', isLoggedIn, async (req,res) => {
                                            " LEFT JOIN orden_compra_requerimiento AS t10 ON t1.id = t10.id_solicitud " +
                                            " LEFT JOIN moneda_tipo AS t11 ON t10.id_moneda = t11.id_moneda " +
                                            " WHERE t1.id_estado IN(1,2,3,4,5) " + 
-                                           " GROUP BY t1.id ORDER BY t1.id DESC", [req.user.idUsuario]); 
+                                           " GROUP BY t1.id ORDER BY fechaIngreso DESC", [req.user.idUsuario]); 
 
     // buscar el listado de las personas vigentes para poder terminar una OC por parte de finanzas.
     const listadoFinanzas = await pool.query(" SELECT * FROM orden_compra_aprob_finanzas");

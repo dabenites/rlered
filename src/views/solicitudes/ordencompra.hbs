@@ -377,7 +377,7 @@
                                 <div class="clearfix"></div>
                             </div>
         <div class="x_content">
-            <table class="table table-hover" id="tablaOrden">
+            <table class="table table-hover" id="tablaOrden" name="tablaOrden">
                         <thead>
                             <tr>
                                 <th>Emisor</th>
@@ -670,6 +670,11 @@
 
 
 <script>
+
+ 
+
+
+
  $('#tablaOrden').DataTable({
      "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
                 "<'row'<'col-sm-12'tr>>" +
@@ -694,6 +699,7 @@
             "previous": "Anterior"
           }
         },
+        order: [[4, 'desc']],
         "scrolly" : "50vh",
         "scrollCollapse" : true
       });

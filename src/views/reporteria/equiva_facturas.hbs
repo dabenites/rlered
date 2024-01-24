@@ -1,0 +1,53 @@
+ <h2>{{titulo}}</h2>
+ <table class="table table-striped" name="tablaErrores" id="tablaErrores" style="width: 100%;">
+    <thead>
+        <tr>
+            <th> Id/ Código</th>
+            <th> Fecha Revisar</th>
+            <th> Error </th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each errores}}
+        <tr>
+            <td>{{id}}</td>
+            <td>{{fecha}}</td>
+            <td>{{desc}}</td>
+        </tr>
+        {{/each}}
+    </tbody>  
+ </table>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+ <script src="../../../template/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+ <script src="../../../template/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script> 
+ <script src="../../../template/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+
+ <script>
+    $('#tablaErrores').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'f><'col-sm-12 col-md-6'l>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        }
+      });
+ </script>

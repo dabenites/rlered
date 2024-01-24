@@ -75,7 +75,9 @@ En el caso que falte una fecha para una factura será reportada.
         </div>
 </div>
 
-<div class="col-md-8">
+<div class="col-md-1">
+</div>
+<div class="col-md-7">
     <div class="row" id="cargaInformacion">
     </div>
 
@@ -150,7 +152,7 @@ En el caso que falte una fecha para una factura será reportada.
                          toastr.success('Analisis de Factura terminado', 'Información', {
                                     "progressBar": true
                                 });
-                        $('#cargaInformacion').html('');
+                        $('#cargaInformacion').html(result);
                     }
                 });
 
@@ -175,7 +177,7 @@ En el caso que falte una fecha para una factura será reportada.
                          toastr.success('Analisis de OC terminado', 'Información', {
                                     "progressBar": true
                                 });
-                        $('#cargaInformacion').html('');
+                        $('#cargaInformacion').html(result);
                     }
                 });
     }
@@ -197,7 +199,7 @@ function BitacoraNueva()
                          toastr.success('Análisis de bitacora Planner terminada', 'Información', {
                                     "progressBar": true
                                 });
-                        $('#cargaInformacion').html('');
+                        $('#cargaInformacion').html(result);
                     }
                 });
 

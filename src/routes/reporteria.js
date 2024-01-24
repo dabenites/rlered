@@ -3984,10 +3984,12 @@ router.post('/buscarListadoProyectos',isLoggedIn,  async (req, res) => {
 
         
 
-        let {servicio,moneda,estado,director,desde,hasta} = req.body;
+        let {servicio,moneda,estado,director,desde,hasta, codigoProyecto,nombre_pro} = req.body;
         let sqlDirector = "";
         let sqlEstado = "";
         let sqlServicio = "";
+        let sqlCodigo = "";
+        let sqlNombre = "";
 
         // verificamos valores desde y hasta 
         if (desde === ""){ desde = 1000;} //
@@ -4006,7 +4008,20 @@ router.post('/buscarListadoProyectos',isLoggedIn,  async (req, res) => {
         {
                 sqlServicio = " AND t1.id_tipo_servicio = "+servicio+"";
         }
+
+        if ( codigoProyecto != "")
+        {
+                
+                sqlCodigo = " AND CONCAT(t1.year,'-',t1.code) LIKE '%"+codigoProyecto+"%' ";
+        }
+        if ( nombre_pro != "")
+        {
+                
+                sqlNombre = " AND t1.nombre  LIKE '%"+nombre_pro+"%' ";
+        }
         
+        
+        //console.log(sqlCodigo);
         let sql = "SELECT " +
                         " t1.nombre, " +
                         " t1.id, " +
@@ -4032,10 +4047,12 @@ router.post('/buscarListadoProyectos',isLoggedIn,  async (req, res) => {
                         " AND   t1.id_director = t2.idUsuario " +
                         " AND   t1.id_tipo_servicio = t3.id  " +
                        // " AND   t1.id_cliente = t4.id " +
-                        " AND 	t1.id_estado = t5.id " +
+                        " AND t1.id_estado = t5.id " +
                         sqlDirector +
                         sqlEstado + 
                         sqlServicio +
+                        sqlCodigo+ 
+                        sqlNombre+
                         " ";
 
 
@@ -4124,6 +4141,11 @@ router.post('/buscarListadoProyectos',isLoggedIn,  async (req, res) => {
                                         adicional_clp = adicional_clp + parseFloat(factura.monto_clp);
                                         adicional_usd = adicional_usd + parseFloat(factura.monto_dolar);
                                         adicional_sol = adicional_sol + parseFloat(factura.monto_sol);
+
+                                        pagada_uf = pagada_uf + parseFloat(factura.monto_uf);
+                                        pagada_clp = pagada_clp + parseFloat(factura.monto_uf);
+                                        pagada_usd = pagada_usd + parseFloat(factura.monto_dolar);
+                                        pagada_sol = pagada_sol + parseFloat(factura.monto_sol);
                                 }
                                 else
                                 {
@@ -5036,9 +5058,9 @@ router.post('/bitacoraPlanner',isLoggedIn,  async (req, res) => {
                         {
                                
                                 errores.push({
-                                        tipo : "Valor moneda",
+                                        desc : "Valor moneda",
                                         fecha : fechaAnalisis,
-                                        usuario : usuarioID
+                                        id : b.id_usuario
                                 });
                         }
                         else
@@ -5050,9 +5072,9 @@ router.post('/bitacoraPlanner',isLoggedIn,  async (req, res) => {
                                 if (bValorUsuario === undefined)
                                 {
                                         errores.push({
-                                                tipo : "Costo Usuario",
+                                                desc : "Costo Usuario",
                                                 fecha : fechaAnalisis,
-                                                usuario : usuarioID
+                                                id : usuarioID
                                         });   
                                         
                                         /*
@@ -5098,7 +5120,19 @@ router.post('/bitacoraPlanner',isLoggedIn,  async (req, res) => {
                 });
 
 
-        res.send('ok');
+                //console.log(errores);
+
+                if (errores.length == 0 )
+                {
+                        res.send('')
+                }
+                else
+                {
+                        
+                      let titulo = "Errores Bitacora - Planner";
+                      res.render('reporteria/equiva_facturas', { errores, req , layout: 'blanco'});  
+                }
+
 });
 function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -5312,7 +5346,7 @@ router.post('/analisisMonedaCostoExterno',isLoggedIn,  async (req, res) => {
                                 {
                                         case 1: // Pesos
                                         registro = {
-                                                
+                                                id_costo_externo : ce.id_costo_externo,
                                                 id_proyecto : ce.id_proyecto,
                                                 id_moneda_base : ce.id_moneda,
                                                 id_prob_externo : ce.id_prob_externo,
@@ -5335,7 +5369,7 @@ router.post('/analisisMonedaCostoExterno',isLoggedIn,  async (req, res) => {
                                         break;
                                         case 2: // USD
                                         registro = {
-                                                
+                                                id_costo_externo : ce.id_costo_externo,
                                                 id_proyecto : ce.id_proyecto,
                                                 id_moneda_base : ce.id_moneda,
                                                 id_prob_externo : ce.id_prob_externo,
@@ -5358,6 +5392,7 @@ router.post('/analisisMonedaCostoExterno',isLoggedIn,  async (req, res) => {
                                         break;
                                         case 4: // UF
                                         registro = {
+                                                id_costo_externo : ce.id_costo_externo,
                                                 id_proyecto : ce.id_proyecto,
                                                 id_moneda_base : ce.id_moneda,
                                                 id_prob_externo : ce.id_prob_externo,
@@ -5378,6 +5413,9 @@ router.post('/analisisMonedaCostoExterno',isLoggedIn,  async (req, res) => {
                                         }
                                         ist =  pool.query('INSERT INTO proyecto_costo_externo_equivalencias set ?', [registro]);
                                         break;
+                                        case 10:
+                                                console.log("REGISTRAR");
+                                        break;
                 
                                 }
                                 
@@ -5394,6 +5432,7 @@ router.post('/analisisMonedaCostoExterno',isLoggedIn,  async (req, res) => {
 router.post('/analisisMonedaOC',isLoggedIn,  async (req, res) => {
 
 
+let errores = [];
         //#region VALORES DE LAS MONEDAS 
 let valorUfMensual = []; 
 let valorUsdMensual = [];
@@ -5509,7 +5548,40 @@ valorSOLMes.forEach(element => {
 
                         if (colUSD === undefined || colUF === undefined || colSOL === undefined )
                         {
-                                console.log("ERROR EN LA CARGA DE ALGUN VALOR DE MONEDA" + fechaAnalisis);
+                                console.log("ERROR EN LA CARGA DE ALGUN VALOR DE MONEDA " + fechaAnalisis);
+
+                                if (colUSD === undefined){
+                                        errores.push(
+                                                {
+                                                        tipo : "Orden Compra",
+                                                        id : oc.folio,
+                                                        fecha : fechaAnalisis,
+                                                        desc : "No se encontro el valor USD"
+                                                }
+                                        );
+                                }
+                                if (colUF === undefined){
+                                        errores.push(
+                                                {
+                                                        tipo : "Orden Compra",
+                                                        id : oc.folio,
+                                                        fecha : fechaAnalisis,
+                                                        desc : "No se encontro el valor UF"
+                                                }
+                                        );
+                                }
+                                if (colSOL === undefined){
+                                        errores.push(
+                                                {
+                                                        tipo : "Orden Compra",
+                                                        id : oc.folio,
+                                                        fecha : fechaAnalisis,
+                                                        desc : "No se encontro el valor SOL"
+                                                }
+                                        );
+                                }
+                                
+
                         }
                         else
                         {
@@ -5622,10 +5694,19 @@ valorSOLMes.forEach(element => {
 
         }
 
-        //oc.log();
-       
+        console.log(errores);
 
-        res.send('ok');
+        if (errores.length == 0 )
+        {
+                res.send('')
+        }
+        else
+        {
+                
+              let titulo = "Errores Orden de Compra";
+              res.render('reporteria/equiva_facturas', { errores, req , layout: 'blanco'});  
+        }
+
 });
 
 //analisisMoneda
@@ -5700,6 +5781,7 @@ router.post('/analisisMonedaFactura',isLoggedIn,  async (req, res) => {
         
 
         // bloque Facturas 
+       
         let sqlFacturas = " SELECT * " +
                           " FROM  " +
                                         " fact_facturas AS t2 " +
@@ -5710,6 +5792,9 @@ router.post('/analisisMonedaFactura',isLoggedIn,  async (req, res) => {
                                                                 " FROM  " +
                                                                         " fact_facturas_equivalencias AS t1 "+
                                                           ")";
+                                                          
+
+        
 
         let listadoProyectosAnalisisFactura = await pool.query(sqlFacturas);
  
@@ -5850,8 +5935,21 @@ router.post('/analisisMonedaFactura',isLoggedIn,  async (req, res) => {
 
 
         
+        
+        if (errores.length == 0 )
+        {
+                res.send('')
+        }
+        else
+        {
+                
+              let titulo = "Errores Facturas";
+              res.render('reporteria/equiva_facturas', { errores, req , layout: 'blanco'});  
+        }
 
-        res.send("ok");
+        
+
+
 });
 
 

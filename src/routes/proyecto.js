@@ -627,6 +627,7 @@ router.get('/editar/:id', isLoggedIn, async (req, res) => {
      " t1.id_pais AS id_pais, " +
      " t1.zona AS zona, " +
      " t1.id_estado as id_estado,"+
+     " t1.direccion as direccion,"+
      " t1.suelo AS suelo, " +
      " t1.categoria AS categoria, " +
      " t1.id_jefe AS idJefe, t1b.Nombre AS nomJefe, " +
@@ -655,6 +656,7 @@ router.get('/editar/:id', isLoggedIn, async (req, res) => {
      " t1.zona AS zona, " +
      " t1.id_estado as id_estado,"+
      " t1.suelo AS suelo, " +
+     " t1.direccion as direccion,"+
      " t1.categoria AS categoria, " +
      " t1.id_jefe AS idJefe, t1b.Nombre AS nomJefe, " +
      " t1.id_mandante AS idMan , t1c.name nomMan, " +
@@ -689,7 +691,7 @@ router.get('/editar/:id', isLoggedIn, async (req, res) => {
       };
   
   // Revisión
-  
+  //console.log(proyectos[0]);
  
   res.render('proyecto/uptProyecto', {monedas,zonas, suelo,categoria, proyecto:proyectos[0], tipo, complejidad, servicio, estado, req, layout: 'template' , helpers : { if_equal : isEqualHelperHandlerbar}});
 

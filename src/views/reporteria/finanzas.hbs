@@ -6,7 +6,7 @@
         </div>
         <div class="x_content">
             <div class="form-group row">
-                <label for="staticEmail" class="col-sm-3 col-form-label">Moneda Presentación</label>
+                <label for="id_moneda" class="col-sm-3 col-form-label">Moneda Presentación</label>
                     <div class="col-sm-8">
                         <select class="form-control" name="id_moneda" id="id_moneda">
                                     <option value="0">Seleccione una opción</option>
@@ -17,7 +17,7 @@
                     </div>
             </div>
             <div class="form-group row">
-                <label for="staticEmail" class="col-sm-3 col-form-label">Servicio Proyecto</label>
+                <label for="id_servicio_proyecto" class="col-sm-3 col-form-label">Servicio Proyecto</label>
                     <div class="col-sm-8">
                         <select class="form-control" name="id_servicio_proyecto" id="id_servicio_proyecto">
                                     <option value="0">Seleccione una opción</option>
@@ -28,7 +28,7 @@
                     </div>
             </div>
             <div class="form-group row">
-                <label for="staticEmail" class="col-sm-3 col-form-label">Estado Proyecto</label>
+                <label for="id_estado_proyecto" class="col-sm-3 col-form-label">Estado Proyecto</label>
                     <div class="col-sm-8">
                         <select class="form-control" name="id_estado_proyecto" id="id_estado_proyecto">
                                     <option value="0">Seleccione una opción</option>
@@ -39,7 +39,7 @@
                     </div>
             </div>
             <div class="form-group row">
-                <label for="staticEmail" class="col-sm-3 col-form-label">Director</label>
+                <label for="idx_director" class="col-sm-3 col-form-label">Director</label>
                     <div class="col-sm-8">
                         <select class="form-control" name="id_director" id="id_director">
                                     <option value="0">Seleccione una opción</option>
@@ -50,13 +50,25 @@
                     </div>
             </div>
             <div class="form-group row">
-                <label for="staticEmail" class="col-sm-3 col-form-label">Periodo</label>
+                <label for="idx_desdeHasta" class="col-sm-3 col-form-label">Fecha (Año)</label>
                     <div class="col-sm-4">
                         <input type="number" id="desdeProyecto" name="desdeProyecto"  class="form-control" placeholder="Desde">
                     </div>
                     -
                     <div class="col-sm-4">
                         <input type="number" id="hastaProyecto" name="hastaProyecto"  class="form-control" placeholder="Hasta">
+                    </div>
+            </div>
+            <div class="form-group row">
+                <label for="id_codigo" class="col-sm-3 col-form-label">Código Proyecto</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="codigo_proyecto" name="codigo_proyecto"  class="form-control" >
+                    </div>
+            </div>
+            <div class="form-group row">
+                <label for="nombre_pro" class="col-sm-3 col-form-label">Nombre Proyecto</label>
+                    <div class="col-sm-8">
+                        <input type="text" id="nombre_pro" name="nombre_pro"  class="form-control" >
                     </div>
             </div>
             <div class="form-group row">
@@ -81,9 +93,11 @@
         var director = $("#id_director").val();
         var desde = $("#desdeProyecto").val();
         var hasta = $("#hastaProyecto").val();
+        var codigoProyecto = $("#codigo_proyecto").val();  
+        var nombre_pro = $("#nombre_pro").val();
 
         let informacion = {
-            servicio,moneda,estado,director,desde,hasta
+            servicio,moneda,estado,director,desde,hasta,codigoProyecto,nombre_pro
         };
         
         $('#cargaResultado').html('<div class="col-md-4"></div><div class="col-md-4"><button class="btn btn-primary" type="button" disabled> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...</button></div><div class="col-md-4"></div>');

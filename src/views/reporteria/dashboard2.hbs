@@ -330,15 +330,16 @@
                                 <div class="panel-heading"> <i class="fa fa-university" aria-hidden="true"> Datos Generales </i></div>
                                     <div class="panel-body">
                                         <div class="row">
-                                                <label class="col-form-label col-md-5 label-align" for="moneda">
+                                                <label class="col-form-label col-md-5 label-align" for="simbolo">
                                                         <b> Moneda</b>
                                                 </label>
-                                                <select class="col-form-label col-md-4" name="idMoneda" id="idMoneda" onchange="ActualizaMonedas(this.value);">
-                                                         <option value="4" {{selectUF}}>UF</option>
-                                                         <option value="2" {{selectUSD}}>USD</option>
-                                                         <option value="10"{{selectSOL}}>SOL</option>
+                                                <!-- <select class="col-form-label col-md-4" name="idMoneda" id="idMoneda" onchange="ActualizaMonedas(this.value);" readonly="readonly">
+                                                         <option value="4" {{info.selectUF}} readonly="readonly">UF</option>
+                                                         <option value="2" {{info.selectUSD}} readonly="readonly">USD</option>
+                                                         <option value="10"{{info.selectSOL}} readonly="readonly">SOL</option>
 
-                                                </select>
+                                                </select>-->
+                                                <label class="col-form-label col-md-7" for="fxsimbolo">{{info.simbolo}}</label>
                                                 <input type="hidden" name="idProyecto" id="idProyecto" value="{{info.id}}">
                                         </div>
 
@@ -488,26 +489,26 @@
                                                  <table id="iproductividad" class="table table-striped table-bordered" style="width:100%;padding: 0.1rem 0.1rem;">
                                                     <tbody>
                                                         <tr>
-                                                            <td style=" text-align: right;"> Costo {{moneda}} / m<sup>2</sup></td>
-                                                            <td id="costo_m2"></td>
+                                                            <td style=" text-align: right;"> Costo {{info.simbolo}} / m<sup>2</sup></td>
+                                                            <td id="costo_m2">{{info.productividad_cst_m}}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="text-align: right;">Costo {{moneda}} / plano</td>
-                                                            <td  id="costo_plano"></td>
+                                                            <td style="text-align: right;">Costo {{info.simbolo}} / plano</td>
+                                                            <td  id="costo_plano">{{info.productividad_cst_plano}}</td>
                                                             <input type="hidden" value="" name="dato0" id="dato0">
                                                             <input type="hidden" value="" name="dato1" id="dato1">
                                                         </tr>
                                                         <tr>
                                                             <td style="text-align: right;">Hrs Dib/ plano</td>
-                                                            <td id="hrsDibPlano"></td>
+                                                            <td id="hrsDibPlano">{{info.hrsDib_plano}}</td>
                                                         </tr>
                                                          <tr>
                                                             <td style="text-align: right;">m<sup>2</sup> / plano</td>
-                                                            <td  id="m2_plano"></td>
+                                                            <td  id="m2_plano">{{info.m2_plano}}</td>
                                                          </tr>
                                                           <tr>
                                                             <td style="text-align: right;">Nº Hrs Mod.</td>
-                                                            <td>{{modificaciones.horas}}</td>
+                                                            <td>{{info.numHrs_mod}}</td>
                                                           </tr>
                                                     </tbody>
                                                  </table>
@@ -533,19 +534,19 @@
                                                         </tr>
                                                         <tr>
                                                             <td style="text-align: right;">Adicionales Pagados [{{info.simbolo}}]</td>
-                                                            <td id="adicionalesProyecto">{{adicionalesPagadosv2}}</td>
+                                                            <td id="adicionalesProyecto">{{info.RocPagado}}</td>
                                                         </tr>
                                                         <tr>
                                                             <td style="text-align: right;">Total Proyecto [{{info.simbolo}}]</td>
-                                                            <td id="totalProyecto">{{totalProyectov2}}</td>
+                                                            <td id="totalProyecto">{{info.economico_total_proyecto}}</td>
                                                         </tr>
                                                         <tr>
                                                                 <td style="text-align: right;">Costo Total [{{info.simbolo}}]</td>
-                                                                <td  id="costoTotalPro"></td>
+                                                                <td  id="costoTotalPro">{{info.costoTotal}}</td>
                                                         </tr>
                                                         <tr>
                                                                 <td style="text-align: right;">Margen [{{info.simbolo}}] (Valor Total Proyecto)</td>
-                                                                <td  id="margenPro"></td>
+                                                                <td  id="margenPro">{{info.margen}}</td>
                                                         </tr>
                                                     </tbody>
                                             </table>
@@ -569,7 +570,7 @@
                                                         
                                                          <tr>
                                                             <td style="text-align: right;">Margen [{{info.simbolo}}] (Fact.)</td>
-                                                            <td id="margenProFac"></td>
+                                                            <td id="margenProFac">{{info.margenFac}}</td>
                                                          </tr>
                                                          
                                                           <tr>
@@ -602,44 +603,23 @@
                                             <tr>
                                                 <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;"></th>
                                                 <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Interno [hrs]</th>
-                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">C. Int. [{{moneda}}]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">C. Int. [{{info.simbolo}}]</th>
                                                 <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Externo [hrs]</th>
-                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">C. Ext. [{{moneda}}]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">C. Ext. [{{info.simbolo}}]</th>
                                                 <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Totales [hrs]</th>
-                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Totales [{{moneda}}]</th>
+                                                <th style="padding-top: 0.3rem;padding-bottom: 0.3rem;">Totales [{{info.simbolo}}]</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {{#each colaboradoresCentroCostoGeneral}}
                                              <tr>
                                                 <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{nombre}}</td>
-                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horas}}</td>
-                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
-                                                    {{#if (if_equal ../moneda "UF") }}
-                                                        {{horasCosto}}
-                                                    {{/if}}
-                                                    {{#if (if_equal ../moneda "US$") }}
-                                                        {{horasCostoDolar}}
-                                                    {{/if}}
-                                                    {{#if (if_equal ../moneda "S/") }}
-                                                        {{horasCostoSol}}
-                                                    {{/if}}
-                                                    </td>
-                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{externo}}</td>
-                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{costoUFExterno}}</td>
-                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{total}}</td>
-                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">
-                                                     {{#if (if_equal ../moneda "UF") }}
-                                                        {{costoTotal}}
-                                                    {{/if}}
-                                                    {{#if (if_equal ../moneda "US$") }}
-                                                        {{costoTotalDolar}}
-                                                    {{/if}}
-                                                    {{#if (if_equal ../moneda "S/") }}
-                                                        {{costoTotalSol}}
-                                                    {{/if}}
-
-                                                </td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horasInterna}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horasCostoInterna}} </td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horasExterna}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{horasCostoExterna}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;">{{TotalHoras}}</td>
+                                                <td style="padding-top: 0.3rem;padding-bottom: 0.3rem;"> {{CostoTotal}}</td>
                                             </tr>
                                              {{/each}}
                                          </tbody>
@@ -1063,6 +1043,36 @@
         }
       }); 
 
+      var dataTable2a = $('#example2a').DataTable({
+          "dom": "<'row'<'col-sm-12 col-md-6'><'col-sm-12 col-md-6'>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-12 col-md-5'><'col-sm-12 col-md-7'p>>",
+        columnDefs: [
+                        { className: 'text-center', targets: [0,1,2,3,4,5,6] },
+                    ],
+        language: {
+          "decimal": "",
+          "emptyTable": "No hay información",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+          "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+          "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+          "infoPostFix": "",
+          "thousands": ",",
+          "lengthMenu": "Mostrar _MENU_ Entradas",
+          "loadingRecords": "Cargando...",
+          "processing": "Procesando...",
+          "search": "Buscar:",
+          "zeroRecords": "Sin resultados encontrados",
+          "paginate": {
+            "first": "Primero",
+            "last": "Ultimo",
+            "next": "Siguiente",
+            "previous": "Anterior"
+          }
+        }
+      });
+      
+
     $(document).ready(function(){
 
       /// GRAFICOS 
@@ -1121,6 +1131,294 @@
                         dataset[c].data.push(valor);
                     }
                 }
+
+    // USO COSTO ESPERADOS 
+    // The speed gauge
+    var gaugeOptions = {
+                                    chart: {
+                                        type: 'solidgauge'
+                                    },
+
+                                    title: null,
+                                    pane: {
+                                        center: ['50%', '85%'],
+                                        size: '140%',
+                                        startAngle: -90,
+                                        endAngle: 90,
+                                        background: {
+                                        backgroundColor:
+                                            Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+                                        innerRadius: '60%',
+                                        outerRadius: '100%',
+                                        shape: 'arc'
+                                        }
+                                    },
+
+                                    exporting: {
+                                        enabled: false
+                                    },
+
+                                    tooltip: {
+                                        enabled: false
+                                    },
+
+                                    // the value axis
+                                    yAxis: {
+                                        stops: [
+                                        [0.1, '#55BF3B'], // green
+                                        [0.5, '#DDDF0D'], // yellow
+                                        [0.9, '#DF5353'] // red
+                                        ],
+                                        lineWidth: 0,
+                                        tickWidth: 0,
+                                        minorTickInterval: null,
+                                        tickAmount: 2,
+                                        title: {
+                                        y: -70
+                                        },
+                                        labels: {
+                                        y: 16
+                                        }
+                                    },
+
+                                    plotOptions: {
+                                        solidgauge: {
+                                        dataLabels: {
+                                            y: 5,
+                                            borderWidth: 0,
+                                            useHTML: true
+                                        }
+                                        }
+                                    }
+                                    };
+
+    var chartSpeed = Highcharts.chart('container-speed', Highcharts.merge(gaugeOptions, {
+                    yAxis: {
+                        min: 0,
+                        max: 100,
+                        title: {
+                        text: 'Uso Costos Esperados'
+                        }
+                    },
+
+                    credits: {
+                        enabled: false
+                    },
+
+                    series: [{
+                        name: 'Speed',
+                        data: [parseInt("{{info.uso_cost_esperado}}")],
+                        dataLabels: {
+                        format:
+                            '<div style="text-align:center">' +
+                            '<span style="font-size:25px">{y}</span><span style="font-size:13px;opacity:0.4"> %</span><br/>' +
+                            '<span style="font-size:12px;opacity:0.4"></span>' +
+                            '</div>'
+                        }
+                    }]
+
+                    }));
+
+    // MARGEN PAGADO 
+    var gaugeOptions2 = {
+                                    chart: {
+                                        type: 'solidgauge'
+                                    },
+
+                                    title: null,
+                                    pane: {
+                                        center: ['50%', '85%'],
+                                        size: '140%',
+                                        startAngle: -90,
+                                        endAngle: 90,
+                                        background: {
+                                        backgroundColor:
+                                            Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+                                        innerRadius: '60%',
+                                        outerRadius: '100%',
+                                        shape: 'arc'
+                                        }
+                                    },
+
+                                    exporting: {
+                                        enabled: false
+                                    },
+
+                                    tooltip: {
+                                        enabled: false
+                                    },
+
+                                    // the value axis
+                                    yAxis: {
+                                        stops: [
+                                        [0, '#DF5353'],     // green 55BF3B
+                                        [0.5, '#DDDF0D'],   // yellow DDDF0D
+                                        [0.75, '#55BF3B']   // red DF5353
+                                        ],
+                                        lineWidth: 0,
+                                        tickWidth: 0,
+                                        minorTickInterval: null,
+                                        tickAmount: 2,
+                                        title: {
+                                        y: -70
+                                        },
+                                        labels: {
+                                        y: 16
+                                        }
+                                    },
+
+                                    plotOptions: {
+                                        solidgauge: {
+                                        dataLabels: {
+                                            y: 5,
+                                            borderWidth: 0,
+                                            useHTML: true
+                                        }
+                                        }
+                                    }
+                                    };
+
+var chartRpm = Highcharts.chart('container-rpm', Highcharts.merge(gaugeOptions2, {
+  yAxis: {
+    min: 0,
+    max: 100,
+    title: {
+      text: 'Margen (Pagado)'
+    }
+  }, 
+  credits: {
+    enabled: false
+  },
+
+  series: [{
+    name: 'Margen',
+    data: [parseFloat("{{info.margen_pagado}}")],
+    dataLabels: {
+      format:
+         '<div style="text-align:center">' +
+        '<span style="font-size:25px">{y}</span><span style="font-size:13px;opacity:0.4"> %</span><br/>' +
+        '<span style="font-size:12px;opacity:0.4"></span>' +
+        '</div>'
+    }
+  }]
+
+}));
+
+// DIstribucion HORAS 
+    var mostrarA = $("#barChartA");
+    var mostrarB = $("#barChartB");
+
+    let valoresHHTotal = [];
+    let valoresHHCostoTotal = [];
+    let labelsCentrosTotal = [];
+    let labelsColorTotal = [];
+
+           dataTable2a.rows().iterator('row', function(context, index){
+                var node = $(this.row(index).node()); 
+                    
+                    if (node.context.children[0].innerText != "TOTALES")
+                    {
+                        labelsCentrosTotal.push(node.context.children[0].innerText);
+                        const centroColor = coloresCentro.find(centro => {return centro.centroCosto === node.context.children[0].innerText });
+                        if (centroColor !== undefined)
+                        {
+                            labelsColorTotal.push(centroColor.color)
+                        }
+                        
+                    }
+                });
+                
+            let totalUF =0;
+            let totalUFDib =0;
+            let totalHrsDib =0;
+
+    for (let centros in labelsCentrosTotal)
+            {
+
+                
+                dataTable2a.rows().iterator('row', function(context, index){
+                var node = $(this.row(index).node()); 
+                    
+                    let auxHHTotal = node.context.children[5].innerText;
+                                auxHHTotal = auxHHTotal.replace(".","").replace(".","");
+                                auxHHTotal = auxHHTotal.replace(",",".");
+
+                    let auxHHCostoTotal = node.context.children[6].innerText;
+                                auxHHCostoTotal = auxHHCostoTotal.replace(".","").replace(".","");
+                                auxHHCostoTotal = auxHHCostoTotal.replace(",",".");
+
+                    if (node.context.children[0].innerText != "TOTALES")
+                    {
+                        if (labelsCentrosTotal[centros] == node.context.children[0].innerText)
+                        {
+                            valoresHHTotal.push(auxHHTotal);
+                            valoresHHCostoTotal.push(auxHHCostoTotal);
+                        }
+
+                        if ( node.context.children[0].innerText === "DIBUJO")
+                        {
+                            totalUFDib = auxHHCostoTotal;
+                            totalHrsDib = auxHHTotal
+                        }
+                    }
+                    else
+                    {
+                        totalUF = auxHHCostoTotal;
+                    }
+                    
+                });
+            }
+
+    var dataTotal = {
+                        labels: labelsCentrosTotal,
+                        datasets: [
+                            {
+                                fill: true,
+                                backgroundColor: labelsColorTotal,
+                                data: valoresHHTotal
+                            }
+                        ]
+                    };
+
+  const chartA = new Chart(mostrarA, {
+                type: 'pie',
+                data: dataTotal,
+                options: {
+                            plugins: {
+                            title: {
+                                display: true,
+                                text: 'Distribución HORAS [Hrs]'
+                            },
+                            },
+                            responsive: true
+                        }
+                });
+
+// DISTRUBICION COSTO 
+var dataCostoTotal = {
+                        labels: labelsCentrosTotal,
+                        datasets: [
+                            {
+                                fill: true,
+                                backgroundColor: labelsColorTotal,
+                                data: valoresHHCostoTotal
+                            }
+                        ]
+                    };
+
+ const chartB = new Chart(mostrarB, {
+                type: 'pie',
+                data: dataCostoTotal,
+                options: {
+                            plugins: {
+                            title: {
+                                display: true,
+                                text: 'Distribución COSTO [{{info.simbolo}}]'
+                            },
+                            },
+                            responsive: true
+                        }
+                });
 
       /// COSTO INTERNO 
       var costo_interno_esfuerzo_mes = $("#myChart");
@@ -1216,7 +1514,7 @@
                                 plugins: {
                                 title: {
                                     display: true,
-                                    text: 'C. Externo Distribución COSTOS [{{moneda}}]'
+                                    text: 'C. Externo Distribución COSTOS [{{info.simbolo}}]'
                                 },
                                 },
                                 responsive: true
@@ -1289,7 +1587,7 @@
                             plugins: {
                             title: {
                                 display: true,
-                                text: 'C. Interno Distribución COSTOS [{{moneda}}]'
+                                text: 'C. Interno Distribución COSTOS [{{info.simbolo}}]'
                             },
                             },
                             responsive: true

@@ -182,7 +182,7 @@ function getSimboloByIdMoneda( idMoneda)
 
 
 //router.get('/proyectos2/:id',isLoggedIn,  async (req, res) => {
-router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {
+router.get('/proyectos/:id',isLoggedIn,  async (req, res) => {o
         try {
                 let { id } = req.params; // ID PROYECTO 
 

@@ -249,21 +249,25 @@ router.post('/addSolicitud', isLoggedIn, async (req, res) => {
       mensajeria.EnvioMailIngresoPloter(mailPloter);
 
     //res.redirect('/ploter/ploteo/');
+   /*
     res.redirect(   url.format({
         pathname:'/ploter/ploteo',
         query: {
            "a": 1
          }
       }));
+      */
 
     } catch (error) {
         mensajeria.MensajerErrores("\n\n Archivo : ploter.js \n Error en el directorio: /addSolicitud \n" + error + "\n Generado por : " + req.user.login);
+        /*
         res.redirect(   url.format({
             pathname:'/dashboard',
                     query: {
                     "a": 1
                     }
                 }));  
+                */
     }
 
   

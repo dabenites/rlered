@@ -426,12 +426,14 @@
                                                 <i class="fa fa-search"></i>
                                             </button>
                                             -->
+                                            <a href="/solicitudes/createPDFPre/{{id}}" style="color: white;" target="_blank">
                                             <button type="button" class="btn btn-secondary btn-sm">
-                                                <a href="/solicitudes/createPDFPre/{{id}}" style="color: white;" target="_blank">
+                                                
                                                 <i class="fa fa-search">
                                                 </i>
-                                                </a>
+                                                
                                             </button>
+                                            </a>
                                             <!-- SOLO EN ESTE ESTADO SE PUEDE EDITAR -->
                                             <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg3" onclick="EditarOC({{id}})">
                                                 <i class="fa fa-edit"></i>
@@ -494,20 +496,22 @@
                                         {{/if}}
 
                                         {{#if (if_equal 2 id_estado) }}
-                                         <button type="button" class="btn btn-secondary btn-sm">
-                                             <a href="/solicitudes/createPDF/{{id}}" style="color: white;" target="_blank">
-                                             <i class="fa fa-print">
-                                             </i>
-                                             </a>
-                                         </button>
+                                            <a href="/solicitudes/createPDF/{{id}}" style="color: white;" target="_blank">
+                                                <button type="button" class="btn btn-secondary btn-sm">
+                                            
+                                                <i class="fa fa-print">
+                                                </i>
+                                                </button>
+                                            </a>
                                         {{/if}}
                                         {{#if (if_equal 3 id_estado) }}
-                                         <button type="button" class="btn btn-success btn-sm">
-                                             <a href="/solicitudes/createPDF/{{id}}" style="color: white;" target="_blank">
-                                             <i class="fa fa-print">
-                                             </i>
-                                             </a>
-                                         </button> 
+                                            <a href="/solicitudes/createPDF/{{id}}" style="color: white;" target="_blank">
+                                                <button type="button" class="btn btn-success btn-sm">
+                                                <i class="fa fa-print">
+                                                </i>
+                                                
+                                                </button> 
+                                            </a>
                                          
                                             {{#if (if_equal "N" recepcionado_finanza) }}
                                                 {{#if (if_equal "Y" ../UserFinanzas) }}
@@ -523,12 +527,12 @@
                                         <!-- PODER BORRAR -->
                                         {{#if (if_equal id_solicitante ../req.user.idUsuario) }}
                                             {{#if (if_distinto 4 id_estado)}}
-                                         <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg4" onclick="cargaOCEliminar({{id}}, '{{folio}}' , '{{nomProoveedor}}')">
+                                                 <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg4" onclick="cargaOCEliminar({{id}}, '{{folio}}' , '{{nomProoveedor}}')">
                                                     <a style="color: white;">
                                                     <i class="fa fa-trash">
                                                     </i>
                                                     </a>
-                                         </button>
+                                                </button>
                                             <div class="modal fade bs-example-modal-lg4" id="verDetalle" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                                         <div class="modal-dialog modal-lg" role="document">
                                                             <div class="modal-content">

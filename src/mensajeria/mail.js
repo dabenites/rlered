@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 
+
 const {google} = require("googleapis");
 
 const CLIENTD_ID = "1096192584894-n9encon9n4e7ik1gf00jhibc0ita3pqs.apps.googleusercontent.com";
@@ -451,9 +452,6 @@ module.exports.EnvioMailIngresoPloter =  async function (objeto) {
         oAuthClient.setCredentials({refresh_token:REFRESH_TOKEN});
   
         const accessToken = await oAuthClient.getAccessToken();
-
-        console.log(accessToken);
-
         const transporter = nodemailer.createTransport({
                           service : "gmail",
                           auth : {
@@ -465,10 +463,7 @@ module.exports.EnvioMailIngresoPloter =  async function (objeto) {
                               accessToken : accessToken,
                           },
                       });
-                      
-        console.log(transporter);
-
-
+  
          const generico = "Estimado/a:\n" +
                           " \t Solicitud de ploteo en el proyecto :  "+ objeto.proyecto +", ingresado por "+ objeto.solicitante+" \n" +
                           " Destinatario  : "+objeto.destinario +" \n"+
@@ -498,7 +493,7 @@ module.exports.EnvioMailIngresoPloter =  async function (objeto) {
   
          const result = await transporter.sendMail(mailOptions);
   
-         console.log(result);
+        
   }
 
 module.exports.EnvioMailSolicitudCostoExterno =  async function (objeto) {

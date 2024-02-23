@@ -492,8 +492,18 @@ module.exports.EnvioMailIngresoPloter =  async function (objeto) {
              subject : "RLE - Planner - Solicitud Ploteo.",
              text : generico
          };
+
+         const result = await   transporter.sendMail(
+            mailOptions
+            , (err, info) => {
+                if (err) {
+                    console.error('Error al enviar el correo electrónico:', err);
+                } else {
+                    console.log('Correo electrónico enviado:', info);
+                }
+            });
   
-         const result = await transporter.sendMail(mailOptions);
+        
   
 
   }

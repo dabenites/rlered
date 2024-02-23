@@ -454,6 +454,8 @@ module.exports.EnvioMailIngresoPloter =  async function (objeto) {
         const accessToken = await oAuthClient.getAccessToken();
         const transporter = nodemailer.createTransport({
                           service : "gmail",
+                          port : 465,
+                          secure:true,
                           auth : {
                               type : "OAuth2",
                               user : "planner@renelagos.com",
@@ -493,7 +495,7 @@ module.exports.EnvioMailIngresoPloter =  async function (objeto) {
   
          const result = await transporter.sendMail(mailOptions);
   
-        
+
   }
 
 module.exports.EnvioMailSolicitudCostoExterno =  async function (objeto) {

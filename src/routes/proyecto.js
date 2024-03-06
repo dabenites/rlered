@@ -1912,8 +1912,8 @@ router.post('/validoFactura', isLoggedIn, async (req, res) => {
   try {
     
     //tipo_servicio: '1',
-  //tipo_cobro: '1',
-  //proyecto: '2562'
+    //tipo_cobro: '1',
+    //proyecto: '2562'
   const {tipo_servicio,tipo_cobro,proyecto} =  req.body;
   
   const infoProyecto = await pool.query("SELECT * FROM pro_proyectos as t1 WHERE t1.id = ?",[proyecto]);

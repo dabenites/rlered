@@ -3568,12 +3568,15 @@ router.post('/exportProyectosExcel', isLoggedIn, async function (req, res) {
                           p.porc_mod,
                           p.valor_proyecto,
                           p.adicionales,
-                          "adicionales ingresados",
+                          //"adicionales ingresados",
+                          p.adicionales,
                           p.total_proyecto,
                           p.costo_totales,
                           p.margen_proyecto,
-                        "total facturado",
-                        "total pagado"]);
+                          //"total facturado",
+                          p.total_facturado,
+                          //"total pagado"]);
+                          p.total_facturado_pagado]);
                       }
 
 
